@@ -9,11 +9,8 @@ import { HomeDesigners } from '../components/home/home-designers';
 import { HomeFeatures } from '../components/home/home-features';
 import { HomeTestimonials } from '../components/home/home-testimonials';
 import { gtm } from '../lib/gtm';
-<<<<<<< HEAD
 import Login from './authentication/login';
 import { color } from '@mui/system';
-=======
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 
 const Home = () => {
   useEffect(() => {
@@ -22,7 +19,6 @@ const Home = () => {
 
   return (
     <>
-<<<<<<< HEAD
       {/* <Head>
         <title>
           Material Kit Pro
@@ -30,40 +26,15 @@ const Home = () => {
       </Head> */}
       <main>
         <Login sx={{color:'secondary'}}/>
-=======
-      <Head>
-        <title>
-          Material Kit Pro
-        </title>
-      </Head>
-      <main>
-        <HomeHero />
-        <Divider />
-        <HomeDevelopers />
-        <Divider />
-        <HomeDesigners />
-        <HomeTestimonials />
-        <HomeFeatures />
-        <Divider />
-        <HomeClients />
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
       </main>
     </>
   );
 };
 
-<<<<<<< HEAD
 // Home.getLayout = (page) => (
 //   <MainLayout>
 //     {page}
 //   </MainLayout>
 // );
-=======
-Home.getLayout = (page) => (
-  <MainLayout>
-    {page}
-  </MainLayout>
-);
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 
 export default Home;

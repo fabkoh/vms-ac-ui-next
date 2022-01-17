@@ -66,11 +66,7 @@ const App = (props) => {
                       <SettingsButton />
                       <AuthConsumer>
                         {(auth) => !auth.isInitialized
-<<<<<<< HEAD
                           ? <SplashScreen sx ={{height:50, width:50}}/>
-=======
-                          ? <SplashScreen />
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
                           : getLayout(
                             <Component {...pageProps} />
                           )}

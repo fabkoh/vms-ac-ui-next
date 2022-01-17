@@ -3,11 +3,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
-<<<<<<< HEAD
-import { Box, Button, Chip, Divider, Drawer, SvgIcon, Typography, useMediaQuery } from '@mui/material';
-=======
 import { Box, Button, Chip, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 import { Calendar as CalendarIcon } from '../../icons/calendar';
 import { Cash as CashIcon } from '../../icons/cash';
 import { ChartBar as ChartBarIcon } from '../../icons/chart-bar';
@@ -34,13 +30,6 @@ import { Logo } from '../logo';
 import { Scrollbar } from '../scrollbar';
 import { DashboardSidebarSection } from './dashboard-sidebar-section';
 import { OrganizationPopover } from './organization-popover';
-<<<<<<< HEAD
-import Image from 'next/image'
-import etlasname from '../../components/etlas_logo_name.png'
-import { Etlasglobesvg } from '../etlas_globe';
-import { UserAdd } from '../../icons/user-add';
-=======
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 
 const getSections = (t) => [
   {
@@ -88,48 +77,6 @@ const getSections = (t) => [
     ]
   },
   {
-<<<<<<< HEAD
-    title: t('People'),
-    items: [
-      {
-        title: t('Organization'),
-        path: '/authentication',
-        icon: <LockClosedIcon fontSize="small" />,
-        children: [
-          {
-            title: t('Register'),
-            path: '/authentication/register?disableGuard=true'
-          },
-          {
-            title: t('Login'),
-            path: '/authentication/login?disableGuard=true'
-          }
-        ]
-      },
-      {
-        title: t('Persons'),
-        path: '/error',
-        icon: <UsersIcon fontSize="small" />,
-        children: [
-          {
-            title: 'List',
-            path: '/persons'
-          },
-          {
-            title: '404',
-            path: '/404'
-          },
-          {
-            title: '500',
-            path: '/500'
-          }
-        ]
-      }
-    ]
-  },
-  {
-=======
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
     title: t('Management'),
     items: [
       {
@@ -334,12 +281,7 @@ const getSections = (t) => [
         ]
       }
     ]
-<<<<<<< HEAD
-  },
-
-=======
   }
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 ];
 
 export const DashboardSidebar = (props) => {
@@ -407,14 +349,8 @@ export const DashboardSidebar = (props) => {
                   />
                 </a>
               </NextLink>
-<<<<<<< HEAD
-                <Image src={etlasname}/>
-            </Box>
-            {/* <Box sx={{ px: 2 }}>
-=======
             </Box>
             <Box sx={{ px: 2 }}>
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
               <Box
                 onClick={handleOpenOrganizationsPopover}
                 ref={organizationsRef}
@@ -453,11 +389,7 @@ export const DashboardSidebar = (props) => {
                   }}
                 />
               </Box>
-<<<<<<< HEAD
-            </Box> */}
-=======
             </Box>
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
           </div>
           <Divider
             sx={{
