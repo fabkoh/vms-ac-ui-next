@@ -45,7 +45,11 @@ const Login = () => {
           minHeight: '100vh'
         }}
       >
+<<<<<<< HEAD
         {/* <AuthBanner /> */}
+=======
+        <AuthBanner />
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
         <Container
           maxWidth="sm"
           sx={{
@@ -78,7 +82,11 @@ const Login = () => {
               }
             }}
           >
+<<<<<<< HEAD
             {/* <Typography
+=======
+            <Typography
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
               color="textSecondary"
               variant="caption"
             >
@@ -87,7 +95,11 @@ const Login = () => {
             <img
               alt="Auth platform"
               src={platformIcons[platform]}
+<<<<<<< HEAD
             /> */}
+=======
+            />
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
           </Box>
           <Card
             elevation={16}
@@ -108,8 +120,13 @@ const Login = () => {
                 <a>
                   <Logo
                     sx={{
+<<<<<<< HEAD
                       height: 50,
                       width: 50
+=======
+                      height: 40,
+                      width: 40
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
                     }}
                   />
                 </a>
@@ -118,7 +135,11 @@ const Login = () => {
                 Log in
               </Typography>
               <Typography
+<<<<<<< HEAD
                 color="textPrimary"
+=======
+                color="textSecondary"
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
                 sx={{ mt: 2 }}
                 variant="body2"
               >

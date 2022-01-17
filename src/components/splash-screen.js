@@ -1,10 +1,13 @@
 import { Box } from '@mui/material';
 import { Logo } from './logo';
 import { keyframes } from '@emotion/react';
+<<<<<<< HEAD
 // import etlasname from '../components/etlas_logo_name.png'
 // import Image from 'next/image'
 
 
+=======
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 
 const bounce1 = keyframes`
   0% {
@@ -59,6 +62,9 @@ export const SplashScreen = () => (
         }
       }}
     />
+<<<<<<< HEAD
     {/* <Image src={etlasname}/> */}
+=======
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
   </Box>
 );

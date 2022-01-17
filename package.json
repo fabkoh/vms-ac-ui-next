@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "vms-ac-ui-next",
   "private": true,
   "scripts": {
@@ -6,6 +7,32 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
+=======
+  "name": "@devias/material-kit-pro-react",
+  "version": "5.0.2",
+  "author": "Devias",
+  "private": true,
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "build-export": "next build && next export",
+    "lint": "next lint",
+    "lint-fix": "next lint --fix"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.13.6",
@@ -36,7 +63,10 @@
     "gray-matter": "^4.0.3",
     "i18next": "^19.8.7",
     "lodash.debounce": "^4.0.8",
+<<<<<<< HEAD
     "material-ui-image": "^3.3.2",
+=======
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
     "next": "12.0.3-canary.7",
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
@@ -64,7 +94,14 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "eslint": "8.6.0",
     "eslint-config-next": "12.0.8"
+=======
+    "@svgr/webpack": "^5.5.0",
+    "eslint": "^7.32.0",
+    "eslint-config-next": "12.0.3-canary.7",
+    "next-transpile-modules": "^9.0.0"
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
   }
 }

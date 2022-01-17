@@ -20,16 +20,28 @@ const background = {
 const divider = '#E6E8F0';
 
 const primary = {
+<<<<<<< HEAD
   main: '#3E5879',
   light: '#7CA8EB',
   dark: '#1E2A39',
+=======
+  main: '#5048E5',
+  light: '#828DF8',
+  dark: '#3832A0',
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
   contrastText: '#FFFFFF'
 };
 
 const secondary = {
+<<<<<<< HEAD
   main: '#A1C8B8',
   light: '#A9F0D2',
   dark: '#669983',
+=======
+  main: '#10B981',
+  light: '#3FC79A',
+  dark: '#0B815A',
+>>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
   contrastText: '#FFFFFF'
 };
 
