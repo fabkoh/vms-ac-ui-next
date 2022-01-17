@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-module.exports = {
-  reactStrictMode: true,
-}
-=======
 // Remove this if you're not using Fullcalendar features
 const withTM = require('next-transpile-modules')([
   '@fullcalendar/common',
@@ -40,4 +35,3 @@ module.exports = withTM({
     ];
   }
 });
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8

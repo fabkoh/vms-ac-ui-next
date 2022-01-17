@@ -1,7 +1,4 @@
 {
-<<<<<<< HEAD
-  "extends": "next/core-web-vitals"
-=======
   "extends": "next/core-web-vitals",
   "rules": {
     "@next/next/no-img-element": "off",
@@ -14,5 +11,4 @@
       }
     ]
   }
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
 }
