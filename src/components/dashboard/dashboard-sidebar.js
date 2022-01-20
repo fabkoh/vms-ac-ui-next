@@ -88,7 +88,7 @@ const getSections = (t) => [
         children: [
           {
             title: t('List'),
-            path: '/dashboard/people'
+            path: '/dashboard/persons'
           },
           {
             title: t('Add'),
