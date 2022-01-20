@@ -8,6 +8,6 @@
  cd /home/koh_fabian/runNextTmp
  sudo pkill "npm run start"
  sudo pkill node
- nohup npm run start &> next.out &
+ sudo nohup npm run start &> next.out &
  exit      
 EOF
