@@ -30,6 +30,8 @@ import { Logo } from '../logo';
 import { Scrollbar } from '../scrollbar';
 import { DashboardSidebarSection } from './dashboard-sidebar-section';
 import { OrganizationPopover } from './organization-popover';
+import etlasname from '../etlas_logo_name.png';
+import Image from 'next/image'
 
 const getSections = (t) => [
   {
@@ -74,6 +76,41 @@ const getSections = (t) => [
         path: '/dashboard/account',
         icon: <UserCircleIcon fontSize="small" />
       }
+    ]
+  },
+  {
+    title: t('People'),
+    items: [
+      {
+        title: t('Persons'),
+        path: '/dashboard/social',
+        icon: <UsersIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/people'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/social/feed'
+          }
+        ]
+      },
+      {
+        title: t('Organizations'),
+        path: '/dashboard/jobs',
+        icon: <OfficeBuildingIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/jobs'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/jobs/companies/1'
+          }
+        ]
+      },
     ]
   },
   {
@@ -343,14 +380,15 @@ export const DashboardSidebar = (props) => {
                 <a>
                   <Logo
                     sx={{
-                      height: 42,
-                      width: 42
+                      height: 40,
+                      width: 40
                     }}
                   />
                 </a>
               </NextLink>
+                <Image src ={etlasname}/>
             </Box>
-            <Box sx={{ px: 2 }}>
+            {/* <Box sx={{ px: 2 }}>
               <Box
                 onClick={handleOpenOrganizationsPopover}
                 ref={organizationsRef}
@@ -389,7 +427,7 @@ export const DashboardSidebar = (props) => {
                   }}
                 />
               </Box>
-            </Box>
+            </Box> */}
           </div>
           <Divider
             sx={{
@@ -461,7 +499,7 @@ export const DashboardSidebar = (props) => {
         open
         PaperProps={{
           sx: {
-            backgroundColor: 'neutral.900',
+            backgroundColor: 'primary.dark',
             borderRightColor: 'divider',
             borderRightStyle: 'solid',
             borderRightWidth: (theme) => theme.palette.mode === 'dark' ? 1 : 0,
@@ -483,7 +521,7 @@ export const DashboardSidebar = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.900',
+          backgroundColor: 'primary.dark',
           color: '#FFFFFF',
           width: 280
         }

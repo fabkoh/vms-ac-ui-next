@@ -8,7 +8,6 @@
 # testing
 /coverage
 
-<<<<<<< HEAD
 # next.js
 /.next/
 /out/
@@ -33,22 +32,3 @@ yarn-error.log*
 
 # vercel
 .vercel
-=======
-# production
-/build
-out
-.next
-
-# misc
-.DS_Store
-.eslintcache
-/.env
-/.env.local
-/.env.development.local
-/.env.test.local
-/.env.production.local
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
