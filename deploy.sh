@@ -1,6 +1,7 @@
 -#!/bin/sh
  sudo pkill "npm run start"
  sudo pkill node
+ sudo npm install next@canary
  sudo npm ci
  sudo npm run build
  sudo rm -rf /home/koh_fabian/runNextTmp/.next
