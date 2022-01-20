@@ -45,11 +45,7 @@ const Register = () => {
           minHeight: '100vh'
         }}
       >
-<<<<<<< HEAD
-        {/* <AuthBanner /> */}
-=======
         <AuthBanner />
->>>>>>> dd8547503fc1799293d50ec94a844f4fe45a96e8
         <Container
           maxWidth="sm"
           sx={{
