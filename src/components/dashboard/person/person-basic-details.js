@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
-import { Button, Card, CardActions, CardHeader, Divider, useMediaQuery } from '@mui/material';
+import { Card, CardHeader, Divider, useMediaQuery } from '@mui/material';
 import { PropertyList } from '../../property-list';
 import { PropertyListItem } from '../../property-list-item';
+import { SeverityPill } from '../../severity-pill';
+import WarningIcon from '@mui/icons-material/Warning';
 
 export const PersonBasicDetails = (props) => {
   const { firstName, lastName, uid, mobileNumber, email, ...other } = props;
@@ -37,12 +39,28 @@ export const PersonBasicDetails = (props) => {
           divider
           label="Mobile Number"
           value={mobileNumber}
-        />
+          children={!mobileNumber && (
+            <SeverityPill
+              color='warning'
+            >
+              <WarningIcon fontSize="small" />
+              No mobile number
+            </SeverityPill>
+          )}
+        />                   
         <PropertyListItem
           align={align}
           divider
           label="Email"
           value={email}
+          children={!email && (
+            <SeverityPill
+              color='warning'
+            >
+              <WarningIcon fontSize="small" />
+              No email
+            </SeverityPill>
+          )}
         />
       </PropertyList>
     </Card>

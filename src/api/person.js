@@ -1,5 +1,7 @@
+import { apiHelper } from './helper'
+
 class PersonApi {
-    getPersons() {
+    fakePersons() {
         return [
             {
                 "personId": 1,
@@ -20,10 +22,30 @@ class PersonApi {
         ]
     }
 
+    getPersons(id) {
+        return Promise.resolve(this.fakePersons());
+    }
+
+    async getPersons() {
+        try {
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + '/api/persons');
+        } catch(err) {
+            console.err(err);
+        }
+    }
+    
     getFakePerson(id) {
         return Promise.resolve(
-            this.getPersons().find((p => p.personId == id))
+            this.fakePersons().find((p => p.personId == id))
         )
+    }
+
+    async getPerson(id) {
+        try {
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + `/api/person/${id}`);
+        } catch(err) {
+            console.error(err);
+        }
     }
 }
 

@@ -26,9 +26,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';;
 
 const PersonDetails = () => {
+
+  // load person details
   const isMounted = useMounted();
   const [person, setPerson] = useState(null);  
-
   const router = useRouter();
   const { personId } = router.query;
 
@@ -38,8 +39,8 @@ const PersonDetails = () => {
 
   const getPerson = useCallback(async () => {
     try {
+      // const data = await personApi.getPerson(personId);
       const data = await personApi.getFakePerson(personId);
-
       if(isMounted()) {
         setPerson(data);
       }
@@ -57,6 +58,9 @@ const PersonDetails = () => {
   const open = Boolean(anchorEl);
   const handleClick = (e) => { setAnchorEl(e.currentTarget); }
   const handleClose = () => { setAnchorEl(null); }
+
+  // link to edit page
+  const editLink = "/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
 
   if (!person) {
     return null;
@@ -138,17 +142,27 @@ const PersonDetails = () => {
             open={open}
             onClose={handleClose}
           >
-            <MenuItem disableRipple>
-              <AddIcon />
-              Create new person
-            </MenuItem>
-            <MenuItem disableRipple>
-              <EditIcon />
-              Edit person
-            </MenuItem>
+            <NextLink
+              href="/persons/create"
+              passHref
+            >
+              <MenuItem disableRipple>
+                <AddIcon />
+                Create new person
+              </MenuItem>
+            </NextLink>
+            <NextLink
+              href={editLink}
+              passHref
+            >
+              <MenuItem disableRipple>
+                <EditIcon />
+                Edit person
+              </MenuItem>
+            </NextLink>           
             <MenuItem disableRipple>
               <DeleteIcon />
-              Delete person
+              Delete person 
             </MenuItem>
           </StyledMenu>
 			  </Grid>
