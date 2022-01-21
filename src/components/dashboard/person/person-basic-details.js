@@ -5,6 +5,8 @@ import { PropertyListItem } from '../../property-list-item';
 import { SeverityPill } from '../../severity-pill';
 import WarningIcon from '@mui/icons-material/Warning';
 
+/* eslint react/no-children-prop: 0 */
+
 export const PersonBasicDetails = (props) => {
   const { firstName, lastName, uid, mobileNumber, email, ...other } = props;
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
