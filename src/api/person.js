@@ -30,7 +30,7 @@ class PersonApi {
         try {
             return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + '/api/persons');
         } catch(err) {
-            console.err(err);
+            console.error(err);
         }
     }
     
