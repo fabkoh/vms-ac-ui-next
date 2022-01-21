@@ -39,8 +39,8 @@ const PersonDetails = () => {
 
   const getPerson = useCallback(async () => {
     try {
-      // const data = await personApi.getPerson(personId);
-      const data = await personApi.getFakePerson(personId);
+      const data = await personApi.getPerson(personId);
+      // const data = await personApi.getFakePerson(personId);
       if(isMounted()) {
         setPerson(data);
       }
@@ -51,7 +51,9 @@ const PersonDetails = () => {
 
   useEffect(() => {
     getPerson();
-  }, []);
+  }, 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
 
   // action menu open / close
   const [anchorEl, setAnchorEl] = useState(null);
@@ -60,7 +62,7 @@ const PersonDetails = () => {
   const handleClose = () => { setAnchorEl(null); }
 
   // link to edit page
-  const editLink = "/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
+  const editLink = "/dashboard/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
 
   if (!person) {
     return null;
@@ -143,7 +145,7 @@ const PersonDetails = () => {
             onClose={handleClose}
           >
             <NextLink
-              href="/persons/create"
+              href="/dashboard/persons/create"
               passHref
             >
               <MenuItem disableRipple>
@@ -168,7 +170,6 @@ const PersonDetails = () => {
 			  </Grid>
 			</Grid>
 		  </div>
-		  <Divider />
 		  <Box sx={{ mt: 3 }}>
         <Grid
           container
