@@ -39,8 +39,8 @@ const PersonDetails = () => {
 
   const getPerson = useCallback(async () => {
     try {
-      // const data = await personApi.getPerson(personId);
-      const data = await personApi.getFakePerson(personId);
+      const data = await personApi.getPerson(personId);
+      // const data = await personApi.getFakePerson(personId);
       if(isMounted()) {
         setPerson(data);
       }
