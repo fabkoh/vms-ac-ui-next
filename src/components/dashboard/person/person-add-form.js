@@ -35,7 +35,6 @@ export const PersonAddForm = (props) => {
 	const { 
     person, 
     removePerson, 
-    onFieldChange, 
     onNameChange,
     onNumberChange,
     onEmailChange,
@@ -55,7 +54,8 @@ export const PersonAddForm = (props) => {
          person.valid.uidNotRepeated &&
          person.valid.uidNotInUse &&
          person.valid.mobileNumber &&
-         person.valid.email) ||
+         person.valid.email &&
+         person.valid.submitOk) ||
         errorStyle.root
       }
     >

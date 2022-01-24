@@ -15,6 +15,7 @@ import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
 import { PersonAddForm } from '../../../components/dashboard/person/person-add-form';
 import { personApi } from '../../../api/person';
+import toast from 'react-hot-toast';
 
 const CreatePersons = () => {
 
@@ -31,7 +32,8 @@ const CreatePersons = () => {
       uidNotRepeated: true,
       uidNotInUse: true,
       mobileNumber: true,
-      email: true
+      email: true,
+      submitOk: true
     }
   });
 
@@ -120,23 +122,40 @@ const CreatePersons = () => {
     }
 
     // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
-    
+    // newPersonInfo.valid.uidNotInUse = true;
+    // if(!(/^\s*$/.test(newPersonInfo.uid))) {
+    //   newPersonInfo.valid.uidNotInUse = !(await personApi.uidExists(newPersonInfo.uid));
+    // }
 
-    setPersonsInfo(newPersonsInfo);
-  }
-
-  const onFieldChange = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ]
-    const currPersonInfo = newPersonsInfo.find(person => person.id == id);
-    currPersonInfo[e.target.name] = e.target.value;
     setPersonsInfo(newPersonsInfo);
   }
 
   const [submitted, setSubmitted] = useState(false);
 
-  const submitForm = (e) => {
+  const submitForm = e => {
     e.preventDefault();
-    console.log(personsInfo);
+
+    setSubmitted(true);
+    Promise.all(personsInfo.map(person => {
+      person.valid.submitOk = true;
+      return personApi.createPerson(person)
+    })).then(values => {
+      let allSuccess = true;
+
+      values.forEach((res, i) => {
+        if (res.status != 201) {
+          allSuccess = false;
+          personsInfo[i].valid.submitOk = false;
+        }
+      })
+      
+      if(allSuccess) {
+        toast.success('Persons created')
+      } else {
+        toast.error('Error creating the highlighted persons')
+        setSubmitted(false);
+      }
+    })
   }
 
   return (

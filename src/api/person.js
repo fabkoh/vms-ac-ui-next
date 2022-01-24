@@ -54,9 +54,32 @@ class PersonApi {
 
     async uidExists(uid) {
         try {
-            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URL + `/api/person/${uid}`);
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + `/api/person/uid/${uid}`);
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async createPerson(person) {
+        const personDto = {
+            personFirstName: person.firstName,
+            personLastName: person.lastName,
+            personUid: person.uid,
+            personMobileNumber: person.mobileNumber,
+            personEmail: person.email
+        }
+
+        try{
+            const res = fetch(process.env.NEXT_PUBLIC_URI + '/api/person', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(personDto)
+            });
+            return res;
+        } catch (err) {
+            console.log(err)
         }
     }
 }
