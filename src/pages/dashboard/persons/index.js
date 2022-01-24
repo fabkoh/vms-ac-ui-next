@@ -16,7 +16,7 @@ import {
 import { customerApi } from '../../../__fake-api__/customer-api';
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { CustomerListTable } from '../../../components/dashboard/customer/customer-list-table';
+import { PersonsListTable } from '../../../components/dashboard/persons/persons-list-table';
 import { useMounted } from '../../../hooks/use-mounted';
 import { Download as DownloadIcon } from '../../../icons/download';
 import { Plus as PlusIcon } from '../../../icons/plus';
@@ -65,7 +65,7 @@ const sortOptions = [
 const applyFilters = (customers, filters) => customers.filter((customer) => {
   if (filters.query) {
     let queryMatched = false;
-    const properties = ['email', 'name'];
+    const properties = ['personEmail', 'name'];
 
     properties.forEach((property) => {
       if (customer[property].toLowerCase().includes(filters.query.toLowerCase())) {
@@ -151,8 +151,8 @@ const CustomerList = () => {
 
   const getCustomers = useCallback(async () => {
     try {
-      const data = await customerApi.getCustomers();
-
+      const response = await fetch("http://localhost:8082/api/persons")
+      const data = await response.json()
       if (isMounted()) {
         setCustomers(data);
       }
@@ -332,7 +332,7 @@ const CustomerList = () => {
                 ))}
               </TextField>
             </Box>
-            <CustomerListTable
+            <PersonsListTable
               customers={paginatedCustomers}
               customersCount={filteredCustomers.length}
               onPageChange={handlePageChange}
