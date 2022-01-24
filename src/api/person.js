@@ -30,7 +30,7 @@ class PersonApi {
         try {
             return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + '/api/persons');
         } catch(err) {
-            console.err(err);
+            console.error(err);
         }
     }
     
@@ -45,6 +45,18 @@ class PersonApi {
             return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + `/api/person/${id}`);
         } catch(err) {
             console.error(err);
+        }
+    }
+
+    fakeUidExists(uid) {
+        return Promise.resolve(this.fakePersons().some(person => person.personUid == uid))
+    }
+
+    async uidExists(uid) {
+        try {
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URL + `/api/person/${uid}`);
+        } catch (err) {
+            console.log(err);
         }
     }
 }
