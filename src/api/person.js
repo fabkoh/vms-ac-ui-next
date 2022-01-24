@@ -47,6 +47,18 @@ class PersonApi {
             console.error(err);
         }
     }
+
+    fakeUidExists(uid) {
+        return Promise.resolve(this.fakePersons().some(person => person.personUid == uid))
+    }
+
+    async uidExists(uid) {
+        try {
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URL + `/api/person/${uid}`);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 }
 
 export const personApi = new PersonApi();
