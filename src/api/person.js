@@ -59,6 +59,26 @@ class PersonApi {
             console.log(err);
         }
     }
+    
+
+    async uidInUse(uid,id) {
+        try {
+            return await apiHelper.getJsonPromise(process.env.NEXT_PUBLIC_URI + `/api/person/uid/${id}/${uid}`)
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async deletePerson(id) {
+        try {
+            const res = fetch(process.env.NEXT_PUBLIC_URI + `/api/person/${id}`,{
+                method: 'DELETE'
+            });
+            return res;
+        } catch(err) {
+            console.error(err);
+        }
+    }
 
     async createPerson(person) {
         const personDto = {
@@ -72,6 +92,29 @@ class PersonApi {
         try{
             const res = fetch(process.env.NEXT_PUBLIC_URI + '/api/person', {
                 method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(personDto)
+            });
+            return res;
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    async updatePerson(person) {
+        const personDto = {
+            personId: person.id,
+            personFirstName: person.firstName,
+            personLastName: person.lastName,
+            personUid: person.uid,
+            personMobileNumber: person.mobileNumber,
+            personEmail: person.email
+        }
+
+        try{
+            const res = fetch(process.env.NEXT_PUBLIC_URI + '/api/person', {
+                method: 'PUT',
                 headers: {
                     'Content-type': 'application/json'
                 },

@@ -12,14 +12,14 @@ import {
   Typography
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AuthGuard } from '../../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
-import { useMounted } from '../../../../hooks/use-mounted';
-import { ChevronDown as ChevronDownIcon } from '../../../../icons/chevron-down';
-import { gtm } from '../../../../lib/gtm';
-import { personApi } from '../../../../api/person';
-import { PersonBasicDetails } from '../../../../components/dashboard/person/person-basic-details';
-import StyledMenu from '../../../../components/dashboard/styled-menu';
+import { AuthGuard } from '../../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../../components/dashboard/dashboard-layout';
+import { useMounted } from '../../../../../hooks/use-mounted';
+import { ChevronDown as ChevronDownIcon } from '../../../../../icons/chevron-down';
+import { gtm } from '../../../../../lib/gtm';
+import { personApi } from '../../../../../api/person';
+import { PersonBasicDetails } from '../../../../../components/dashboard/person/person-basic-details';
+import StyledMenu from '../../../../../components/dashboard/styled-menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

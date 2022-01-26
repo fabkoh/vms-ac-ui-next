@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router'
 import {
   Box,
   Container,
@@ -11,34 +12,49 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AuthGuard } from '../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { PersonAddForm } from '../../../components/dashboard/person/person-add-form';
-import { personApi } from '../../../api/person';
+import { AuthGuard } from '../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
+import { PersonEditForm } from '../../../../components/dashboard/person/person-edit-form';
+import { personApi } from '../../../../api/person';
 import toast from 'react-hot-toast';
-import router from 'next/router';
 
-const CreatePersons = () => {
+const EditPersons = () => {
 
-  const personInfo = (id) => ({
-    id,
-    firstName: '',
-    lastName: '',
-    uid: '',
-    mobileNumber: '',
-    email: '',
-    valid: {
-      firstName: true,
-      lastName: true,
-      uidNotRepeated: true,
-      uidNotInUse: true,
-      mobileNumber: true,
-      email: true,
-      submitOk: true
-    }
-  });
+  const router = useRouter();
+  const ids = JSON.parse(decodeURIComponent(router.query.ids));
+  const [personsInfo, setPersonsInfo] = useState([])
 
-  const [personsInfo, setPersonsInfo] = useState([personInfo(0)])
+  const getPersons = ids => {
+	Promise.all(ids.map(id => personApi.getPerson(id)))
+	.then(personDetails => {
+		setPersonsInfo(personDetails.filter(person => person.personFirstName)
+			.map(person => {
+				return {
+					id: person.personId,
+					firstName: person.personFirstName,
+					lastName: person.personLastName,
+					uid: person.personUid,
+					mobileNumber: person.personMobileNumber,
+					email: person.personEmail,
+					valid: {
+					  firstName: true,
+					  lastName: true,
+					  uidNotRepeated: true,
+					  uidNotInUse: true,
+					  mobileNumber: true,
+					  email: true,
+					  submitOk: true
+					}
+				}
+			}))
+	})
+	.catch(err => console.log(err))
+  }
+
+  useEffect(() => {
+	  getPersons(ids);
+  }, [])
+  
 
   const getNextId = () => {
     if(personsInfo.length == 0){
@@ -112,6 +128,7 @@ const CreatePersons = () => {
         continue;  
       }
 
+
       const uid = newPersonsInfo[i].uid
       if(uid in uidMap) {
         newPersonsInfo[i].valid.uidNotRepeated = false;
@@ -122,10 +139,10 @@ const CreatePersons = () => {
       }
     }
 
-    newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     newPersonInfo.valid.uidNotInUse = true;
+    // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !(await personApi.uidExists(newPersonInfo.uid));
+      newPersonInfo.valid.uidNotInUse = !(await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id));
     }
 
     setPersonsInfo(newPersonsInfo);
@@ -139,22 +156,22 @@ const CreatePersons = () => {
     setSubmitted(true);
     Promise.all(personsInfo.map(person => {
       person.valid.submitOk = true;
-      return personApi.createPerson(person)
+      return personApi.updatePerson(person)
     })).then(values => {
       let allSuccess = true;
 
       values.forEach((res, i) => {
-        if (res.status != 201) {
+        if (res.status != 200) {
           allSuccess = false;
           personsInfo[i].valid.submitOk = false;
         }
       })
       
       if(allSuccess) {
-        toast.success('Persons created')
-        router.replace('/dashboard/persons')
+        toast.success('Persons updated')
+        router.replace('/dashboard/persons');
       } else {
-        toast.error('Error creating the highlighted persons')
+        toast.error('Error updating the highlighted persons')
         setSubmitted(false);
       }
     })
@@ -201,13 +218,13 @@ const CreatePersons = () => {
           <Stack spacing={3}>
             <div>
               <Typography variant="h3">
-                Add Persons
+                Edit Persons
               </Typography>
             </div>
             <form onSubmit={submitForm}>
               <Stack spacing={3}>
                 {personsInfo.map(person => (
-                  <PersonAddForm
+                  <PersonEditForm
                     person={person}
                     removePerson={removePerson}
                     onUidChange={onUidChange}
@@ -218,17 +235,6 @@ const CreatePersons = () => {
                   />
                 ))}
                 <div>
-                  <Button
-                    size="large"
-                    sx={{ mr: 3 }}
-                    variant="contained"
-                    startIcon={(
-                      <AddIcon />
-                    )}
-                    onClick={addPerson}
-                  >
-                      Add person
-                  </Button>
                 </div>
                 <div>
                   <Button
@@ -270,7 +276,7 @@ const CreatePersons = () => {
   );
 };
 
-CreatePersons.getLayout = (page) => (
+EditPersons.getLayout = (page) => (
   <AuthGuard>
     <DashboardLayout>
       {page}
@@ -278,4 +284,4 @@ CreatePersons.getLayout = (page) => (
   </AuthGuard>
 );
 
-export default CreatePersons;
+export default EditPersons;
