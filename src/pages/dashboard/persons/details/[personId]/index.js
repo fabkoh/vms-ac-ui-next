@@ -26,8 +26,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { Confirmdelete } from '../../../../../components/dashboard/persons/Confirmdelete';
 import toast from 'react-hot-toast';
 
-;
-
 const PersonDetails = () => {
 
   // load person details

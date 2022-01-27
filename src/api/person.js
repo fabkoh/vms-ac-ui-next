@@ -108,7 +108,7 @@ class PersonApi {
     }
 
     deletePerson(id) {
-        if (useApi) { return sendApi(`/api/persons/${id}`); }
+        if (useApi) { return sendApi(`/api/persons/${id}`, { method: 'DELETE' }); }
 
         const index = fakePersons.findIndex(person => person.personId == id);
         if (index == -1) {

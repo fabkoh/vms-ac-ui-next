@@ -40,6 +40,6 @@ const fakePersons = [
     }
 ];
 
-const sendApi = (path) => fetch(apiUri + path);
+const sendApi = (path, init={}) => fetch(apiUri + path, init);
 
 export { useApi, sendApi, fakePersons };
