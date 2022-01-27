@@ -25,7 +25,7 @@ class PersonApi {
             }); 
         }
 
-        newPerson = {
+        const newPerson = {
             personId: Math.max(fakePersons.map(person => person.personId)) + 1,
             personFirstName,
             personLastName,
@@ -48,7 +48,7 @@ class PersonApi {
     getPerson(id) {
         if (useApi) { return sendApi(`/api/person/${id}`); }
 
-        person = fakePersons.find(person => person.personId == id)
+        const person = fakePersons.find(p => p.personId == id)
 
         if (person) { 
             return Promise.resolve(new Response(person, { status: 200 }));
@@ -85,7 +85,7 @@ class PersonApi {
             });
         }
 
-        updatedPerson = {
+        const updatedPerson = {
             personId,
             personFirstName,
             personLastName,
@@ -94,23 +94,23 @@ class PersonApi {
             personEmail
         };
 
-        index = fakePersons.findIndex(person => person.personId == personId);
+        const index = fakePersons.findIndex(person => person.personId == personId);
 
         if (index == -1) {
             return Promise.resolve(new Response(
-                {personId: `Person with Id ${personId} does not exist`},
+                { personId: `Person with Id ${personId} does not exist` },
                 { status: 404 }
             ));
         }
 
-        fakePersons[index] = updatePerson
+        fakePersons[index] = updatedPerson
         return Promise.resolve(new Response(updatedPerson, { status: 200 }));
     }
 
     deletePerson(id) {
         if (useApi) { return sendApi(`/api/persons/${id}`); }
 
-        index = fakePersons.findIndex(person => person.personId == id);
+        const index = fakePersons.findIndex(person => person.personId == id);
         if (index == -1) {
             return Promise.resolve(new Response(
                 { "personId": `Person with Id ${id} does not exist` },
@@ -125,12 +125,9 @@ class PersonApi {
 
     uidExists(uid) {
         if (useApi) { return sendApi(`/api/persons/${uid}`); }
-        
-        if (fakePersons.find(person => person.personUid == uid)) {
-            return Promise.resolve(new Response(true, { status: 200 }));
-        }
 
-        return Promise.resolve(new Response(false, { status: 200 }));
+        return Promise.resolve(new Response(
+            fakePersons.some(person => person.personUid == uid), { status: 200 }));
     }
 
     uidInUse(uid, id) {
