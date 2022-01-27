@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Logo } from './logo';
 import { keyframes } from '@emotion/react';
 // import etlasname from '../components/etlas_logo_name.png'
@@ -59,6 +59,11 @@ export const SplashScreen = () => (
         }
       }}
     />
+    <h1>
+      <Typography fontSize={10} color={'whitesmoke'}>
+         Loading ...
+      </Typography>
+    </h1>
     {/* <Image src={etlasname}/> */}
   </Box>
 );

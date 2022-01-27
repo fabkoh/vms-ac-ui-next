@@ -92,7 +92,7 @@ const getSections = (t) => [
           },
           {
             title: t('Add'),
-            path: '/dashboard/social/feed'
+            path: '/dashboard/persons/create'
           }
         ]
       },
