@@ -150,7 +150,7 @@ const applySort = (Persons, sort) => {
 const applyPagination = (Persons, page, rowsPerPage) =>
 	Persons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-const personList = () => {
+const PersonList = () => {
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
 	const [Persons, setPersons] = useState([]);
@@ -344,7 +344,7 @@ const personList = () => {
 							<Grid item>
 								<Button
 									endIcon={<ChevronDownIcon fontSize="small" />}
-									sx={{ m: 1 }}
+									sx={{ m: 2 }}
 									variant="contained"
 									onClick={handleClick}
 								>
@@ -489,10 +489,10 @@ const personList = () => {
 	);
 };
 
-personList.getLayout = (page) => (
+PersonList.getLayout = (page) => (
 	<AuthGuard>
 		<DashboardLayout>{page}</DashboardLayout>
 	</AuthGuard>
 );
 
-export default personList;
+export default PersonList;
