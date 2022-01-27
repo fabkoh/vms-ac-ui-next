@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = false;
+const useApi = true;
 
 // fake persons data
 const fakePersons = [

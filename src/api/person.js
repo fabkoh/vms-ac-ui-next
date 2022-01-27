@@ -36,13 +36,13 @@ class PersonApi {
 
         fakePersons.push(newPerson);
 
-        return Promise.resolve(new Response(newPerson, { status: 201 }));
+        return Promise.resolve(new Response(JSON.stringify(newPerson), { status: 201 }));
     }
 
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        return Promise.resolve(new Response(fakePersons, { status: 200 }));
+        return Promise.resolve(new Response(JSON.stringify(fakePersons), { status: 200 }));
     }
 
     getPerson(id) {
@@ -51,11 +51,11 @@ class PersonApi {
         const person = fakePersons.find(p => p.personId == id)
 
         if (person) { 
-            return Promise.resolve(new Response(person, { status: 200 }));
+            return Promise.resolve(new Response(JSON.stringify(person), { status: 200 }));
         }
 
         return Promise.resolve(new Response(
-            { personId: `Person with Id ${id} does not exist` },
+            JSON.stringify({ personId: `Person with Id ${id} does not exist` }),
             { status: 404 }
             ));
     }
@@ -98,13 +98,13 @@ class PersonApi {
 
         if (index == -1) {
             return Promise.resolve(new Response(
-                { personId: `Person with Id ${personId} does not exist` },
+                JSON.stringify({ personId: `Person with Id ${personId} does not exist` }),
                 { status: 404 }
             ));
         }
 
         fakePersons[index] = updatedPerson
-        return Promise.resolve(new Response(updatedPerson, { status: 200 }));
+        return Promise.resolve(new Response(JSON.stringify(updatedPerson), { status: 200 }));
     }
 
     deletePerson(id) {
@@ -113,28 +113,29 @@ class PersonApi {
         const index = fakePersons.findIndex(person => person.personId == id);
         if (index == -1) {
             return Promise.resolve(new Response(
-                { "personId": `Person with Id ${id} does not exist` },
+                JSON.stringify({ "personId": `Person with Id ${id} does not exist` }),
                 { status: 404 }
             ));
         }
 
         fakePersons.splice(index, 1);
 
-        return Promise.resolve(new Response({}, { status: 204 }));
+        return Promise.resolve(new Response('{}', { status: 204 }));
     }
 
     uidExists(uid) {
         if (useApi) { return sendApi(`/api/persons/${uid}`); }
 
         return Promise.resolve(new Response(
-            fakePersons.some(person => person.personUid == uid), { status: 200 }));
+            JSON.stringify(fakePersons.some(person => person.personUid == uid)),
+            { status: 200 }));
     }
 
     uidInUse(uid, id) {
         if (useApi) { return sendApi(`/api/person/uid/${id}/${uid}`); }
 
         return Promise.resolve(new Response(
-            fakePersons.some(person => person.personUid == uid && person.personId != id),
+            JSON.stringify(fakePersons.some(person => person.personUid == uid && person.personId != id)),
             { status: 200 }
         ));
     }
