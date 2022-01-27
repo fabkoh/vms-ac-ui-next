@@ -29,9 +29,9 @@ import { Buttons2 } from "../../widgets/buttons/buttons-2";
 import { Buttons3 } from "../../widgets/buttons/buttons-3";
 import { Buttonfilter } from "../../widgets/buttons/buttonfilter";
 import { SeverityPill } from "../../severity-pill";
-import WarningIcon from '@mui/icons-material/Warning';
-import { useRouter } from 'next/router'
-
+import WarningIcon from "@mui/icons-material/Warning";
+import { useRouter } from "next/router";
+import { width } from "@mui/system";
 
 export const PersonsListTable = (props) => {
 	const {
@@ -44,8 +44,6 @@ export const PersonsListTable = (props) => {
 		...other
 	} = props;
 	// const [selectedPersons, setSelectedPersons] = useState([]);
-
-
 
 	// // Reset selected Persons when Persons change
 	// useEffect(
@@ -79,12 +77,12 @@ export const PersonsListTable = (props) => {
 	// 	selectedPersons.length > 0 && selectedPersons.length < Persons.length;
 	// const selectedAllPersons = selectedPersons.length === Persons.length;
 
-//   const [selectId, setSelectId] = useState([]);
-// 	const handleSelectId = (event,personId) => {
-//   setSelectId(personId)
-//   }, [selectId]);
-  
-  return (
+	//   const [selectId, setSelectId] = useState([]);
+	// 	const handleSelectId = (event,personId) => {
+	//   setSelectId(personId)
+	//   }, [selectId]);
+
+	return (
 		<div {...other}>
 			<Box
 				sx={{
@@ -109,7 +107,7 @@ export const PersonsListTable = (props) => {
 			<Scrollbar>
 				<Table sx={{ minWidth: 700 }}>
 					<TableHead
-						// sx={{ visibility: props.enableBulkActions ? "collapse" : "visible" }}
+					// sx={{ visibility: props.enableBulkActions ? "collapse" : "visible" }}
 					>
 						<TableRow>
 							<TableCell padding="checkbox">
@@ -124,14 +122,14 @@ export const PersonsListTable = (props) => {
 							<TableCell>email</TableCell>
 							<TableCell>
 								<Buttonfilter
-                //pass org group into array prop. should store somewhere first
-									array={["ORG/DEPT", "Org group1", "Org group2"]}
+									//pass org group into array prop. should store somewhere first
+									array={["ISS", "ORG/DEPT", "GRABFOOD"]}
 									sx={{}}
 								/>
 							</TableCell>
 							<TableCell>
 								<Buttonfilter
-									array={["ACCESS GROUP", "Access group1", "Access group2"]}
+									array={["SIDE GATE", "ACCESS GROUP", "MAIN GATE"]}
 									sx={{}}
 								/>
 							</TableCell>
@@ -140,10 +138,16 @@ export const PersonsListTable = (props) => {
 					</TableHead>
 					<TableBody>
 						{Persons.map((person) => {
-							const isPersonselected = props.selectedPersons.includes(person.personId);
+							const isPersonselected = props.selectedPersons.includes(
+								person.personId
+							);
 
 							return (
-								<TableRow hover key={person.personId} selected={isPersonselected}>
+								<TableRow
+									hover
+									key={person.personId}
+									selected={isPersonselected}
+								>
 									<TableCell padding="checkbox">
 										<Checkbox
 											checked={isPersonselected}
@@ -153,7 +157,7 @@ export const PersonsListTable = (props) => {
 											value={isPersonselected}
 										/>
 									</TableCell>
-									<TableCell>
+									<TableCell width="10%">
 										<Box
 											sx={{
 												m: 1,
@@ -170,37 +174,49 @@ export const PersonsListTable = (props) => {
 											>
 												{getInitials(person.personFirstName)}
 											</Avatar>
-											<Box sx={{ ml: 1 }}>
-												<NextLink href={"/dashboard/persons/details/" + person.personId} passHref>
+											<Box sx={{ ml: 1, width:100}}>
+												<NextLink
+													href={"/dashboard/persons/details/" + person.personId}
+													passHref
+												>
 													<Link color="inherit" variant="subtitle2">
+														<Typography noWrap>
 														{person.personFirstName} {person.personLastName}
+														</Typography>
 													</Link>
 												</NextLink>
-												<Typography color="textSecondary" variant="body2">
-													Uid: {person.personUid}
+												<Typography
+													color="textSecondary"
+													variant="body2"
+													noWrap
+												>
+													UID: {person.personUid}
 												</Typography>
 											</Box>
 										</Box>
 									</TableCell>
-									<TableCell>
-                  { person.personMobileNumber || 
-                    <SeverityPill
-                      color='warning'
-                    >
-                      <WarningIcon fontSize="small" />
-                      No mobile number
-                    </SeverityPill>}
-                  </TableCell>
-									<TableCell >{ person.personEmail || 
-                    <SeverityPill
-                      color='warning'
-                    >
-                      <WarningIcon fontSize="small" />
-                      No email
-                    </SeverityPill>}
-                  </TableCell>
-									<TableCell>{person.personOrgGroup}</TableCell>
-									<TableCell>{person.PersonAccessGroup}</TableCell>
+									<TableCell width="20%">
+										<Typography width={180} noWrap>
+											{person.personMobileNumber || (
+												<SeverityPill color="warning">
+													<WarningIcon fontSize="small" />
+													No mobile number
+												</SeverityPill>
+											)}
+										</Typography>
+									</TableCell>
+									<TableCell width="20%">
+										<Typography width={130} noWrap>
+										{person.personEmail || (
+											<SeverityPill color="warning">
+												<WarningIcon fontSize="small" />
+												No email
+											</SeverityPill>
+										)}
+										</Typography>
+									</TableCell>
+									<TableCell width="20%">{person.personOrgGroup}</TableCell>
+									<TableCell width="20%">{person.PersonAccessGroup}</TableCell>
 
 									{/* <TableCell>
                     <Typography
@@ -210,16 +226,26 @@ export const PersonsListTable = (props) => {
                       {numeral(person.totalAmountSpent).format(`${person.currency}0,0.00`)}
                     </Typography>
                   </TableCell> */}
-									<TableCell align="left">
-										<NextLink href={{
-										pathname: '/dashboard/persons/edit',
-										query: { ids: encodeURIComponent(JSON.stringify([person.personId])) }
-									}} passHref>
+									<TableCell width="10%" align="left">
+										<NextLink
+											href={{
+												pathname: "/dashboard/persons/edit",
+												query: {
+													ids: encodeURIComponent(
+														JSON.stringify([person.personId])
+													),
+												},
+											}}
+											passHref
+										>
 											<IconButton component="a">
 												<PencilAltIcon fontSize="small" />
 											</IconButton>
 										</NextLink>
-										<NextLink href={"/dashboard/persons/details/" + person.personId} passHref>
+										<NextLink
+											href={"/dashboard/persons/details/" + person.personId}
+											passHref
+										>
 											<IconButton component="a">
 												<ArrowRightIcon fontSize="small" />
 											</IconButton>

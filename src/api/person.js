@@ -12,7 +12,7 @@ class PersonApi {
         if (useApi) { 
             return sendApi('/api/person', {
                 method: 'POST',
-                header: {
+                headers: {
                     'Content-type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -108,7 +108,7 @@ class PersonApi {
     }
 
     deletePerson(id) {
-        if (useApi) { return sendApi(`/api/persons/${id}`, { method: 'DELETE' }); }
+        if (useApi) { return sendApi(`/api/person/${id}`, { method: 'DELETE' }); }
 
         const index = fakePersons.findIndex(person => person.personId == id);
         if (index == -1) {
@@ -124,7 +124,7 @@ class PersonApi {
     }
 
     uidExists(uid) {
-        if (useApi) { return sendApi(`/api/persons/${uid}`); }
+        if (useApi) { return sendApi(`/api/person/uid/${uid}`); }
 
         return Promise.resolve(new Response(
             JSON.stringify(fakePersons.some(person => person.personUid == uid)),

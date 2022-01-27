@@ -169,12 +169,14 @@ const PersonList = () => {
 		gtm.push({ event: "page_view" });
 	}, []);
 
-	const getPersons = useCallback(async () => {
+	const getPersonsLocal = useCallback(async () => {
 		try {
       //const data = await personApi.getFakePersons() 
-        const data = await personApi.getPersons()
+        const res = await personApi.getPersons()
+		const data = await res.json()
 			if (isMounted()) {
 				setPersons(data);
+				console.log(data);
 			}
 		} catch (err) {
 			console.error(err);
@@ -183,7 +185,7 @@ const PersonList = () => {
 
 	useEffect(
 		() => {
-			getPersons();
+			getPersonsLocal();
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[]
@@ -273,7 +275,6 @@ const PersonList = () => {
 		() => {
 			if (selectedPersons.length) {
 				setSelectedPersons([]);
-				// console.log(selectedPersons.personId);
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,7 +302,7 @@ const PersonList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			})
-			getPersons();
+			getPersonsLocal();
 		})
 		setDeleteOpen(false);
 		console.log(deleteOpen);
@@ -319,7 +320,7 @@ const PersonList = () => {
 		
 	}, [selectedPersons]);
 	
-
+	
 	
 	return (
 		<>

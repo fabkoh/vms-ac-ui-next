@@ -33,7 +33,6 @@ const useStyles = makeStyles({
     border: '1px solid #D14343'
   }
 });
-
 export const PersonEditForm = (props) => {
 	const { 
     person, 
@@ -72,6 +71,10 @@ export const PersonEditForm = (props) => {
       toast.error("Delete unsuccessful for" + id);
     }
 		}
+  
+  //anchor is for menu item on list. Added here for deleting single person
+  //on the edit form to prevent errors. ensures <Confirmdelete> is reusable.
+  const [AnchorEl, setAnchorEl] = useState(true);
 
 	return (
 		<Card
@@ -110,11 +113,11 @@ export const PersonEditForm = (props) => {
           variant="contained"
           color="error"
           onClick={handleDeleteOpen}
-          sx={{m:1}}
+          sx={{}}
         >
           Delete
         </Button>
-        <Confirmdelete deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+        <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}
 			handleDeleteOpen={handleDeleteOpen}/>
         </div>

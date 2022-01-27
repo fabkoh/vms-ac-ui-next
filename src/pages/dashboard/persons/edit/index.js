@@ -26,30 +26,30 @@ const EditPersons = () => {
 
   const getPersons = ids => {
 	Promise.all(ids.map(id => personApi.getPerson(id)))
-	.then(personDetails => {
-		setPersonsInfo(personDetails.filter(person => person.personFirstName)
-			.map(person => {
-				return {
-					id: person.personId,
-					firstName: person.personFirstName,
-					lastName: person.personLastName,
-					uid: person.personUid,
-					mobileNumber: person.personMobileNumber,
-					email: person.personEmail,
-					valid: {
-					  firstName: true,
-					  lastName: true,
-					  uidNotRepeated: true,
-					  uidNotInUse: true,
-					  mobileNumber: true,
-					  email: true,
-					  submitOk: true
-					}
-				}
-			}))
-	})
-	.catch(err => console.log(err))
-  }
+	  .then(resArray => {
+      Promise.all(resArray.filter(res => res.status == 200).map( res => res.json() ))
+        .then(personArray => {
+          setPersonsInfo(personArray.map(person => {
+            return {
+              id: person.personId,
+              firstName: person.personFirstName,
+              lastName: person.personLastName,
+              uid: person.personUid,
+              mobileNumber: person.personMobileNumber,
+              email: person.personEmail,
+              valid: {
+                firstName: true,
+                lastName: true,
+                uidNotRepeated: true,
+                uidNotInUse: true,
+                mobileNumber: true,
+                email: true,
+                submitOk: true
+              }
+            }
+          }))
+        }).catch(err => console.log(err));
+    }).catch(err => console.log(err));}
 
   useEffect(() => {
 	  getPersons(ids);
