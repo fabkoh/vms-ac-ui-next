@@ -164,7 +164,7 @@ const CreatePersons = () => {
     <>
       <Head>
         <title>
-          Etlas
+          Etlas : Create Persons
         </title>
       </Head>
       <Box

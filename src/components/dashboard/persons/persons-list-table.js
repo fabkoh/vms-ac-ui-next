@@ -125,17 +125,17 @@ export const PersonsListTable = (props) => {
 							<TableCell>
 								<Buttonfilter
                 //pass org group into array prop. should store somewhere first
-									array={["Org group", "Org group1", "Org group2"]}
+									array={["ORG/DEPT", "Org group1", "Org group2"]}
 									sx={{}}
 								/>
 							</TableCell>
 							<TableCell>
 								<Buttonfilter
-									array={["Access group", "Access group1", "Access group2"]}
+									array={["ACCESS GROUP", "Access group1", "Access group2"]}
 									sx={{}}
 								/>
 							</TableCell>
-							<TableCell align="right">Actions</TableCell>
+							<TableCell align="left">Actions</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -210,7 +210,7 @@ export const PersonsListTable = (props) => {
                       {numeral(person.totalAmountSpent).format(`${person.currency}0,0.00`)}
                     </Typography>
                   </TableCell> */}
-									<TableCell align="right">
+									<TableCell align="left">
 										<NextLink href={{
 										pathname: '/dashboard/persons/edit',
 										query: { ids: encodeURIComponent(JSON.stringify([person.personId])) }

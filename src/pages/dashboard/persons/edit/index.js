@@ -181,7 +181,7 @@ const EditPersons = () => {
     <>
       <Head>
         <title>
-          Etlas
+          Etlas : Edit Persons
         </title>
       </Head>
       <Box

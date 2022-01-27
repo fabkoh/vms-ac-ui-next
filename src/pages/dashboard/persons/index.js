@@ -82,7 +82,7 @@ const applyFilters = (Persons, filters) =>
 	Persons.filter((person) => {
 		if (filters.query) {
 			let queryMatched = false;
-			const properties = ["personEmail", "personFirstName","personUid"];
+			const properties = ["personEmail", "personFirstName","personLastName","personUid","personMobileNumber","personEmail"];
 
 			properties.forEach((property) => {
 				if (
@@ -154,7 +154,7 @@ const PersonList = () => {
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
 	const [Persons, setPersons] = useState([]);
-	const [currentTab, setCurrentTab] = useState("all");
+	// const [currentTab, setCurrentTab] = useState("all");
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [sort, setSort] = useState(sortOptions[0].value);
@@ -212,7 +212,7 @@ const PersonList = () => {
 			query: queryRef.current?.value,
 		}));
 	};
-
+	
 	// const handleSortChange = (event) => {
 	// 	setSort(event.target.value);
 	// };
@@ -273,7 +273,7 @@ const PersonList = () => {
 		() => {
 			if (selectedPersons.length) {
 				setSelectedPersons([]);
-				console.log(selectedPersons.personId);
+				// console.log(selectedPersons.personId);
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -288,12 +288,8 @@ const PersonList = () => {
 	};
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
-	};
-	function sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	  }
+	}
 	const handleDeleteAction = () => {
-		setDeleteOpen(false);
 		Promise.all(selectedPersons.map(id=>{
 			return personApi.deletePerson(id)
 		})).then( resArr => {
@@ -307,6 +303,8 @@ const PersonList = () => {
 			})
 			getPersons();
 		})
+		setDeleteOpen(false);
+		console.log(deleteOpen);
 	};
 
 	//blank out edit and delete if no people selected
@@ -326,7 +324,7 @@ const PersonList = () => {
 	return (
 		<>
 			<Head>
-				<title>Dashboard: Persons List</title>
+				<title>Etlas : Persons List</title>
 			</Head>
 			<Box
 				component="main"
@@ -375,7 +373,7 @@ const PersonList = () => {
 										<DeleteIcon />
 										Delete person
 									</MenuItem>
-									<Confirmdelete deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+									<Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}
 			handleDeleteOpen={handleDeleteOpen}/>
 								</StyledMenu>
@@ -397,6 +395,7 @@ const PersonList = () => {
 								Export
 							</Button>
 							<Tooltip  title='Excel template can be found at {}'
+							enterTouchDelay={0}
 								placement ='top' sx={{
 									m: -0.5,
 									mt: 3,
@@ -431,7 +430,7 @@ const PersonList = () => {
 						>
 							<Box
 								component="form"
-								onSubmit={handleQueryChange}
+								onChange={handleQueryChange}
 								sx={{
 									flexGrow: 1,
 									m: 1.5,
@@ -448,7 +447,7 @@ const PersonList = () => {
 											</InputAdornment>
 										),
 									}}
-									placeholder="Search for name,email,mobile number or Uid"
+									placeholder="Search for Name, Email, Mobile Number or UID"
 								/>
 							</Box>
 							{/* <TextField

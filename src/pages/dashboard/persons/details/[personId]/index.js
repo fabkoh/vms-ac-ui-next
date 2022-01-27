@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -23,7 +23,9 @@ import StyledMenu from '../../../../../components/dashboard/styled-menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';;
+import AddIcon from '@mui/icons-material/Add';import { Confirmdelete } from '../../../../../components/dashboard/persons/Confirmdelete';
+import toast from 'react-hot-toast';
+;
 
 const PersonDetails = () => {
 
@@ -64,6 +66,30 @@ const PersonDetails = () => {
   // link to edit page
   const editLink = "/dashboard/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
 
+
+  // //handle delete action. put this in parent component
+	const [deleteOpen, setDeleteOpen] = React.useState(false);  
+
+	const handleDeleteOpen = () => {        
+		setDeleteOpen(true);                        
+	};
+	const handleDeleteClose = () => {
+		setDeleteOpen(false);
+	}
+	const handleDeleteAction = () => {
+    Promise.resolve(
+      personApi.deletePerson(person.personId)
+    ).then((res)=>{
+      if (res.status == 204){
+        toast.success('Delete success');
+        router.replace('/dashboard/persons');
+      }
+      else{
+        toast.error('Delete unsuccessful')
+      }
+    })
+	};
+
   if (!person) {
     return null;
   }
@@ -71,7 +97,7 @@ const PersonDetails = () => {
 	<>
 	  <Head>
 		<title>
-		  Etlas
+		  Etlas : Person Details
 		</title>
 	  </Head>
 	  <Box
@@ -162,10 +188,13 @@ const PersonDetails = () => {
                 Edit person
               </MenuItem>
             </NextLink>           
-            <MenuItem disableRipple>
+            <MenuItem disableRipple onClick={handleDeleteOpen}>
               <DeleteIcon />
               Delete person 
             </MenuItem>
+            <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+			handleDeleteAction={handleDeleteAction}
+			handleDeleteOpen={handleDeleteOpen}/>
           </StyledMenu>
 			  </Grid>
 			</Grid>

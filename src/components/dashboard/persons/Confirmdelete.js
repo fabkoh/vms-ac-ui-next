@@ -60,15 +60,22 @@ export const Confirmdelete = (props) => {
 				</DialogContent>
 				<DialogActions>
 					<Button
-						variant="outlined"
-						onClick={props.handleDeleteAction}
+						variant="contained"
+						onClick={()=>{
+							props.handleDeleteAction()
+							props.setAnchorEl(null)
+						}}
 						sx={{ borderRadius: 8, bgcolor: "#F44336" }}
+						
 					>
 						<Typography sx={{ color: "white" }}>Delete</Typography>
 					</Button>
 					<Button
 						variant="outlined"
-						onClick={props.handleDeleteClose}
+						onClick={()=>{
+							props.handleDeleteClose()
+							props.setAnchorEl(null)
+						}}
 						sx={{ borderRadius: 8, color: "main.primary" }}
 					>
 						Cancel
