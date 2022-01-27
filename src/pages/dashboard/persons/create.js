@@ -122,7 +122,7 @@ const CreatePersons = () => {
       }
     }
 
-    newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
+    // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     newPersonInfo.valid.uidNotInUse = true;
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
       newPersonInfo.valid.uidNotInUse = !(await personApi.uidExists(newPersonInfo.uid));
