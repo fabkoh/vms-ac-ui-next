@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Container,
-  Divider,
   Grid,
   Link,
   Typography
@@ -23,8 +22,10 @@ import StyledMenu from '../../../../../components/dashboard/styled-menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';import { Confirmdelete } from '../../../../../components/dashboard/persons/Confirmdelete';
+import AddIcon from '@mui/icons-material/Add';
+import { Confirmdelete } from '../../../../../components/dashboard/persons/Confirmdelete';
 import toast from 'react-hot-toast';
+
 ;
 
 const PersonDetails = () => {
@@ -41,10 +42,11 @@ const PersonDetails = () => {
 
   const getPerson = useCallback(async () => {
     try {
-      const data = await personApi.getPerson(personId);
-      // const data = await personApi.getFakePerson(personId);
+      const res = await personApi.getPerson(personId);
+      const body = await res.json();
+
       if(isMounted()) {
-        setPerson(data);
+        setPerson(body);
       }
     } catch (err) {
       console.error(err);
@@ -66,8 +68,7 @@ const PersonDetails = () => {
   // link to edit page
   const editLink = "/dashboard/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
 
-
-  // //handle delete action. put this in parent component
+  // handle delete action. put this in parent component
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
 
 	const handleDeleteOpen = () => {        
@@ -208,13 +209,7 @@ const PersonDetails = () => {
             item
             xs={12}
           >
-            <PersonBasicDetails
-              firstName={person.personFirstName}
-              lastName={person.personLastName}
-              uid={person.personUid}
-              mobileNumber={person.personMobileNumber}
-              email={person.personEmail}
-            />
+            <PersonBasicDetails person={person} />
           </Grid>
 			  </Grid>
 		  </Box>
