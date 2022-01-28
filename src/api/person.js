@@ -140,6 +140,7 @@ class PersonApi {
         ));
     }
 
+/*
     mobileNumberExists(uid, mobileNumber) {
         if (useApi) { return sendApi(`/api/person/uid/${uid}`); }
 
@@ -155,7 +156,7 @@ class PersonApi {
             JSON.stringify(fakePersons.some(person => person.personMobileNumber == mobileNumber && person.personId != id)),
             { status: 200 }
         ));
-    }
+    } */
 }
 
 export const personApi = new PersonApi();
