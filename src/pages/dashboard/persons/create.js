@@ -33,6 +33,8 @@ const CreatePersons = () => {
       uidNotRepeated: true,
       uidNotInUse: true,
       mobileNumber: true,
+      mobileNumberNotRepeated: true,
+      mobileNumberNotInUse: true,
       email: true,
       submitOk: true
     }
@@ -84,7 +86,7 @@ const CreatePersons = () => {
   }
 
 
-  const onNumberChange = (e, id) => {
+  const onNumberChange = async (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
     newPersonInfo.mobileNumber = e.target.value;
@@ -93,6 +95,34 @@ const CreatePersons = () => {
     newPersonInfo.valid.mobileNumber = (
       e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
     );
+
+    // test if mobile number are repeated
+    // maps mobileNumber to the first occurrence of mobileNumber in new persons info
+    const mobileNumberMap = {}
+    for(let i=0; i<newPersonsInfo.length; i++) {
+
+      if(newPersonsInfo[i].mobileNumber == "") {
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
+        continue;
+      }
+
+      const mobileNumber = newPersonsInfo[i].mobileNumber
+      if(mobileNumber in mobileNumberMap) {
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = false;
+        newPersonsInfo[mobileNumberMap[mobileNumber]].valid.mobileNumberNotRepeated = false;
+      } else {
+        mobileNumberMap[mobileNumber] = i;
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
+      }
+    }
+
+    // check against the db too
+    newPersonInfo.valid.mobileNumberNotInUse = true;
+    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
+      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
+      const data = await res.json();
+      newPersonInfo.valid.mobileNumberNotInUse = !(data);
+    }
 
     setPersonsInfo(newPersonsInfo);
   }
@@ -173,7 +203,7 @@ const CreatePersons = () => {
     <>
       <Head>
         <title>
-          Etlas : Create Persons
+          Etlas: Create Persons
         </title>
       </Head>
       <Box
@@ -253,6 +283,8 @@ const CreatePersons = () => {
                                                   person.valid.uidNotRepeated &&
                                                   person.valid.uidNotInUse &&
                                                   person.valid.mobileNumber &&
+                                                  person.valid.mobileNumberNotRepeated &&
+                                                  person.valid.mobileNumberNotInUse &&
                                                   person.valid.email)}
                   >
                       Submit

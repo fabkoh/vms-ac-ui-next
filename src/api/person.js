@@ -139,6 +139,23 @@ class PersonApi {
             { status: 200 }
         ));
     }
+
+    mobileNumberExists(uid, mobileNumber) {
+        if (useApi) { return sendApi(`/api/person/uid/${uid}`); }
+
+        return Promise.resolve(new Response(
+            JSON.stringify(fakePersons.some(person => person.personMobileNumber == mobileNumber)),
+            { status: 200 }));
+    }
+
+    mobileNumberInUse(mobileNumber, id) {
+        if (useApi) { return sendApi(`/api/person/uid/${id}/${uid}`); }
+
+        return Promise.resolve(new Response(
+            JSON.stringify(fakePersons.some(person => person.personMobileNumber == mobileNumber && person.personId != id)),
+            { status: 200 }
+        ));
+    }
 }
 
 export const personApi = new PersonApi();
