@@ -71,6 +71,14 @@ const EditPersons = () => {
     setPersonsInfo(personsInfo.filter(person => person.id != id))
   }
 
+  const onFieldChange = (e, id) => {
+    const newPersonsInfo = [ ...personsInfo ];
+    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
+    newPersonInfo[e.target.name] = e.target.value;
+
+    setPersonsInfo(newPersonsInfo)
+  }
+
   const onNameChange = (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id)
@@ -127,8 +135,7 @@ const EditPersons = () => {
         newPersonsInfo[i].valid.uidNotRepeated = true;
         continue;  
       }
-
-
+      
       const uid = newPersonsInfo[i].uid
       if(uid in uidMap) {
         newPersonsInfo[i].valid.uidNotRepeated = false;
@@ -142,7 +149,7 @@ const EditPersons = () => {
     newPersonInfo.valid.uidNotInUse = true;
     // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !(await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id));
+      newPersonInfo.valid.uidNotInUse = !( await (await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id)).json());
     }
 
     setPersonsInfo(newPersonsInfo);
@@ -150,32 +157,45 @@ const EditPersons = () => {
 
   const [submitted, setSubmitted] = useState(false);
 
-  const submitForm = e => {
+  const submitForm = (e) => {
     e.preventDefault();
-
     setSubmitted(true);
-    Promise.all(personsInfo.map(person => {
-      person.valid.submitOk = true;
-      return personApi.updatePerson(person)
-    })).then(values => {
-      let allSuccess = true;
 
-      values.forEach((res, i) => {
-        if (res.status != 200) {
-          allSuccess = false;
-          personsInfo[i].valid.submitOk = false;
+    Promise.all(personsInfo.map( personInfo => personApi.updatePerson({
+      personId: personInfo.id,
+      personFirstName: personInfo.firstName,
+      personLastName:personInfo.lastName,
+      personUid:personInfo.uid,
+      personMobileNumber:personInfo.mobileNumber,
+      personEmail:personInfo.email,
+    })))
+      .then( resArr => {
+        const failedPersons = [];
+
+        resArr.forEach((res, i) => {
+          if(res.status != 200) {
+            failedPersons.push(personsInfo[i]);
+            personsInfo[i].valid.submitOk=false;
+            setSubmitted(false);
+          }
+        })
+
+        const successfulEditCount = personsInfo.length - failedPersons.length;
+        if (successfulEditCount) {
+          toast.success(`Edit ${successfulEditCount == 1 ? '1 person' : `${successfulEditCount} persons`}`);
         }
+
+        if (failedPersons.length) {
+          toast.error('Edit failed for highlighted persons');
+          setPersonsInfo(failedPersons);
+        } else {
+          router.replace('/dashboard/persons');
+        }
+
       })
-      
-      if(allSuccess) {
-        toast.success('Persons updated')
-        router.replace('/dashboard/persons');
-      } else {
-        toast.error('Error updating the highlighted persons')
-        setSubmitted(false);
-      }
-    })
-  }
+    }
+
+  
 
   return (
     <>
@@ -227,6 +247,7 @@ const EditPersons = () => {
                   <PersonEditForm
                     person={person}
                     removePerson={removePerson}
+                    onFieldChange={onFieldChange}
                     onUidChange={onUidChange}
                     onNameChange={onNameChange}
                     onNumberChange={onNumberChange}

@@ -35,9 +35,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { personApi } from "../../../api/person";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
-import { Confirmdelete } from "../../../components/dashboard/persons/Confirmdelete";
-import { string } from "prop-types";
-import { setISODay } from "date-fns";
+import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
 import toast from "react-hot-toast";
 
 const tabs = [
@@ -283,6 +281,30 @@ const PersonList = () => {
 
 	//for delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
+	const [text, setText] = React.useState("");
+	const [deleteBlock, setDeleteBlock] = React.useState(true);
+	const handleTextChange = (e) => {
+		setText(e.target.value);
+	};
+	useEffect(() => {
+	 console.log(text);
+	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
+	}, [text]);
+	
+	//Set to true if multiple people are selected. controls form input visibility.
+	const [selectedState, setselectedState] = useState(false);
+	const checkSelected = () => {
+	  if(selectedPersons.length==1){
+		 setselectedState(false)
+	  }
+	  else{
+		  setselectedState(true)
+	  }
+	};
+	useEffect(() => {
+		checkSelected()
+	}, [selectedPersons]);
+	
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
@@ -296,7 +318,7 @@ const PersonList = () => {
 		})).then( resArr => {
 			resArr.filter(res=>{
 				if(res.status == 204){
-					toast.success('Delete success');
+					toast.success('Delete success',{duration:2000},);
 				}
 				else{
 					toast.error('Delete unsuccessful' )
@@ -307,6 +329,12 @@ const PersonList = () => {
 		setDeleteOpen(false);
 		console.log(deleteOpen);
 	};
+
+
+	
+
+	
+	
 
 	//blank out edit and delete if no people selected
 	const [buttonBlock, setbuttonBlock] = useState(true);
@@ -357,7 +385,7 @@ const PersonList = () => {
 									<NextLink href={"/dashboard/persons/create"} passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
-											Create new person
+											&#8288;Create new person
 										</MenuItem>
 									</NextLink>
 									<NextLink href={{
@@ -366,17 +394,23 @@ const PersonList = () => {
 									}} passHref>
 										<MenuItem disableRipple disabled={buttonBlock}>
 											<EditIcon />
-											Edit person
+											&#8288;Edit person
 										</MenuItem>
 									</NextLink>
 									
 									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
 										<DeleteIcon />
-										Delete person
+										&#8288;Delete person
 									</MenuItem>
-									<Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+									<Confirmdelete selectedState={selectedState} 
+									setAnchorEl={setAnchorEl}
+									 deleteOpen={deleteOpen} 
+									 handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}
-			handleDeleteOpen={handleDeleteOpen}/>
+			handleDeleteOpen={handleDeleteOpen}
+			selectedPersons={selectedPersons}
+			handleTextChange={handleTextChange}
+			deleteBlock={deleteBlock}/>
 								</StyledMenu>
 							</Grid>
 						</Grid>

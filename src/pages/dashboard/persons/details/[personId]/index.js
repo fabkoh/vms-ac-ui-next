@@ -23,7 +23,7 @@ import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { Confirmdelete } from '../../../../../components/dashboard/persons/Confirmdelete';
+import { Confirmdelete } from '../../../../../components/dashboard/persons/confirm-delete';
 import toast from 'react-hot-toast';
 
 const PersonDetails = () => {
