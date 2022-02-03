@@ -206,7 +206,7 @@ export const PersonsListTable = (props) => {
 										</Typography>
 									</TableCell>
 									<TableCell width="20%">
-										<Typography width={130} noWrap>
+										<Typography width={190} noWrap>
 										{person.personEmail || (
 											<SeverityPill color="warning">
 												<WarningIcon fontSize="small" />
