@@ -5,16 +5,20 @@ import { PropertyListItem } from '../../property-list-item';
 import { SeverityPill } from '../../severity-pill';
 import WarningIcon from '@mui/icons-material/Warning';
 
-/* eslint react/no-children-prop: 0 */
-
 export const PersonBasicDetails = (props) => {
-  const { firstName, lastName, uid, mobileNumber, email, ...other } = props;
+  const { 
+    personFirstName, 
+    personLastName, 
+    personUid, 
+    personMobileNumber, 
+    personEmail } = props.person;
+  
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
   const align = mdUp ? 'horizontal' : 'vertical';
 
   return (
-    <Card {...other}>
+    <Card>
       <CardHeader title="Basic Details" />
       <Divider />
       <PropertyList>
@@ -22,26 +26,27 @@ export const PersonBasicDetails = (props) => {
           align={align}
           divider
           label="First Name"
-          value={firstName}
+          value={personFirstName}
         />
         <PropertyListItem
           align={align}
           divider
           label="Last Name"
-          value={lastName}
+          value={personLastName}
         />
         <PropertyListItem
           align={align}
           divider
           label="UID"
-          value={uid}
+          value={personUid}
         />
         <PropertyListItem
           align={align}
           divider
           label="Mobile Number"
-          value={mobileNumber}
-          children={!mobileNumber && (
+          value={personMobileNumber}
+        >
+          { !personMobileNumber && (
             <SeverityPill
               color='warning'
             >
@@ -49,13 +54,14 @@ export const PersonBasicDetails = (props) => {
               No mobile number
             </SeverityPill>
           )}
-        />                   
+        </PropertyListItem>                   
         <PropertyListItem
           align={align}
           divider
           label="Email"
-          value={email}
-          children={!email && (
+          value={personEmail}
+        >
+          { !personEmail && (
             <SeverityPill
               color='warning'
             >
@@ -63,16 +69,16 @@ export const PersonBasicDetails = (props) => {
               No email
             </SeverityPill>
           )}
-        />
+        </PropertyListItem>
       </PropertyList>
     </Card>
   );
 };
 
 PersonBasicDetails.propTypes = {
-  firstName: PropTypes.string.isRequired,
-  lastName: PropTypes.string.isRequired,
-  uid: PropTypes.string.isRequired,
-  mobileNumber: PropTypes.string,
-  email: PropTypes.string
+  personFirstName: PropTypes.string.isRequired,
+  personLastName: PropTypes.string.isRequired,
+  personUid: PropTypes.string.isRequired,
+  personMobileNumber: PropTypes.string,
+  personEmail: PropTypes.string
 };

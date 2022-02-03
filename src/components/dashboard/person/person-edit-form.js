@@ -13,7 +13,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
-import { Confirmdelete } from '../persons/Confirmdelete';
+import { Confirmdelete } from '../persons/confirm-delete';
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 
@@ -33,11 +33,11 @@ const useStyles = makeStyles({
     border: '1px solid #D14343'
   }
 });
-
 export const PersonEditForm = (props) => {
 	const { 
     person, 
     removePerson, 
+    onFieldChange,
     onNameChange,
     onNumberChange,
     onEmailChange,
@@ -51,6 +51,7 @@ export const PersonEditForm = (props) => {
 
   //form handling functions : delete person directly with delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);
+  
 
   const handleDeleteOpen = () => {
 		setDeleteOpen(true);
@@ -72,6 +73,10 @@ export const PersonEditForm = (props) => {
       toast.error("Delete unsuccessful for" + id);
     }
 		}
+  
+  //anchor is for menu item on list. Added here for deleting single person
+  //on the edit form to prevent errors. ensures <Confirmdelete> is reusable.
+  const [AnchorEl, setAnchorEl] = useState(true);
 
 	return (
 		<Card
@@ -110,11 +115,11 @@ export const PersonEditForm = (props) => {
           variant="contained"
           color="error"
           onClick={handleDeleteOpen}
-          sx={{m:1}}
+          sx={{}}
         >
           Delete
         </Button>
-        <Confirmdelete deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+        <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}
 			handleDeleteOpen={handleDeleteOpen}/>
         </div>
@@ -180,7 +185,10 @@ export const PersonEditForm = (props) => {
                     helperText={(person.valid.uidNotRepeated && person.valid.uidNotInUse) || "UID taken"}
                     label="UID"
                     name="uid"
-                    onChange={(e) => onUidChange(e, person.id)}
+                    onChange={(e) => {
+                      onFieldChange(e, person.id)
+                      onUidChange(e, person.id)
+                    }}
                     value={person.uid}
                   />
                 </Grid>

@@ -122,10 +122,12 @@ const CreatePersons = () => {
       }
     }
 
-    newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
+    // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     newPersonInfo.valid.uidNotInUse = true;
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !(await personApi.uidExists(newPersonInfo.uid));
+      const res = await personApi.uidExists(newPersonInfo.uid);
+      const data = await res.json();
+      newPersonInfo.valid.uidNotInUse = !(data);
     }
 
     setPersonsInfo(newPersonsInfo);
@@ -135,11 +137,18 @@ const CreatePersons = () => {
 
   const submitForm = e => {
     e.preventDefault();
+    
 
     setSubmitted(true);
     Promise.all(personsInfo.map(person => {
       person.valid.submitOk = true;
-      return personApi.createPerson(person)
+      return personApi.createPerson({
+        personFirstName: person.firstName,
+        personLastName: person.lastName,
+        personUid: person.uid,
+        personMobileNumber: person.mobileNumber,
+        personEmail: person.email
+      })
     })).then(values => {
       let allSuccess = true;
 

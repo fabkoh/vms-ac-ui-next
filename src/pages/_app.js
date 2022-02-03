@@ -40,7 +40,7 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>
-          Material Kit Pro
+          Etlas
         </title>
         <meta
           name="viewport"

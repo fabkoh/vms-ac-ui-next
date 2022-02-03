@@ -1,6 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { Logo } from './logo';
 import { keyframes } from '@emotion/react';
+import Head from "next/head";
+
 // import etlasname from '../components/etlas_logo_name.png'
 // import Image from 'next/image'
 
@@ -31,6 +33,10 @@ const bounce3 = keyframes`
 `;
 
 export const SplashScreen = () => (
+  <>
+  <Head>
+    <title>Etlas </title>
+  </Head>
   <Box
     sx={{
       alignItems: 'center',
@@ -66,4 +72,5 @@ export const SplashScreen = () => (
     </h1>
     {/* <Image src={etlasname}/> */}
   </Box>
+  </>    
 );
