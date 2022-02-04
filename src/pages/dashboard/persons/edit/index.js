@@ -63,12 +63,12 @@ const EditPersons = () => {
     return personsInfo.at(-1).id + 1;
   }
 
-  const addPerson = () => {
-    setPersonsInfo([ ...personsInfo, personInfo(getNextId()) ]);
-  };
-
   const removePerson = (id) => {
     setPersonsInfo(personsInfo.filter(person => person.id != id))
+    // if last person is removed, redirect back to persons list
+    if(personsInfo.length == 1){
+      router.push('/dashboard/persons')
+    }
   }
 
   const onFieldChange = (e, id) => {
@@ -149,7 +149,7 @@ const EditPersons = () => {
     newPersonInfo.valid.uidNotInUse = true;
     // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !( await (await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id)).json());
+      newPersonInfo.valid.uidNotInUse = !( await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id));
     }
 
     setPersonsInfo(newPersonsInfo);
@@ -194,6 +194,14 @@ const EditPersons = () => {
 
       })
     }
+
+    //reroute if empty
+    // useEffect(() => {
+    //  if(personsInfo.length==0){
+    //    router.push('/dashboard/persons')
+    //  }
+    // }, [personsInfo]);
+    
 
   
 

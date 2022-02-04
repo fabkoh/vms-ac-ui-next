@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import { Confirmdelete } from '../persons/confirm-delete';
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
+import { Box } from '@mui/system';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -91,6 +92,7 @@ export const PersonEditForm = (props) => {
         errorStyle.root
       }
     >
+      <Grid container>
       <CardHeader
         avatar={
           <ExpandMore
@@ -99,10 +101,11 @@ export const PersonEditForm = (props) => {
           >
             <ExpandMoreIcon />
           </ExpandMore>
+          
         }
         title="Person"
         action={
-          <div>
+          <Grid item>
           <Button
             variant="outlined"
             color="error"
@@ -115,17 +118,18 @@ export const PersonEditForm = (props) => {
           variant="contained"
           color="error"
           onClick={handleDeleteOpen}
-          sx={{}}
+          sx={{m:1}}
         >
           Delete
         </Button>
         <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}
 			handleDeleteOpen={handleDeleteOpen}/>
-        </div>
+      </Grid>
         } 
-        sx={{ width: '100%' }} 
+        sx={{ width: '100%' ,flexWrap:'wrap',}} 
       />
+      </Grid>
       <Divider />
       <CardContent>
         <Grid
@@ -182,9 +186,10 @@ export const PersonEditForm = (props) => {
                   <TextField
                     fullWidth
                     error={!(person.valid.uidNotRepeated && person.valid.uidNotInUse)}
-                    helperText={(person.valid.uidNotRepeated && person.valid.uidNotInUse) || "UID taken"}
+                    helperText={(person.valid.uidNotRepeated && person.valid.uidNotInUse) || "Error: UID taken"}
                     label="UID"
                     name="uid"
+                    required='UID must not be blank'
                     onChange={(e) => {
                       onFieldChange(e, person.id)
                       onUidChange(e, person.id)

@@ -34,6 +34,7 @@ export const Confirmdelete = (props) => {
 	// 	} catch (error) {}
 	// };
 
+	//move text state here
 	
 	return (
 		<>
@@ -61,13 +62,13 @@ export const Confirmdelete = (props) => {
 								org groups and access groups.
 							</Typography>
 						</DialogContentText>
-						<DialogContentText visibility={selectedState?'visible':'hidden'}>
+						{ selectedState && <DialogContentText>
 							
 								<TextField variant="filled" fullWidth 
 								helperText='Type in DELETE to proceed' 
 								onChange={handleTextChange} />
 						
-						</DialogContentText>
+						</DialogContentText>}
 				</DialogContent>
 				<DialogActions>
 					<Button
