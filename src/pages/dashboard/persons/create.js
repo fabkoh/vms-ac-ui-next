@@ -36,6 +36,8 @@ const CreatePersons = () => {
       mobileNumberNotRepeated: true,
       mobileNumberNotInUse: true,
       email: true,
+      emailNotRepeated: true,
+      emailNotInUse: true,
       submitOk: true
     }
   });
@@ -72,15 +74,44 @@ const CreatePersons = () => {
     setPersonsInfo(newPersonsInfo);
   }
 
-  const onEmailChange = (e, id) => {
+  const onEmailChange = async (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
     newPersonInfo.email = e.target.value;
 
     // test if email is valid
     newPersonInfo.valid.email = (
-      e.target.value == "" || /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e.target.value)
+
+      //to prevent matching multiple @ signs
+      e.target.value == "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)
     );
+
+    // test if email are repeated
+    // maps email to the first occurrence of email in new persons info
+    const emailMap = {}
+    for(let i=0; i<newPersonsInfo.length; i++) {
+      if(newPersonsInfo[i].email == "") {
+        newPersonsInfo[i].valid.emailNotRepeated = true;
+        continue;
+      }
+
+      const email = newPersonsInfo[i].email;
+      if(email in emailMap) {
+        newPersonsInfo[i].valid.emailNotRepeated = false;
+        newPersonsInfo[emailMap[email]].valid.emailNotRepeated = false;
+      } else {
+        emailMap[email] = i;
+        newPersonsInfo[i].valid.emailNotRepeated = true;
+      }
+    }
+
+    // check against the db too
+    newPersonInfo.valid.emailNotInUse = true;
+    if(!(/^\s*$/.test(newPersonInfo.email))) {
+      const res = await personApi.emailExists(newPersonInfo.email);
+      const data = await res.json();
+      newPersonInfo.valid.emailNotInUse = !(data);
+    }
 
     setPersonsInfo(newPersonsInfo);
   }
@@ -89,12 +120,12 @@ const CreatePersons = () => {
   const onNumberChange = async (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.mobileNumber = e.target.value;
+    newPersonInfo.mobileNumber = e;
 
-    // test if mobile number is valid
-    newPersonInfo.valid.mobileNumber = (
-      e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
-    );
+   // newPersonInfo.valid.mobileNumber = (
+   //   e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
+    //  e == "12345678"
+   // );
 
     // test if mobile number are repeated
     // maps mobileNumber to the first occurrence of mobileNumber in new persons info
@@ -285,7 +316,9 @@ const CreatePersons = () => {
                                                   person.valid.mobileNumber &&
                                                   person.valid.mobileNumberNotRepeated &&
                                                   person.valid.mobileNumberNotInUse &&
-                                                  person.valid.email)}
+                                                  person.valid.email &&
+                                                  person.valid.emailNotRepeated &&
+                                                  person.valid.emailNotInUse)}
                   >
                       Submit
                   </Button>
