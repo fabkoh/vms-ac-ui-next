@@ -120,10 +120,10 @@ class PersonApi {
 
         fakePersons.splice(index, 1);
 
-        return Promise.resolve(new Response('{}', { status: 204 }));
+        return Promise.resolve(new Response(null, { status: 204 }));
     }
 
-    uidExists(uid) {
+    uidExists(uid) { //if it exists db
         if (useApi) { return sendApi(`/api/person/uid/${uid}`); }
 
         return Promise.resolve(new Response(
@@ -131,7 +131,7 @@ class PersonApi {
             { status: 200 }));
     }
 
-    uidInUse(uid, id) {
+    uidInUse(uid, id) { //if it is in use by others
         if (useApi) { return sendApi(`/api/person/uid/${id}/${uid}`); }
 
         return Promise.resolve(new Response(
@@ -139,6 +139,23 @@ class PersonApi {
             { status: 200 }
         ));
     }
+
+    mobileNumberExists(mobileNumber) { //for create person
+        if (useApi) { return sendApi(`/api/person/mobileNumber/${mobileNumber}`); }
+
+        return Promise.resolve(new Response(
+            JSON.stringify(fakePersons.some(person => person.personMobileNumber == mobileNumber)),
+            { status: 200 }));
+    }
+
+    emailExists(email) { //for create person
+        if (useApi) { return sendApi(`/api/person/email/${email}`); }
+
+        return Promise.resolve(new Response(
+            JSON.stringify(fakePersons.some(person => person.personEmail == email)),
+            { status: 200 }));
+    }
+
 }
 
 export const personApi = new PersonApi();

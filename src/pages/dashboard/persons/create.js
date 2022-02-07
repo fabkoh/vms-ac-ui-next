@@ -33,7 +33,11 @@ const CreatePersons = () => {
       uidNotRepeated: true,
       uidNotInUse: true,
       mobileNumber: true,
+      mobileNumberNotRepeated: true,
+      mobileNumberNotInUse: true,
       email: true,
+      emailNotRepeated: true,
+      emailNotInUse: true,
       submitOk: true
     }
   });
@@ -70,29 +74,86 @@ const CreatePersons = () => {
     setPersonsInfo(newPersonsInfo);
   }
 
-  const onEmailChange = (e, id) => {
+  const onEmailChange = async (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
     newPersonInfo.email = e.target.value;
 
     // test if email is valid
     newPersonInfo.valid.email = (
-      e.target.value == "" || /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e.target.value)
+
+      //to prevent matching multiple @ signs
+      e.target.value == "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)
     );
+
+    // test if email are repeated
+    // maps email to the first occurrence of email in new persons info
+    const emailMap = {}
+    for(let i=0; i<newPersonsInfo.length; i++) {
+      if(newPersonsInfo[i].email == "") {
+        newPersonsInfo[i].valid.emailNotRepeated = true;
+        continue;
+      }
+
+      const email = newPersonsInfo[i].email;
+      if(email in emailMap) {
+        newPersonsInfo[i].valid.emailNotRepeated = false;
+        newPersonsInfo[emailMap[email]].valid.emailNotRepeated = false;
+      } else {
+        emailMap[email] = i;
+        newPersonsInfo[i].valid.emailNotRepeated = true;
+      }
+    }
+
+    // check against the db too
+    newPersonInfo.valid.emailNotInUse = true;
+    if(!(/^\s*$/.test(newPersonInfo.email))) {
+      const res = await personApi.emailExists(newPersonInfo.email);
+      const data = await res.json();
+      newPersonInfo.valid.emailNotInUse = !(data);
+    }
 
     setPersonsInfo(newPersonsInfo);
   }
 
 
-  const onNumberChange = (e, id) => {
+  const onNumberChange = async (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.mobileNumber = e.target.value;
+    newPersonInfo.mobileNumber = e;
 
-    // test if mobile number is valid
-    newPersonInfo.valid.mobileNumber = (
-      e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
-    );
+   // newPersonInfo.valid.mobileNumber = (
+   //   e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
+    //  e == "12345678"
+   // );
+
+    // test if mobile number are repeated
+    // maps mobileNumber to the first occurrence of mobileNumber in new persons info
+    const mobileNumberMap = {}
+    for(let i=0; i<newPersonsInfo.length; i++) {
+
+      if(newPersonsInfo[i].mobileNumber == "") {
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
+        continue;
+      }
+
+      const mobileNumber = newPersonsInfo[i].mobileNumber
+      if(mobileNumber in mobileNumberMap) {
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = false;
+        newPersonsInfo[mobileNumberMap[mobileNumber]].valid.mobileNumberNotRepeated = false;
+      } else {
+        mobileNumberMap[mobileNumber] = i;
+        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
+      }
+    }
+
+    // check against the db too
+    newPersonInfo.valid.mobileNumberNotInUse = true;
+    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
+      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
+      const data = await res.json();
+      newPersonInfo.valid.mobileNumberNotInUse = !(data);
+    }
 
     setPersonsInfo(newPersonsInfo);
   }
@@ -173,7 +234,7 @@ const CreatePersons = () => {
     <>
       <Head>
         <title>
-          Etlas : Create Persons
+          Etlas: Create Persons
         </title>
       </Head>
       <Box
@@ -253,7 +314,11 @@ const CreatePersons = () => {
                                                   person.valid.uidNotRepeated &&
                                                   person.valid.uidNotInUse &&
                                                   person.valid.mobileNumber &&
-                                                  person.valid.email)}
+                                                  person.valid.mobileNumberNotRepeated &&
+                                                  person.valid.mobileNumberNotInUse &&
+                                                  person.valid.email &&
+                                                  person.valid.emailNotRepeated &&
+                                                  person.valid.emailNotInUse)}
                   >
                       Submit
                   </Button>
