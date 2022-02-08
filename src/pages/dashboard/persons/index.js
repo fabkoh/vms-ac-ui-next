@@ -80,7 +80,7 @@ const applyFilters = (Persons, filters) =>
 	Persons.filter((person) => {
 		if (filters.query) {
 			let queryMatched = false;
-			const properties = ["personEmail", "personFirstName","personLastName","personUid","personMobileNumber","personEmail"];
+			const properties = ["personEmail", "personFirstName","personLastName","personUid","personMobileNumber"];
 
 			properties.forEach((property) => {
 				if (
@@ -174,7 +174,6 @@ const PersonList = () => {
 		const data = await res.json()
 			if (isMounted()) {
 				setPersons(data);
-				console.log(data);
 			}
 		} catch (err) {
 			console.error(err);
@@ -287,7 +286,7 @@ const PersonList = () => {
 		setText(e.target.value);
 	};
 	useEffect(() => {
-	 console.log(text);
+	//  console.log(text); 
 	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
 	}, [text]);
 	
@@ -327,7 +326,6 @@ const PersonList = () => {
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
-		console.log(deleteOpen);
 	};
 
 
@@ -365,7 +363,7 @@ const PersonList = () => {
 				<Container maxWidth="xl">
 					<Box sx={{ mb: 4 }}>
 						<Grid container justifyContent="space-between" spacing={3}>
-							<Grid item>
+							<Grid item sx={{m:2.5}}>
 								<Typography variant="h4">Persons</Typography>
 							</Grid>
 							<Grid item>

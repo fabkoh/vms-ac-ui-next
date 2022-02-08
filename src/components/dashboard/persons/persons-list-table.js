@@ -108,6 +108,7 @@ export const PersonsListTable = (props) => {
 				<Table sx={{ minWidth: 700 }}>
 					<TableHead
 					// sx={{ visibility: props.enableBulkActions ? "collapse" : "visible" }}
+					sx={{backgroundColor: "neutral.200",}}
 					>
 						<TableRow>
 							<TableCell padding="checkbox">
@@ -172,7 +173,7 @@ export const PersonsListTable = (props) => {
 													width: 42,
 												}}
 											>
-												{getInitials(person.personFirstName)}
+												{getInitials(person.personFirstName) + getInitials(person.personLastName)}
 											</Avatar>
 											<Box sx={{ ml: 1, width:100}}>
 												<NextLink

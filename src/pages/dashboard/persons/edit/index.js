@@ -63,12 +63,12 @@ const EditPersons = () => {
     return personsInfo.at(-1).id + 1;
   }
 
-  const addPerson = () => {
-    setPersonsInfo([ ...personsInfo, personInfo(getNextId()) ]);
-  };
-
   const removePerson = (id) => {
     setPersonsInfo(personsInfo.filter(person => person.id != id))
+    // if last person is removed, redirect back to persons list
+    if(personsInfo.length == 1){
+      router.push('/dashboard/persons')
+    }
   }
 
   const onFieldChange = (e, id) => {
@@ -108,16 +108,22 @@ const EditPersons = () => {
   }
 
 
-  const onNumberChange = (e, id) => {
+  const onNumberChange = async(e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.mobileNumber = e.target.value;
+
+    newPersonInfo.mobileNumber = e;
 
     // test if mobile number is valid
-    newPersonInfo.valid.mobileNumber = (
-      e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
-    );
-
+    // newPersonInfo.valid.mobileNumber = (
+    //   e == ""  || /^\+\d{1,7}/.test(e)
+    // );
+    newPersonInfo.valid.mobileNumber = true;
+    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
+      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
+      const data = await res.json();
+      newPersonInfo.valid.mobileNumber = !(data);
+    }
     setPersonsInfo(newPersonsInfo);
   }
 
@@ -149,7 +155,7 @@ const EditPersons = () => {
     newPersonInfo.valid.uidNotInUse = true;
     // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
     if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !( await (await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id)).json());
+      newPersonInfo.valid.uidNotInUse = !( await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id));
     }
 
     setPersonsInfo(newPersonsInfo);
@@ -194,6 +200,14 @@ const EditPersons = () => {
 
       })
     }
+
+    //reroute if empty
+    // useEffect(() => {
+    //  if(personsInfo.length==0){
+    //    router.push('/dashboard/persons')
+    //  }
+    // }, [personsInfo]);
+    
 
   
 

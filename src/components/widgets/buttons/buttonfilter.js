@@ -11,6 +11,7 @@ import {
   Popper
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import { width } from '@mui/system';
 
 // const options = [
 //   'Create a merge commit',
@@ -48,13 +49,13 @@ export const Buttonfilter = (props) => {
         ref={anchorRef}
         variant="text"
       >
-        <Button sg={{size:'small'}}>
+        <Button sx={{size:'small',whiteSpace:'nowrap'}}>
           {options[selectedIndex]}
         </Button>
         <Button
           onClick={handleToggle}
           size="small"
-          // sx={{ backgroundColor: 'primary.main' }}
+          sx={{ size: 'small',whiteSpace:'nowrap' }}
         >
           <FilterListIcon fontSize="small" />
         </Button>
