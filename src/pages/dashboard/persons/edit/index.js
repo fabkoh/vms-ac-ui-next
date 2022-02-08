@@ -111,11 +111,12 @@ const EditPersons = () => {
   const onNumberChange = (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.mobileNumber = e.target.value;
+    console.log(e);
+    newPersonInfo.mobileNumber = e;
 
     // test if mobile number is valid
     newPersonInfo.valid.mobileNumber = (
-      e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
+      e == ""  || /^\+\d{1,7}/.test(e)
     );
 
     setPersonsInfo(newPersonsInfo);

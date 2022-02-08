@@ -17,6 +17,7 @@ import { Confirmdelete } from '../persons/confirm-delete';
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 import { Box } from '@mui/system';
+import MuiPhoneNumber from "material-ui-phone-number";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -56,7 +57,6 @@ export const PersonEditForm = (props) => {
 
   const handleDeleteOpen = () => {
 		setDeleteOpen(true);
-    console.log(deleteOpen);
 	};
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
@@ -202,14 +202,16 @@ export const PersonEditForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                  <TextField
+                  <MuiPhoneNumber
                     fullWidth
                     error={!person.valid.mobileNumber}
-                    helperText={person.valid.mobileNumber || 'Mobile number must be in the format "+{code} {number}"'}
+                    helperText={person.valid.mobileNumber || 'Mobile number is invalid'}
                     label="Mobile Number"
+                    defaultCountry={"sg"}
                     name="mobileNumber"
                     onChange={(e) => onNumberChange(e, person.id)}
                     value={person.mobileNumber}
+                    variant ='outlined'
                   />
                 </Grid>
                 <Grid

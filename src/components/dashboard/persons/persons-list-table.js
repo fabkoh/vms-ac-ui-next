@@ -173,7 +173,7 @@ export const PersonsListTable = (props) => {
 													width: 42,
 												}}
 											>
-												{getInitials(person.personFirstName)}
+												{getInitials(person.personFirstName) + getInitials(person.personLastName)}
 											</Avatar>
 											<Box sx={{ ml: 1, width:100}}>
 												<NextLink
