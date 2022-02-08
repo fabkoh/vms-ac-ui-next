@@ -108,17 +108,22 @@ const EditPersons = () => {
   }
 
 
-  const onNumberChange = (e, id) => {
+  const onNumberChange = async(e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
     const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    console.log(e);
+
     newPersonInfo.mobileNumber = e;
 
     // test if mobile number is valid
-    newPersonInfo.valid.mobileNumber = (
-      e == ""  || /^\+\d{1,7}/.test(e)
-    );
-
+    // newPersonInfo.valid.mobileNumber = (
+    //   e == ""  || /^\+\d{1,7}/.test(e)
+    // );
+    newPersonInfo.valid.mobileNumber = true;
+    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
+      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
+      const data = await res.json();
+      newPersonInfo.valid.mobileNumber = !(data);
+    }
     setPersonsInfo(newPersonsInfo);
   }
 

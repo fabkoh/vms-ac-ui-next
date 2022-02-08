@@ -205,7 +205,7 @@ export const PersonEditForm = (props) => {
                   <MuiPhoneNumber
                     fullWidth
                     error={!person.valid.mobileNumber}
-                    helperText={person.valid.mobileNumber || 'Mobile number is invalid'}
+                    helperText={person.valid.mobileNumber || 'Mobile number is in use'}
                     label="Mobile Number"
                     defaultCountry={"sg"}
                     name="mobileNumber"
