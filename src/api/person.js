@@ -1,4 +1,4 @@
-import { useApi, sendApi, fakePersons } from './api-config'
+import { useApi, sendApi, fakePersons, fakeAccessGroups } from './api-config';
 
 class PersonApi {
 
@@ -7,7 +7,8 @@ class PersonApi {
         personLastName, 
         personUid, 
         personMobileNumber, 
-        personEmail 
+        personEmail,
+        accessGroup
     }) {
         if (useApi) { 
             return sendApi('/api/person', {
@@ -20,7 +21,8 @@ class PersonApi {
                     personLastName,
                     personUid,
                     personMobileNumber,
-                    personEmail
+                    personEmail,
+                    accessGroup
                 })
             }); 
         }
@@ -31,7 +33,8 @@ class PersonApi {
             personLastName,
             personUid,
             personMobileNumber,
-            personEmail
+            personEmail,
+            accessGroup
         }
 
         fakePersons.push(newPerson);
@@ -42,7 +45,14 @@ class PersonApi {
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        return Promise.resolve(new Response(JSON.stringify(fakePersons), { status: 200 }));
+        const persons = fakePersons.map(person => {
+            if (person.accessGroup) {
+                // populate access group
+                person.accessGroup = fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup);
+            }
+        })
+
+        return Promise.resolve(new Response(JSON.stringify(persons), { status: 200 }));
     }
 
     getPerson(id) {
@@ -51,6 +61,10 @@ class PersonApi {
         const person = fakePersons.find(p => p.personId == id)
 
         if (person) { 
+            if (person.accessGroup) {
+                // populate access group
+                person.accessGroup = fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup);
+            }
             return Promise.resolve(new Response(JSON.stringify(person), { status: 200 }));
         }
 
@@ -66,7 +80,8 @@ class PersonApi {
         personLastName,
         personUid,
         personMobileNumber,
-        personEmail
+        personEmail,
+        accessGroup
     }) {
         if (useApi) {
             return sendApi('/api/person', {
@@ -80,7 +95,8 @@ class PersonApi {
                     personLastName,
                     personUid,
                     personMobileNumber,
-                    personEmail
+                    personEmail,
+                    accessGroup
                 })
             });
         }
@@ -91,7 +107,8 @@ class PersonApi {
             personLastName,
             personUid,
             personMobileNumber,
-            personEmail
+            personEmail,
+            accessGroup
         };
 
         const index = fakePersons.findIndex(person => person.personId == personId);
@@ -103,7 +120,7 @@ class PersonApi {
             ));
         }
 
-        fakePersons[index] = updatedPerson
+        fakePersons[index] = updatedPerson;
         return Promise.resolve(new Response(JSON.stringify(updatedPerson), { status: 200 }));
     }
 
@@ -119,6 +136,10 @@ class PersonApi {
         }
 
         fakePersons.splice(index, 1);
+        fakeAccessGroups = fakeAccessGroups.forEach(group => {
+            // remove deleted person id from access group
+            group.person = group.person.filter(personId => personId != id);
+        })
 
         return Promise.resolve(new Response(null, { status: 204 }));
     }
