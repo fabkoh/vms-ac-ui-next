@@ -45,11 +45,10 @@ class PersonApi {
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        //return Promise.resolve(new Response(JSON.stringify(fakePersons), { status: 200 }));
         const persons = fakePersons.map(person => {
             if (person.accessGroup) {
                 // populate access group
-                person.accessGroup = fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup);
+                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup)};
             } 
             return person
         })
@@ -64,7 +63,7 @@ class PersonApi {
         if (person) { 
             if (person.accessGroup) {
                 // populate access group
-                person.accessGroup = fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup);
+                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup)};
             }
             return Promise.resolve(new Response(JSON.stringify(person), { status: 200 }));
         }
@@ -72,7 +71,7 @@ class PersonApi {
         return Promise.resolve(new Response(
             JSON.stringify({ personId: `Person with Id ${id} does not exist` }),
             { status: 404 }
-            ));
+        ));
     }
 
     updatePerson({

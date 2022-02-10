@@ -47,7 +47,7 @@ class AccessGroupApi {
         if (accessGroup) {
             if(accessGroup.person) {
                 // populate the person field
-                accessGroup.person = fakePersons.filter(person => accessGroup.person.includes(person.personId));
+                accessGroup.person = [ ...fakePersons.filter(person => accessGroup.person.includes(person.personId))];
             }
             
             return Promise.resolve(new Response(JSON.stringify(accessGroup), { status: 200 }));

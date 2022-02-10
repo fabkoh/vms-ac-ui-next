@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = process.env.NEXT_PUBLIC_USE_API || true;
+const useApi = process.env.NEXT_PUBLIC_USE_API || false;
 
 // fake persons data
 const fakePersons = [
@@ -13,7 +13,11 @@ const fakePersons = [
         "personUid": "lCj7sSpU",
         "personMobileNumber": "+1 1001001000",
         "personEmail": "paul@atreides.com",
-        "accessGroup": 1
+        "accessGroup": {
+            "accessGroupId": 1,
+            "accessGroupName": "Dune",
+            "accessGroupDesc": "the characters from Dune"
+        }
     },
     {
         "personId": 2,
@@ -22,7 +26,11 @@ const fakePersons = [
         "personUid": "F2VMFevJ",
         "personMobileNumber": "+1 1001001001",
         "personEmail": "leto@atreides.com",
-        "accessGroup": 1
+        "accessGroup": {
+            "accessGroupId": 1,
+            "accessGroupName": "Dune",
+            "accessGroupDesc": "the characters from Dune"
+        }
     },
     {
         "personId": 3,
@@ -31,7 +39,10 @@ const fakePersons = [
         "personUid": "abc",
         "personMobileNumber": "+65 98765432",
         "personEmail": "smith.j@mail.com",
-        "accessGroup": 2
+        "accessGroup":  {
+            "accessGroupId": 2,
+            "accessGroupName": "Not dune"
+        }
     },
     {
         "personId": 4,
