@@ -43,7 +43,10 @@ export const AccessGroupPersons = (props) => {
                         paddingLeft={3}
                     >
                         <SeverityPill color="warning">
-                            <Warning fontSize="small" />
+                            <Warning 
+                                fontSize="small" 
+                                sx={{ mr: 1 }} 
+                            />
                             No persons
                         </SeverityPill>
                     </Grid>

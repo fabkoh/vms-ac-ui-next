@@ -31,7 +31,10 @@ export const AccessGroupBasicDetails = (props) => {
                         // if no accessGroupDesc, render warning
                         !accessGroupDesc && (
                             <SeverityPill color="warning">
-                                <Warning fontSize="small" />
+                                <Warning 
+                                    fontSize="small" 
+                                    sx={{ mr: 1 }}
+                                />
                                 No description
                             </SeverityPill>
                         )
