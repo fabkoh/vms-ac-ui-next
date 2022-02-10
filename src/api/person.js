@@ -45,13 +45,14 @@ class PersonApi {
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
+        //return Promise.resolve(new Response(JSON.stringify(fakePersons), { status: 200 }));
         const persons = fakePersons.map(person => {
             if (person.accessGroup) {
                 // populate access group
                 person.accessGroup = fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup);
-            }
+            } 
+            return person
         })
-
         return Promise.resolve(new Response(JSON.stringify(persons), { status: 200 }));
     }
 
