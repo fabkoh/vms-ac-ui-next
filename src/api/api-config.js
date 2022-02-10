@@ -54,6 +54,10 @@ const fakeAccessGroups = [
         "accessGroupId": 2,
         "accessGroupName": "Not dune",
         "person":[3]
+    },
+    {
+        "accessGroupId": 3,
+        "accessGroupName": "Empty group"
     }
 ]
 
