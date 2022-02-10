@@ -50,7 +50,7 @@ class PersonApi {
 
         const persons = [ ...fakePersons ]
 
-        const persons = persons.map(person => {
+        persons.map(person => {
             if (person.accessGroup) {
                 // populate access group
                 person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup) };
