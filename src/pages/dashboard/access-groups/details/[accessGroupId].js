@@ -24,6 +24,7 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { AccessGroupBasicDetails } from "../../../../components/dashboard/access-groups/details/access-group-basic-details";
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
+import Error from 'next/error';
 
 const AccessGroupDetails = () => {
 
@@ -66,6 +67,7 @@ const AccessGroupDetails = () => {
     if (!accessGroup) {
         return null;
     }
+    console.log(accessGroup);
     return (
         <>
             <Head>
@@ -118,7 +120,7 @@ const AccessGroupDetails = () => {
                             >
                                 <div>
                                     <Typography variant="h4">
-                                        { accessGroup.accessGroupName }    
+                                        { accessGroup.accessGroupName || "Access Group Not Found" }    
                                     </Typography>    
                                 </div>    
                             </Grid>
