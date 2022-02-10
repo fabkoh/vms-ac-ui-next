@@ -21,7 +21,8 @@ class AccessGroupApi {
         //     })
         // }
         const newAccessGroup = {
-            accessGroupId: Math.max(fakeAccessGroups.map(group => group.accessGroupId)) + 1,
+            accessGroupId: fakeAccessGroups.map(group => group.accessGroupId)
+                                           .reduce((a, b) => Math.max(a, b), 0) + 1,
             accessGroupName,
             accessGroupDesc,
             person
@@ -42,12 +43,12 @@ class AccessGroupApi {
     getAccessGroup(id) {
         // if (useApi) { return sendApi(PATH); }
 
-        const accessGroup = fakeAccessGroups.find(group => group.accessGroupId == id);
+        const accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == id) };
 
         if (accessGroup) {
             if(accessGroup.person) {
                 // populate the person field
-                accessGroup.person = [ ...fakePersons.filter(person => accessGroup.person.includes(person.personId))];
+                accessGroup.person = [ ...fakePersons.filter(person => accessGroup.person.includes(person.personId)) ];
             }
             
             return Promise.resolve(new Response(JSON.stringify(accessGroup), { status: 200 }));

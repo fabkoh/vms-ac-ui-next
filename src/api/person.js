@@ -28,10 +28,12 @@ class PersonApi {
         }
 
         const newPerson = {
-            personId: Math.max(fakePersons.map(person => person.personId)) + 1,
+            personId: fakePersons.map(p => p.personId)
+                                 .reduce((a, b) => Math.max(a, b), 0) + 1,
             personFirstName,
             personLastName,
-            personUid,
+            // if no uid, generate random uid
+            personUid: (personUid || String(Math.floor(Math.random() * (10 ** 8)))),
             personMobileNumber,
             personEmail,
             accessGroup
@@ -39,16 +41,19 @@ class PersonApi {
 
         fakePersons.push(newPerson);
 
+        // did not populate access group as not required
         return Promise.resolve(new Response(JSON.stringify(newPerson), { status: 201 }));
     }
 
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        const persons = fakePersons.map(person => {
+        const persons = [ ...fakePersons ]
+
+        const persons = persons.map(person => {
             if (person.accessGroup) {
                 // populate access group
-                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup)};
+                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup) };
             } 
             return person
         })
@@ -58,7 +63,7 @@ class PersonApi {
     getPerson(id) {
         if (useApi) { return sendApi(`/api/person/${id}`); }
 
-        const person = fakePersons.find(p => p.personId == id)
+        const person = { ...fakePersons.find(p => p.personId == id)}
 
         if (person) { 
             if (person.accessGroup) {

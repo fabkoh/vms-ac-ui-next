@@ -13,11 +13,7 @@ const fakePersons = [
         "personUid": "lCj7sSpU",
         "personMobileNumber": "+1 1001001000",
         "personEmail": "paul@atreides.com",
-        "accessGroup": {
-            "accessGroupId": 1,
-            "accessGroupName": "Dune",
-            "accessGroupDesc": "the characters from Dune"
-        }
+        "accessGroup": 1
     },
     {
         "personId": 2,
@@ -26,11 +22,7 @@ const fakePersons = [
         "personUid": "F2VMFevJ",
         "personMobileNumber": "+1 1001001001",
         "personEmail": "leto@atreides.com",
-        "accessGroup": {
-            "accessGroupId": 1,
-            "accessGroupName": "Dune",
-            "accessGroupDesc": "the characters from Dune"
-        }
+        "accessGroup": 1
     },
     {
         "personId": 3,
@@ -39,10 +31,7 @@ const fakePersons = [
         "personUid": "abc",
         "personMobileNumber": "+65 98765432",
         "personEmail": "smith.j@mail.com",
-        "accessGroup":  {
-            "accessGroupId": 2,
-            "accessGroupName": "Not dune"
-        }
+        "accessGroup":  2
     },
     {
         "personId": 4,
