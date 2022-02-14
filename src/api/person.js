@@ -1,4 +1,4 @@
-import { useApi, sendApi, fakePersons } from './api-config'
+import { useApi, sendApi, fakePersons, fakeAccessGroups } from './api-config';
 
 class PersonApi {
 
@@ -7,7 +7,8 @@ class PersonApi {
         personLastName, 
         personUid, 
         personMobileNumber, 
-        personEmail 
+        personEmail,
+        accessGroup
     }) {
         if (useApi) { 
             return sendApi('/api/person', {
@@ -20,44 +21,62 @@ class PersonApi {
                     personLastName,
                     personUid,
                     personMobileNumber,
-                    personEmail
+                    personEmail,
+                    accessGroup
                 })
             }); 
         }
 
         const newPerson = {
-            personId: Math.max(fakePersons.map(person => person.personId)) + 1,
+            personId: fakePersons.map(p => p.personId)
+                                 .reduce((a, b) => Math.max(a, b), 0) + 1,
             personFirstName,
             personLastName,
-            personUid,
+            // if no uid, generate random uid
+            personUid: (personUid || String(Math.floor(Math.random() * (10 ** 8)))),
             personMobileNumber,
-            personEmail
+            personEmail,
+            accessGroup
         }
 
         fakePersons.push(newPerson);
 
+        // did not populate access group as not required
         return Promise.resolve(new Response(JSON.stringify(newPerson), { status: 201 }));
     }
 
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        return Promise.resolve(new Response(JSON.stringify(fakePersons), { status: 200 }));
+        const persons = [ ...fakePersons ]
+
+        persons.map(person => {
+            if (person.accessGroup) {
+                // populate access group
+                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup) };
+            } 
+            return person
+        })
+        return Promise.resolve(new Response(JSON.stringify(persons), { status: 200 }));
     }
 
     getPerson(id) {
         if (useApi) { return sendApi(`/api/person/${id}`); }
 
-        const person = fakePersons.find(p => p.personId == id)
+        const person = { ...fakePersons.find(p => p.personId == id)}
 
         if (person) { 
+            if (person.accessGroup) {
+                // populate access group
+                person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup)};
+            }
             return Promise.resolve(new Response(JSON.stringify(person), { status: 200 }));
         }
 
         return Promise.resolve(new Response(
             JSON.stringify({ personId: `Person with Id ${id} does not exist` }),
             { status: 404 }
-            ));
+        ));
     }
 
     updatePerson({
@@ -66,7 +85,8 @@ class PersonApi {
         personLastName,
         personUid,
         personMobileNumber,
-        personEmail
+        personEmail,
+        accessGroup
     }) {
         if (useApi) {
             return sendApi('/api/person', {
@@ -80,7 +100,8 @@ class PersonApi {
                     personLastName,
                     personUid,
                     personMobileNumber,
-                    personEmail
+                    personEmail,
+                    accessGroup
                 })
             });
         }
@@ -91,7 +112,8 @@ class PersonApi {
             personLastName,
             personUid,
             personMobileNumber,
-            personEmail
+            personEmail,
+            accessGroup
         };
 
         const index = fakePersons.findIndex(person => person.personId == personId);
@@ -103,7 +125,7 @@ class PersonApi {
             ));
         }
 
-        fakePersons[index] = updatedPerson
+        fakePersons[index] = updatedPerson;
         return Promise.resolve(new Response(JSON.stringify(updatedPerson), { status: 200 }));
     }
 
@@ -119,6 +141,10 @@ class PersonApi {
         }
 
         fakePersons.splice(index, 1);
+        fakeAccessGroups = fakeAccessGroups.forEach(group => {
+            // remove deleted person id from access group
+            group.person = group.person.filter(personId => personId != id);
+        })
 
         return Promise.resolve(new Response(null, { status: 204 }));
     }
