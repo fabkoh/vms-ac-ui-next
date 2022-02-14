@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
 import { accessGroupApi } from "../../../../api/access-groups";
