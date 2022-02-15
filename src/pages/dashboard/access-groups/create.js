@@ -12,6 +12,7 @@ import { accessGroupApi } from "../../../api/access-groups";
 import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
+import formUtils from "../../../utils/form-utils";
 
 const CreateAccessGroups = () => {
 
@@ -48,69 +49,6 @@ const CreateAccessGroups = () => {
     const [accessGroupValidationsArr, 
         setAccessGroupValidationsArr] = useState([getEmptyAccessGroupValidations(0)]);
 
-    // add card logic
-    //returns largest cardId + 1
-    const getNewId = () => accessGroupInfoArr.map(info => info.cardId)
-                                             .reduce((a, b) => Math.max(a, b), -1) + 1
-
-    const addCard = () => {
-        const newId = getNewId();
-        setAccessGroupInfoArr([ ...accessGroupInfoArr, getEmptyAccessGroupInfo(newId) ]);
-        setAccessGroupValidationsArr([ ...accessGroupValidationsArr, getEmptyAccessGroupValidations(newId) ]);
-    }
-
-    // remove card logic
-    const removeCard = (id) => {
-        const newAccessGroupInfoArr = accessGroupInfoArr.filter(info => info.cardId != id);
-        const newValidations = accessGroupValidationsArr.filter(validation => validation.cardId != id);
-
-        // check name duplicated
-        const nameMap = {} // maps name to the index of the first occurence of said name
-        for (let i=0; i<newAccessGroupInfoArr.length; i++) {
-            const accessGroupInfo = newAccessGroupInfoArr[i];
-
-            // accessGroupInfo is not updated yet with the latest name yet, so check if name is updated
-            const name = accessGroupInfo.cardId == id ? accessGroupName : accessGroupInfo.accessGroupName;
-
-            if (/^\s*$/.test(name)) {
-                newValidations[i].accessGroupNameDuplicated = false;
-            } else if (name in nameMap) {
-                newValidations[i].accessGroupNameDuplicated = true;
-                newValidations[nameMap[name]].accessGroupNameDuplicated = true;
-            } else {
-                newValidations[i].accessGroupNameDuplicated = false;
-                nameMap[name] = i;
-            }
-        }
-        
-        // check person duplicated
-        const personIdMap = {}; // stores person id and maps to the first card id
-        const newDuplicatedPerson = {}; // stores id of duplicated person
-        for(let i=0; i<newAccessGroupInfoArr.length; i++) {
-            const accessGroupInfo = newAccessGroupInfoArr[i];
-
-            // accessGroupInfo is not updated yet, so check if needs updating
-            const persons = accessGroupInfo.cardId == id ? newValue : accessGroupInfo.person;
-            
-            const currValidation = newValidations[i];
-            currValidation.accessGroupPersonDuplicated = false;
-            persons.forEach(person => {
-                const personId = person.personId;
-                if (personId in personIdMap) {
-                    currValidation.accessGroupPersonDuplicated = true;
-                    newValidations[personIdMap[personId]].accessGroupPersonDuplicated = true;
-                    newDuplicatedPerson[personId] = true; // save duplicated person id
-                } else {
-                    personIdMap[personId] = i;
-                }
-            })
-        }
-
-        setAccessGroupInfoArr(newAccessGroupInfoArr);
-        setAccessGroupValidationsArr(newValidations);
-        setDuplicatedPerson(newDuplicatedPerson);        
-    }
-    
     // persons logic (displaying in dropdown box)
     const isMounted = useMounted();
     const [allPersons, setAllPersons] = useState([]);
@@ -126,6 +64,7 @@ const CreateAccessGroups = () => {
             }
         } catch(e) {
             console.error(e);
+            toast.error("Persons not loaded");
         }
     }, [isMounted]);
 
@@ -133,8 +72,86 @@ const CreateAccessGroups = () => {
         getPersons();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [])
+    []);
 
+    // stores the duplicated person ids
+    const [duplicatedPerson, setDuplicatedPerson] = useState({});
+
+    // store previous access group names
+    const accessGroupNames = {};
+    accessGroupApi.getAccessGroups()
+        .then(async res => {
+            if (res.status == 200) {
+               const body = await res.json();
+               body.forEach(group => accessGroupNames[group.accessGroupName] = true); 
+            }
+        });
+
+    // add card logic
+    //returns largest cardId + 1
+    const getNewId = () => accessGroupInfoArr.map(info => info.cardId)
+                                             .reduce((a, b) => Math.max(a, b), -1) + 1
+
+    const addCard = () => {
+        const newId = getNewId();
+        setAccessGroupInfoArr([ ...accessGroupInfoArr, getEmptyAccessGroupInfo(newId) ]);
+        setAccessGroupValidationsArr([ ...accessGroupValidationsArr, getEmptyAccessGroupValidations(newId) ]);
+    }
+
+    // helper for remove card and changeNameCheck
+    // directly modifies validationArr
+    const checkDuplicateName = (groupArr, validationArr) => {
+        const duplicatedNames = formUtils.getDuplicates(
+            groupArr
+                // get access group names
+                .map(group => group.accessGroupName)
+                // keep the ones that are not blank strings
+                .filter(name => !(/^\s*$/.test(name)))
+        );
+        for(let i=0; i<groupArr.length; i++) {
+            validationArr[i].accessGroupNameDuplicated = groupArr[i].accessGroupName in duplicatedNames;
+        }
+    }
+
+    // helper for removeCard and changePersonCheck
+    // directly modifies validationArr, return newDuplicatedPerson
+    const checkDuplicatePerson = (groupArr, validationArr) => {
+        // stores id of duplicated persons
+        const newDuplicatedPerson = formUtils.getDuplicates(
+            groupArr.map(
+                // get access group person
+                group => group.person.map(
+                    // get person id
+                    person => person.personId
+                )
+            ).flat()
+        );
+        for(let i=0; i<groupArr.length; i++) {
+            // equals true if 
+            validationArr[i].accessGroupPersonDuplicated =
+                // returns true if some person in access group is in duplicaed person
+                groupArr[i].person.some(
+                    person => person.personId in newDuplicatedPerson
+                );           
+        }
+        return newDuplicatedPerson
+    }
+
+    // remove card logic
+    const removeCard = (id) => {
+        const newAccessGroupInfoArr = accessGroupInfoArr.filter(info => info.cardId != id);
+        const newValidations = accessGroupValidationsArr.filter(validation => validation.cardId != id);
+
+        // check name duplicated
+        checkDuplicateName(newAccessGroupInfoArr, newValidations);
+        
+        // check person duplicated
+        setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, newValidations)); 
+
+        setAccessGroupInfoArr(newAccessGroupInfoArr);
+        setAccessGroupValidationsArr(newValidations);       
+    }
+    
     // update methods for form inputs
     const changeTextField = (e, id) => {
         const updatedInfo = [ ...accessGroupInfoArr ];
@@ -155,77 +172,32 @@ const CreateAccessGroups = () => {
         const newValidations = [ ...accessGroupValidationsArr ];
         const validation = newValidations.find(v => v.cardId == id);
 
+        // store a temp updated access group info
+        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ]
+        newAccessGroupInfoArr.find(group => group.cardId == id).accessGroupName = accessGroupName;
+
         // remove submit failed
         validation.submitFailed = false;
 
         // check name is blank?
-        if (/^\s*$/.test(accessGroupName)) {
-            validation.accessGroupNameBlank = true;
-        } else {
-            validation.accessGroupNameBlank = false;
-        }
+        validation.accessGroupNameBlank = formUtils.checkBlank(accessGroupName);
 
         // check name exists?
-        try {
-            const res =  await accessGroupApi.nameExists(accessGroupName);
-            if (res.status == 200) {
-                const body = await res.json();
-                if (body) {
-                    validation.accessGroupNameExists = true;
-                } else {
-                    validation.accessGroupNameExists = false;
-                }
-            } else {
-                throw Error("accessGroupNameExists check failed")
-            }
-        } catch(e) {
-            console.error(e);
-            // if cannot check, default to no error
-            validation.accessGroupNameExists = false;
-        }
+        validation.accessGroupNameExists = !!accessGroupNames[accessGroupName];
 
         // check name duplicated
-        const nameMap = {} // maps name to the index of the first occurence of said name
-        for (let i=0; i<accessGroupInfoArr.length; i++) {
-            const accessGroupInfo = accessGroupInfoArr[i];
-
-            // accessGroupInfo is not updated yet with the latest name yet, so check if name is updated
-            const name = accessGroupInfo.cardId == id ? accessGroupName : accessGroupInfo.accessGroupName;
-
-            if (/^\s*$/.test(name)) {
-                newValidations[i].accessGroupNameDuplicated = false;
-            } else if (name in nameMap) {
-                newValidations[i].accessGroupNameDuplicated = true;
-                newValidations[nameMap[name]].accessGroupNameDuplicated = true;
-            } else {
-                newValidations[i].accessGroupNameDuplicated = false;
-                nameMap[name] = i;
-            }
-        }
+        checkDuplicateName(newAccessGroupInfoArr, newValidations);
 
         setAccessGroupValidationsArr(newValidations);
     }
-
-    const changeDescCheck = (e, id) => {
-        const newValidations = [ ...accessGroupValidationsArr ];
-        const validation = validation.find(v => v.cardId == id);
-
-        // remove submit failed
-        validation.submitfailed = false;
-
-        // check if desc is blank
-        validation.accessGroupDescBlank = /^\s+$/.test(e.target.value);
-
-        setAccessGroupValidationsArr(newValidations);
-    }
-
-    // stores the duplicated person ids
-    const [duplicatedPerson, setDuplicatedPerson] = useState({});
 
     const changePersonCheck = (newValue, id) => {
         // check if person has existing access group
         const validations = [ ...accessGroupValidationsArr ];
         const validation = validations.find(v => v.cardId == id);
+
+        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
+        newAccessGroupInfoArr.find(group => group.cardId == id).person = newValue; // hold an updated copy of access group info for validation checks
 
         // remove submit failed
         validation.submitFailed = false;
@@ -234,30 +206,9 @@ const CreateAccessGroups = () => {
         validation.accessGroupPersonHasAccessGroup = newValue.some(person => person.accessGroup);
 
         // check person duplicated
-        const personIdMap = {}; // stores person id and maps to the first card id
-        const newDuplicatedPerson = {}; // stores id of duplicated person
-        for(let i=0; i<accessGroupInfoArr.length; i++) {
-            const accessGroupInfo = accessGroupInfoArr[i];
-
-            // accessGroupInfo is not updated yet, so check if needs updating
-            const persons = accessGroupInfo.cardId == id ? newValue : accessGroupInfo.person;
-            
-            const currValidation = validations[i];
-            currValidation.accessGroupPersonDuplicated = false;
-            persons.forEach(person => {
-                const personId = person.personId
-                if (personId in personIdMap) {
-                    currValidation.accessGroupPersonDuplicated = true;
-                    validations[personIdMap[personId]].accessGroupPersonDuplicated = true;
-                    newDuplicatedPerson[personId] = true; // save duplicated person id
-                } else {
-                    personIdMap[personId] = i;
-                }
-            })
-        }
+        setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, validations)); 
 
         setAccessGroupValidationsArr(validations);
-        setDuplicatedPerson(newDuplicatedPerson);
     }
 
     const [submitted, setSubmitted] = useState(false);
@@ -358,7 +309,6 @@ const CreateAccessGroups = () => {
                                     changeNameCheck={changeNameCheck}
                                     changePersonCheck={changePersonCheck}
                                     duplicatedPerson={duplicatedPerson}
-                                    changeDescCheck={changeDescCheck}
                                 />
                             ))}
                             <div>
@@ -378,6 +328,7 @@ const CreateAccessGroups = () => {
                                         size="large"
                                         variant="contained"
                                         disabled={
+                                            submitted                      ||
                                             accessGroupInfoArr.length == 0 || // no access groups to submit
                                             accessGroupValidationsArr.some( // check if validations fail
                                                 validation => validation.accessGroupNameBlank        ||

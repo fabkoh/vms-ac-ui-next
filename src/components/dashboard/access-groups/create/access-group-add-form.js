@@ -15,7 +15,7 @@ import { ExpandMore } from "../../person/person-add-form";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 
-export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, changeDescCheck }) => {
+export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson }) => {
     const {
         cardId,
         accessGroupName,
@@ -25,7 +25,6 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
 
     const {
         accessGroupNameBlank,
-        accessGroupDescBlank,
         accessGroupNameExists,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
@@ -42,7 +41,6 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
     return (
         <ErrorCard error={
             accessGroupNameBlank        ||
-            accessGroupDescBlank        ||
             accessGroupNameExists       ||
             accessGroupNameDuplicated   ||
             accessGroupPersonDuplicated ||
@@ -108,7 +106,7 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                                     label="Description"
                                     name="accessGroupDesc"
                                     value={accessGroupDesc}
-                                    onChange={ (e) => { changeTextField(e, cardId);  changeDescCheck(e, cardId); }}
+                                    onChange={ (e) => changeTextField(e, cardId) }
                                 />
                             </Grid>
                             <Divider />
