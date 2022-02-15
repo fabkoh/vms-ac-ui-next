@@ -189,6 +189,35 @@ export const PersonAddForm = (props) => {
                     />
                   </ThemeProvider>
                 </Grid>
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                >
+                    <TextField
+                      fullWidth
+                      //error={!person.valid.email || !(person.valid.emailNotRepeated && person.valid.emailNotInUse)}
+                      //helperText={!person.valid.email ? 'Error: Email is not valid' : !(person.valid.emailNotRepeated && person.valid.emailNotInUse) ? "Note: Email Address already exists" : person.valid.email}
+                      label="Access Group"
+                      name="accessGroup"
+                      //onChange={(e) => onEmailChange(e, person.id)}
+                      value={person.accessGroup}
+                    />
+
+                {/*<TextField
+									defaultValue=""
+									fullWidth
+									inputProps={{ ref: queryRef }}
+									InputProps={{
+										startAdornment: (
+											<InputAdornment position="start">
+												<SearchIcon fontSize="small" />
+											</InputAdornment>
+										),
+									}}
+									placeholder="Search for Access Group"
+								/>*/}
+                </Grid>
               </Grid>
             </Collapse>
           </Grid>

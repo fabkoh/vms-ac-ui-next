@@ -145,11 +145,11 @@ export const AccessGroupListTable = (props) => {
 											value={isAccessGroupselected}
 										/>
 									</TableCell>
-									<TableCell width="10%">
+									<TableCell width="30%">
 										<Box
 											sx={{
 												m: 1,
-												alignItems: "center",
+												//alignItems: "center",
 												display: "flex",
 											}}
 										>
@@ -167,30 +167,24 @@ export const AccessGroupListTable = (props) => {
 											</Box>
 										</Box>
 									</TableCell>
-                                    <TableCell width="5%">
-										<Box
-											sx={{
-												m: 1,
-												alignItems: "center",
-												display: "flex",
-											}}
-										>
-											<Box sx={{ ml: 1, width:100}}>
+                                    <TableCell width="15%">
+		
+											<Box sx={{ ml: -5, width:180}}>
 												<NextLink
 													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
 													passHref
 												>
-													<Link color="inherit" variant="headline5">
-														<Typography noWrap>
+													<Link color="inherit" variant="headline6">
+														<Typography>
 														{accGroup.accessGroupDesc}
 														</Typography>
 													</Link>
 												</NextLink>
 											</Box>
-										</Box>
+										
 									</TableCell>
-									<TableCell width="20%">
-										<Typography width={180} noWrap>
+									<TableCell width="20%" align="center">
+										<Typography width={160} noWrap>
 											{(accGroup.person) || (
 												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" />
@@ -199,9 +193,9 @@ export const AccessGroupListTable = (props) => {
 											)}
 										</Typography>
 									</TableCell>
-									<TableCell width="10%">{accGroup.entrances}</TableCell>
+									<TableCell width="20%">{accGroup.entrances}</TableCell>
 
-									<TableCell width="10%" align="left">
+									<TableCell width="20%" align="left">
 										<NextLink
 											href={{
 												pathname: "/dashboard/access-groups/edit",

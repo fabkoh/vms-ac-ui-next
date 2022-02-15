@@ -35,7 +35,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { accessGroupApi } from "../../../api/access-groups";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
-import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
+import { confirmDelete } from "../../../components/dashboard/access-groups/confirm-delete";
 import toast from "react-hot-toast";
 
 const tabs = [
@@ -395,7 +395,7 @@ const accessGroupList = () => {
 										<DeleteIcon />
 										&#8288;Delete Access Group
 									</MenuItem>
-									<Confirmdelete selectedState={selectedState} 
+									<confirmDelete selectedState={selectedState} 
 									setAnchorEl={setAnchorEl}
 									deleteOpen={deleteOpen} 
 									handleDeleteClose={handleDeleteClose}
@@ -502,7 +502,7 @@ const accessGroupList = () => {
 							handleSelectAllAccessGroup={handleSelectAllAccessGroup}
 							handleSelectOneAccessGroup={handleSelectOneAccessGroup}
 							accessGroup={paginatedAccessGroup}
-							accessGroupCount={accessGroup.length}
+							accessGroupCount={filteredAccessGroup.length}
 							onPageChange={handlePageChange}
 							onRowsPerPageChange={handleRowsPerPageChange}
 							rowsPerPage={rowsPerPage}
