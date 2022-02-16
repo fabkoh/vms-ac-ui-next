@@ -8,24 +8,25 @@ import {
     Divider, 
     CardContent,
     Stack,
-    Typography
+    Typography,
+    Box
 } from "@mui/material";
 import { useState } from "react";
-import { ExpandMore } from "../../person/person-add-form";
+import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 
-export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, changeDescCheck }) => {
+const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, edit }) => {
     const {
-        cardId,
+        accessGroupId,
         accessGroupName,
         accessGroupDesc,
-        person
+        person,
+        originalPersonIds
     } = accessGroupInfo;
 
     const {
         accessGroupNameBlank,
-        accessGroupDescBlank,
         accessGroupNameExists,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
@@ -38,11 +39,9 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
     const handleExpandClick = () => setExpanded(!expanded);
 
     const getName = (p) => p.personFirstName + ' ' + p.personLastName;
-
     return (
         <ErrorCard error={
             accessGroupNameBlank        ||
-            accessGroupDescBlank        ||
             accessGroupNameExists       ||
             accessGroupNameDuplicated   ||
             accessGroupPersonDuplicated ||
@@ -61,15 +60,30 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                 title="Access group"
                 action={
                     // action are children flushed to the right
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => removeCard(cardId)}
-                    >
-                        Remove
-                    </Button>
+                    (
+                        <Grid item container>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={() => removeCard(accessGroupId)}
+                            >
+                                Remove
+                            </Button>
+                            { edit && (
+                                <Box ml={2}>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => console.log("delete")} // put delete method here
+                                    >
+                                        Delete
+                                    </Button>
+                                </Box>
+                            )}
+                        </Grid>
+                    )
                 }
-                sx={{ width: '100%' }}
+                sx={{ width: '100%', flexWrap: "wrap" }}
             />
             <Divider />
             <CardContent>
@@ -87,7 +101,7 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                             name="accessGroupName"
                             required
                             value={accessGroupName}
-                            onChange={(e) => { changeTextField(e, cardId); changeNameCheck(e, cardId); }}
+                            onChange={(e) => { changeTextField(e, accessGroupId); changeNameCheck(e, accessGroupId); }}
                             helperText={ 
                                 (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                                 (accessGroupNameExists && 'Error: access group name taken') ||
@@ -108,7 +122,7 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                                     label="Description"
                                     name="accessGroupDesc"
                                     value={accessGroupDesc}
-                                    onChange={ (e) => { changeTextField(e, cardId);  changeDescCheck(e, cardId); }}
+                                    onChange={ (e) => changeTextField(e, accessGroupId) }
                                 />
                             </Grid>
                             <Divider />
@@ -123,12 +137,12 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                                     item
                                     md={2}
                                 >
-                                    <Grid>
+                                    <Grid mb={1}>
                                         <Typography 
                                             variant="body" 
                                             fontWeight="bold"
                                         >
-                                            Add Persons:
+                                            Assign persons:
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -139,7 +153,7 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                                 >
                                     <MultipleSelectInput 
                                         options={allPersons}
-                                        setSelected={(newValue) => { changePerson(newValue, cardId); changePersonCheck(newValue, cardId); }}
+                                        setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
                                         getOptionLabel={getName}
                                         label="Persons"
                                         noOptionsText="No persons found"
@@ -163,9 +177,11 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
                                         helperText={
                                             (accessGroupPersonDuplicated && "Error: person(s) in red are present in another access group form") ||
                                             (accessGroupPersonHasAccessGroup && "Note: person(s) in yellow already has an access group. Submitting the form would update their access group.")}
-                                        isWarning={person => person.accessGroup}
+                                        isWarning={p => p.accessGroup && !(originalPersonIds && originalPersonIds.includes(p.personId)) }
                                         isError={person => duplicatedPerson[person.personId]}
                                         error={accessGroupPersonDuplicated}
+                                        value={person}
+                                        isOptionEqualToValue={(option, value) => option.personId == value.personId}
                                     />                                 
                                 </Grid>
                             </Grid>
@@ -176,3 +192,5 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
         </ErrorCard>
     )
 }
+
+export default AccessGroupForm;

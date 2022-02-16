@@ -4,7 +4,7 @@ import { gtm } from "../../../../lib/gtm";
 import { accessGroupApi } from "../../../../api/access-groups";
 import NextLink from 'next/link';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import router from 'next/router';
 import { 
     Box, 
     Grid, 
@@ -24,13 +24,13 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { AccessGroupBasicDetails } from "../../../../components/dashboard/access-groups/details/access-group-basic-details";
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
+import toast from "react-hot-toast";
 
 const AccessGroupDetails = () => {
 
     // load access group details
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
-    const router = useRouter();
     const { accessGroupId }  = router.query;
 
     useEffect(() => { // copied from original template
@@ -40,6 +40,10 @@ const AccessGroupDetails = () => {
     const getAccessGroup = useCallback(async() => {
         try {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
+            if(res.status != 200) {
+                toast.error('Access group not found');
+                router.replace('/dashboard/access-groups')
+            }
             const body = await res.json();
 
             if (isMounted()) {

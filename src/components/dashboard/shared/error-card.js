@@ -11,7 +11,7 @@ const useStyles = makeStyles({
 const ErrorCard = ({ error, ...props }) => {
     const errorStyle = useStyles();
     return (
-        <Card className={error && errorStyle.root} {...props} />
+        <Card className={error && errorStyle.root || ""} {...props} />
     );
 }
 

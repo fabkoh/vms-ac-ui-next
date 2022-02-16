@@ -33,6 +33,8 @@ export default function CheckboxesTags({
     isWarning,
     isError,
     error,
+    value,
+    isOptionEqualToValue,
     ...other
 }) {
 
@@ -85,6 +87,8 @@ export default function CheckboxesTags({
                     />
                 ))}
             getOptionLabel={getOptionLabel}
+            value={value}
+            isOptionEqualToValue={isOptionEqualToValue}
         />
     );
 }
