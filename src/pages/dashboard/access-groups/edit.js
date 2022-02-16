@@ -6,7 +6,6 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 import { AccessGroupAddForm } from "../../../components/dashboard/access-groups/create/access-group-add-form";
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import Add from "@mui/icons-material/Add";
 import { personApi } from "../../../api/person";
 import { accessGroupApi } from "../../../api/access-groups";
 import { useMounted } from "../../../hooks/use-mounted";
@@ -14,43 +13,89 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 
-const CreateAccessGroups = () => {
+const EditAccessGroups = () => {
 
-    // empty objects for initialisation of new card
-    const getEmptyAccessGroupInfo = (accessGroupId) => ({
-        accessGroupId,
-        accessGroupName: '',
-        accessGroupDesc: '',
-        person: []
-    });
-    const getEmptyAccessGroupValidations = (accessGroupId) => ({
-        accessGroupId,
-        accessGroupNameBlank: false,
-        accessGroupDescBlank: false,
-
-        // name in database (error)
-        accessGroupNameExists: false,
-
-        // name duplicated in form (error)
-        accessGroupNameDuplicated: false,
-
-        // person has access group (note)
-        accessGroupPersonHasAccessGroup: false,
-
-        // person in two access groups in same form (error) 
-        accessGroupPersonDuplicated: false,
-
-        // submit failed
-        submitFailed: false
-    });
-
-    const [accessGroupInfoArr, 
-        setAccessGroupInfoArr] = useState([getEmptyAccessGroupInfo(0)]);
+    // edited access groups logic
+    const isAccessGroupMounted = useMounted();
+    const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
     const [accessGroupValidationsArr, 
-        setAccessGroupValidationsArr] = useState([getEmptyAccessGroupValidations(0)]);
+        setAccessGroupValidationsArr] = useState([]);
+
+    // load access groups to be edited
+    const getAccessGroups = ids => {
+        // map each id to a fetch req for that access group
+        Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)))
+            .then(resArr => {
+                // get all successful req
+                const successfulReq = resArr.filter(res => res.status == 200);
+
+                if (successfulReq.length == 0) {
+                    // no access groups found
+                    toast.error('Error editing access groups. Please refresh and try again');
+                    router.replace('/dashboard/access-groups');
+                };
+
+                if (successfulReq.length != resArr.length) {
+                    // some access groups not found
+                    toast.error('Some access groups were not found.');
+                };
+
+                // get all req bodies
+                Promise.all(successfulReq.map(req => req.json()))
+                    .then(accessGroupArr => {                        
+                        const validation = []
+                        // create a validation for each access group
+                        accessGroupArr.forEach(
+                            group => validation.push({
+                                accessGroupId: group.accessGroupId,
+                                accessGroupNameBlank: false,
+                                accessGroupDescBlank: false,
+
+                                // name in database (error)
+                                accessGroupNameExists: false,
+
+                                // name duplicated in form (error)
+                                accessGroupNameDuplicated: false,
+
+                                // person has access group (note)
+                                accessGroupPersonHasAccessGroup: false,
+
+                                // person in two access groups in same form (error) 
+                                accessGroupPersonDuplicated: false,
+
+                                // submit failed
+                                submitFailed: false
+                            })
+                        );
+                        setAccessGroupValidationsArr(validation);
+                        setAccessGroupInfoArr(
+                            accessGroupArr.map(
+                                group => {
+                                    return {
+                                        accessGroupId: group.accessGroupId,
+                                        accessGroupName: group.accessGroupName,
+                                        accessGroupDesc: group.accessGroupDesc,
+                                        person: group.person,
+                                        originalName: group.accessGroupName, // do not change original fields as they are needed for validations
+                                        originalPersonIds: group.person.map(p => p.personId)
+                                    }
+                                }
+                            )
+                        );
+                    })
+            });
+    }
+
+    useEffect(() => {
+        try {
+            getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)));
+        } catch(e){
+            router.replace('/dashboard/access-groups')
+        }
+    }, [])
 
     // persons logic (displaying in dropdown box)
-    const isMounted = useMounted();
+    const isPersonMounted = useMounted();
     const [allPersons, setAllPersons] = useState([]);
 
     const getPersons = useCallback( async() => {
@@ -66,7 +111,7 @@ const CreateAccessGroups = () => {
             console.error(e);
             toast.error("Persons not loaded");
         }
-    }, [isMounted]);
+    }, [isPersonMounted]);
 
     useEffect(() => {
         getPersons();
@@ -86,17 +131,6 @@ const CreateAccessGroups = () => {
                body.forEach(group => accessGroupNames[group.accessGroupName] = true); 
             }
         });
-
-    // add card logic
-    //returns largest accessGroupId + 1
-    const getNewId = () => accessGroupInfoArr.map(info => info.accessGroupId)
-                                             .reduce((a, b) => Math.max(a, b), -1) + 1
-
-    const addCard = () => {
-        const newId = getNewId();
-        setAccessGroupInfoArr([ ...accessGroupInfoArr, getEmptyAccessGroupInfo(newId) ]);
-        setAccessGroupValidationsArr([ ...accessGroupValidationsArr, getEmptyAccessGroupValidations(newId) ]);
-    }
 
     // helper for remove card and changeNameCheck
     // directly modifies validationArr
@@ -142,6 +176,10 @@ const CreateAccessGroups = () => {
         const newAccessGroupInfoArr = accessGroupInfoArr.filter(info => info.accessGroupId != id);
         const newValidations = accessGroupValidationsArr.filter(validation => validation.accessGroupId != id);
 
+        if (newAccessGroupInfoArr.length == 0) {
+            router.replace('/dashboard/access-groups'); // redirect if nothing left to edit
+        }
+
         // check name duplicated
         checkDuplicateName(newAccessGroupInfoArr, newValidations);
         
@@ -164,6 +202,7 @@ const CreateAccessGroups = () => {
         const updatedInfo = [ ...accessGroupInfoArr ];
         updatedInfo.find(info => info.accessGroupId == id).person = newValue;
         setAccessGroupInfoArr(updatedInfo);
+        console.log(updatedInfo);
     }
 
     // error checking methods
@@ -172,9 +211,10 @@ const CreateAccessGroups = () => {
         const newValidations = [ ...accessGroupValidationsArr ];
         const validation = newValidations.find(v => v.accessGroupId == id);
 
-        // store a temp updated access group info
-        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ]
-        newAccessGroupInfoArr.find(group => group.accessGroupId == id).accessGroupName = accessGroupName;
+        // store a temp updated access group info (not for updating purposes)
+        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
+        const newCurrAccessGroup = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
+        newCurrAccessGroup.accessGroupName = accessGroupName;
 
         // remove submit failed
         validation.submitFailed = false;
@@ -183,7 +223,10 @@ const CreateAccessGroups = () => {
         validation.accessGroupNameBlank = formUtils.checkBlank(accessGroupName);
 
         // check name exists?
-        validation.accessGroupNameExists = !!accessGroupNames[accessGroupName];
+        validation.accessGroupNameExists = (
+            newCurrAccessGroup.originalName != accessGroupName &&
+            !!accessGroupNames[accessGroupName]
+        );
 
         // check name duplicated
         checkDuplicateName(newAccessGroupInfoArr, newValidations);
@@ -197,13 +240,17 @@ const CreateAccessGroups = () => {
         const validation = validations.find(v => v.accessGroupId == id);
 
         const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
-        newAccessGroupInfoArr.find(group => group.accessGroupId == id).person = newValue; // hold an updated copy of access group info for validation checks
+        const newAccessGroupInfo = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
+        newAccessGroupInfo.person = newValue; // hold an updated copy of access group info for validation checks
 
         // remove submit failed
         validation.submitFailed = false;
 
         // some selected persons has access group already
-        validation.accessGroupPersonHasAccessGroup = newValue.some(person => person.accessGroup);
+        const originalPersonIds = newAccessGroupInfo.originalPersonIds;
+        validation.accessGroupPersonHasAccessGroup = newValue.some(
+            person => person.accessGroup && !originalPersonIds.includes(person.personId)
+        );
 
         // check person duplicated
         setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, validations)); 
@@ -256,7 +303,7 @@ const CreateAccessGroups = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Create Access Groups
+                    Etlas: Edit Access Groups
                 </title>
             </Head>
             <Box
@@ -292,7 +339,7 @@ const CreateAccessGroups = () => {
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Create Access Groups
+                            Edit Access Groups
                         </Typography>
                     </Box>
                     <form onSubmit={submitForm}>
@@ -309,18 +356,9 @@ const CreateAccessGroups = () => {
                                     changeNameCheck={changeNameCheck}
                                     changePersonCheck={changePersonCheck}
                                     duplicatedPerson={duplicatedPerson}
+                                    edit
                                 />
                             ))}
-                            <div>
-                                <Button
-                                    size="large"
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                    onClick={addCard}
-                                >
-                                    Add another
-                                </Button>
-                            </div>
                             <Grid container>
                                 <Grid item marginRight={3}>
                                     <Button
@@ -364,7 +402,7 @@ const CreateAccessGroups = () => {
     )
 }
 
-CreateAccessGroups.getLayout = (page) => (
+EditAccessGroups.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -372,4 +410,4 @@ CreateAccessGroups.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default CreateAccessGroups;
+export default EditAccessGroups;
