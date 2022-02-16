@@ -3,7 +3,7 @@ import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import { AccessGroupAddForm } from "../../../components/dashboard/access-groups/create/access-group-add-form";
+import AccessGroupAddForm from "../../../components/dashboard/access-groups/forms/access-group-add-form";
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
 import Add from "@mui/icons-material/Add";

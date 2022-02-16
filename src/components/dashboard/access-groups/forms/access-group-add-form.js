@@ -12,11 +12,11 @@ import {
     Box
 } from "@mui/material";
 import { useState } from "react";
-import { ExpandMore } from "../../person/person-add-form";
+import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 
-export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, edit }) => {
+const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, edit }) => {
     const {
         accessGroupId,
         accessGroupName,
@@ -192,3 +192,5 @@ export const AccessGroupAddForm = ({ accessGroupInfo, accessGroupValidations, re
         </ErrorCard>
     )
 }
+
+export default AccessGroupForm;

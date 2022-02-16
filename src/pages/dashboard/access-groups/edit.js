@@ -3,7 +3,7 @@ import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import { AccessGroupAddForm } from "../../../components/dashboard/access-groups/create/access-group-add-form";
+import AccessGroupEditForm from "../../../components/dashboard/access-groups/forms/access-group-add-form";
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
 import { personApi } from "../../../api/person";
@@ -345,7 +345,7 @@ const EditAccessGroups = () => {
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
                             { accessGroupInfoArr.map((accessGroupInfo, i) => (
-                                <AccessGroupAddForm
+                                <AccessGroupEditForm
                                     key={accessGroupInfo.accessGroupId}
                                     accessGroupInfo={accessGroupInfo}
                                     removeCard={removeCard}
