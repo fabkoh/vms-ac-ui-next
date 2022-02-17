@@ -41,6 +41,10 @@ const PersonDetails = () => {
   const getPerson = useCallback(async () => {
     try {
       const res = await personApi.getPerson(personId);
+      if(res.status != 200) { // person not found
+        toast.error("Person not found");
+        router.replace("/dashboard/persons");
+      }
       const body = await res.json();
 
       if(isMounted()) {
