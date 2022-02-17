@@ -31,7 +31,8 @@ import { Scrollbar } from '../scrollbar';
 import { DashboardSidebarSection } from './dashboard-sidebar-section';
 import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
-import Image from 'next/image'
+import Image from 'next/image';
+import { LockClosed } from '../../icons/lock-closed';
 
 const getSections = (t) => [
   {
@@ -85,7 +86,7 @@ const getSections = (t) => [
       {
         title: t('Access groups'),
         path: '/dashboard/access-groups',
-        icon: <UsersIcon fontSize="small" />,
+        icon: <LockClosed fontSize="small" />,
         children: [
           {
             title: t('List'),
