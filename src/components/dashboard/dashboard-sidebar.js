@@ -41,40 +41,6 @@ const getSections = (t) => [
         title: t('Overview'),
         path: '/dashboard',
         icon: <HomeIcon fontSize="small" />
-      },
-      {
-        title: t('Analytics'),
-        path: '/dashboard/analytics',
-        icon: <ChartBarIcon fontSize="small" />
-      },
-      {
-        title: t('Finance'),
-        path: '/dashboard/finance',
-        icon: <ChartPieIcon fontSize="small" />
-      },
-      {
-        title: t('Logistics'),
-        path: '/dashboard/logistics',
-        icon: <TruckIcon fontSize="small" />,
-        chip: <Chip
-          color="secondary"
-          label={(
-            <Typography
-              sx={{
-                fontSize: '10px',
-                fontWeight: '600'
-              }}
-            >
-              NEW
-            </Typography>
-          )}
-          size="small"
-        />
-      },
-      {
-        title: t('Account'),
-        path: '/dashboard/account',
-        icon: <UserCircleIcon fontSize="small" />
       }
     ]
   },
@@ -83,7 +49,7 @@ const getSections = (t) => [
     items: [
       {
         title: t('Persons'),
-        path: '/dashboard/social',
+        path: '/dashboard/persons',
         icon: <UsersIcon fontSize="small" />,
         children: [
           {
@@ -111,6 +77,26 @@ const getSections = (t) => [
           }
         ]
       },
+    ]
+  },
+  {
+    title: t('Rules'),
+    items: [
+      {
+        title: t('Access groups'),
+        path: '/dashboard/access-groups',
+        icon: <UsersIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/access-groups'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/access-groups/create'
+          }
+        ]
+      }
     ]
   },
   {
