@@ -200,7 +200,7 @@ export const PersonsListTable = (props) => {
 										<Typography width={180} noWrap>
 											{person.personMobileNumber || (
 												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" />
+													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 													No mobile number
 												</SeverityPill>
 											)}
@@ -210,14 +210,27 @@ export const PersonsListTable = (props) => {
 										<Typography width={190} noWrap>
 										{person.personEmail || (
 											<SeverityPill color="warning">
-												<WarningIcon fontSize="small" />
+												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 												No email
 											</SeverityPill>
 										)}
 										</Typography>
 									</TableCell>
 									<TableCell width="20%">{person.personOrgGroup}</TableCell>
-									<TableCell width="20%">{person.PersonAccessGroup}</TableCell>
+									<TableCell width="20%">
+										{ person.accessGroup ? (
+											<NextLink href={`/dashboard/access-groups/details/${person.accessGroup.accessGroupId}`} passHref>
+												<Link>
+													<Typography width={190} noWrap>{person.accessGroup.accessGroupName}</Typography>
+												</Link>
+											</NextLink>
+										) : (
+											<SeverityPill color="warning">
+												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+												No access Group
+											</SeverityPill>
+										) }
+									</TableCell>
 
 									{/* <TableCell>
                     <Typography
