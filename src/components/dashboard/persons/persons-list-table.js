@@ -32,6 +32,7 @@ import { SeverityPill } from "../../severity-pill";
 import WarningIcon from "@mui/icons-material/Warning";
 import { useRouter } from "next/router";
 import { width } from "@mui/system";
+import { ListFilter } from "../shared/list-filter";
 
 export const PersonsListTable = (props) => {
 	const {
@@ -41,6 +42,8 @@ export const PersonsListTable = (props) => {
 		onRowsPerPageChange,
 		page,
 		rowsPerPage,
+		accessGroupNames,
+		onSelect,
 		...other
 	} = props;
 	// const [selectedPersons, setSelectedPersons] = useState([]);
@@ -129,9 +132,10 @@ export const PersonsListTable = (props) => {
 								/>
 							</TableCell>
 							<TableCell>
-								<Buttonfilter
-									array={["SIDE GATE", "ACCESS GROUP", "MAIN GATE"]}
-									sx={{}}
+								<ListFilter
+									array={accessGroupNames}
+									onSelect={onSelect}
+									defaultLabel="ACCESS GROUP"
 								/>
 							</TableCell>
 							<TableCell align="left">Actions</TableCell>
