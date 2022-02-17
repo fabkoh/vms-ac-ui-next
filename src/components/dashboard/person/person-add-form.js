@@ -17,7 +17,7 @@ import IconButton from '@mui/material/IconButton';
 
 import MuiPhoneNumber from "material-ui-phone-number";
 
-const ExpandMore = styled((props) => {
+export const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
 })(({ theme, expand }) => ({

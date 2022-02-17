@@ -111,6 +111,12 @@ class AccessGroupApi {
         
         return Promise.resolve(new Response(null, { status: 204 }));
     }
+
+    nameExists(name) {
+        // if (useApi) { return sendApi(PATH); }
+
+        return Promise.resolve(new Response(fakeAccessGroups.some(group => group.accessGroupName == name), { status: 200 }));
+    }
 }
 
 export const accessGroupApi = new AccessGroupApi();
