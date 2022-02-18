@@ -7,9 +7,11 @@ import {
   Grid, 
   TextField, 
   CardContent,
-  Collapse
+  Collapse,
+  Select
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Search as SearchIcon } from "../../../icons/search";
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -50,7 +52,9 @@ export const PersonAddForm = (props) => {
     onNameChange,
     onNumberChange,
     onEmailChange,
-    onUidChange
+    onUidChange,
+    allAccessgroups,
+    accessGroup
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -194,30 +198,26 @@ export const PersonAddForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                    <TextField
-                      fullWidth
-                      //error={!person.valid.email || !(person.valid.emailNotRepeated && person.valid.emailNotInUse)}
-                      //helperText={!person.valid.email ? 'Error: Email is not valid' : !(person.valid.emailNotRepeated && person.valid.emailNotInUse) ? "Note: Email Address already exists" : person.valid.email}
-                      label="Access Group"
-                      name="accessGroup"
-                      //onChange={(e) => onEmailChange(e, person.id)}
-                      value={person.accessGroup}
-                    />
-
-                {/*<TextField
-									defaultValue=""
-									fullWidth
-									inputProps={{ ref: queryRef }}
-									InputProps={{
-										startAdornment: (
-											<InputAdornment position="start">
-												<SearchIcon fontSize="small" />
-											</InputAdornment>
-										),
-									}}
-									placeholder="Search for Access Group"
-								/>*/}
-                </Grid>
+                    <Select
+                        options={allAccessgroups}
+                        //setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
+                        getOptionLabel={(a) => a.accessGroupName}
+                        label="Access Group"
+                        noOptionsText="No Access Group found"
+                        placeholder="Enter Access Group Name"
+                        filterOptions={
+                            (accGroup, state) => {
+                                const text = state.inputValue.toLowerCase();
+                                return accGroup.filter(p => (
+                                    (p.accessGroupName.toLowerCase().includes(text))
+                                ))
+                            }
+                        }
+                        value={accessGroup}
+                        isOptionEqualToValue={(option, value) => option.accessGroupId == value.accessGroupId}
+                        defaultValue=""
+                    />  
+                  </Grid>
               </Grid>
             </Collapse>
           </Grid>

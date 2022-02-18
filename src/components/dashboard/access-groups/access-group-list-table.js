@@ -40,6 +40,7 @@ export const AccessGroupListTable = (props) => {
 		onRowsPerPageChange,
 		page,
 		rowsPerPage,
+		person,
 		...other
 	} = props;
 	// const [selectedPersons, setSelectedPersons] = useState([]);
@@ -168,7 +169,6 @@ export const AccessGroupListTable = (props) => {
 										</Box>
 									</TableCell>
                                     <TableCell width="15%">
-		
 											<Box sx={{ ml: -5, width:180}}>
 												<NextLink
 													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
@@ -181,17 +181,32 @@ export const AccessGroupListTable = (props) => {
 													</Link>
 												</NextLink>
 											</Box>
-										
 									</TableCell>
 									<TableCell width="20%" align="center">
 										<Typography width={160} noWrap>
-											{(accGroup.person) || (
+											{person.forEach(element => 
+												
+													{element}) || 
+													<SeverityPill color="warning">
+														<WarningIcon fontSize="small" />
+														No Persons
+													</SeverityPill>
+												
+											} 
+										</Typography>
+											
+
+										
+
+										{/*
+										<Typography width={160} noWrap>
+											{person.map((p) => p) || (
 												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" />
 													No Persons
 												</SeverityPill>
 											)}
-										</Typography>
+											</Typography> */}
 									</TableCell>
 									<TableCell width="20%">{accGroup.entrances}</TableCell>
 

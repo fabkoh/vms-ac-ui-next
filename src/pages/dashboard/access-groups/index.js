@@ -35,8 +35,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { accessGroupApi } from "../../../api/access-groups";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
-import { confirmDelete } from "../../../components/dashboard/access-groups/confirm-delete";
 import toast from "react-hot-toast";
+import { Confirmdelete } from "../../../components/dashboard/access-groups/confirm-delete";
 
 const tabs = [
 	{
@@ -80,7 +80,7 @@ const applyFilters = (accessGroup, filters) =>
     accessGroup.filter((accGroup) => {
 		if (filters.query) {
 			let queryMatched = false;
-			const properties = ["accessGroupName", "accessGroupDesc","person"];
+			const properties = ["accessGroupName"];
 
 			properties.forEach((property) => {
 				if (
@@ -162,6 +162,7 @@ const accessGroupList = () => {
 		// isProspect: null,
 		// isReturning: null,
 	});
+	const [person, setPerson] = useState([]);
 
 	useEffect(() => {
 		gtm.push({ event: "page_view" });
@@ -174,6 +175,18 @@ const accessGroupList = () => {
 		const data = await res.json()
 			if (isMounted()) {
 				setAccessGroup(data);
+				
+				const personCount = 0;
+				data.forEach(p => {
+					if(p.person) {
+						personCount += 1;
+					}
+					else {
+						personCount = 0;
+					}
+					person.push(personCount);
+				})
+				setPerson(person);
 			}
 		} catch (err) {
 			console.error(err);
@@ -395,7 +408,7 @@ const accessGroupList = () => {
 										<DeleteIcon />
 										&#8288;Delete Access Group
 									</MenuItem>
-									<confirmDelete selectedState={selectedState} 
+									<Confirmdelete selectedState={selectedState} 
 									setAnchorEl={setAnchorEl}
 									deleteOpen={deleteOpen} 
 									handleDeleteClose={handleDeleteClose}
@@ -507,6 +520,7 @@ const accessGroupList = () => {
 							onRowsPerPageChange={handleRowsPerPageChange}
 							rowsPerPage={rowsPerPage}
 							page={page}
+							person={person}
 						/>
 					</Card>
 				</Container>

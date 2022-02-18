@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import Alert from "@mui/material/Alert";
 
-export const confirmDelete = (props) => {
+export const Confirmdelete = (props) => {
 	const {selectedState,handleTextChange,deleteBlock}=props;
 	// //handle delete action. put this in parent component
 	// const [Open, setOpen] = React.useState(false);
@@ -56,13 +56,13 @@ export const confirmDelete = (props) => {
 						Are you sure you want to delete access group(s)? This action cannot be
 						undone.
 					</DialogContentText>
-						{ selectedState && <DialogContentText>
-							
-								<TextField variant="filled" fullWidth 
-								helperText='Please type in DELETE to proceed' 
-								onChange={handleTextChange} />
+					{ selectedState && <DialogContentText>
 						
-						</DialogContentText>}
+							<TextField variant="filled" fullWidth 
+							helperText='Please type in DELETE to proceed' 
+							onChange={handleTextChange} />
+					
+					</DialogContentText>}
 				</DialogContent>
 				<DialogActions>
 					<Button
