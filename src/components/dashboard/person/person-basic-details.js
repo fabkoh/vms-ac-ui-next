@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { Card, CardHeader, Divider, useMediaQuery } from '@mui/material';
+import NextLink from 'next/link';
+import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
 import { PropertyList } from '../../property-list';
 import { PropertyListItem } from '../../property-list-item';
 import { SeverityPill } from '../../severity-pill';
@@ -11,7 +12,9 @@ export const PersonBasicDetails = (props) => {
     personLastName, 
     personUid, 
     personMobileNumber, 
-    personEmail } = props.person;
+    personEmail,
+    accessGroup
+  } = props.person;
   
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
@@ -25,13 +28,13 @@ export const PersonBasicDetails = (props) => {
         <PropertyListItem
           align={align}
           divider
-          label="First Name"
+          label="First name"
           value={personFirstName}
         />
         <PropertyListItem
           align={align}
           divider
-          label="Last Name"
+          label="Last name"
           value={personLastName}
         />
         <PropertyListItem
@@ -43,14 +46,14 @@ export const PersonBasicDetails = (props) => {
         <PropertyListItem
           align={align}
           divider
-          label="Mobile Number"
+          label="Mobile number"
           value={personMobileNumber}
         >
           { !personMobileNumber && (
             <SeverityPill
               color='warning'
             >
-              <WarningIcon fontSize="small" />
+              <WarningIcon fontSize="small" sx={{ mr: 1 }} />
               No mobile number
             </SeverityPill>
           )}
@@ -65,10 +68,30 @@ export const PersonBasicDetails = (props) => {
             <SeverityPill
               color='warning'
             >
-              <WarningIcon fontSize="small" />
+              <WarningIcon fontSize="small" sx={{ mr: 1 }} />
               No email
             </SeverityPill>
           )}
+        </PropertyListItem>
+        <PropertyListItem
+          align={align}
+          divider
+          label="Access group"
+        >
+          {
+            accessGroup ? (
+              <Link component="a">
+                <NextLink href={`/dashboard/access-groups/details/${accessGroup.accessGroupId}`} passHref>                
+                  <Chip label={accessGroup.accessGroupName} />
+                </NextLink>
+              </Link>
+            ) : (
+              <SeverityPill color="warning">
+                <WarningIcon fontSize="small" sx={{ mr: 1 }} />
+                No access group
+              </SeverityPill>
+            )
+          }
         </PropertyListItem>
       </PropertyList>
     </Card>
