@@ -12,6 +12,7 @@ export const AccessGroupPersons = (props) => {
                 title="Persons"
                 subheader="Click on person name below to go to person details page" 
             />
+            <Divider />
             <Grid
                 container
                 flexDirection="row"

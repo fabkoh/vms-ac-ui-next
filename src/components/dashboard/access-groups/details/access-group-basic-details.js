@@ -14,6 +14,7 @@ export const AccessGroupBasicDetails = (props) => {
     return(
         <Card>
             <CardHeader title="Basic Details" />
+            <Divider />
             <PropertyList>
                 <PropertyListItem
                     align={align}
