@@ -21,7 +21,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
         accessGroupId,
         accessGroupName,
         accessGroupDesc,
-        person,
+        persons,
         originalPersonIds
     } = accessGroupInfo;
 
@@ -180,7 +180,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                         isWarning={p => p.accessGroup && !(originalPersonIds && originalPersonIds.includes(p.personId)) }
                                         isError={person => duplicatedPerson[person.personId]}
                                         error={accessGroupPersonDuplicated}
-                                        value={person}
+                                        value={persons}
                                         isOptionEqualToValue={(option, value) => option.personId == value.personId}
                                     />                                 
                                 </Grid>

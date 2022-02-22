@@ -21,7 +21,7 @@ const CreateAccessGroups = () => {
         accessGroupId,
         accessGroupName: '',
         accessGroupDesc: '',
-        person: []
+        persons: []
     });
     const getEmptyAccessGroupValidations = (accessGroupId) => ({
         accessGroupId,
@@ -120,7 +120,7 @@ const CreateAccessGroups = () => {
         const newDuplicatedPerson = formUtils.getDuplicates(
             groupArr.map(
                 // get access group person
-                group => group.person.map(
+                group => group.persons.map(
                     // get person id
                     person => person.personId
                 )
@@ -130,7 +130,7 @@ const CreateAccessGroups = () => {
             // equals true if 
             validationArr[i].accessGroupPersonDuplicated =
                 // returns true if some person in access group is in duplicaed person
-                groupArr[i].person.some(
+                groupArr[i].persons.some(
                     person => person.personId in newDuplicatedPerson
                 );           
         }
@@ -162,7 +162,7 @@ const CreateAccessGroups = () => {
 
     const changePerson = (newValue, id) => {
         const updatedInfo = [ ...accessGroupInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).person = newValue;
+        updatedInfo.find(info => info.accessGroupId == id).persons = newValue;
         setAccessGroupInfoArr(updatedInfo);
     }
 

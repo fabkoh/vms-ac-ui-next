@@ -5,7 +5,7 @@ class AccessGroupApi {
     createAccessGroup({
         accessGroupName,
         accessGroupDesc,
-        person
+        persons
     }) {
         // if (useApi) {
         //     return sendApi(PATH, {
@@ -25,7 +25,7 @@ class AccessGroupApi {
                                            .reduce((a, b) => Math.max(a, b), 0) + 1,
             accessGroupName,
             accessGroupDesc,
-            person
+            persons
         }
 
         fakeAccessGroups.push(newAccessGroup);
@@ -46,9 +46,9 @@ class AccessGroupApi {
         const accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == id) };
 
         if (accessGroup) {
-            if(accessGroup.person) {
+            if(accessGroup.persons) {
                 // populate the person field
-                accessGroup.person = [ ...fakePersons.filter(person => accessGroup.person.includes(person.personId)) ];
+                accessGroup.persons = [ ...fakePersons.filter(person => accessGroup.persons.includes(person.personId)) ];
             }
             
             return Promise.resolve(new Response(JSON.stringify(accessGroup), { status: 200 }));
@@ -62,7 +62,7 @@ class AccessGroupApi {
         accessGroupId,
         accessGroupName,
         accessGroupDesc,
-        person
+        persons
     }) {
         // if (useApi) {
         //     return sendApi(PATH, {
@@ -78,7 +78,7 @@ class AccessGroupApi {
         //         })
         //     });
         // }
-        const updatedAccessGroup = { accessGroupId, accessGroupName, accessGroupDesc, person };
+        const updatedAccessGroup = { accessGroupId, accessGroupName, accessGroupDesc, persons };
         const index = fakeAccessGroups.findIndex(group => group.accessGroupId == accessGroupId);
 
         if (index == -1) {
