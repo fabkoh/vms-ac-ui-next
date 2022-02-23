@@ -17,11 +17,10 @@ export const AccessGroupPersons = (props) => {
                 container
                 flexDirection="row"
             >
-                { persons && persons.map((p,i) => (
+                { Array.isArray(persons) && persons.length > 0 && persons.map((p,i) => (
                     <Grid 
                         item
-                        paddingBottom={3}
-                        paddingLeft={3}
+                        padding={3}
                         key={i}
                     >                   
                          { /* Link and NextLink order reverse to have pointer + underline when hover */ }
@@ -31,17 +30,16 @@ export const AccessGroupPersons = (props) => {
                                 passHref
                             >
 
-                                    <Chip label={p.personFirstName + ' ' + p.personLastName} />
+                                <Chip label={p.personFirstName + ' ' + p.personLastName} />
 
                             </NextLink>
                         </Link>
                     </Grid>
                 )) }
-                { !persons && (
+                { (Array.isArray(persons) && persons.length > 0) || (
                     <Grid
                         item
-                        paddingBottom={3}
-                        paddingLeft={3}
+                        padding={3}
                     >
                         <SeverityPill color="warning">
                             <Warning 
