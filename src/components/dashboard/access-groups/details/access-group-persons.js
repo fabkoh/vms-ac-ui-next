@@ -17,7 +17,7 @@ export const AccessGroupPersons = (props) => {
                 container
                 flexDirection="row"
             >
-                { Array.isArray(persons) && persons.length > 0 && persons.map((p,i) => (
+                { (Array.isArray(persons) && persons.length > 0) ? persons.map((p,i) => (
                     <Grid 
                         item
                         padding={3}
@@ -35,8 +35,7 @@ export const AccessGroupPersons = (props) => {
                             </NextLink>
                         </Link>
                     </Grid>
-                )) }
-                { (Array.isArray(persons) && persons.length > 0) || (
+                )) : (
                     <Grid
                         item
                         padding={3}
