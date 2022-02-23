@@ -16,11 +16,14 @@ export const AccessGroupPersons = (props) => {
             <Grid
                 container
                 flexDirection="row"
+                paddingLeft={3}
+                paddingTop={3}
             >
                 { (Array.isArray(persons) && persons.length > 0) ? persons.map((p,i) => (
                     <Grid 
                         item
-                        padding={3}
+                        paddingRight={3}
+                        paddingBottom = {3}
                         key={i}
                     >                   
                          { /* Link and NextLink order reverse to have pointer + underline when hover */ }
@@ -38,7 +41,8 @@ export const AccessGroupPersons = (props) => {
                 )) : (
                     <Grid
                         item
-                        padding={3}
+                        paddingRight={3}
+                        paddingBottom={3}
                     >
                         <SeverityPill color="warning">
                             <Warning 
