@@ -7,19 +7,19 @@ class AccessGroupApi {
         accessGroupDesc,
         persons
     }) {
-        // if (useApi) {
-        //     return sendApi(PATH, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-type': 'application/json'
-        //         },
-        //         body: JSON.stringify({
-        //             accessGroupName,
-        //             accessGroupDesc,
-        //             person
-        //         })
-        //     })
-        // }
+        if (useApi) {
+            return sendApi("/api/accessgroup", {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accessGroupName,
+                    accessGroupDesc,
+                    persons
+                })
+            })
+        }
         const newAccessGroup = {
             accessGroupId: fakeAccessGroups.map(group => group.accessGroupId)
                                            .reduce((a, b) => Math.max(a, b), 0) + 1,
@@ -34,14 +34,14 @@ class AccessGroupApi {
     }
 
     getAccessGroups() {
-        // if (useApi) { return sendApi(PATH); }
+        if (useApi) { return sendApi("/api/accessgroups"); }
 
         // did not populate person field here as not required
         return Promise.resolve(new Response(JSON.stringify(fakeAccessGroups), { status: 200 }));
     }
 
     getAccessGroup(id) {
-        // if (useApi) { return sendApi(PATH); }
+        if (useApi) { return sendApi(`/api/accessgroup/${id}`); }
 
         const accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == id) };
 
@@ -64,20 +64,20 @@ class AccessGroupApi {
         accessGroupDesc,
         persons
     }) {
-        // if (useApi) {
-        //     return sendApi(PATH, {
-        //         method: 'PUT',
-        //         headers: {
-        //             'Content-type': 'application/json'
-        //         },
-        //         body: JSON.stringify({
-        //             accessGroupId,
-        //             accessGroupName,
-        //             accessGroupDesc,
-        //             person
-        //         })
-        //     });
-        // }
+        if (useApi) {
+            return sendApi("/api/accessgroup", {
+                method: 'PUT',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accessGroupId,
+                    accessGroupName,
+                    accessGroupDesc,
+                    persons
+                })
+            });
+        }
         const updatedAccessGroup = { accessGroupId, accessGroupName, accessGroupDesc, persons };
         const index = fakeAccessGroups.findIndex(group => group.accessGroupId == accessGroupId);
 
@@ -93,7 +93,7 @@ class AccessGroupApi {
     }
 
     deleteAccessGroup(id) {
-        // if(useApi) { return sendApi(PATH, { method: 'DELETE' }); }
+        if(useApi) { return sendApi(`/api/accessgroup/${id}`, { method: 'DELETE' }); }
 
         const index = fakeAccessGroups.findIndex(group => group.accessGroupId == id);
         if (index == -1) {
@@ -112,11 +112,11 @@ class AccessGroupApi {
         return Promise.resolve(new Response(null, { status: 204 }));
     }
 
-    nameExists(name) {
-        // if (useApi) { return sendApi(PATH); }
+    // nameExists(name) {
+    //     // if (useApi) { return sendApi(PATH); }
 
-        return Promise.resolve(new Response(fakeAccessGroups.some(group => group.accessGroupName == name), { status: 200 }));
-    }
+    //     return Promise.resolve(new Response(fakeAccessGroups.some(group => group.accessGroupName == name), { status: 200 }));
+    // }
 }
 
 export const accessGroupApi = new AccessGroupApi();
