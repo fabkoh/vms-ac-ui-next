@@ -1,10 +1,10 @@
-import { Card, CardHeader, Chip, Grid, Link } from "@mui/material";
+import { Card, CardHeader, Chip, Grid, Link, Divider } from "@mui/material";
 import NextLink from "next/link";
 import Warning from "@mui/icons-material/Warning";
 import { SeverityPill } from "../../../severity-pill";
 
 export const AccessGroupPersons = (props) => {
-    const { person } = props.accessGroup;
+    const { persons } = props.accessGroup;
 
     return (
         <Card>
@@ -12,11 +12,12 @@ export const AccessGroupPersons = (props) => {
                 title="Persons"
                 subheader="Click on person name below to go to person details page" 
             />
+            <Divider />
             <Grid
                 container
                 flexDirection="row"
             >
-                { person && person.map((p,i) => (
+                { persons && persons.map((p,i) => (
                     <Grid 
                         item
                         paddingBottom={3}
@@ -36,7 +37,7 @@ export const AccessGroupPersons = (props) => {
                         </Link>
                     </Grid>
                 )) }
-                { !person && (
+                { !persons && (
                     <Grid
                         item
                         paddingBottom={3}
