@@ -70,6 +70,7 @@ const AccessGroupDetails = () => {
     if (!accessGroup) {
         return null;
     }
+    console.log(accessGroup);
     return (
         <>
             <Head>
@@ -122,7 +123,7 @@ const AccessGroupDetails = () => {
                             >
                                 <div>
                                     <Typography variant="h4">
-                                        { accessGroup.accessGroupName }    
+                                        { accessGroup.accessGroupName || "Access Group Not Found" }    
                                     </Typography>    
                                 </div>    
                             </Grid>

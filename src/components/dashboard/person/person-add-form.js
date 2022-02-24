@@ -7,9 +7,11 @@ import {
   Grid, 
   TextField, 
   CardContent,
-  Collapse
+  Collapse,
+  Select
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Search as SearchIcon } from "../../../icons/search";
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -50,7 +52,9 @@ export const PersonAddForm = (props) => {
     onNameChange,
     onNumberChange,
     onEmailChange,
-    onUidChange
+    onUidChange,
+    allAccessgroups,
+    //accessGroup
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -189,6 +193,50 @@ export const PersonAddForm = (props) => {
                     />
                   </ThemeProvider>
                 </Grid>
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                >
+                  {console.log(allAccessgroups)}
+
+                  <Select
+                  label="Access Group"
+                  placeholder="Enter Access Group Name"
+                  value={person.accessGroup}
+                  fullWidth
+                  >
+                    {Object.entries(allAccessgroups).map(([key, value]) => {
+                        return (
+                          <option key={key} value={key}>
+                            {value}
+                          </option>
+                        );
+                    })}
+                  </Select>
+
+
+
+                    {/*<Select
+                        options={allAccessgroups}
+                        //setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
+                        getOptionLabel={(a) => a.accessGroupName}
+                        label="Access Group"
+                        noOptionsText="No Access Group found"
+                        placeholder="Enter Access Group Name"
+                        filterOptions={
+                            (accGroup, state) => {
+                                const text = state.inputValue.toLowerCase();
+                                return accGroup.filter(p => (
+                                    (p.accessGroupName.toLowerCase().includes(text))
+                                ))
+                            }
+                        }
+                        value={person.accessGroup}
+                        isOptionEqualToValue={(option, value) => option.accessGroupId == value.accessGroupId}
+                        defaultValue=""
+                      />  */}
+                  </Grid>
               </Grid>
             </Collapse>
           </Grid>

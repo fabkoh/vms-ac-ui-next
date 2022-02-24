@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import {
@@ -17,6 +17,8 @@ import { PersonAddForm } from '../../../components/dashboard/person/person-add-f
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 import router from 'next/router';
+import { accessGroupApi } from '../../../api/access-groups';
+import { useMounted } from "../../../hooks/use-mounted";
 
 const CreatePersons = () => {
 
@@ -38,6 +40,7 @@ const CreatePersons = () => {
       email: true,
       emailNotRepeated: true,
       emailNotInUse: true,
+      accessGroup: true,
       submitOk: true
     }
   });
@@ -194,6 +197,37 @@ const CreatePersons = () => {
     setPersonsInfo(newPersonsInfo);
   }
 
+  //access group logic (displaying in dropdownlist)
+  const isMounted = useMounted();
+  const [allAccessgroups, setAllAccessgroups] = useState([]);
+
+  const accessGroups = {};
+
+  const getAccessGroups = useCallback(async() => {
+    try {
+      const res = await accessGroupApi.getAccessGroups();
+      if (res.status == 200) {
+        const data = await res.json();
+
+        data.forEach(a => {
+          accessGroups[a.accessGroupId] = a.accessGroupName;
+        })
+        //console.log(accessGroups);
+        setAllAccessgroups(accessGroups);
+      } else {
+        throw new Error("Access Groups not loaded");
+      } 
+    } catch(e) {
+      console.error(e);
+      toast.error("Access Groups not loaded");
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    getAccessGroups();
+  },
+  []);
+
   const [submitted, setSubmitted] = useState(false);
 
   const submitForm = e => {
@@ -208,7 +242,8 @@ const CreatePersons = () => {
         personLastName: person.lastName,
         personUid: person.uid,
         personMobileNumber: person.mobileNumber,
-        personEmail: person.email
+        personEmail: person.email,
+        accessGroup: person.accessGroup
       })
     })).then(values => {
       let allSuccess = true;
@@ -285,6 +320,7 @@ const CreatePersons = () => {
                     onNumberChange={onNumberChange}
                     onEmailChange={onEmailChange}
                     key={person.id}
+                    allAccessgroups={allAccessgroups}
                   />
                 ))}
                 <div>
@@ -318,7 +354,8 @@ const CreatePersons = () => {
                                                   person.valid.mobileNumberNotInUse &&
                                                   person.valid.email &&
                                                   person.valid.emailNotRepeated &&
-                                                  person.valid.emailNotInUse)}
+                                                  person.valid.emailNotInUse &&
+                                                  person.valid.accessGroup)}
                   >
                       Submit
                   </Button>
