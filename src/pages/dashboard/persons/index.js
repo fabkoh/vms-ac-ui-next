@@ -406,7 +406,7 @@ const PersonList = () => {
 									<NextLink href={"/dashboard/persons/create"} passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
-											&#8288;Create new person
+											&#8288;Create
 										</MenuItem>
 									</NextLink>
 									<NextLink href={{
@@ -415,13 +415,13 @@ const PersonList = () => {
 									}} passHref>
 										<MenuItem disableRipple disabled={buttonBlock}>
 											<EditIcon />
-											&#8288;Edit person
+											&#8288;Edit
 										</MenuItem>
 									</NextLink>
 									
 									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
 										<DeleteIcon />
-										&#8288;Delete person
+										&#8288;Delete
 									</MenuItem>
 									<Confirmdelete selectedState={selectedState} 
 									setAnchorEl={setAnchorEl}
