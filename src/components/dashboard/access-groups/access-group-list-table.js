@@ -184,21 +184,15 @@ export const AccessGroupListTable = (props) => {
 									</TableCell>
 									<TableCell width="20%" align="center">
 										<Typography width={160} noWrap>
-											{person.forEach(element => 
-												
-													{element}) || 
-													<SeverityPill color="warning">
-														<WarningIcon fontSize="small" />
-														No Persons
-													</SeverityPill>
-												
-											} 
+											{(accGroup.persons) || (
+												<SeverityPill color="warning">
+													<WarningIcon fontSize="small" />
+													No Persons
+												</SeverityPill>
+											)}
 										</Typography>
 											
-
-										
-
-										{/*
+									{/*
 										<Typography width={160} noWrap>
 											{person.map((p) => p) || (
 												<SeverityPill color="warning">

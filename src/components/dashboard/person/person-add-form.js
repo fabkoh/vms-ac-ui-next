@@ -54,7 +54,7 @@ export const PersonAddForm = (props) => {
     onEmailChange,
     onUidChange,
     allAccessgroups,
-    accessGroup
+    //accessGroup
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -198,7 +198,26 @@ export const PersonAddForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                    <Select
+                  {console.log(allAccessgroups)}
+
+                  <Select
+                  label="Access Group"
+                  placeholder="Enter Access Group Name"
+                  value={person.accessGroup}
+                  fullWidth
+                  >
+                    {Object.entries(allAccessgroups).map(([key, value]) => {
+                        return (
+                          <option key={key} value={key}>
+                            {value}
+                          </option>
+                        );
+                    })}
+                  </Select>
+
+
+
+                    {/*<Select
                         options={allAccessgroups}
                         //setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
                         getOptionLabel={(a) => a.accessGroupName}
@@ -213,10 +232,10 @@ export const PersonAddForm = (props) => {
                                 ))
                             }
                         }
-                        value={accessGroup}
+                        value={person.accessGroup}
                         isOptionEqualToValue={(option, value) => option.accessGroupId == value.accessGroupId}
                         defaultValue=""
-                    />  
+                      />  */}
                   </Grid>
               </Grid>
             </Collapse>

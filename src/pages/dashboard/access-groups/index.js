@@ -162,7 +162,6 @@ const accessGroupList = () => {
 		// isProspect: null,
 		// isReturning: null,
 	});
-	const [person, setPerson] = useState([]);
 
 	useEffect(() => {
 		gtm.push({ event: "page_view" });
@@ -175,18 +174,6 @@ const accessGroupList = () => {
 		const data = await res.json()
 			if (isMounted()) {
 				setAccessGroup(data);
-				
-				const personCount = 0;
-				data.forEach(p => {
-					if(p.person) {
-						personCount += 1;
-					}
-					else {
-						personCount = 0;
-					}
-					person.push(personCount);
-				})
-				setPerson(person);
 			}
 		} catch (err) {
 			console.error(err);
@@ -520,7 +507,6 @@ const accessGroupList = () => {
 							onRowsPerPageChange={handleRowsPerPageChange}
 							rowsPerPage={rowsPerPage}
 							page={page}
-							person={person}
 						/>
 					</Card>
 				</Container>

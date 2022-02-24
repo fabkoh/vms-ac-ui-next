@@ -201,12 +201,19 @@ const CreatePersons = () => {
   const isMounted = useMounted();
   const [allAccessgroups, setAllAccessgroups] = useState([]);
 
+  const accessGroups = {};
+
   const getAccessGroups = useCallback(async() => {
     try {
       const res = await accessGroupApi.getAccessGroups();
       if (res.status == 200) {
-        const body = await res.json();
-        setAllAccessgroups(body);
+        const data = await res.json();
+
+        data.forEach(a => {
+          accessGroups[a.accessGroupId] = a.accessGroupName;
+        })
+        //console.log(accessGroups);
+        setAllAccessgroups(accessGroups);
       } else {
         throw new Error("Access Groups not loaded");
       } 
@@ -235,7 +242,8 @@ const CreatePersons = () => {
         personLastName: person.lastName,
         personUid: person.uid,
         personMobileNumber: person.mobileNumber,
-        personEmail: person.email
+        personEmail: person.email,
+        accessGroup: person.accessGroup
       })
     })).then(values => {
       let allSuccess = true;
