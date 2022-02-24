@@ -57,7 +57,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                         <ExpandMoreIcon />
                     </ExpandMore>
                 }
-                title="Access group"
+                title="Access Group"
                 action={
                     // action are children flushed to the right
                     (
