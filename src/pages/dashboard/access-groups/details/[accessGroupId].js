@@ -152,7 +152,7 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <AddIcon />
-                                            Create new access group
+                                            Create
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
@@ -164,14 +164,14 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />
-                                            Edit access group
+                                            Edit
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem
                                         disableRipple
                                     >
                                         <DeleteIcon />
-                                        Delete access group
+                                        Delete
                                     </MenuItem>
                                 </StyledMenu>
                             </Grid>

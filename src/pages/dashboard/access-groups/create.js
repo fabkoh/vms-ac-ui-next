@@ -236,7 +236,7 @@ const CreateAccessGroups = () => {
 
                     if (failedAccessGroup.length) {
                         // some failed
-                        toast.error('Error creating the highlighted persons');
+                        toast.error('Error creating the highlighted access groups');
                         Promise.all(failedRes.map(res => res.json()))
                                .then(failedObjArr => {
                                     setSubmitted(false);

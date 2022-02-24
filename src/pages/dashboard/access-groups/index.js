@@ -378,7 +378,7 @@ const accessGroupList = () => {
 									<NextLink href={"/dashboard/access-groups/create"} passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
-											&#8288;Create New Access Group
+											&#8288;Create
 										</MenuItem>
 									</NextLink>
 									<NextLink href={{
@@ -387,13 +387,13 @@ const accessGroupList = () => {
 									}} passHref>
 										<MenuItem disableRipple disabled={buttonBlock}>
 											<EditIcon />
-											&#8288;Edit Access Group
+											&#8288;Edit
 										</MenuItem>
 									</NextLink>
 									
 									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
 										<DeleteIcon />
-										&#8288;Delete Access Group
+										&#8288;Delete
 									</MenuItem>
 									<Confirmdelete selectedState={selectedState} 
 									setAnchorEl={setAnchorEl}

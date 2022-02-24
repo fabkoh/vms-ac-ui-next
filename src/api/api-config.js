@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = process.env.NEXT_PUBLIC_USE_API || true;
+const useApi = process.env.NEXT_PUBLIC_USE_API || false;
 
 // fake persons data
 const fakePersons = [
@@ -57,7 +57,8 @@ const fakeAccessGroups = [
     },
     {
         "accessGroupId": 3,
-        "accessGroupName": "Empty group"
+        "accessGroupName": "Empty group",
+        "persons": []
     }
 ]
 
