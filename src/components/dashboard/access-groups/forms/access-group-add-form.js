@@ -9,12 +9,13 @@ import {
     CardContent,
     Stack,
     Typography,
-    Box
+    Box,
 } from "@mui/material";
 import { useState } from "react";
 import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
+import EditFormTooltip from "../../../../components/dashboard/shared/edit_form_tooltip";
 
 const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, edit }) => {
     const {
@@ -62,12 +63,17 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                     // action are children flushed to the right
                     (
                         <Grid item container>
+                            { edit && (
+                                <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
+                                    <EditFormTooltip />
+                                </Grid>
+                            )}
                             <Button
                                 variant="outlined"
                                 color="error"
                                 onClick={() => removeCard(accessGroupId)}
                             >
-                                Remove
+                                Clear
                             </Button>
                             { edit && (
                                 <Box ml={2}>

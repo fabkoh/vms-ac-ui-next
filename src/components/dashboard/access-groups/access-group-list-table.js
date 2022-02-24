@@ -184,7 +184,7 @@ export const AccessGroupListTable = (props) => {
 									</TableCell>
 									<TableCell width="20%" align="center">
 										<Typography width={160} noWrap>
-											{(accGroup.persons.length) || (
+											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
 												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" />
 													No Persons

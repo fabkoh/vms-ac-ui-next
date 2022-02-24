@@ -89,7 +89,7 @@ export const PersonAddForm = (props) => {
             color="error"
             onClick={() => removePerson(person.id)}
           >
-            Remove
+            Clear
           </Button>
         } 
         sx={{ width: '100%' }} 
