@@ -16,7 +16,6 @@ import formUtils from "../../../utils/form-utils";
 const EditAccessGroups = () => {
 
     // edited access groups logic
-    const isAccessGroupMounted = useMounted();
     const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
     const [accessGroupValidationsArr, 
         setAccessGroupValidationsArr] = useState([]);
@@ -75,9 +74,9 @@ const EditAccessGroups = () => {
                                         accessGroupId: group.accessGroupId,
                                         accessGroupName: group.accessGroupName,
                                         accessGroupDesc: group.accessGroupDesc,
-                                        person: group.person,
+                                        persons: group.persons,
                                         originalName: group.accessGroupName, // do not change original fields as they are needed for validations
-                                        originalPersonIds: group.person.map(p => p.personId)
+                                        originalPersonIds: group.persons.map(p => p.personId)
                                     }
                                 }
                             )
@@ -154,7 +153,7 @@ const EditAccessGroups = () => {
         const newDuplicatedPerson = formUtils.getDuplicates(
             groupArr.map(
                 // get access group person
-                group => group.person.map(
+                group => group.persons.map(
                     // get person id
                     person => person.personId
                 )
@@ -164,7 +163,7 @@ const EditAccessGroups = () => {
             // equals true if 
             validationArr[i].accessGroupPersonDuplicated =
                 // returns true if some person in access group is in duplicaed person
-                groupArr[i].person.some(
+                groupArr[i].persons.some(
                     person => person.personId in newDuplicatedPerson
                 );           
         }
@@ -200,7 +199,7 @@ const EditAccessGroups = () => {
 
     const changePerson = (newValue, id) => {
         const updatedInfo = [ ...accessGroupInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).person = newValue;
+        updatedInfo.find(info => info.accessGroupId == id).persons = newValue;
         setAccessGroupInfoArr(updatedInfo);
         console.log(updatedInfo);
     }
@@ -241,7 +240,7 @@ const EditAccessGroups = () => {
 
         const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
         const newAccessGroupInfo = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
-        newAccessGroupInfo.person = newValue; // hold an updated copy of access group info for validation checks
+        newAccessGroupInfo.persons = newValue; // hold an updated copy of access group info for validation checks
 
         // remove submit failed
         validation.submitFailed = false;
@@ -264,13 +263,13 @@ const EditAccessGroups = () => {
         e.preventDefault(); 
 
         setSubmitted(true);
-        Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.createAccessGroup(accessGroup)))
+        Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.updateAccessGroup(accessGroup)))
                .then(resArr => {
                     const failedAccessGroup = [];
                     const failedRes = [];
 
                     resArr.forEach((res, i) => {
-                        if (res.status != 201) {
+                        if (res.status != 200) {
                             failedAccessGroup.push(accessGroupInfoArr[i])
                             failedRes.push(res)
                         }
@@ -278,12 +277,12 @@ const EditAccessGroups = () => {
 
                     const numCreated = accessGroupInfoArr.length - failedAccessGroup.length
                     if (numCreated) {
-                        toast.success(`${numCreated} access groups created`); 
+                        toast.success(`${numCreated} access groups edited`); 
                     }
 
                     if (failedAccessGroup.length) {
                         // some failed
-                        toast.error('Error creating the highlighted persons');
+                        toast.error('Error editing the highlighted access groups');
                         Promise.all(failedRes.map(res => res.json()))
                                .then(failedObjArr => {
                                     setSubmitted(false);

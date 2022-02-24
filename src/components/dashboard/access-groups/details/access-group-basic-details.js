@@ -1,5 +1,5 @@
 import Warning from "@mui/icons-material/Warning";
-import { Card, useMediaQuery, CardHeader } from "@mui/material";
+import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
@@ -14,6 +14,7 @@ export const AccessGroupBasicDetails = (props) => {
     return(
         <Card>
             <CardHeader title="Basic Details" />
+            <Divider />
             <PropertyList>
                 <PropertyListItem
                     align={align}

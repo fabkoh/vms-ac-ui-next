@@ -1,10 +1,10 @@
-import { Card, CardHeader, Chip, Grid, Link } from "@mui/material";
+import { Card, CardHeader, Chip, Grid, Link, Divider } from "@mui/material";
 import NextLink from "next/link";
 import Warning from "@mui/icons-material/Warning";
 import { SeverityPill } from "../../../severity-pill";
 
 export const AccessGroupPersons = (props) => {
-    const { person } = props.accessGroup;
+    const { persons } = props.accessGroup;
 
     return (
         <Card>
@@ -12,15 +12,18 @@ export const AccessGroupPersons = (props) => {
                 title="Persons"
                 subheader="Click on person name below to go to person details page" 
             />
+            <Divider />
             <Grid
                 container
                 flexDirection="row"
+                paddingLeft={3}
+                paddingTop={3}
             >
-                { person && person.map((p,i) => (
+                { (Array.isArray(persons) && persons.length > 0) ? persons.map((p,i) => (
                     <Grid 
                         item
-                        paddingBottom={3}
-                        paddingLeft={3}
+                        paddingRight={3}
+                        paddingBottom = {3}
                         key={i}
                     >                   
                          { /* Link and NextLink order reverse to have pointer + underline when hover */ }
@@ -30,17 +33,16 @@ export const AccessGroupPersons = (props) => {
                                 passHref
                             >
 
-                                    <Chip label={p.personFirstName + ' ' + p.personLastName} />
+                                <Chip label={p.personFirstName + ' ' + p.personLastName} />
 
                             </NextLink>
                         </Link>
                     </Grid>
-                )) }
-                { !person && (
+                )) : (
                     <Grid
                         item
+                        paddingRight={3}
                         paddingBottom={3}
-                        paddingLeft={3}
                     >
                         <SeverityPill color="warning">
                             <Warning 

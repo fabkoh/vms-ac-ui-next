@@ -48,12 +48,12 @@ const fakeAccessGroups = [
         "accessGroupId": 1,
         "accessGroupName": "Dune",
         "accessGroupDesc": "the characters from Dune",
-        "person": [1,2]
+        "persons": [1,2]
     },
     {
         "accessGroupId": 2,
         "accessGroupName": "Not dune",
-        "person":[3]
+        "persons":[3]
     },
     {
         "accessGroupId": 3,

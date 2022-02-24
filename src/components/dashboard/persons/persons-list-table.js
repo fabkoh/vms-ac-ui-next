@@ -32,6 +32,7 @@ import { SeverityPill } from "../../severity-pill";
 import WarningIcon from "@mui/icons-material/Warning";
 import { useRouter } from "next/router";
 import { width } from "@mui/system";
+import { ListFilter } from "../shared/list-filter";
 
 export const PersonsListTable = (props) => {
 	const {
@@ -41,6 +42,8 @@ export const PersonsListTable = (props) => {
 		onRowsPerPageChange,
 		page,
 		rowsPerPage,
+		accessGroupNames,
+		onSelect,
 		...other
 	} = props;
 	// const [selectedPersons, setSelectedPersons] = useState([]);
@@ -129,9 +132,10 @@ export const PersonsListTable = (props) => {
 								/>
 							</TableCell>
 							<TableCell>
-								<Buttonfilter
-									array={["SIDE GATE", "ACCESS GROUP", "MAIN GATE"]}
-									sx={{}}
+								<ListFilter
+									array={accessGroupNames}
+									onSelect={onSelect}
+									defaultLabel="ACCESS GROUP"
 								/>
 							</TableCell>
 							<TableCell align="left">Actions</TableCell>
@@ -200,7 +204,7 @@ export const PersonsListTable = (props) => {
 										<Typography width={180} noWrap>
 											{person.personMobileNumber || (
 												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" />
+													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 													No mobile number
 												</SeverityPill>
 											)}
@@ -210,14 +214,27 @@ export const PersonsListTable = (props) => {
 										<Typography width={190} noWrap>
 										{person.personEmail || (
 											<SeverityPill color="warning">
-												<WarningIcon fontSize="small" />
+												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 												No email
 											</SeverityPill>
 										)}
 										</Typography>
 									</TableCell>
 									<TableCell width="20%">{person.personOrgGroup}</TableCell>
-									<TableCell width="20%">{person.PersonAccessGroup}</TableCell>
+									<TableCell width="20%">
+										{ person.accessGroup ? (
+											<NextLink href={`/dashboard/access-groups/details/${person.accessGroup.accessGroupId}`} passHref>
+												<Link>
+													<Typography width={190} noWrap>{person.accessGroup.accessGroupName}</Typography>
+												</Link>
+											</NextLink>
+										) : (
+											<SeverityPill color="warning">
+												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+												No access Group
+											</SeverityPill>
+										) }
+									</TableCell>
 
 									{/* <TableCell>
                     <Typography

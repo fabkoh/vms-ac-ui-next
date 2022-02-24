@@ -76,7 +76,7 @@ const sortOptions = [
 	},
 ];
 
-const applyFilters = (Persons, filters) =>
+const applyFilters = (Persons, filters) => 
 	Persons.filter((person) => {
 		if (filters.query) {
 			let queryMatched = false;
@@ -95,6 +95,11 @@ const applyFilters = (Persons, filters) =>
 			}
 		}
 
+		if (filters.accessGroup) {
+			if (!(person.accessGroup && person.accessGroup.accessGroupName == filters.accessGroup)) {
+				return false;
+			}
+		}
 		// if (filters.hasAcceptedMarketing && !person.hasAcceptedMarketing) {
 		// 	return false;
 		// }
@@ -158,10 +163,12 @@ const PersonList = () => {
 	const [sort, setSort] = useState(sortOptions[0].value);
 	const [filters, setFilters] = useState({
 		query: "",
+		accessGroup: false, // stores the access group name to filter by, or false if no filter
 		// hasAcceptedMarketing: null,
 		// isProspect: null,
 		// isReturning: null,
 	});
+	const [accessGroupNames, setAccessGroupNames] = useState([]);
 
 	useEffect(() => {
 		gtm.push({ event: "page_view" });
@@ -174,6 +181,13 @@ const PersonList = () => {
 		const data = await res.json()
 			if (isMounted()) {
 				setPersons(data);
+				const newAccessGroupNames = {};
+				data.forEach(p => {
+					if(p.accessGroup) {
+						newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
+					}
+				})
+				setAccessGroupNames(Object.keys(newAccessGroupNames));
 			}
 		} catch (err) {
 			console.error(err);
@@ -346,7 +360,16 @@ const PersonList = () => {
 		
 	}, [selectedPersons]);
 	
-	
+	// access group filtering
+	const onSelect = (i) => {
+		const newFilters = { ...filters };
+		if (i == -1) {
+			newFilters.accessGroup = false;
+		} else {
+			newFilters.accessGroup = accessGroupNames[i];
+		}
+		setFilters(newFilters);
+	}
 	
 	return (
 		<>
@@ -513,6 +536,8 @@ const PersonList = () => {
 							onRowsPerPageChange={handleRowsPerPageChange}
 							rowsPerPage={rowsPerPage}
 							page={page}
+							accessGroupNames={accessGroupNames}
+							onSelect={onSelect}
 						/>
 					</Card>
 				</Container>
