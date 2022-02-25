@@ -4,11 +4,11 @@ import {
   CardHeader, 
   Button, 
   Divider, 
-  Grid, 
+  Grid,
+  MenuItem, 
   TextField, 
   CardContent,
-  Collapse,
-  Select
+  Collapse
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Search as SearchIcon } from "../../../icons/search";
@@ -53,8 +53,7 @@ export const PersonAddForm = (props) => {
     onNumberChange,
     onEmailChange,
     onUidChange,
-    allAccessgroups,
-    //accessGroup
+    allAccessgroups
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -198,44 +197,24 @@ export const PersonAddForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                  {console.log(allAccessgroups)}
-
-                  <Select
-                  label="Access Group"
-                  placeholder="Enter Access Group Name"
-                  value={person.accessGroup}
-                  fullWidth
+                  <TextField
+                    fullWidth
+                    select
+                    label="Access Group"
+                    value={person.accessGroup}
+                    helperText="Please select an access group"
+                    defaultValue={""}
+                    onChange={(e) => {         console.log(e.target.value); }}
                   >
-                    {Object.entries(allAccessgroups).map(([key, value]) => {
-                        return (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        );
-                    })}
-                  </Select>
-
-
-
-                    {/*<Select
-                        options={allAccessgroups}
-                        //setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
-                        getOptionLabel={(a) => a.accessGroupName}
-                        label="Access Group"
-                        noOptionsText="No Access Group found"
-                        placeholder="Enter Access Group Name"
-                        filterOptions={
-                            (accGroup, state) => {
-                                const text = state.inputValue.toLowerCase();
-                                return accGroup.filter(p => (
-                                    (p.accessGroupName.toLowerCase().includes(text))
-                                ))
-                            }
-                        }
-                        value={person.accessGroup}
-                        isOptionEqualToValue={(option, value) => option.accessGroupId == value.accessGroupId}
-                        defaultValue=""
-                      />  */}
+                    {Object.entries(allAccessgroups).map(([key, value]) => (
+                        <MenuItem
+                          key={key}
+                          value={key}
+                        >
+                        {value}
+                        </MenuItem>
+                    ))}
+                  </TextField>
                   </Grid>
               </Grid>
             </Collapse>

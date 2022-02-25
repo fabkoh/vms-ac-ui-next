@@ -25,6 +25,7 @@ import { DashboardLayout } from "../../../../components/dashboard/dashboard-layo
 import { AccessGroupBasicDetails } from "../../../../components/dashboard/access-groups/details/access-group-basic-details";
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
 import toast from "react-hot-toast";
+import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
 
 const AccessGroupDetails = () => {
 
@@ -61,10 +62,37 @@ const AccessGroupDetails = () => {
     [])
 
     // actions menu open/close
-    const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null) // which component to anchor action menu to
+  /*  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null) // which component to anchor action menu to
     const actionMenuOpen = Boolean(actionMenuAnchorEl);
     const handleActionMenuOpen = (e) => { setActionMenuAnchorEl(e.currentTarget); }
-    const handleActionMenuClose = () => { setActionMenuAnchorEl(null); }
+    const handleActionMenuClose = () => { setActionMenuAnchorEl(null); } */
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const actionMenuOpen = Boolean(anchorEl);
+    const handleActionMenuOpen = (e) => { setAnchorEl(e.currentTarget); }
+    const handleActionMenuClose = () => { setAnchorEl(null); }
+
+    const [deleteOpen, setDeleteOpen] = useState(false);  
+
+	const handleDeleteOpen = () => {        
+		setDeleteOpen(true);                        
+	};
+	const handleDeleteClose = () => {
+		setDeleteOpen(false);
+	}
+	const handleDeleteAction = () => {
+        Promise.resolve(
+            accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
+        ).then((res)=>{
+        if (res.status == 204){
+            toast.success('Delete success');
+            router.replace('/dashboard/access-groups');
+        }
+        else{
+            toast.error('Delete unsuccessful')
+        }
+        })
+    };
 
     // render view
     if (!accessGroup) {
@@ -142,7 +170,7 @@ const AccessGroupDetails = () => {
                                     Actions
                                 </Button>
                                 <StyledMenu
-                                    anchorEl={actionMenuAnchorEl}
+                                    anchorEl={anchorEl}
                                     open={actionMenuOpen}
                                     onClose={handleActionMenuClose}
                                 >
@@ -169,10 +197,14 @@ const AccessGroupDetails = () => {
                                     </NextLink>
                                     <MenuItem
                                         disableRipple
+                                        onClick={handleDeleteOpen}
                                     >
                                         <DeleteIcon />
                                         Delete access group
                                     </MenuItem>
+                                    <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+                                    handleDeleteAction={handleDeleteAction}
+                                    handleDeleteOpen={handleDeleteOpen}/>
                                 </StyledMenu>
                             </Grid>
                         </Grid>

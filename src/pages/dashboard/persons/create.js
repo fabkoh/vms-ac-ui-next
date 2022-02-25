@@ -29,6 +29,7 @@ const CreatePersons = () => {
     uid: '',
     mobileNumber: '',
     email: '',
+    accessGroup: '',
     valid: {
       firstName: true,
       lastName: true,
@@ -212,7 +213,6 @@ const CreatePersons = () => {
         data.forEach(a => {
           accessGroups[a.accessGroupId] = a.accessGroupName;
         })
-        //console.log(accessGroups);
         setAllAccessgroups(accessGroups);
       } else {
         throw new Error("Access Groups not loaded");

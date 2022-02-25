@@ -120,9 +120,9 @@ export const AccessGroupListTable = (props) => {
 							</TableCell>
 							<TableCell>Access Group</TableCell>
 							<TableCell>Description</TableCell>
-							<TableCell>Number Of Persons</TableCell>
-							<TableCell>Number Of Entrances</TableCell>
-							<TableCell align="left">Actions</TableCell>
+							<TableCell>No. Of Persons</TableCell>
+							<TableCell>No. Of Entrances</TableCell>
+							<TableCell align="right">Actions</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -146,7 +146,7 @@ export const AccessGroupListTable = (props) => {
 											value={isAccessGroupselected}
 										/>
 									</TableCell>
-									<TableCell width="30%">
+									<TableCell width="20%">
 										<Box
 											sx={{
 												m: 1,
@@ -182,9 +182,9 @@ export const AccessGroupListTable = (props) => {
 												</NextLink>
 											</Box>
 									</TableCell>
-									<TableCell width="20%" align="center">
-										<Typography width={160} noWrap>
-											{(accGroup.persons) || (
+									<TableCell width="20%">
+										<Typography width={130} noWrap align="center">
+											{accGroup.persons || (
 												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" />
 													No Persons
@@ -204,7 +204,7 @@ export const AccessGroupListTable = (props) => {
 									</TableCell>
 									<TableCell width="20%">{accGroup.entrances}</TableCell>
 
-									<TableCell width="20%" align="left">
+									<TableCell width="30%" align="right">
 										<NextLink
 											href={{
 												pathname: "/dashboard/access-groups/edit",
