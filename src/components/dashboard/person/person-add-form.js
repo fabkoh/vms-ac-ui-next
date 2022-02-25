@@ -4,12 +4,14 @@ import {
   CardHeader, 
   Button, 
   Divider, 
-  Grid, 
+  Grid,
+  MenuItem, 
   TextField, 
   CardContent,
   Collapse
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Search as SearchIcon } from "../../../icons/search";
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -50,7 +52,8 @@ export const PersonAddForm = (props) => {
     onNameChange,
     onNumberChange,
     onEmailChange,
-    onUidChange
+    onUidChange,
+    allAccessgroups
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -189,6 +192,30 @@ export const PersonAddForm = (props) => {
                     />
                   </ThemeProvider>
                 </Grid>
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                >
+                  <TextField
+                    fullWidth
+                    select
+                    label="Access Group"
+                    value={person.accessGroup}
+                    helperText="Please select an access group"
+                    defaultValue={""}
+                    onChange={(e) => {         console.log(e.target.value); }}
+                  >
+                    {Object.entries(allAccessgroups).map(([key, value]) => (
+                        <MenuItem
+                          key={key}
+                          value={key}
+                        >
+                        {value}
+                        </MenuItem>
+                    ))}
+                  </TextField>
+                  </Grid>
               </Grid>
             </Collapse>
           </Grid>
