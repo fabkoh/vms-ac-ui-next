@@ -179,7 +179,7 @@ const PersonDetails = () => {
             >
               <MenuItem disableRipple>
                 <AddIcon />
-                Create new person
+                Create
               </MenuItem>
             </NextLink>
             <NextLink
@@ -188,12 +188,12 @@ const PersonDetails = () => {
             >
               <MenuItem disableRipple>
                 <EditIcon />
-                Edit person
+                Edit
               </MenuItem>
             </NextLink>           
             <MenuItem disableRipple onClick={handleDeleteOpen}>
               <DeleteIcon />
-              Delete person 
+              Delete
             </MenuItem>
             <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
 			handleDeleteAction={handleDeleteAction}

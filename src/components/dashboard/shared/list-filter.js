@@ -93,8 +93,8 @@ export const ListFilter = (props) => {
                         onClick={() => handleMenuItemClick(-1)}
                         selected={selectedIndex == -1}
                     >
-                        <Typography color="red">
-                            RESET
+                        <Typography fontStyle="italic">
+                            CLEAR 
                         </Typography>
                     </MenuItem>
                   {options.map((option, index) => (

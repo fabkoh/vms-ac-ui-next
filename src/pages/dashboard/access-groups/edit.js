@@ -263,13 +263,13 @@ const EditAccessGroups = () => {
         e.preventDefault(); 
 
         setSubmitted(true);
-        Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.createAccessGroup(accessGroup)))
+        Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.updateAccessGroup(accessGroup)))
                .then(resArr => {
                     const failedAccessGroup = [];
                     const failedRes = [];
 
                     resArr.forEach((res, i) => {
-                        if (res.status != 201) {
+                        if (res.status != 200) {
                             failedAccessGroup.push(accessGroupInfoArr[i])
                             failedRes.push(res)
                         }
@@ -277,12 +277,12 @@ const EditAccessGroups = () => {
 
                     const numCreated = accessGroupInfoArr.length - failedAccessGroup.length
                     if (numCreated) {
-                        toast.success(`${numCreated} access groups created`); 
+                        toast.success(`${numCreated} access groups edited`); 
                     }
 
                     if (failedAccessGroup.length) {
                         // some failed
-                        toast.error('Error creating the highlighted access groups');
+                        toast.error('Error editing the highlighted access groups');
                         Promise.all(failedRes.map(res => res.json()))
                                .then(failedObjArr => {
                                     setSubmitted(false);
