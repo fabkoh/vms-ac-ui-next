@@ -148,7 +148,7 @@ const getComparator = (order, orderBy) =>
 const applyPagination = (accessGroup, page, rowsPerPage) =>
 	accessGroup.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-const accessGroupList = () => {
+const AccessGroupList = () => {
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
 	const [accessGroup, setAccessGroup] = useState([]);
@@ -515,10 +515,10 @@ const accessGroupList = () => {
 	);
 };
 
-accessGroupList.getLayout = (page) => (
+AccessGroupList.getLayout = (page) => (
 	<AuthGuard>
 		<DashboardLayout>{page}</DashboardLayout>
 	</AuthGuard>
 );
 
-export default accessGroupList;
+export default AccessGroupList;
