@@ -200,12 +200,14 @@ const CreatePersons = () => {
 
   const handleAccessGroup = (e, id) => {
     const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-
-    const accGroup = allAccessgroups.find(grp => grp.accessGroupName == e.target.value);
-    newPersonInfo.accessGroup = accGroup;
-    
-    setPersonsInfo(newPersonsInfo);
+      const newPersonInfo = newPersonsInfo.find(person => person.id == id);
+      if(e.target.value == "clear") {
+        newPersonInfo.accessGroup = null
+      } else {
+        const accGroup = allAccessgroups.find(grp => grp.accessGroupName == e.target.value);
+        newPersonInfo.accessGroup = accGroup
+      }
+      setPersonsInfo(newPersonsInfo)
   }
 
   //access group logic (displaying in dropdownlist)

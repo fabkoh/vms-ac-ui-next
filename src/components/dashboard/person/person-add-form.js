@@ -209,8 +209,9 @@ export const PersonAddForm = (props) => {
                 >
                   <FormControl fullWidth>
                     <InputLabel>Access Group</InputLabel>
-                    <Select label = "Access Group" value={person.accessGroup} data="" onChange={(e)=> handleAccessGroup(e,person.id)}>
+                    <Select label = "Access Group" value={person.accessGroup? person.accessGroup.accessGroupName:""} data="" onChange={(e)=> handleAccessGroup(e,person.id)}>
                       {/* {mapping for accessgrp todisplay menu item here} */}
+                    <MenuItem value={"clear"} sx={{fontStyle: 'italic'}}>clear</MenuItem>
                       {allAccessgroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} data={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
                     </Select>
                   </FormControl>
