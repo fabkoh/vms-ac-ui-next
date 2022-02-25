@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Card, 
   CardHeader, 
@@ -7,7 +7,11 @@ import {
   Grid, 
   TextField, 
   CardContent,
-  Collapse
+  Collapse,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
@@ -18,6 +22,7 @@ import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 import { Box } from '@mui/system';
 import MuiPhoneNumber from "material-ui-phone-number";
+import { accessGroupApi } from '../../../api/access-groups';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -43,7 +48,11 @@ export const PersonEditForm = (props) => {
     onNameChange,
     onNumberChange,
     onEmailChange,
-    onUidChange
+    onUidChange,
+    allAccGroups,
+    handleAccGrpChg,
+    accGroupName,
+    setAccGroupName,
   } = props;
   const [expanded, setExpanded] = useState(true);
 
@@ -79,6 +88,17 @@ export const PersonEditForm = (props) => {
   //on the edit form to prevent errors. ensures <Confirmdelete> is reusable.
   const [AnchorEl, setAnchorEl] = useState(true);
 
+  // const [accGroupName, setAccGroupName] = useState('')
+
+  // useEffect(() => {
+  //   person.accessGroup? setAccGroupName(person.accessGroup.accessGroupName):setAccGroupName("");
+  //   console.log(person)
+  // }, [])
+    
+  useEffect(() => {
+    setAccGroupName(person.accessGroup.accessGroupName)
+  }, [])
+  
 	return (
 		<Card
       className={ 
@@ -228,6 +248,19 @@ export const PersonEditForm = (props) => {
                     onChange={(e) => onEmailChange(e, person.id)}
                     value={person.email}
                   />
+                </Grid>
+                <Grid  
+                  item
+                  md={6}
+                  xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel>Access Group</InputLabel>
+                  <Select  label = "Access Group" value={person.accessGroup ? person.accessGroup.accessGroupName : ""} data="" onChange={(e)=> handleAccGrpChg(e,person.id)}>
+                    {/* {mapping for accessgrp todisplay menu item here} */}
+                    <MenuItem value={"clear"} sx={{fontStyle: 'italic'}}>clear</MenuItem>
+                    {allAccGroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} data={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
+                  </Select>
+                  </FormControl>
                 </Grid>
               </Grid>
             </Collapse>
