@@ -289,16 +289,13 @@ const AccessGroupList = () => {
 	useEffect(() => {
 	//  console.log(text); 
 	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	}, [text]);
+	});
 	
-	//Set to true if multiple people are selected. controls form input visibility.
+	//Set to true if an access group is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
-	  if(selectedAccessGroup.length==1){
-		 setselectedState(false)
-	  }
-	  else{
-		  setselectedState(true)
+	  if(selectedAccessGroup.length>=1){
+		 setselectedState(true)
 	  }
 	};
 	useEffect(() => {

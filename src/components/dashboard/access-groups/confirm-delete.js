@@ -56,13 +56,13 @@ export const Confirmdelete = (props) => {
 						Are you sure you want to delete access group(s)? This action cannot be
 						undone.
 					</DialogContentText>
-					{ selectedState && <DialogContentText>
+					<DialogContentText>
 						
 							<TextField variant="filled" fullWidth 
 							helperText='Please type in DELETE to proceed' 
 							onChange={handleTextChange} />
 					
-					</DialogContentText>}
+					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
 					<Button
