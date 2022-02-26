@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Card, 
   CardHeader, 
   Button, 
   Divider, 
   Grid,
+  FormControl,
   MenuItem, 
-  TextField, 
+  InputLabel,
+  TextField,
+  Select, 
   CardContent,
   Collapse
 } from '@mui/material';
@@ -53,13 +56,20 @@ export const PersonAddForm = (props) => {
     onNumberChange,
     onEmailChange,
     onUidChange,
-    allAccessgroups
+    allAccessgroups,
+    handleAccessGroup,
+    accGroupName,
+    setAccGroupName
   } = props;
   const [expanded, setExpanded] = useState(true);
 
   const handleExpandClick = () => setExpanded(!expanded);
 
   const errorStyle = useStyles();
+
+  useEffect(() => {
+    setAccGroupName(person.accessGroup.accessGroupName)
+  }, [])
 
 	return (
 		<Card
@@ -88,7 +98,7 @@ export const PersonAddForm = (props) => {
             color="error"
             onClick={() => removePerson(person.id)}
           >
-            Remove
+            Clear
           </Button>
         } 
         sx={{ width: '100%' }} 
@@ -197,24 +207,14 @@ export const PersonAddForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                  <TextField
-                    fullWidth
-                    select
-                    label="Access Group"
-                    value={person.accessGroup}
-                    helperText="Please select an access group"
-                    defaultValue={""}
-                    onChange={(e) => {         console.log(e.target.value); }}
-                  >
-                    {Object.entries(allAccessgroups).map(([key, value]) => (
-                        <MenuItem
-                          key={key}
-                          value={key}
-                        >
-                        {value}
-                        </MenuItem>
-                    ))}
-                  </TextField>
+                  <FormControl fullWidth>
+                    <InputLabel>Access Group</InputLabel>
+                    <Select label = "Access Group" value={person.accessGroup? person.accessGroup.accessGroupName:""} data="" onChange={(e)=> handleAccessGroup(e,person.id)}>
+                      {/* {mapping for accessgrp todisplay menu item here} */}
+                    <MenuItem value={"clear"} sx={{fontStyle: 'italic'}}>clear</MenuItem>
+                      {allAccessgroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} data={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
+                    </Select>
+                  </FormControl>
                   </Grid>
               </Grid>
             </Collapse>

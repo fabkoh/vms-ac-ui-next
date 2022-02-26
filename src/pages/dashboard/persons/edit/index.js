@@ -17,6 +17,7 @@ import { DashboardLayout } from '../../../../components/dashboard/dashboard-layo
 import { PersonEditForm } from '../../../../components/dashboard/person/person-edit-form';
 import { personApi } from '../../../../api/person';
 import toast from 'react-hot-toast';
+import { accessGroupApi } from '../../../../api/access-groups';
 
 const EditPersons = () => {
 
@@ -30,6 +31,7 @@ const EditPersons = () => {
       Promise.all(resArray.filter(res => res.status == 200).map( res => res.json() ))
         .then(personArray => {
           setPersonsInfo(personArray.map(person => {
+            if(person.accessGroup){
             return {
               id: person.personId,
               firstName: person.personFirstName,
@@ -37,6 +39,11 @@ const EditPersons = () => {
               uid: person.personUid,
               mobileNumber: person.personMobileNumber,
               email: person.personEmail,
+              accessGroup:{
+                accessGroupId:person.accessGroup.accessGroupId,
+                accessGroupName:person.accessGroup.accessGroupName,
+                accessGroupDesc:person.accessGroup.accessGroupDesc,
+              },
               valid: {
                 firstName: true,
                 lastName: true,
@@ -47,6 +54,29 @@ const EditPersons = () => {
                 submitOk: true
               }
             }
+          }
+          return {
+            id: person.personId,
+            firstName: person.personFirstName,
+            lastName: person.personLastName,
+            uid: person.personUid,
+            mobileNumber: person.personMobileNumber,
+            email: person.personEmail,
+            accessGroup:{
+              accessGroupId:"",
+              accessGroupName:"",
+              accessGroupDesc:"",
+            },
+            valid: {
+              firstName: true,
+              lastName: true,
+              uidNotRepeated: true,
+              uidNotInUse: true,
+              mobileNumber: true,
+              email: true,
+              submitOk: true
+            }
+          }
           }))
         }).catch(err => console.log(err));
     }).catch(err => console.log(err));}
@@ -174,6 +204,7 @@ const EditPersons = () => {
       personUid:personInfo.uid,
       personMobileNumber:personInfo.mobileNumber,
       personEmail:personInfo.email,
+      accessGroup:personInfo.accessGroup,
     })))
       .then( resArr => {
         const failedPersons = [];
@@ -208,7 +239,47 @@ const EditPersons = () => {
     //  }
     // }, [personsInfo]);
     
+    const [allAccGroups, setAllAccGroups] = useState([])
+    const getAccGroups = async() => {
+      const res = await accessGroupApi.getAccessGroups();
+      const data = await res.json();
+      setAllAccGroups(data);
+     }
+     useEffect(() => {
+      getAccGroups();
+      personsInfo.map(person=> person.accessGroup?true:person.accessGroup="");
+     }, [])
+     
+    const [accGroupName, setAccGroupName] = useState('')
+    // const handleAccGrpChg = (e,id) => {
+    //   const newPersonsInfo = [...personsInfo];
+    //   const newPersonInfo = newPersonsInfo.find(person=> person.id == id);
+    //   if(e.target.value == "clear"){
+    //     setAccGroupName("")
+    //     newPersonInfo.accessGroup = null
+    //     setPersonsInfo(newPersonsInfo)
+    //   }
+    //   else{
+    //   setAccGroupName(e.target.value)
+    //   const temp = allAccGroups.find(grp=>grp.accessGroupName==e.target.value)
+    //   console.log(typeof(e.target.value))
 
+    //   newPersonInfo.accessGroup.accessGroupId= temp.accessGroupId
+    //   setPersonsInfo(newPersonsInfo)
+    // }
+    // }
+
+    const handleAccGrpChg = (e, id) => {
+      const newPersonsInfo = [ ...personsInfo ];
+      const newPersonInfo = newPersonsInfo.find(person => person.id == id);
+      if(e.target.value == "clear") {
+        newPersonInfo.accessGroup = null
+      } else {
+        const accGroup = allAccGroups.find(grp => grp.accessGroupName == e.target.value);
+        newPersonInfo.accessGroup = accGroup
+      }
+      setPersonsInfo(newPersonsInfo)
+    }
   
 
   return (
@@ -259,6 +330,10 @@ const EditPersons = () => {
               <Stack spacing={3}>
                 {personsInfo.map(person => (
                   <PersonEditForm
+                    allAccGroups={allAccGroups}
+                    handleAccGrpChg={handleAccGrpChg}
+                    accGroupName={accGroupName}
+                    setAccGroupName={setAccGroupName}
                     person={person}
                     removePerson={removePerson}
                     onFieldChange={onFieldChange}

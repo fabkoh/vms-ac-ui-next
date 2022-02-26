@@ -72,7 +72,26 @@ const AccessGroupDetails = () => {
     const handleActionMenuOpen = (e) => { setAnchorEl(e.currentTarget); }
     const handleActionMenuClose = () => { setAnchorEl(null); }
 
-    const [deleteOpen, setDeleteOpen] = useState(false);  
+    //for delete button
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [text, setText] = useState("");
+    const [deleteBlock, setDeleteBlock] = useState(true);
+    const handleTextChange = (e) => {
+		setText(e.target.value);
+	};
+    useEffect(() => {
+        console.log(text);
+        (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
+    }, [text]);
+
+    //Set to true if an access group is selected. controls form input visibility.
+	const [selectedState, setselectedState] = useState(false);
+	const checkSelected = () => {
+		setselectedState(true)
+	};
+	useEffect(() => {
+		checkSelected()
+	});
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
@@ -92,6 +111,7 @@ const AccessGroupDetails = () => {
             toast.error('Delete unsuccessful')
         }
         })
+        setDeleteOpen(false);
     };
 
     // render view
@@ -180,7 +200,7 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <AddIcon />
-                                            Create new access group
+                                            &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
@@ -192,7 +212,7 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />
-                                            Edit access group
+                                            &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem
@@ -200,11 +220,17 @@ const AccessGroupDetails = () => {
                                         onClick={handleDeleteOpen}
                                     >
                                         <DeleteIcon />
-                                        Delete access group
+                                        &#8288;Delete
                                     </MenuItem>
-                                    <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
+                                    <Confirmdelete 
+                                    selectedState={selectedState}
+                                    setAnchorEl={setAnchorEl} 
+                                    deleteOpen={deleteOpen}
+                                    handleDeleteClose={handleDeleteClose}
                                     handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}/>
+                                    handleDeleteOpen={handleDeleteOpen}
+                                    handleTextChange={handleTextChange}
+                                    deleteBlock={deleteBlock}/>
                                 </StyledMenu>
                             </Grid>
                         </Grid>

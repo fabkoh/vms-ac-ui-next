@@ -198,41 +198,42 @@ const CreatePersons = () => {
     setPersonsInfo(newPersonsInfo);
   }
 
+  const handleAccessGroup = (e, id) => {
+    const newPersonsInfo = [ ...personsInfo ];
+      const newPersonInfo = newPersonsInfo.find(person => person.id == id);
+      if(e.target.value == "clear") {
+        newPersonInfo.accessGroup = null
+      } else {
+        const accGroup = allAccessgroups.find(grp => grp.accessGroupName == e.target.value);
+        newPersonInfo.accessGroup = accGroup
+      }
+      setPersonsInfo(newPersonsInfo)
+  }
+
   //access group logic (displaying in dropdownlist)
-  const isMounted = useMounted();
+  //const isMounted = useMounted();
   const [allAccessgroups, setAllAccessgroups] = useState([]);
 
-  const accessGroups = {};
+  const getAccessGroups = async() => {
+    const res = await accessGroupApi.getAccessGroups();
+    const data = await res.json();
 
-  const getAccessGroups = useCallback(async() => {
-    try {
-      const res = await accessGroupApi.getAccessGroups();
-      if (res.status == 200) {
-        const data = await res.json();
-
-        data.forEach(a => {
+       /* data.forEach(a => {
           accessGroups[a.accessGroupId] = a.accessGroupName;
-        })
-        setAllAccessgroups(accessGroups);
-      } else {
-        throw new Error("Access Groups not loaded");
-      } 
-    } catch(e) {
-      console.error(e);
-      toast.error("Access Groups not loaded");
-    }
-  }, [isMounted]);
+        }) */
+    setAllAccessgroups(data);
+  };
 
   useEffect(() => {
     getAccessGroups();
-  },
-  []);
+  }, []);
+
+  const [accGroupName, setAccGroupName] = useState('');
 
   const [submitted, setSubmitted] = useState(false);
 
   const submitForm = e => {
     e.preventDefault();
-    
 
     setSubmitted(true);
     Promise.all(personsInfo.map(person => {
@@ -321,6 +322,9 @@ const CreatePersons = () => {
                     onEmailChange={onEmailChange}
                     key={person.id}
                     allAccessgroups={allAccessgroups}
+                    handleAccessGroup={handleAccessGroup}
+                    accGroupName={accGroupName}
+                    setAccGroupName={setAccGroupName}
                   />
                 ))}
                 <div>

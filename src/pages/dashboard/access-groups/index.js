@@ -148,7 +148,7 @@ const getComparator = (order, orderBy) =>
 const applyPagination = (accessGroup, page, rowsPerPage) =>
 	accessGroup.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-const accessGroupList = () => {
+const AccessGroupList = () => {
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
 	const [accessGroup, setAccessGroup] = useState([]);
@@ -289,16 +289,13 @@ const accessGroupList = () => {
 	useEffect(() => {
 	//  console.log(text); 
 	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	}, [text]);
+	});
 	
-	//Set to true if multiple people are selected. controls form input visibility.
+	//Set to true if an access group is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
-	  if(selectedAccessGroup.length==1){
-		 setselectedState(false)
-	  }
-	  else{
-		  setselectedState(true)
+	  if(selectedAccessGroup.length>=1){
+		 setselectedState(true)
 	  }
 	};
 	useEffect(() => {
@@ -378,7 +375,7 @@ const accessGroupList = () => {
 									<NextLink href={"/dashboard/access-groups/create"} passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
-											&#8288;Create New Access Group
+											&#8288;Create
 										</MenuItem>
 									</NextLink>
 									<NextLink href={{
@@ -387,13 +384,13 @@ const accessGroupList = () => {
 									}} passHref>
 										<MenuItem disableRipple disabled={buttonBlock}>
 											<EditIcon />
-											&#8288;Edit Access Group
+											&#8288;Edit
 										</MenuItem>
 									</NextLink>
 									
 									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
 										<DeleteIcon />
-										&#8288;Delete Access Group
+										&#8288;Delete
 									</MenuItem>
 									<Confirmdelete selectedState={selectedState} 
 									setAnchorEl={setAnchorEl}
@@ -515,10 +512,10 @@ const accessGroupList = () => {
 	);
 };
 
-accessGroupList.getLayout = (page) => (
+AccessGroupList.getLayout = (page) => (
 	<AuthGuard>
 		<DashboardLayout>{page}</DashboardLayout>
 	</AuthGuard>
 );
 
-export default accessGroupList;
+export default AccessGroupList;
