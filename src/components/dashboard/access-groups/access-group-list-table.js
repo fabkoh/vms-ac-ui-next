@@ -191,16 +191,6 @@ export const AccessGroupListTable = (props) => {
 												</SeverityPill>
 											)}
 										</Typography>
-											
-									{/*
-										<Typography width={160} noWrap>
-											{person.map((p) => p) || (
-												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" />
-													No Persons
-												</SeverityPill>
-											)}
-											</Typography> */}
 									</TableCell>
 									<TableCell width="20%">{accGroup.entrances}</TableCell>
 

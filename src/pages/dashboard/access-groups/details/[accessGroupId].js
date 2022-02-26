@@ -80,8 +80,9 @@ const AccessGroupDetails = () => {
 		setText(e.target.value);
 	};
     useEffect(() => {
+        console.log(text);
         (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-    });
+    }, [text]);
 
     //Set to true if an access group is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -199,7 +200,7 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <AddIcon />
-                                            Create
+                                            &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
@@ -211,7 +212,7 @@ const AccessGroupDetails = () => {
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />
-                                            Edit
+                                            &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem
@@ -219,7 +220,7 @@ const AccessGroupDetails = () => {
                                         onClick={handleDeleteOpen}
                                     >
                                         <DeleteIcon />
-                                        Delete
+                                        &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete 
                                     selectedState={selectedState}
