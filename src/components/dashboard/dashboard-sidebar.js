@@ -84,7 +84,7 @@ const getSections = (t) => [
     title: t('Rules'),
     items: [
       {
-        title: t('Access groups'),
+        title: t('Access Groups'),
         path: '/dashboard/access-groups',
         icon: <LockClosed fontSize="small" />,
         children: [

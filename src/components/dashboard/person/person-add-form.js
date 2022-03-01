@@ -68,7 +68,8 @@ export const PersonAddForm = (props) => {
   const errorStyle = useStyles();
 
   useEffect(() => {
-    setAccGroupName(person.accessGroup.accessGroupName)
+    person.accessGroup? setAccGroupName(person.accessGroup.accessGroupName):setAccGroupName("");
+    //setAccGroupName(person.accessGroup.accessGroupName)
   }, [])
 
 	return (
