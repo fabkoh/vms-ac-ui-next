@@ -78,14 +78,18 @@ const CreateAccessGroups = () => {
     const [duplicatedPerson, setDuplicatedPerson] = useState({});
 
     // store previous access group names
-    const accessGroupNames = {};
-    accessGroupApi.getAccessGroups()
-        .then(async res => {
-            if (res.status == 200) {
-               const body = await res.json();
-               body.forEach(group => accessGroupNames[group.accessGroupName] = true); 
-            }
-        });
+    const [accessGroupNames, setAccessGroupNames] = useState({});
+    useEffect(() => {
+        accessGroupApi.getAccessGroups()
+            .then(async res => {
+                const newAccessGroupNames = {}
+                if (res.status == 200) {
+                    const body = await res.json();
+                    body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
+                    setAccessGroupNames(newAccessGroupNames);
+                }
+            })
+    }, []);
 
     // add card logic
     //returns largest accessGroupId + 1
