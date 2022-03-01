@@ -67,10 +67,10 @@ export const PersonAddForm = (props) => {
 
   const errorStyle = useStyles();
 
-  useEffect(() => {
-    person.accessGroup? setAccGroupName(person.accessGroup.accessGroupName):setAccGroupName("");
-    //setAccGroupName(person.accessGroup.accessGroupName)
-  }, [])
+  // useEffect(() => {
+  //   person.accessGroup? setAccGroupName(person.accessGroup.accessGroupName):setAccGroupName("");
+  //   //setAccGroupName(person.accessGroup.accessGroupName)
+  // }, [])
 
 	return (
 		<Card
@@ -210,7 +210,7 @@ export const PersonAddForm = (props) => {
                 >
                   <FormControl fullWidth>
                     <InputLabel>Access Group</InputLabel>
-                    <Select label = "Access Group" value={person.accessGroup? person.accessGroup.accessGroupName:""} data="" onChange={(e)=> handleAccessGroup(e,person.id)}>
+                    <Select label = "Access Group" value={person.accessGroup? person.accessGroup.accessGroupName:""} onChange={(e)=> handleAccessGroup(e,person.id)}>
                       {/* {mapping for accessgrp todisplay menu item here} */}
                     <MenuItem value={"clear"} sx={{fontStyle: 'italic'}}>clear</MenuItem>
                       {allAccessgroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} data={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
