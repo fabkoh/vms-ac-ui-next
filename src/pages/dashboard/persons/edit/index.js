@@ -196,6 +196,11 @@ const EditPersons = () => {
   const submitForm = (e) => {
     e.preventDefault();
     setSubmitted(true);
+    personsInfo.map(personInfo=> {
+      if(personInfo.accessGroup == null || personInfo.accessGroup.accessGroupId == "") {
+        personInfo.accessGroup=null;
+      }
+    })
 
     Promise.all(personsInfo.map( personInfo => personApi.updatePerson({
       personId: personInfo.id,

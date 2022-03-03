@@ -29,7 +29,11 @@ const CreatePersons = () => {
     uid: '',
     mobileNumber: '',
     email: '',
-    accessGroup: '',
+    accessGroup: {
+      accessGroupId:"",
+      accessGroupName:"",
+      accessGroupDesc:"",
+    },
     valid: {
       firstName: true,
       lastName: true,
@@ -234,6 +238,12 @@ const CreatePersons = () => {
 
   const submitForm = e => {
     e.preventDefault();
+    personsInfo.map(personInfo=> {
+      if(personInfo.accessGroup == null || personInfo.accessGroup.accessGroupId == "") {
+        personInfo.accessGroup=null;
+      }
+    })
+
 
     setSubmitted(true);
     Promise.all(personsInfo.map(person => {

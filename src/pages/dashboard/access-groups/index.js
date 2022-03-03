@@ -80,7 +80,7 @@ const applyFilters = (accessGroup, filters) =>
     accessGroup.filter((accGroup) => {
 		if (filters.query) {
 			let queryMatched = false;
-			const properties = ["accessGroupName"];
+			const properties = ["accessGroupName", "accessGroupDesc"];
 
 			properties.forEach((property) => {
 				if (
@@ -472,7 +472,7 @@ const AccessGroupList = () => {
 											</InputAdornment>
 										),
 									}}
-									placeholder="Search for Access Group"
+									placeholder="Search for Access Group Name or Description"
 								/>
 							</Box>
 							{/* <TextField
