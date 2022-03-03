@@ -105,7 +105,7 @@ export const AccessGroupListTable = (props) => {
 				</Button> */}
 			</Box>
 			<Scrollbar>
-				<Table sx={{ minWidth: 700 }}>
+				<Table sx={{ minWidth: 800 }}>
 					<TableHead
 					// sx={{ visibility: props.enableBulkActions ? "collapse" : "visible" }}
 					sx={{backgroundColor: "neutral.200",}}
@@ -122,7 +122,7 @@ export const AccessGroupListTable = (props) => {
 							<TableCell>Description</TableCell>
 							<TableCell>No. Of Persons</TableCell>
 							<TableCell>No. Of Entrances</TableCell>
-							<TableCell align="right">Actions</TableCell>
+							<TableCell align="center">Actions</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -168,8 +168,8 @@ export const AccessGroupListTable = (props) => {
 											</Box>
 										</Box>
 									</TableCell>
-                                    <TableCell width="15%">
-											<Box sx={{ ml: -5, width:180}}>
+                                    <TableCell width="20%" align="center">
+											<Box sx={{ ml: -9, width:230}}>
 												<NextLink
 													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
 													passHref
@@ -183,9 +183,9 @@ export const AccessGroupListTable = (props) => {
 											</Box>
 									</TableCell>
 									<TableCell width="20%" align="center">
-										<Typography width={160} noWrap>
+										<Typography width={130} marginLeft="-10px" noWrap>
 											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
-												<SeverityPill color="warning">
+												<SeverityPill color="warning" align="left">
 													<WarningIcon fontSize="small" />
 													No Persons
 												</SeverityPill>
@@ -194,7 +194,7 @@ export const AccessGroupListTable = (props) => {
 									</TableCell>
 									<TableCell width="20%">{accGroup.entrances}</TableCell>
 
-									<TableCell width="30%" align="right">
+									<TableCell width="20%" align="center">
 										<NextLink
 											href={{
 												pathname: "/dashboard/access-groups/edit",
