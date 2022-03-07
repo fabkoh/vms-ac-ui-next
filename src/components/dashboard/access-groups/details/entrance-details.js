@@ -1,14 +1,25 @@
 import DetailsCard from "../../shared/details_card_with_search_field"
 
 export default function EntranceDetails({ entrances }){
+    const getName = (entrance) => entrance.entranceName;
+    const getLink = (entrance) => `/dashboard/entrances/details/${entrance.entranceId}`
+    const search = (entrances, inputValue) => {
+        const input = inputValue.toLowerCase();
+        return entrances.filter(e => (
+            e.entranceName.toLowerCase().includes(input)
+        ));
+    }
     return (
         <DetailsCard 
             title="Entrances"
-            subheader="Enter entrance to view, edit or delete schedule"
+            subheader="Click on entrance below to go to entrance details page"
             entities={ entrances }
-            getLabel={ (entrance) => entrance.entranceName }
-            getLink={ (entrance) => `dashboard/entrance/details/${entrance.entranceId}` }
+            getLabel={ getName }
+            getLink={ getLink }
             emptyLabel="No entrances"
+            searchFilter={ search }
+            placeholder="Search for entrance name"
+            noneFoundText="No entrances found"
         />
     )
 }

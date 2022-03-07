@@ -139,7 +139,6 @@ const AccessGroupDetails = () => {
     if (!accessGroup) {
         return null;
     }
-    console.log(accessGroup);
     return (
         <>
             <Head>
