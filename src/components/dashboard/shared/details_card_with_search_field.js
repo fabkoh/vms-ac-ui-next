@@ -11,7 +11,7 @@ import ExpandMore from "./expand-more";
 compulsory fields
     renderChip : function (entity) => JSX
     entities : list of entities
-    getLabel : function (entity) => string
+    getLabel : (entity) => string
     searchFilter : function (list of entities, string) => list of entities
 
 optional fields
@@ -20,6 +20,7 @@ optional fields
     emptyLabel : string
     placeholder : string
     noneFoundText : string
+    icon : JSX
 */
 
 export default function DetailsCardWithSearchField({
@@ -31,7 +32,8 @@ export default function DetailsCardWithSearchField({
     emptyLabel = "",
     searchFilter,
     placeholder = "",
-    noneFoundText = ""
+    noneFoundText = "",
+    icon = false
 }) {
 
     const [inputValue, setInputValue] = useState('');
@@ -63,7 +65,7 @@ export default function DetailsCardWithSearchField({
                                     href={ getLink(e) }
                                     passHref
                                 >
-                                    <Chip label={getLabel(e)} />
+                                    <Chip icon={icon} label={getLabel(e)} />
                                 </NextLink>
                             </Link>
                         </Grid>

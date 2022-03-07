@@ -1,3 +1,4 @@
+import { Person } from "@mui/icons-material";
 import DetailsCard from "../../shared/details_card_with_search_field";
 
 export const AccessGroupPersons = (props) => {
@@ -25,6 +26,7 @@ export const AccessGroupPersons = (props) => {
             searchFilter={ personSearch } // find a file for this function as it is written multiple times
             placeholder="Search for person name, mobile number or email"
             noneFoundText="No persons found"
+            icon={<Person fontSize="small" sx={{mr: 1}} />}
         />
     )
 }
