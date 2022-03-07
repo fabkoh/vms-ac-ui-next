@@ -36,7 +36,7 @@ class PersonApi {
             personUid: (personUid || String(Math.floor(Math.random() * (10 ** 8)))),
             personMobileNumber,
             personEmail,
-            accessGroup
+            accessGroup: accessGroup && accessGroup.accessGroupId
         }
 
         fakePersons.push(newPerson);
@@ -48,9 +48,11 @@ class PersonApi {
     getPersons() {
         if (useApi) { return sendApi('/api/persons'); }
 
-        const persons = [ ...fakePersons ]
+        const persons = fakePersons.map(p => {
+            return { ...p }
+        })
 
-        persons.map(person => {
+        persons.forEach(person => {
             if (person.accessGroup) {
                 // populate access group
                 person.accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == person.accessGroup) };
@@ -113,7 +115,7 @@ class PersonApi {
             personUid,
             personMobileNumber,
             personEmail,
-            accessGroup
+            accessGroup: accessGroup && accessGroup.accessGroupId
         };
 
         const index = fakePersons.findIndex(person => person.personId == personId);
@@ -141,10 +143,6 @@ class PersonApi {
         }
 
         fakePersons.splice(index, 1);
-        fakeAccessGroups = fakeAccessGroups.forEach(group => {
-            // remove deleted person id from access group
-            group.person = group.person.filter(personId => personId != id);
-        })
 
         return Promise.resolve(new Response(null, { status: 204 }));
     }

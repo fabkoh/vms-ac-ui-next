@@ -9,6 +9,8 @@ import { DashboardLayout } from '../../../components/dashboard/dashboard-layout'
 import Add from "@mui/icons-material/Add";
 import { personApi } from "../../../api/person";
 import { accessGroupApi } from "../../../api/access-groups";
+import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
+import entranceApi from "../../../api/entrance";
 import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
@@ -21,7 +23,8 @@ const CreateAccessGroups = () => {
         accessGroupId,
         accessGroupName: '',
         accessGroupDesc: '',
-        persons: []
+        persons: [],
+        entrances: []
     });
     const getEmptyAccessGroupValidations = (accessGroupId) => ({
         accessGroupId,
@@ -64,7 +67,7 @@ const CreateAccessGroups = () => {
             }
         } catch(e) {
             console.error(e);
-            toast.error("Persons not loaded");
+            toast.error("Persons info not loaded");
         }
     }, [isMounted]);
 
@@ -73,6 +76,31 @@ const CreateAccessGroups = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
+
+    // fetch all entrance info
+    const isEntranceMounted = useMounted();
+    const [allEntrances, setAllEntrances] = useState([]);
+    const getEntrances = useCallback( async() => {
+        try {
+            const res = await entranceApi.getEntrances();
+            if (res.status == 200) {
+                const body = await res.json();
+                setAllEntrances(body);
+            } else {
+                throw new Error("entrances not loaded");
+            }
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrances info not loaded")
+        }
+    }, [isEntranceMounted]);
+
+    useEffect(() => {
+        getEntrances();
+ 
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [])
 
     // stores the duplicated person ids
     const [duplicatedPerson, setDuplicatedPerson] = useState({});
@@ -215,6 +243,26 @@ const CreateAccessGroups = () => {
         setAccessGroupValidationsArr(validations);
     }
 
+    // entrance logic
+    const changeEntrance = (newValue, id) => {
+        const updatedInfo = [ ...accessGroupInfoArr ];
+        updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
+        setAccessGroupInfoArr(updatedInfo);
+    }
+
+    // currying for cleaner code
+    const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
+    const onNameChangeFactory = (id) => (e) => {
+        changeTextField(e, id);
+        changeNameCheck(e, id);
+    }
+    const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onPersonChangeFactory = (id) => (newValue) => {
+        changePerson(newValue, id);
+        changePersonCheck(newValue, id);
+    }
+
+
     const [submitted, setSubmitted] = useState(false);
 
     const submitForm = e => {
@@ -223,32 +271,62 @@ const CreateAccessGroups = () => {
         setSubmitted(true);
         Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.createAccessGroup(accessGroup)))
                .then(resArr => {
-                    const failedAccessGroup = [];
-                    const failedRes = [];
+                    const failedResIndex = []; // stores the index of the failed creations
+                    const successResIndex = []; // stores the index of success creations
+                    const originalAccessGroupInfoArr = [ ...accessGroupInfoArr ] // store first in case set access group info arr is executed before assignment
 
                     resArr.forEach((res, i) => {
                         if (res.status != 201) {
-                            failedAccessGroup.push(accessGroupInfoArr[i])
-                            failedRes.push(res)
+                            failedResIndex.push(i);
+                        } else {
+                            successResIndex.push(i);
                         }
                     })
 
-                    const numCreated = accessGroupInfoArr.length - failedAccessGroup.length
+                    // assign entrances to access group
+                    Promise.all(successResIndex.map(i => resArr[i].json()))
+                        .then(successResJson => {
+                            const accessGroupToEntrance = []; // stores [accessGroupId, [array of entranceId]]
+                            successResIndex.forEach((index, i) => {
+                                const entranceIds = originalAccessGroupInfoArr[index].entrances.map(e => e.entranceId);
+                                if (entranceIds.length > 0) { // there are entrances to add
+                                    accessGroupToEntrance.push([
+                                        successResJson[i].accessGroupId,
+                                        entranceIds
+                                    ])
+                                }
+                            });
+
+                            Promise.all(
+                                accessGroupToEntrance.map(
+                                    groupToEntrance => accessGroupEntranceApi.assignEntranceToAccessGroup(groupToEntrance[0], groupToEntrance[1])
+                                )
+                            ).then(
+                                resArr => {
+                                    resArr.forEach((res, i) => {
+                                        if (res.status != 204) { // failed to assign
+                                            const accessGroupName = successResJson[i].accessGroupName;
+                                            toast.error(`Failed to assign entrances to ${accessGroupName}`);
+                                        }
+                                    })
+                                }
+                            )
+                        })
+
+                    const numCreated = accessGroupInfoArr.length - failedResIndex.length
                     if (numCreated) {
                         toast.success(`${numCreated} access groups created`); 
                     }
 
-                    if (failedAccessGroup.length) {
+                    if (failedResIndex.length) {
                         // some failed
                         toast.error('Error creating the highlighted access groups');
-                        Promise.all(failedRes.map(res => res.json()))
-                               .then(failedObjArr => {
-                                    setSubmitted(false);
-                                    setAccessGroupValidationsArr(failedObjArr.map(obj => {
-                                        obj.submitFailed = true;
-                                        return obj;
-                                    }))
-                               })
+                        Promise.all(failedResIndex.map(i => resArr[i].json()))
+                            .then(failedResArr => {
+                                // TODO failedResArr map field errors to fields
+                                setAccessGroupInfoArr(failedResIndex.map(i => accessGroupInfoArr[i])); // set failed access groups to stay
+                                setAccessGroupValidationsArr(failedResIndex.map(i => accessGroupValidationsArr[i])); // set failed access group validations to stay
+                            });
                     } else {
                         // all passed
                         router.replace('/dashboard/access-groups')
@@ -301,20 +379,24 @@ const CreateAccessGroups = () => {
                     </Box>
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
-                            { accessGroupInfoArr.map((accessGroupInfo, i) => (
-                                <AccessGroupAddForm
-                                    key={accessGroupInfo.accessGroupId}
-                                    accessGroupInfo={accessGroupInfo}
-                                    removeCard={removeCard}
-                                    allPersons={allPersons}
-                                    accessGroupValidations={accessGroupValidationsArr[i]}
-                                    changeTextField={changeTextField}
-                                    changePerson={changePerson}
-                                    changeNameCheck={changeNameCheck}
-                                    changePersonCheck={changePersonCheck}
-                                    duplicatedPerson={duplicatedPerson}
-                                />
-                            ))}
+                            { accessGroupInfoArr.map((accessGroupInfo, i) => {
+                                const id = accessGroupInfo.accessGroupId
+                                return (
+                                    <AccessGroupAddForm
+                                        key={id}
+                                        accessGroupInfo={accessGroupInfo}
+                                        removeCard={removeCard}
+                                        allPersons={allPersons}
+                                        accessGroupValidations={accessGroupValidationsArr[i]}
+                                        onNameChange={onNameChangeFactory(id)}
+                                        onDescriptionChange={onDescriptionChangeFactory(id)}
+                                        onPersonChange={onPersonChangeFactory(id)}
+                                        duplicatedPerson={duplicatedPerson}
+                                        allEntrances={allEntrances}
+                                        onEntranceChange={onEntranceChangeFactory(id)}
+                                    />
+                                )
+                            })}
                             <div>
                                 <Button
                                     size="large"

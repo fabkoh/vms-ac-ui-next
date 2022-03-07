@@ -8,10 +8,12 @@ import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
 import { personApi } from "../../../api/person";
 import { accessGroupApi } from "../../../api/access-groups";
+import entranceApi from "../../../api/entrance";
 import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
+import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 
 const EditAccessGroups = () => {
 
@@ -21,73 +23,91 @@ const EditAccessGroups = () => {
         setAccessGroupValidationsArr] = useState([]);
 
     // load access groups to be edited
-    const getAccessGroups = ids => {
+    const getAccessGroups = async ids => {
+        const accessGroups = [];
+        const validations = [];
+
         // map each id to a fetch req for that access group
-        Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)))
-            .then(resArr => {
-                // get all successful req
-                const successfulReq = resArr.filter(res => res.status == 200);
+        const resArr = await Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)));
+        const successfulRes = resArr.filter(res => res.status == 200);
 
-                if (successfulReq.length == 0) {
-                    // no access groups found
-                    toast.error('Error editing access groups. Please refresh and try again');
-                    router.replace('/dashboard/access-groups');
-                };
+        // no access groups to edit
+        if (successfulRes.length == 0) {
+            toast.error('Error editing access groups. Please try again');
+            router.replace('/dashboard/access-groups');
+        }
 
-                if (successfulReq.length != resArr.length) {
-                    // some access groups not found
-                    toast.error('Some access groups were not found.');
-                };
+        // some groups not found
+        if (successfulRes.length != resArr.length) {
+            toast.error('Some access groups were not found');
+        }
 
-                // get all req bodies
-                Promise.all(successfulReq.map(req => req.json()))
-                    .then(accessGroupArr => {                        
-                        const validation = []
-                        // create a validation for each access group
-                        accessGroupArr.forEach(
-                            group => validation.push({
-                                accessGroupId: group.accessGroupId,
-                                accessGroupNameBlank: false,
-                                accessGroupDescBlank: false,
+        const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
 
-                                // name in database (error)
-                                accessGroupNameExists: false,
-
-                                // name duplicated in form (error)
-                                accessGroupNameDuplicated: false,
-
-                                // person has access group (note)
-                                accessGroupPersonHasAccessGroup: false,
-
-                                // person in two access groups in same form (error) 
-                                accessGroupPersonDuplicated: false,
-
-                                // submit failed
-                                submitFailed: false
-                            })
-                        );
-                        setAccessGroupValidationsArr(validation);
-                        setAccessGroupInfoArr(
-                            accessGroupArr.map(
-                                group => {
-                                    return {
-                                        accessGroupId: group.accessGroupId,
-                                        accessGroupName: group.accessGroupName,
-                                        accessGroupDesc: group.accessGroupDesc,
-                                        persons: group.persons,
-                                        originalName: group.accessGroupName, // do not change original fields as they are needed for validations
-                                        originalPersonIds: group.persons.map(p => p.personId)
-                                    }
-                                }
-                            )
-                        );
-                    })
+        bodyArr.forEach(body => {
+            accessGroups.push({
+                accessGroupId: body.accessGroupId,
+                accessGroupName: body.accessGroupName,
+                accessGroupDesc: body.accessGroupDesc,
+                persons: body.persons,
+                entrances: [], // for now
+                originalName: body.accessGroupName, // fields for validation
+                originalPersonIds: body.persons.map(p => p.personId)
             });
+            validations.push({
+                accessGroupId: body.accessGroupId,
+                accessGroupNameBlank: false,
+                accessGroupDescBlank: false,
+
+                // name in database (error)
+                accessGroupNameExists: false,
+
+                // name duplicated in form (error)
+                accessGroupNameDuplicated: false,
+
+                // person has access group (note)
+                accessGroupPersonHasAccessGroup: false,
+
+                // person in two access groups in same form (error) 
+                accessGroupPersonDuplicated: false,
+
+                // submit failed
+                submitFailed: false
+            });
+        });
+
+        setAccessGroupValidationsArr(validations);
+        setAccessGroupInfoArr(accessGroups);
+
+        return accessGroups; // for extension (see useEffect() below)
     }
 
-    useEffect(() => {
+    const getGroupEntrances = async (groups) => {
+        const accessGroups = [ ...groups ];
+        const resArr = await Promise.all(accessGroups.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
+        const successfulResIndex = [];
+        resArr.forEach((res, i) => {
+            if (res.status == 200) {
+                successfulResIndex.push(i);
+            } else {
+                toast.error(`Entrances for ${accessGroups[i].accessGroupName} not loaded. Please clear to prevent changes to entrance`);
+            }
+        });
+        const bodyArr = await Promise.all(successfulResIndex.map(i => resArr[i].json()));
+        bodyArr.forEach((body, i) => {
+            accessGroups[successfulResIndex[i]].entrances = body.map(e => e.entrance);
+        })
+
+        setAccessGroupInfoArr(accessGroups);
+
+        return accessGroups; // for extension (see useEffect() below)
+    }
+
+    useEffect( async () => {
         try {
-            getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)));
+            getGroupEntrances(
+                await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
+            );
         } catch(e){
             router.replace('/dashboard/access-groups')
         }
@@ -117,6 +137,30 @@ const EditAccessGroups = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
+
+    // fetch all entrance info
+    const isEntranceMounted = useMounted();
+    const [allEntrances, setAllEntrances] = useState([]);
+    const getEntrances = useCallback( async() => {
+        try {
+            const res = await entranceApi.getEntrances();
+            if (res.status == 200) {
+                const body = await res.json();
+                setAllEntrances(body);
+            } else {
+                throw new Error("entrances not loaded");
+            }
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrances info not loaded")
+        }
+    }, [isEntranceMounted]);
+    
+    useEffect(() => {
+        getEntrances();    
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [])
 
     // stores the duplicated person ids
     const [duplicatedPerson, setDuplicatedPerson] = useState({});
@@ -261,45 +305,74 @@ const EditAccessGroups = () => {
         setAccessGroupValidationsArr(validations);
     }
 
+    // entrance logic
+    const changeEntrance = (newValue, id) => {
+        const updatedInfo = [ ...accessGroupInfoArr ];
+        updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
+        setAccessGroupInfoArr(updatedInfo);
+    }
+
+    // currying for cleaner code
+    const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
+    const onNameChangeFactory = (id) => (e) => {
+        changeTextField(e, id);
+        changeNameCheck(e, id);
+    }
+    const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onPersonChangeFactory = (id) => (newValue) => {
+        changePerson(newValue, id);
+        changePersonCheck(newValue, id);
+    }
+
     const [submitted, setSubmitted] = useState(false);
 
-    const submitForm = e => {
+    const submitForm = async e => {
         e.preventDefault(); 
 
         setSubmitted(true);
-        Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.updateAccessGroup(accessGroup)))
-               .then(resArr => {
-                    const failedAccessGroup = [];
-                    const failedRes = [];
 
-                    resArr.forEach((res, i) => {
-                        if (res.status != 200) {
-                            failedAccessGroup.push(accessGroupInfoArr[i])
-                            failedRes.push(res)
-                        }
-                    })
+        const resArr = await Promise.all(accessGroupInfoArr.map(group => accessGroupApi.updateAccessGroup(group)));
+        
+        const successStatus = [];
+        const successfulResIndex = [];
 
-                    const numCreated = accessGroupInfoArr.length - failedAccessGroup.length
-                    if (numCreated) {
-                        toast.success(`${numCreated} access groups edited`); 
-                    }
+        resArr.forEach((res, i) => {
+            if(res.status == 200) {
+                successStatus.push(true);
+                successfulResIndex.push(i);
+            } else {
+                successStatus.push(false);
+            }
+        });
 
-                    if (failedAccessGroup.length) {
-                        // some failed
-                        toast.error('Error editing the highlighted access groups');
-                        Promise.all(failedRes.map(res => res.json()))
-                               .then(failedObjArr => {
-                                    setSubmitted(false);
-                                    setAccessGroupValidationsArr(failedObjArr.map(obj => {
-                                        obj.submitFailed = true;
-                                        return obj;
-                                    }))
-                               })
-                    } else {
-                        // all passed
-                        router.replace('/dashboard/access-groups')
-                    }
-               })
+        const entranceResArr = await Promise.all(
+            successfulResIndex.map(i => {
+                const accessGroup = accessGroupInfoArr[i];
+                return accessGroupEntranceApi.assignEntranceToAccessGroup(
+                    accessGroup.accessGroupId,
+                    accessGroup.entrances.map(e => e.entranceId)
+                );
+            })
+        )
+        entranceResArr.forEach((res, i) => {
+            if (res.status != 204) {
+                successStatus[successfulResIndex[i]] = false;
+            }
+        })
+
+        const numEdited = successStatus.filter(status => status).length;
+        if (numEdited) {
+            toast.success(`${numEdited} access groups edited`);
+            if (numEdited == resArr.length) { // all success
+                router.replace('/dashboard/access-groups');
+                return;
+            }
+        }
+
+        toast.error('Error updating the below access groups');
+        setAccessGroupInfoArr(accessGroupInfoArr.filter((e, i) => !(successStatus[i])));
+        setAccessGroupValidationsArr(accessGroupValidationsArr.filter((e, i) => !(successStatus[i])));
+        setSubmitted(false);
     }
 
     return(
@@ -347,21 +420,25 @@ const EditAccessGroups = () => {
                     </Box>
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
-                            { accessGroupInfoArr.map((accessGroupInfo, i) => (
-                                <AccessGroupEditForm
-                                    key={accessGroupInfo.accessGroupId}
-                                    accessGroupInfo={accessGroupInfo}
-                                    removeCard={removeCard}
-                                    allPersons={allPersons}
-                                    accessGroupValidations={accessGroupValidationsArr[i]}
-                                    changeTextField={changeTextField}
-                                    changePerson={changePerson}
-                                    changeNameCheck={changeNameCheck}
-                                    changePersonCheck={changePersonCheck}
-                                    duplicatedPerson={duplicatedPerson}
-                                    edit
-                                />
-                            ))}
+                            { accessGroupInfoArr.map((accessGroupInfo, i) => {
+                                const id = accessGroupInfo.accessGroupId
+                                return (
+                                    <AccessGroupEditForm
+                                        key={id}
+                                        accessGroupInfo={accessGroupInfo}
+                                        removeCard={removeCard}
+                                        allPersons={allPersons}
+                                        accessGroupValidations={accessGroupValidationsArr[i]}
+                                        onNameChange={onNameChangeFactory(id)}
+                                        onDescriptionChange={onDescriptionChangeFactory(id)}
+                                        onPersonChange={onPersonChangeFactory(id)}
+                                        duplicatedPerson={duplicatedPerson}
+                                        allEntrances={allEntrances}
+                                        onEntranceChange={onEntranceChangeFactory(id)}
+                                        edit
+                                    />
+                                )
+                            })}
                             <Grid container>
                                 <Grid item marginRight={3}>
                                     <Button

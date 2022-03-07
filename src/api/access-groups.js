@@ -24,11 +24,19 @@ class AccessGroupApi {
             accessGroupId: fakeAccessGroups.map(group => group.accessGroupId)
                                            .reduce((a, b) => Math.max(a, b), 0) + 1,
             accessGroupName,
-            accessGroupDesc,
-            persons
+            accessGroupDesc
         }
 
         fakeAccessGroups.push(newAccessGroup);
+
+        const personIds = persons.map(p => p.personId);
+        const accessGroupId = newAccessGroup.accessGroupId;
+        fakePersons.forEach(p => {
+            if (personIds.includes(p.personId)) {
+                p.accessGroup = accessGroupId;
+            }
+        })
+
         // did not populate person field here as not required
         return Promise.resolve(new Response(JSON.stringify(newAccessGroup), { status: 201 }));
     }
@@ -37,7 +45,15 @@ class AccessGroupApi {
         if (useApi) { return sendApi("/api/accessgroups"); }
 
         // did not populate person field here as not required
-        return Promise.resolve(new Response(JSON.stringify(fakeAccessGroups), { status: 200 }));
+        const accessGroups = fakeAccessGroups.map(group => {
+            return { ...group }
+        })
+        accessGroups.forEach(group => {
+            const accessGroupId = group.accessGroupId;
+            group.persons = fakePersons.filter(p => p.accessGroup == accessGroupId);
+        })
+
+        return Promise.resolve(new Response(JSON.stringify(accessGroups), { status: 200 }));
     }
 
     getAccessGroup(id) {
@@ -46,10 +62,8 @@ class AccessGroupApi {
         const accessGroup = { ...fakeAccessGroups.find(group => group.accessGroupId == id) };
 
         if (accessGroup) {
-            if(accessGroup.persons) {
-                // populate the person field
-                accessGroup.persons = [ ...fakePersons.filter(person => accessGroup.persons.includes(person.personId)) ];
-            }
+            const accessGroupId = accessGroup.accessGroupId;
+            accessGroup.persons = fakePersons.filter(p => p.accessGroup == accessGroupId);
             
             return Promise.resolve(new Response(JSON.stringify(accessGroup), { status: 200 }));
         }
@@ -78,7 +92,7 @@ class AccessGroupApi {
                 })
             });
         }
-        const updatedAccessGroup = { accessGroupId, accessGroupName, accessGroupDesc, persons };
+        const updatedAccessGroup = { accessGroupId, accessGroupName, accessGroupDesc };
         const index = fakeAccessGroups.findIndex(group => group.accessGroupId == accessGroupId);
 
         if (index == -1) {
@@ -87,6 +101,16 @@ class AccessGroupApi {
         }
 
         fakeAccessGroups[index] = updatedAccessGroup;
+
+        const personIds = persons.map(p => p.personId);
+        // update membership
+        fakePersons.forEach(p => {
+            if (personIds.includes(p.personId)) {
+                p.accessGroup = accessGroupId;
+            } else if (p.accessGroup == accessGroupId) {
+                p.accessGroup = null;
+            }
+        })
         
         // did not populate person field as not needed
         return Promise.resolve(new Response(JSON.stringify(updatedAccessGroup), { status: 200 }));

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
 import { accessGroupApi } from "../../../../api/access-groups";
+import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
 import NextLink from 'next/link';
 import Head from 'next/head';
 import router from 'next/router';
@@ -26,6 +27,8 @@ import { AccessGroupBasicDetails } from "../../../../components/dashboard/access
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
+import { set } from "date-fns";
+import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 
 const AccessGroupDetails = () => {
 
@@ -38,6 +41,23 @@ const AccessGroupDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
+    const [entrances, setEntrances] = useState(null);
+
+    const getEntrances = async (accessGroupId) => {
+        try {
+            const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
+            if (res.status == 200) {
+                const body = await res.json();
+                setEntrances(body.map(e => e.entrance));
+            } else {
+                toast.error('Entrance info not loaded');
+                throw new Error('entrance info not loaded');
+            }
+        } catch(err) {
+            console.error(err);
+        }
+    }
+
     const getAccessGroup = useCallback(async() => {
         try {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
@@ -49,6 +69,7 @@ const AccessGroupDetails = () => {
 
             if (isMounted()) {
                 setAccessGroup(body);
+                getEntrances(body.accessGroupId);
             }
         } catch(err) {
             console.error(err);
@@ -251,6 +272,12 @@ const AccessGroupDetails = () => {
                                 xs={12}
                             >
                                 <AccessGroupPersons accessGroup={accessGroup} />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <EntranceDetails entrances={entrances} />
                             </Grid>
                         </Grid>
                     </Box>
