@@ -1,0 +1,1 @@
+export const applyPagination = (entities, page, rowPerPage) => entities.slice(page * rowPerPage, page * rowPerPage + rowPerPage);
