@@ -25,7 +25,7 @@ const assignmentHelper = (parentId, childrenIds, parentName, childName) => {
     )
 }
 
-class AccessGroupEntranceNtoNApi { // refactor to include groupToEntranceId
+class AccessGroupEntranceNtoNApi {
     getEntranceWhereAccessGroupId(accessGroupId) {
         return Promise.resolve(
             new Response(
@@ -41,7 +41,7 @@ class AccessGroupEntranceNtoNApi { // refactor to include groupToEntranceId
             )
     }
 
-    getAccessGroupWhereEntranceId(entranceId) { // refactor to include groupToEntranceId
+    getAccessGroupWhereEntranceId(entranceId) {
         return Promise.resolve(
             new Response(
                 JSON.stringify(fakeAccessGroupEntranceNtoN

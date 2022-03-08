@@ -182,17 +182,28 @@ export const AccessGroupListTable = (props) => {
 												</NextLink>
 											</Box>
 									</TableCell>
-									<TableCell width="20%" align="center">
+									<TableCell width="20%">
 										<Typography width={130} marginLeft="-10px" noWrap>
 											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
 												<SeverityPill color="warning" align="left">
-													<WarningIcon fontSize="small" />
+													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 													No Persons
 												</SeverityPill>
 											)}
 										</Typography>
 									</TableCell>
-									<TableCell width="20%">{accGroup.entrances}</TableCell>
+									<TableCell width="20%">
+										{
+											(Array.isArray(accGroup.entrances) && accGroup.entrances.length > 0) ? (
+												<Typography>{accGroup.entrances.length}</Typography>
+											) : (
+												<SeverityPill color="warning" align="left">
+													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+													No entrances
+												</SeverityPill>
+											)
+										}
+									</TableCell>
 
 									<TableCell width="20%" align="center">
 										<NextLink
