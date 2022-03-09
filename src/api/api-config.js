@@ -64,17 +64,17 @@ const fakeEntrances = [
         "entranceId": 1,
         "entranceName": "Main Entrance",
         "entranceDescription": "the main entrance",
-        "isActive": false
+        "isActive": true
     },
     {
         "entranceId": 2,
         "entranceName": "Side Entrance",
-        "isActive": false
+        "isActive": true
     },
     {
         "entranceId": 3,
         "entranceName": "Abandoned Entrance",
-        "isActive": true
+        "isActive": false
     }
 ]
 

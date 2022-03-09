@@ -1,13 +1,15 @@
-import { Box, Checkbox, IconButton, Link, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
-import { propsToClassKey } from "@mui/styles";
+import { Checkbox, Chip, IconButton, Link, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import { Scrollbar } from "../../../scrollbar";
-import { SeverityPill } from "../../../severity-pill";
 import WarningChip from "../../shared/warning-chip";
 import NextLink from "next/link";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
+import { ListFilter } from "../../shared/list-filter";
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, ...other }) {
+// for status options
+const statusOptions = ['Unlocked', 'Active'];
+
+export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
@@ -25,7 +27,13 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                             <TableCell>No. of Access Groups</TableCell>
                             <TableCell>No. of Schedules</TableCell>
                             <TableCell>Controller</TableCell>
-                            <TableCell>Status</TableCell>
+                            <TableCell>
+                                <ListFilter
+                                    array={statusOptions}
+                                    onSelect={handleStatusSelect}
+                                    defaultLabel="Status"
+                                />
+                            </TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>    
                     </TableHead>   
@@ -43,6 +51,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                 const isEntranceSelected = selectedEntrances.includes(entranceId);
                                 const handleSelect = handleSelectFactory(entranceId);
                                 const detailsLink = "/dashboard/entrances/details/" + entranceId;
+                                const editLink = "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([entranceId]));
+                                const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
                                 return(
                                     <TableRow
                                         hover
@@ -94,17 +104,20 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                             }
                                         </TableCell>
                                         <TableCell>
-                                            {
-                                                isActive ? (
-                                                    <SeverityPill color="success">Active</SeverityPill>
-                                                ) : (
-                                                    <SeverityPill color="error">Unlocked</SeverityPill>
-                                                )
-                                            }
+                                            <Chip
+                                                label={isActive ? "ACTIVE" : "UNLOCKED"}
+                                                onClick={handleOpenStatusUpdateDialog}
+                                                color={isActive? "success" : "error"}
+                                                sx={{
+                                                    fontSize: "12px",
+                                                    fontWeight: 600
+                                                }}
+                                                size="small"
+                                            />
                                         </TableCell>
                                         <TableCell>
                                             <NextLink
-                                                href={ "/dashboard/entrances/edit?" + encodeURIComponent(JSON.stringify([entranceId])) }
+                                                href={ editLink }
                                                 passHref
                                             >
                                                 <IconButton component="a">
@@ -129,6 +142,12 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
             </Scrollbar>
             <TablePagination
                 component="div"
+                count={entranceCount}
+                onPageChange={onPageChange}
+                onRowsPerPageChange={onRowsPerPageChange}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[5, 10, 15]}
             />
         </div>
     )

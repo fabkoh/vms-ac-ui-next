@@ -1,8 +1,8 @@
-import { Add, Delete, Edit, HelpOutline } from "@mui/icons-material";
+import { Add, Delete, DoorFront, Edit, HelpOutline, LockOpen } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import entranceApi from "../../../api/entrance";
 import accessGroupEntrance from "../../../api/access-group-entrance-n-to-n";
@@ -16,6 +16,13 @@ import { Upload } from "../../../icons/upload";
 import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
 import EntranceListTable from "../../../components/dashboard/entrances/list/entrance-list-table";
+import { applyPagination, createFilter } from "../../../utils/list-utils";
+import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
+
+const applyFilter = createFilter({
+    query: (entrance, queryString) => entrance.entranceName.toLowerCase().includes(queryString),
+    status: (entrance, state) => state == null || entrance.isActive == state
+})
 
 const EntranceList = () => {
     // copied
@@ -78,11 +85,97 @@ const EntranceList = () => {
             setSelectedEntrances([ ...selectedEntrances, entranceId ]);
         }
     }
+
+    
+    // for filtering
+    const [filters, setFilters] = useState({
+        query: "",
+        status: null
+    })
+    // query filter
+    const queryRef = useRef(null);
+    const handleQueryChange = (e) => {
+        e.preventDefault();
+        setFilters((prevState) => ({
+            ...prevState,
+            query: queryRef.current?.value
+        }));
+    }
+    // status filter
+    const handleStatusSelect = (i) => {
+        const status = i == -1 ? null : i == 1;
+        setFilters((prevState) => ({
+            ...prevState,
+            status: status
+        }));
+    }
+    const filteredEntrances = applyFilter(entrances, filters);
+
+
+    // for pagination
+    const [page, setPage] = useState(0);
+    const handlePageChange = (e, newPage) => setPage(newPage);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
+    const paginatedEntrances = applyPagination(filteredEntrances, page, rowsPerPage);
+
+
+    // for updating status
+    const [statusUpdateIds, setStatusUpdateIds] = useState([]);
+    const [updateStatus, setUpdateStatus] = useState(null);
+    const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+    const openStatusUpdateDialog = (entranceIds, updatedStatus) => {
+        setStatusUpdateIds(entranceIds);
+        setUpdateStatus(updatedStatus);
+        setStatusUpdateDialogOpen(true);
+    }
+    const handleStatusUpdateDialogClose = () => {
+        setStatusUpdateDialogOpen(false);
+        handleActionClose();
+    }
+    const handleMultipleUpdate = (updateStatus) => openStatusUpdateDialog([ ...selectedEntrances ], updateStatus);
+    const handleMultiEnable = () => handleMultipleUpdate(true);
+    const handleMultiUnlock = () => handleMultipleUpdate(false);
+    const handleStatusUpdate = async (entranceIds, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceStatus(entranceId, updatedStatus)));
+        
+        let successCount = 0;
+        const someFailed = false;
+        resArr.forEach(res => {
+            if (res.status == 200) {
+                successCount++;
+            } else {
+                someFailed = true;
+            }
+        })
+
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " some entrances"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+
+        const newEntrances = [ ...entrances ];
+        newEntrances.forEach(entrance => {
+            if (entranceIds.includes(entrance.entranceId)) {
+                entrance.isActive = updatedStatus;
+            }
+        })
+        setEntrances(newEntrances);
+    }
+
+
     return(
         <>
             <Head>
                 <title>Etlas: Entrance List</title>
             </Head>
+            <ConfirmStatusUpdate
+                entranceIds={statusUpdateIds}
+                open={statusUpdateDialogOpen}
+                handleDialogClose={handleStatusUpdateDialogClose}
+                updateStatus={updateStatus}
+                handleStatusUpdate={handleStatusUpdate}
+            />
             <Box
                 component="main"
                 sx={{
@@ -126,6 +219,20 @@ const EntranceList = () => {
                                         <Delete />
                                         &#8288;Delete    
                                     </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiEnable}
+                                    >
+                                        <DoorFront />
+                                        &#8288;Enable
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiUnlock}
+                                    >
+                                        <LockOpen />
+                                        &#8288;Unlock
+                                    </MenuItem>
                                 </StyledMenu>
                             </Grid> 
                         </Grid>
@@ -162,7 +269,7 @@ const EntranceList = () => {
                         >
                             <Box
                                 component="form"
-                                // onChange
+                                onChange={handleQueryChange}
                                 sx={{
                                     flexGrow: 1,
                                     m: 1.5
@@ -172,7 +279,9 @@ const EntranceList = () => {
                                     defaultValue=""
                                     fullWidth
                                     inputProps={{ 
-                                        // ref: queryRef,
+                                        ref: queryRef
+                                    }}
+                                    InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
                                                 <Search fontSize="small" />    
@@ -184,12 +293,19 @@ const EntranceList = () => {
                             </Box>
                         </Box>
                         <EntranceListTable 
-                            entrances={entrances}
+                            entrances={paginatedEntrances}
                             selectedAllEntrances={selectedAllEntrances}
                             selectedSomeEntrances={selectedSomeEntrances}
                             handleSelectAllEntrances={handleSelectAllEntrances}
                             handleSelectFactory={handleSelectFactory}
                             selectedEntrances={selectedEntrances}
+                            entranceCount={filteredEntrances.length}
+                            onPageChange={handlePageChange}
+                            onRowsPerPageChange={handleRowsPerPageChange}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            handleStatusSelect={handleStatusSelect}
+                            openStatusUpdateDialog={openStatusUpdateDialog}
                         />
                     </Card>
                 </Container>    
