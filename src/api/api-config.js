@@ -20,7 +20,6 @@ const fakePersons = [
         "personFirstName": "Leto",
         "personLastName": "Atreides",
         "personUid": "F2VMFevJ",
-        "personMobileNumber": "+1 1001001001",
         "personEmail": "leto@atreides.com",
         "accessGroup": 1
     },
@@ -30,16 +29,13 @@ const fakePersons = [
         "personLastName": "Smith",
         "personUid": "abc",
         "personMobileNumber": "+65 98765432",
-        "personEmail": "smith.j@mail.com",
         "accessGroup":  2
     },
     {
         "personId": 4,
         "personFirstName": "Andy",
         "personLastName": "Tan",
-        "personUid": "123",
-        "personMobileNumber": "+65 91234567",
-        "personEmail": "tan.a@mail.com"
+        "personUid": "123"
     }
 ];
 
