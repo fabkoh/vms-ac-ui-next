@@ -59,7 +59,7 @@ const fakeEntrances = [
     {
         "entranceId": 1,
         "entranceName": "Main Entrance",
-        "entranceDescription": "the main entrance",
+        "entranceDesc": "the main entrance",
         "isActive": true
     },
     {
