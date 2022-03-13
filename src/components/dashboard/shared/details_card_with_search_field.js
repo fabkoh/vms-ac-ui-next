@@ -60,14 +60,14 @@ export default function DetailsCardWithSearchField({
                             paddingBottom={3}
                             key={i}
                         >
-                            <Link component="a">
-                                <NextLink
-                                    href={ getLink(e) }
-                                    passHref
-                                >
-                                    <Chip icon={icon} label={getLabel(e)} />
-                                </NextLink>
-                            </Link>
+                            <NextLink
+                                href={ getLink(e) }
+                                passHref
+                            >
+                                <Link component="a">
+                                    <Chip icon={icon} label={getLabel(e)} clickable />
+                                </Link>
+                            </NextLink>
                         </Grid>
                     ))}
                 </>

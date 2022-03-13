@@ -1,4 +1,4 @@
-import { fakeAccessGroupEntranceNtoN, useApi, fakeEntrances, fakeAccessGroups } from './api-config';
+import { fakeAccessGroupEntranceNtoN, useApi, fakeEntrances, fakeAccessGroups, sendApi } from './api-config';
 
 // helper method placed outside so other files have no access to this
 const assignmentHelper = (parentId, childrenIds, parentName, childName) => {
@@ -27,6 +27,7 @@ const assignmentHelper = (parentId, childrenIds, parentName, childName) => {
 
 class AccessGroupEntranceNtoNApi {
     getEntranceWhereAccessGroupId(accessGroupId) {
+        if(useApi) { return sendApi(`/api/access-group-entrance?accessgroupid=${encodeURIComponent(accessGroupId)}`); }
         return Promise.resolve(
             new Response(
                 JSON.stringify(fakeAccessGroupEntranceNtoN
@@ -42,6 +43,7 @@ class AccessGroupEntranceNtoNApi {
     }
 
     getAccessGroupWhereEntranceId(entranceId) {
+        if(useApi) { return sendApi(`/api/access-group-entrance?entranceid=${encodeURIComponent(entranceId)}`); }
         return Promise.resolve(
             new Response(
                 JSON.stringify(fakeAccessGroupEntranceNtoN
@@ -57,12 +59,20 @@ class AccessGroupEntranceNtoNApi {
     }
 
     assignAccessGroupToEntrance(entranceId, accessGroupIds) {
+        if(useApi) { 
+            const accessGroupIdsString = encodeURIComponent(JSON.stringify(accessGroupIds));
+            return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${accessGroupIdsString.substring(1, accessGroupIdsString.length - 2)}`); 
+        }
         assignmentHelper(entranceId, accessGroupIds, 'entranceId', 'accessGroupId');
 
         return Promise.resolve(new Response(null, { status: 204 }));
     }
 
     assignEntranceToAccessGroup(accessGroupId, entranceIds) {
+        if(useApi) { 
+            const entranceIdsString = encodeURIComponent(JSON.stringify(entranceIds));
+            return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?accessgroupids=${entranceIdsString.substring(1, entranceIdsString.length - 2)}`); 
+        }
         assignmentHelper(accessGroupId, entranceIds, 'accessGroupId', 'entranceId');
 
         return Promise.resolve(new Response(null, { status: 204 }))
