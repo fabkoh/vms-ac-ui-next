@@ -209,7 +209,7 @@ const EntranceList = () => {
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href="/">    
+                                    <NextLink href={"/dashboard/entrances/edit"} passHref>    
                                         <MenuItem disableRipple>
                                             <Edit />
                                             &#8288;Edit
