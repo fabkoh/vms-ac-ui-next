@@ -44,7 +44,7 @@ class EntranceApi {
     }
 
     getEntrances() {
-        // if (useApi) { return fetch(...); }
+        if (useApi) { return sendApi('/api/entrances'); }
 
         return Promise.resolve(new Response(JSON.stringify(fakeEntrances), { status: 200 }));
     }
