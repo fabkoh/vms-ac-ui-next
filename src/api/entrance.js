@@ -8,6 +8,10 @@ class EntranceApi {
     }
 
     updateEntranceStatus(entranceId, isActive) {
+        if (useApi) {
+            if (isActive) { return sendApi(`/api/entrance/enable/${entranceId}`, { method: 'PUT'} ); }
+            return sendApi(`/api/entrance/unlock/${entranceId}`, { method: 'PUT' } );
+        }
         fakeEntrances.find(entrance => entrance.entranceId == entranceId).isActive = isActive;
 
         return Promise.resolve(new Response(isActive, { status: 200 }));
