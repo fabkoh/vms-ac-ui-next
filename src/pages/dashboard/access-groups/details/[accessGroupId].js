@@ -30,6 +30,33 @@ import { Confirmdelete } from '../../../../components/dashboard/access-groups/co
 import { set } from "date-fns";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 
+const fakeAccessGroupSchedules = [
+    {
+        accessGroupScheduleId: 1,
+        accessGroupScheduleName: 'name1',
+        rrule: '',
+        timeStart: '07:00',
+        timeEnd: '19:00',
+        groupToEntranceId: 1
+    },
+    {
+        accessGroupScheduleId: 2,
+        accessGroupScheduleName: 'name2',
+        rrule: '',
+        timeStart: '09:00',
+        timeEnd: '17:00',
+        groupToEntranceId: 1
+    },
+    {
+        accessGroupScheduleId: 3,
+        accessGroupScheduleName: 'name3',
+        rrule: '',
+        timeStart: '00:00',
+        timeEnd: '23:59',
+        groupToEntranceId: 3
+    }
+]
+
 const AccessGroupDetails = () => {
 
     // load access group details
@@ -41,22 +68,38 @@ const AccessGroupDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const [entrances, setEntrances] = useState(null);
+    const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
+    const [accessGroupSchedules, setAccessGroupSchedules] = useState({});
 
-    const getEntrances = async (accessGroupId) => {
-        try {
-            const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
-            if (res.status == 200) {
-                const body = await res.json();
-                setEntrances(body.map(e => e.entrance));
-            } else {
-                toast.error('Entrance info not loaded');
-                throw new Error('entrance info not loaded');
+    const getAccessGroupSchedules = async (accessGroupEntranceArr) => {
+        if (accessGroupEntranceArr == null) { return null; }
+        const body = fakeAccessGroupSchedules;
+        const obj = {} // maps groupToEntranceId to arr of schedules
+        body.forEach(accessGroupEntrance => {
+            const groupToEntranceId = accessGroupEntrance.groupToEntranceId;
+            if (obj[groupToEntranceId] === undefined) {
+                obj[groupToEntranceId] = [];
             }
-        } catch(err) {
-            console.error(err);
+
+            const arr = obj[groupToEntranceId]
+            arr.push(accessGroupEntrance);
+        });
+        setAccessGroupSchedules(obj);
+    };
+
+    const getAccessGroupEntrance = async (accessGroupId) => {
+        if (accessGroupId == null) { return null; }
+        const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
+        if (res.status == 200) {
+            const body = await res.json();
+            setAccessGroupEntrance(body);
+            return body
+        } else {
+            toast.error('Entrance info not loaded');
+            return null;
         }
-    }
+
+    };
 
     const getAccessGroup = useCallback(async() => {
         try {
@@ -76,8 +119,8 @@ const AccessGroupDetails = () => {
         }
     }, [isMounted]);
 
-    useEffect(() => {
-        getAccessGroup();
+    useEffect(async () => {
+        getAccessGroupSchedules(await getAccessGroupEntrance(await getAccessGroup()));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
@@ -276,7 +319,16 @@ const AccessGroupDetails = () => {
                                 item
                                 xs={12}
                             >
-                                <EntranceDetails entrances={entrances} />
+                                <EntranceDetails accessGroupEntrance={accessGroupEntrance} />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <AccessGroupSchedules 
+                                    accessGroupEntrance={accessGroupEntrance}
+                                    accessGroupSchedules={accessGroupSchedules}
+                                />
                             </Grid>
                         </Grid>
                     </Box>
