@@ -92,6 +92,24 @@ const fakeAccessGroupEntranceNtoN = [
     }
 ]
 
+const fakeAccessGroupSchedule = [
+    {
+        "accessGroupScheduleId":1,
+        "accessGroupScheduleName":"sched1",
+        "rrule":"",
+        "timeStart":"",
+        "timeEnd":"",
+        "groupToEntranceId": 1,
+    },
+    {
+        "accessGroupScheduleId":1,
+        "accessGroupScheduleName":"sched1",
+        "rrule":"",
+        "timeStart":"",
+        "timeEnd":"",
+        "groupToEntranceId": 1,
+    }
+]
 const sendApi = (path, init={}) => fetch(apiUri + path, init);
 
-export { useApi, sendApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN };
+export { useApi, sendApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule};
