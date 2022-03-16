@@ -140,23 +140,27 @@ const EntranceList = () => {
         handleStatusUpdateDialogClose();
 
         const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceStatus(entranceId, updatedStatus)));
-        
-        let successCount = 0;
+
         const someFailed = false;
+        const successResArr = []
         resArr.forEach(res => {
             if (res.status == 200) {
-                successCount++;
+                successResArr.push(res)
             } else {
                 someFailed = true;
             }
         })
 
         if (someFailed) { toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " some entrances"); }
+        const successCount = successResArr.length;
         if (successCount) { toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+
+        const bodyArr = await Promise.all(successResArr.map(res => res.json()));
+        const successfulEntranceIds = bodyArr.map(entrance => entrance.entranceId);
 
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
-            if (entranceIds.includes(entrance.entranceId)) {
+            if (successfulEntranceIds.includes(entrance.entranceId)) {
                 entrance.isActive = updatedStatus;
             }
         })

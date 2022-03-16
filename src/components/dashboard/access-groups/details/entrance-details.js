@@ -1,20 +1,21 @@
 import DetailsCard from "../../shared/details_card_with_search_field"
 import MeetingRoom from "@mui/icons-material/MeetingRoom"
 
-export default function EntranceDetails({ entrances }){
-    const getName = (entrance) => entrance.entranceName;
-    const getLink = (entrance) => `/dashboard/entrances/details/${entrance.entranceId}`
-    const search = (entrances, inputValue) => {
-        const input = inputValue.toLowerCase();
-        return entrances.filter(e => (
-            e.entranceName.toLowerCase().includes(input)
-        ));
-    }
+const getName = (entrance) => entrance.entranceName;
+const getLink = (entrance) => `/dashboard/entrances/details/${entrance.entranceId}`
+const search = (entrances, inputValue) => {
+    const input = inputValue.toLowerCase();
+    return entrances.filter(e => (
+        e.entranceName.toLowerCase().includes(input)
+    ));
+}
+
+export default function EntranceDetails({ accessGroupEntrance }){
     return (
         <DetailsCard 
             title="Entrances"
             subheader="Click on entrance below to go to entrance details page"
-            entities={ entrances }
+            entities={ accessGroupEntrance.map(groupEntrance => groupEntrance.entrance) }
             getLabel={ getName }
             getLink={ getLink }
             emptyLabel="No entrances"
