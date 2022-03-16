@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Button, Card, CardHeader, Collapse, Divider, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Button, Card, CardHeader, Collapse, Divider, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "../../shared/expand-more";
 import { Box } from "@mui/system";
 import { ChevronDown } from "../../../../icons/chevron-down";
 import StyledMenu from "../../styled-menu";
 import { Add, Delete, Edit } from "@mui/icons-material";
+import { Scrollbar } from "../../../scrollbar";
 
 const accessGroupSchedules = [
     {
@@ -14,7 +15,7 @@ const accessGroupSchedules = [
     }
 ]
 
-export default function AccessGroupSchedules({ accessGroupEntrance }) {
+export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupSchedules }) {
     // expanding card
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
@@ -24,6 +25,16 @@ export default function AccessGroupSchedules({ accessGroupEntrance }) {
     const actionOpen = Boolean(actionAnchor)
     const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
     const handleActionMenuClose = () => setActionAnchor(null);
+
+    // schedules
+    const [schedules, setSchedules] = useState(null);
+    const handleEntranceSelect = (e) => {
+        const groupToEntranceId = e.target.value;
+        if (groupToEntranceId == "") { // clear selected
+            setSchedules(null);
+        } 
+        setSchedules(accessGroupSchedules[groupToEntranceId])
+    }
 
     return (
         <Card>
@@ -92,7 +103,7 @@ export default function AccessGroupSchedules({ accessGroupEntrance }) {
                         <Select
                             label="Select Entrance"
                             defaultValue=""
-                            onChange={(e) => console.log(e)}
+                            onChange={handleEntranceSelect}
                             fullWidth
                         >
                             <MenuItem value="" sx={{ fontStyle: 'italic' }}>
@@ -101,7 +112,6 @@ export default function AccessGroupSchedules({ accessGroupEntrance }) {
                             { Array.isArray(accessGroupEntrance) && accessGroupEntrance.map((groupEntrance, i) => (
                                 <MenuItem 
                                     key={i}
-                                    name={groupEntrance.entrance.entranceName}
                                     value={groupEntrance.groupToEntranceId}
                                 >
                                     {groupEntrance.entrance.entranceName}
@@ -110,6 +120,37 @@ export default function AccessGroupSchedules({ accessGroupEntrance }) {
                         </Select>
                     </FormControl>
                 </Box>
+                <Divider />
+                {
+                    schedules && (
+                        <Scrollbar>
+                            <Table>
+                                <TableHead sx={{ backgroundColor: "neutral.200" }}>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Description</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {
+                                        Array.isArray(schedules) && (
+                                            schedules.map((schedule, i) => (
+                                                <TableRow hover key={i}>
+                                                    <TableCell>
+                                                        { schedule.accessGroupScheduleName }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        Test
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )
+                                    }
+                                </TableBody>
+                            </Table>
+                        </Scrollbar>
+                    )
+                }
             </Collapse>
         </Card>
     )

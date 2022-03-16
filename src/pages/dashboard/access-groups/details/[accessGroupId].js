@@ -30,6 +30,33 @@ import { Confirmdelete } from '../../../../components/dashboard/access-groups/co
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
 
+const fakeAccessGroupSchedules = [
+    {
+        accessGroupScheduleId: 1,
+        accessGroupScheduleName: 'name1',
+        rrule: '',
+        timeStart: '07:00',
+        timeEnd: '19:00',
+        groupToEntranceId: 1
+    },
+    {
+        accessGroupScheduleId: 2,
+        accessGroupScheduleName: 'name2',
+        rrule: '',
+        timeStart: '09:00',
+        timeEnd: '17:00',
+        groupToEntranceId: 1
+    },
+    {
+        accessGroupScheduleId: 3,
+        accessGroupScheduleName: 'name3',
+        rrule: '',
+        timeStart: '00:00',
+        timeEnd: '23:59',
+        groupToEntranceId: 3
+    }
+]
+
 const AccessGroupDetails = () => {
 
     // load access group details
@@ -42,19 +69,37 @@ const AccessGroupDetails = () => {
     }, [])
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
+    const [accessGroupSchedules, setAccessGroupSchedules] = useState({});
 
+    const getAccessGroupSchedules = async (accessGroupEntranceArr) => {
+        if (accessGroupEntranceArr == null) { return null; }
+        const body = fakeAccessGroupSchedules;
+        const obj = {} // maps groupToEntranceId to arr of schedules
+        body.forEach(accessGroupEntrance => {
+            const groupToEntranceId = accessGroupEntrance.groupToEntranceId;
+            if (obj[groupToEntranceId] === undefined) {
+                obj[groupToEntranceId] = [];
+            }
 
-    const getAccessGroupEntrance = useCallback(async (accessGroupId) => {
-        if (accessGroupId == null) { return; }
+            const arr = obj[groupToEntranceId]
+            arr.push(accessGroupEntrance);
+        });
+        setAccessGroupSchedules(obj);
+    };
+
+    const getAccessGroupEntrance = async (accessGroupId) => {
+        if (accessGroupId == null) { return null; }
         const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
         if (res.status == 200) {
             const body = await res.json();
             setAccessGroupEntrance(body);
+            return body
         } else {
             toast.error('Entrance info not loaded');
+            return null;
         }
 
-    }, [isMounted])
+    };
 
     const getAccessGroup = useCallback(async() => {
         try {
@@ -76,7 +121,7 @@ const AccessGroupDetails = () => {
     }, [isMounted]);
 
     useEffect(async () => {
-        getAccessGroupEntrance(await getAccessGroup());
+        getAccessGroupSchedules(await getAccessGroupEntrance(await getAccessGroup()));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
@@ -283,6 +328,7 @@ const AccessGroupDetails = () => {
                             >
                                 <AccessGroupSchedules 
                                     accessGroupEntrance={accessGroupEntrance}
+                                    accessGroupSchedules={accessGroupSchedules}
                                 />
                             </Grid>
                         </Grid>
