@@ -45,19 +45,9 @@ export const EntranceBasicDetails = (props) => {
                     align={align}
                     divider
                     label="Status"
-                   // value={isActive}
+                    value={isActive}
                 >
                     {
-                        isActive && (
-                            <SeverityPill color="success">
-                                <Warning 
-                                    fontSize="small" 
-                                    sx={{ mr: 1 }}
-                                />
-                                ACTIVE
-                            </SeverityPill>
-                        ),
-
                         !isActive && (
                             <SeverityPill color="error">
                                 <Warning 
@@ -65,6 +55,10 @@ export const EntranceBasicDetails = (props) => {
                                     sx={{ mr: 1 }}
                                 />
                                 UNLOCKED
+                            </SeverityPill>
+                        ) || (
+                            <SeverityPill color="success">
+                                ACTIVE
                             </SeverityPill>
                         )
                     }
