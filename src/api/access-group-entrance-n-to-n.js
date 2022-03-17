@@ -60,8 +60,8 @@ class AccessGroupEntranceNtoNApi {
 
     assignAccessGroupToEntrance(entranceId, accessGroupIds) {
         if(useApi) { 
-            const accessGroupIdsString = encodeURIComponent(JSON.stringify(accessGroupIds));
-            return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${accessGroupIdsString.substring(1, accessGroupIdsString.length - 2)}`, { method: 'POST' }); 
+            const accessGroupIdsString = JSON.stringify(accessGroupIds);
+            return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${encodeURIComponent(accessGroupIdsString.substring(1, accessGroupIdsString.length - 1))}`, { method: 'POST' }); 
         }
         assignmentHelper(entranceId, accessGroupIds, 'entranceId', 'accessGroupId');
 
@@ -70,8 +70,8 @@ class AccessGroupEntranceNtoNApi {
 
     assignEntranceToAccessGroup(accessGroupId, entranceIds) {
         if(useApi) { 
-            const entranceIdsString = encodeURIComponent(JSON.stringify(entranceIds));
-            return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?accessgroupids=${entranceIdsString.substring(1, entranceIdsString.length - 2)}`, { method: 'POST' }); 
+            const entranceIdsString = JSON.stringify(entranceIds);
+            return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?accessgroupids=${encodeURIComponent(entranceIdsString.substring(1, entranceIdsString.length - 1))}`, { method: 'POST' }); 
         }
         assignmentHelper(accessGroupId, entranceIds, 'accessGroupId', 'entranceId');
 

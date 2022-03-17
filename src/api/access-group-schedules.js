@@ -140,6 +140,13 @@ class AccessGroupScheduleApi {
 
     //     return Promise.resolve(new Response(fakeAccessGroups.some(group => group.accessGroupName == name), { status: 200 }));
     // }
+
+    getAccessGroupSchedulesWhereGroupToEntranceIdsIn(groupToEntranceIds) {
+        if (useApi) { 
+            const groupToEntranceIdsString = JSON.stringify(groupToEntranceIds);
+            return sendApi(`/api/access-group-schedule?grouptoentranceids=${encodeURIComponent(groupToEntranceIdsString.substring(1, groupToEntranceIdsString.length - 1))}`)
+        }
+    }
 }
 
 export const accessGroupScheduleApi = new AccessGroupScheduleApi();
