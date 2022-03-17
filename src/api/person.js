@@ -1,4 +1,5 @@
-import { useApi, sendApi, fakePersons, fakeAccessGroups } from './api-config';
+import { useApi, fakePersons, fakeAccessGroups } from './api-config';
+import { sendApi } from './api-helpers';
 
 class PersonApi {
 

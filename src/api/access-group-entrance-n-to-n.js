@@ -1,4 +1,5 @@
-import { fakeAccessGroupEntranceNtoN, useApi, fakeEntrances, fakeAccessGroups, sendApi } from './api-config';
+import { fakeAccessGroupEntranceNtoN, useApi, fakeEntrances, fakeAccessGroups } from './api-config';
+import { sendApi } from './api-helpers';
 
 // helper method placed outside so other files have no access to this
 const assignmentHelper = (parentId, childrenIds, parentName, childName) => {

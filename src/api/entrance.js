@@ -1,4 +1,5 @@
-import { fakeEntrances, useApi, sendApi, fakeAccessGroups } from './api-config';
+import { fakeEntrances, useApi, fakeAccessGroups } from './api-config';
+import { sendApi } from './api-helpers';
 
 class EntranceApi {
 

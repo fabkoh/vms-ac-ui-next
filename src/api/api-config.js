@@ -110,6 +110,5 @@ const fakeAccessGroupSchedule = [
         "groupToEntranceId": 1,
     }
 ]
-const sendApi = (path, init={}) => fetch(apiUri + path, init);
 
-export { useApi, sendApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule};
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule};
