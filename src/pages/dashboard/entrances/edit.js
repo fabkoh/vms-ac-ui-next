@@ -318,9 +318,9 @@ const EditEntrances = () => {
         const entranceResArr = await Promise.all(
             successfulResIndex.map(i => {
                 const entrance = entranceInfoArr[i];
-                return accessGroupEntranceApi.assignAccessGroupToEntrance(
-                    entrance.entranceId,
-                    entrance.accessGroups.map(grp => grp.accessGroupId)
+                return accessGroupEntranceApi.assignAccessGroupsToEntrance(
+                    entrance.accessGroups.map(grp => grp.accessGroupId),
+                    entrance.entranceId
                 );
             })
         )

@@ -7,6 +7,7 @@ import { ChevronDown } from "../../../../icons/chevron-down";
 import StyledMenu from "../../styled-menu";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import { Scrollbar } from "../../../scrollbar";
+import { rrulestr } from "rrule";
 
 const accessGroupSchedules = [
     {
@@ -32,8 +33,9 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
         const groupToEntranceId = e.target.value;
         if (groupToEntranceId == "") { // clear selected
             setSchedules(null);
-        } 
-        setSchedules(accessGroupSchedules[groupToEntranceId])
+        } else {
+            setSchedules(accessGroupSchedules.filter(schedule => schedule.groupToEntranceId == groupToEntranceId))
+        }
     }
 
     return (
@@ -140,7 +142,7 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                                                         { schedule.accessGroupScheduleName }
                                                     </TableCell>
                                                     <TableCell>
-                                                        Test
+                                                        { rrulestr(schedule.rrule).toText() }
                                                     </TableCell>
                                                 </TableRow>
                                             ))

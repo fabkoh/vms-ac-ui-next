@@ -299,7 +299,7 @@ const CreateAccessGroups = () => {
 
                             Promise.all(
                                 accessGroupToEntrance.map(
-                                    groupToEntrance => accessGroupEntranceApi.assignEntranceToAccessGroup(groupToEntrance[0], groupToEntrance[1])
+                                    groupToEntrance => accessGroupEntranceApi.assignEntrancesToAccessGroup(groupToEntrance[1], groupToEntrance[0])
                                 )
                             ).then(
                                 resArr => {

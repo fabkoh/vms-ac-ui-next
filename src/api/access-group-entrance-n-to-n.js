@@ -58,7 +58,7 @@ class AccessGroupEntranceNtoNApi {
             )
     }
 
-    assignAccessGroupToEntrance(entranceId, accessGroupIds) {
+    assignAccessGroupsToEntrance(accessGroupIds, entranceId) {
         if(useApi) { 
             const accessGroupIdsString = JSON.stringify(accessGroupIds);
             return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${encodeURIComponent(accessGroupIdsString.substring(1, accessGroupIdsString.length - 1))}`, { method: 'POST' }); 
@@ -68,10 +68,10 @@ class AccessGroupEntranceNtoNApi {
         return Promise.resolve(new Response(null, { status: 204 }));
     }
 
-    assignEntranceToAccessGroup(accessGroupId, entranceIds) {
+    assignEntrancesToAccessGroup(entranceIds, accessGroupId) {
         if(useApi) { 
             const entranceIdsString = JSON.stringify(entranceIds);
-            return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?accessgroupids=${encodeURIComponent(entranceIdsString.substring(1, entranceIdsString.length - 1))}`, { method: 'POST' }); 
+            return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?entranceids=${encodeURIComponent(entranceIdsString.substring(1, entranceIdsString.length - 1))}`, { method: 'POST' }); 
         }
         assignmentHelper(accessGroupId, entranceIds, 'accessGroupId', 'entranceId');
 
