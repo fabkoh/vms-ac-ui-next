@@ -79,16 +79,12 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                 open={actionOpen}
                 onClose={handleActionMenuClose}
             >
-                <MenuItem disableRipple>
-                    <Add />
-                    &#8288;Create
-                </MenuItem>
                 <MenuItem 
                     disableRipple
                     disabled={actionDisabled}
                 >
                     <Edit />
-                    &#8288;Edit
+                    &#8288;Modify
                 </MenuItem>
                 <MenuItem
                     disableRipple
@@ -116,7 +112,7 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                             fullWidth
                         >
                             <MenuItem value="" sx={{ fontStyle: 'italic' }}>
-                                CLEAR
+                                clear
                             </MenuItem>
                             { Array.isArray(accessGroupEntrance) && accessGroupEntrance.map((groupEntrance, i) => (
                                 <MenuItem 
