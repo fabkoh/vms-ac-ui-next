@@ -31,33 +31,6 @@ import EntranceDetails from "../../../../components/dashboard/access-groups/deta
 import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 
-const fakeAccessGroupSchedules = [
-    {
-        accessGroupScheduleId: 1,
-        accessGroupScheduleName: 'name1',
-        rrule: '',
-        timeStart: '07:00',
-        timeEnd: '19:00',
-        groupToEntranceId: 1
-    },
-    {
-        accessGroupScheduleId: 2,
-        accessGroupScheduleName: 'name2',
-        rrule: '',
-        timeStart: '09:00',
-        timeEnd: '17:00',
-        groupToEntranceId: 1
-    },
-    {
-        accessGroupScheduleId: 3,
-        accessGroupScheduleName: 'name3',
-        rrule: '',
-        timeStart: '00:00',
-        timeEnd: '23:59',
-        groupToEntranceId: 3
-    }
-]
-
 const AccessGroupDetails = () => {
 
     // load access group details
@@ -70,7 +43,7 @@ const AccessGroupDetails = () => {
     }, [])
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
-    const [accessGroupSchedules, setAccessGroupSchedules] = useState({});
+    const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
 
     const getAccessGroupEntranceAndSchedule = async() => {
         try {
