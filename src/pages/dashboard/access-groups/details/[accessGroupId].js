@@ -27,9 +27,8 @@ import { AccessGroupBasicDetails } from "../../../../components/dashboard/access
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
+import { set } from "date-fns";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
-import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
-import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 
 const fakeAccessGroupSchedules = [
     {
@@ -112,6 +111,7 @@ const AccessGroupDetails = () => {
 
             if (isMounted()) {
                 setAccessGroup(body);
+                getEntrances(body.accessGroupId);
             }
         } catch(err) {
             console.error(err);
@@ -291,14 +291,14 @@ const AccessGroupDetails = () => {
                                         &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete 
-                                        selectedState={selectedState}
-                                        setAnchorEl={setAnchorEl} 
-                                        deleteOpen={deleteOpen}
-                                        handleDeleteClose={handleDeleteClose}
-                                        handleDeleteAction={handleDeleteAction}
-                                        handleDeleteOpen={handleDeleteOpen}
-                                        handleTextChange={handleTextChange}
-                                        deleteBlock={deleteBlock}/>
+                                    selectedState={selectedState}
+                                    setAnchorEl={setAnchorEl} 
+                                    deleteOpen={deleteOpen}
+                                    handleDeleteClose={handleDeleteClose}
+                                    handleDeleteAction={handleDeleteAction}
+                                    handleDeleteOpen={handleDeleteOpen}
+                                    handleTextChange={handleTextChange}
+                                    deleteBlock={deleteBlock}/>
                                 </StyledMenu>
                             </Grid>
                         </Grid>

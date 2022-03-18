@@ -242,7 +242,7 @@ const EntranceDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
-                                    <Confirmdelete 
+                                   {/* <Confirmdelete 
                                     selectedState={selectedState}
                                     setAnchorEl={setAnchorEl} 
                                     deleteOpen={deleteOpen}
@@ -250,7 +250,7 @@ const EntranceDetails = () => {
                                     handleDeleteAction={handleDeleteAction}
                                     handleDeleteOpen={handleDeleteOpen}
                                     handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    deleteBlock={deleteBlock}/> */}
                                 </StyledMenu>
                             </Grid>
                         </Grid>

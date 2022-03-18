@@ -138,27 +138,23 @@ const EntranceList = () => {
         handleStatusUpdateDialogClose();
 
         const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceStatus(entranceId, updatedStatus)));
-
+        
+        let successCount = 0;
         const someFailed = false;
-        const successResArr = []
         resArr.forEach(res => {
             if (res.status == 200) {
-                successResArr.push(res)
+                successCount++;
             } else {
                 someFailed = true;
             }
         })
 
         if (someFailed) { toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " some entrances"); }
-        const successCount = successResArr.length;
         if (successCount) { toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
-
-        const bodyArr = await Promise.all(successResArr.map(res => res.json()));
-        const successfulEntranceIds = bodyArr.map(entrance => entrance.entranceId);
 
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
-            if (successfulEntranceIds.includes(entrance.entranceId)) {
+            if (entranceIds.includes(entrance.entranceId)) {
                 entrance.isActive = updatedStatus;
             }
         })
@@ -211,11 +207,19 @@ const EntranceList = () => {
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
+<<<<<<< HEAD
                                     <NextLink href={"/dashboard/entrances/edit"} passHref>    
                                         <MenuItem 
                                             disableRipple 
                                             disabled={actionDisabled}
                                         >
+=======
+                                    <NextLink href={{
+										pathname: '/dashboard/entrances/edit',
+										query: { ids: encodeURIComponent(JSON.stringify(selectedEntrances)) }
+									}} passHref>    
+                                        <MenuItem disableRipple>
+>>>>>>> 732a4d78b5d06716443d8b1e4d2e5ac844d75ba7
                                             <Edit />
                                             &#8288;Edit
                                         </MenuItem>
