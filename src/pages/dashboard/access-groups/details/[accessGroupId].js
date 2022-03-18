@@ -30,6 +30,7 @@ import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
 import { set } from "date-fns";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
+import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 
 const AccessGroupDetails = () => {
 
