@@ -255,7 +255,7 @@ const CreateEntrances = () => {
                     // assign access groups to entrance
                     Promise.all(successResIndex.map(i => resArr[i].json()))
                         .then(successResJson => {
-                            const entranceToAccessGroup = []; // stores [accessGroupId, [array of entranceId]]
+                            const entranceToAccessGroup = []; // stores [entranceId, [array of accessGroupIds]]
                             successResIndex.forEach((index, i) => {
                                 const accessGroupIds = originalEntranceInfoArr[index].accessGroups.map(e => e.accessGroupId);
                                 if (accessGroupIds.length > 0) { // there are access groups to add
@@ -265,7 +265,8 @@ const CreateEntrances = () => {
                                     ])
                                 }
                             });
-
+                            
+                            console.log("this", entranceToAccessGroup);
                             Promise.all(
                                 entranceToAccessGroup.map(
                                     groupToEntrance => accessGroupEntranceApi.assignAccessGroupsToEntrance(groupToEntrance[1], groupToEntrance[0])

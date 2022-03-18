@@ -75,7 +75,7 @@ class AccessGroupEntranceNtoNApi {
             )
     }
 
-    assignAccessGroupToEntrance(entranceId, accessGroupIds) {
+    assignAccessGroupsToEntrance(accessGroupIds, entranceId) {
         if(useApi) { 
             const accessGroupIdsString = JSON.stringify(accessGroupIds);
             return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${encodeURIComponent(accessGroupIdsString.substring(1, accessGroupIdsString.length - 1))}`, { method: 'POST' }); 
