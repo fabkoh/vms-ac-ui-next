@@ -21,12 +21,6 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
 
-    // schedule actions
-    const [actionAnchor, setActionAnchor] = useState(null);
-    const actionOpen = Boolean(actionAnchor)
-    const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
-    const handleActionMenuClose = () => setActionAnchor(null);
-
     // schedules
     const [schedules, setSchedules] = useState(null);
     const handleEntranceSelect = (e) => {
@@ -37,6 +31,13 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
             setSchedules(accessGroupSchedules.filter(schedule => schedule.groupToEntranceId == groupToEntranceId))
         }
     }
+    
+    // schedule actions
+    const [actionAnchor, setActionAnchor] = useState(null);
+    const actionOpen = Boolean(actionAnchor)
+    const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
+    const handleActionMenuClose = () => setActionAnchor(null);
+    const actionDisabled = schedules == null;
 
     return (
         <Card>
@@ -82,11 +83,17 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                     <Add />
                     &#8288;Create
                 </MenuItem>
-                <MenuItem disableRipple>
+                <MenuItem 
+                    disableRipple
+                    disabled={actionDisabled}
+                >
                     <Edit />
                     &#8288;Edit
                 </MenuItem>
-                <MenuItem disableRipple>
+                <MenuItem
+                    disableRipple
+                    disabled={actionDisabled}
+                >
                     <Delete />
                     &#8288;Delete
                 </MenuItem>

@@ -63,15 +63,7 @@ const EntranceList = () => {
         return data;
     }, [isMounted]);
     //eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(async () => getAccessGroupsLocal(await getEntrancesLocal()), [])
-
-
-    // for actions button
-    const [actionAnchor, setActionAnchor] = useState(null);
-    const open = Boolean(actionAnchor);
-    const handleActionClick = (e) => setActionAnchor(e.currentTarget);
-    const handleActionClose = () => setActionAnchor(null);
-    
+    useEffect(async () => getAccessGroupsLocal(await getEntrancesLocal()), [])  
 
     // for selection of checkboxes
     const [selectedEntrances, setSelectedEntrances] = useState([]);
@@ -86,6 +78,12 @@ const EntranceList = () => {
         }
     }
 
+     // for actions button
+    const [actionAnchor, setActionAnchor] = useState(null);
+    const open = Boolean(actionAnchor);
+    const handleActionClick = (e) => setActionAnchor(e.currentTarget);
+    const handleActionClose = () => setActionAnchor(null);
+    const actionDisabled = selectedEntrances.length == 0;
     
     // for filtering
     const [filters, setFilters] = useState({
@@ -214,18 +212,25 @@ const EntranceList = () => {
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink href={"/dashboard/entrances/edit"} passHref>    
-                                        <MenuItem disableRipple>
+                                        <MenuItem 
+                                            disableRipple 
+                                            disabled={actionDisabled}
+                                        >
                                             <Edit />
                                             &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
-                                    <MenuItem disableRipple>
+                                    <MenuItem 
+                                        disableRipple 
+                                        disabled={actionDisabled}
+                                    >
                                         <Delete />
                                         &#8288;Delete    
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
+                                        disabled={actionDisabled}
                                     >
                                         <DoorFront />
                                         &#8288;Enable
@@ -233,6 +238,7 @@ const EntranceList = () => {
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiUnlock}
+                                        disabled={actionDisabled}
                                     >
                                         <LockOpen />
                                         &#8288;Unlock
