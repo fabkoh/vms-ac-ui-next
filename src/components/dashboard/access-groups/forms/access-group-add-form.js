@@ -17,13 +17,14 @@ import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../../../components/dashboard/shared/edit_form_tooltip";
 
-const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, changeTextField, changePerson, changeNameCheck, changePersonCheck, duplicatedPerson, edit }) => {
+const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, onNameChange, onDescriptionChange, onPersonChange, duplicatedPerson, edit, allEntrances, onEntranceChange }) => {
     const {
         accessGroupId,
         accessGroupName,
         accessGroupDesc,
         persons,
-        originalPersonIds
+        originalPersonIds,
+        entrances
     } = accessGroupInfo;
 
     const {
@@ -39,7 +40,19 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
 
-    const getName = (p) => p.personFirstName + ' ' + p.personLastName;
+    // person logic
+    const getPersonName = (p) => p.personFirstName + ' ' + p.personLastName;
+
+    // entrance logic
+    const getEntranceName = (e) => e.entranceName;
+    const entranceFilter = (entrances, state) => {
+        const text = state.inputValue.toLowerCase(); // case insensitive search
+        return entrances.filter(e => (
+            e.entranceName.toLowerCase().includes(text)
+        ))
+    }
+    const entranceEqual = (option, value) => option.entranceId == value.entranceId;
+
     return (
         <ErrorCard error={
             accessGroupNameBlank        ||
@@ -107,7 +120,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                             name="accessGroupName"
                             required
                             value={accessGroupName}
-                            onChange={(e) => { changeTextField(e, accessGroupId); changeNameCheck(e, accessGroupId); }}
+                            onChange={onNameChange}
                             helperText={ 
                                 (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                                 (accessGroupNameExists && 'Error: access group name taken') ||
@@ -128,7 +141,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                     label="Description"
                                     name="accessGroupDesc"
                                     value={accessGroupDesc}
-                                    onChange={ (e) => changeTextField(e, accessGroupId) }
+                                    onChange={onDescriptionChange}
                                 />
                             </Grid>
                             <Divider />
@@ -159,8 +172,8 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                 >
                                     <MultipleSelectInput 
                                         options={allPersons}
-                                        setSelected={(newValue) => { changePerson(newValue, accessGroupId); changePersonCheck(newValue, accessGroupId); }}
-                                        getOptionLabel={getName}
+                                        setSelected={onPersonChange}
+                                        getOptionLabel={getPersonName}
                                         label="Persons"
                                         noOptionsText="No persons found"
                                         placeholder="Enter person details (name, org/dept) to search"
@@ -174,7 +187,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                                      (p.personEmail && p.personEmail.toLowerCase().includes(text)) ||
                                                      (p.personMobileNumber && p.personMobileNumber.toLowerCase().includes(text)) ||
                                                      // full name check
-                                                     getName(p).toLowerCase().includes(text)) ||
+                                                     getPersonName(p).toLowerCase().includes(text)) ||
                                                      //access group name check
                                                      (p.accessGroup && p.accessGroup.accessGroupName.toLowerCase().includes(text))
                                                 ))
@@ -188,6 +201,45 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                         error={accessGroupPersonDuplicated}
                                         value={persons}
                                         isOptionEqualToValue={(option, value) => option.personId == value.personId}
+                                    />                                 
+                                </Grid>
+                            </Grid>
+                            <Divider />
+                            <Grid
+                                item
+                                md={12}
+                                xs={12}
+                                container
+                                alignItems="center"
+                            >
+                                <Grid
+                                    item
+                                    md={2}
+                                >
+                                    <Grid mb={1}>
+                                        <Typography 
+                                            variant="body" 
+                                            fontWeight="bold"
+                                        >
+                                            Assign Entrances:
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                                <Grid
+                                    item
+                                    md={10}
+                                    xs={12}
+                                >
+                                    <MultipleSelectInput 
+                                        options={allEntrances}
+                                        setSelected={onEntranceChange}
+                                        getOptionLabel={getEntranceName}
+                                        label="Entrances"
+                                        noOptionsText="No entrance found"
+                                        placeholder="Enter entrance details (name, description) to search"
+                                        filterOptions={entranceFilter}
+                                        value={entrances}
+                                        isOptionEqualToValue={entranceEqual}
                                     />                                 
                                 </Grid>
                             </Grid>

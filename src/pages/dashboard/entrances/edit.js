@@ -3,10 +3,9 @@ import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import AccessGroupEditForm from "../../../components/dashboard/access-groups/forms/access-group-add-form";
+import EntranceEditForm from "../../../components/dashboard/entrances/forms/entrance-add-form";
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { personApi } from "../../../api/person";
 import { accessGroupApi } from "../../../api/access-groups";
 import entranceApi from "../../../api/entrance";
 import { useMounted } from "../../../hooks/use-mounted";
@@ -15,166 +14,140 @@ import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 
-const EditAccessGroups = () => {
+const EditEntrances = () => {
 
-    // edited access groups logic
-    const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
-    const [accessGroupValidationsArr, 
-        setAccessGroupValidationsArr] = useState([]);
+    // edited entrance logic
+    const [entranceInfoArr, setEntranceInfoArr] = useState([]);
+    const [entranceValidationsArr, 
+        setEntranceValidationsArr] = useState([]);
 
-    // load access groups to be edited
-    const getAccessGroups = async ids => {
-        const accessGroups = [];
+    // load entrance to be edited
+    const getEntrances = async ids => {
+        const entrances = [];
         const validations = [];
 
         // map each id to a fetch req for that access group
-        const resArr = await Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)));
+        const resArr = await Promise.all(ids.map(id => entranceApi.getEntrance(id)));
         const successfulRes = resArr.filter(res => res.status == 200);
 
-        // no access groups to edit
+        // no entrances to edit
         if (successfulRes.length == 0) {
-            toast.error('Error editing access groups. Please try again');
-            router.replace('/dashboard/access-groups');
+            toast.error('Error editing entrance. Please try again');
+            router.replace('/dashboard/entrances');
         }
 
-        // some groups not found
+        // some entrances not found
         if (successfulRes.length != resArr.length) {
-            toast.error('Some access groups were not found');
+            toast.error('Some entrances were not found');
         }
 
         const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
 
         bodyArr.forEach(body => {
-            accessGroups.push({
-                accessGroupId: body.accessGroupId,
-                accessGroupName: body.accessGroupName,
-                accessGroupDesc: body.accessGroupDesc,
-                persons: body.persons,
-                entrances: [], // for now
-                originalName: body.accessGroupName, // fields for validation
-                originalPersonIds: body.persons.map(p => p.personId)
+            entrances.push({
+                entranceId: body.entranceId,
+                entranceName: body.entranceName,
+                entranceDesc: body.entranceDesc,
+                accessGroups: [],
+                originalName: body.entranceName, // fields for validation
+                originalAccessGroupIds: body.accessGroups.map(p => p.accessGroupId)
             });
             validations.push({
-                accessGroupId: body.accessGroupId,
-                accessGroupNameBlank: false,
-                accessGroupDescBlank: false,
+                entranceId: body.entranceId,
+                entranceNameBlank: false,
+                entranceDescBlank: false,
 
                 // name in database (error)
-                accessGroupNameExists: false,
+                entranceNameExists: false,
 
                 // name duplicated in form (error)
-                accessGroupNameDuplicated: false,
+                entranceNameDuplicated: false,
 
-                // person has access group (note)
-                accessGroupPersonHasAccessGroup: false,
+                // access group has entrance (note)
+                //entranceHasAccessGroup: false,
 
                 // person in two access groups in same form (error) 
-                accessGroupPersonDuplicated: false,
+                //accessGroupPersonDuplicated: false,
 
                 // submit failed
                 submitFailed: false
             });
         });
 
-        setAccessGroupValidationsArr(validations);
-        setAccessGroupInfoArr(accessGroups);
+        setEntranceValidationsArr(validations);
+        setEntranceInfoArr(entrances);
 
-        return accessGroups; // for extension (see useEffect() below)
+        return entrances; // for extension (see useEffect() below)
     }
 
-    const getGroupEntrances = async (groups) => {
-        const accessGroups = [ ...groups ];
-        const resArr = await Promise.all(accessGroups.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
+    const getAccessGroupsEntrances = async (entrances) => {
+        const entrance = [ ...entrances ];
+        const resArr = await Promise.all(entrance.map(e => accessGroupEntranceApi.getAccessGroupWhereEntranceId(e.entranceId)));
         const successfulResIndex = [];
         resArr.forEach((res, i) => {
             if (res.status == 200) {
                 successfulResIndex.push(i);
             } else {
-                toast.error(`Entrances for ${accessGroups[i].accessGroupName} not loaded. Please clear to prevent changes to entrance`);
+                toast.error(`Access Groups for ${entrance[i].entranceName} not loaded. Please clear to prevent changes`);
             }
         });
         const bodyArr = await Promise.all(successfulResIndex.map(i => resArr[i].json()));
         bodyArr.forEach((body, i) => {
-            accessGroups[successfulResIndex[i]].entrances = body.map(e => e.entrance);
+            entrances[successfulResIndex[i]].accessGroups = body.map(group => group.accessGroup);
         })
 
-        setAccessGroupInfoArr(accessGroups);
+        setEntranceInfoArr(entrances);
 
-        return accessGroups; // for extension (see useEffect() below)
+        return entrances; // for extension (see useEffect() below)
     }
 
     useEffect( async () => {
         try {
-            getGroupEntrances(
-                await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
+            getAccessGroupsEntrances(
+                await getEntrances(JSON.parse(decodeURIComponent(router.query.ids)))
             );
         } catch(e){
-            router.replace('/dashboard/access-groups')
+            router.replace('/dashboard/entrances')
         }
     }, [])
 
-    // persons logic (displaying in dropdown box)
-    const isPersonMounted = useMounted();
-    const [allPersons, setAllPersons] = useState([]);
-
-    const getPersons = useCallback( async() => {
+    // fetch all access groups info
+    const isAccessGroupMounted = useMounted();
+    const [allAccessGroups, setAllAccessGroups] = useState([]);
+    const getAccessGroups = useCallback( async() => {
         try {
-            const res = await personApi.getPersons();
+            const res = await accessGroupApi.getAccessGroups();
             if (res.status == 200) {
                 const body = await res.json();
-                setAllPersons(body);
+                setAllAccessGroups(body);
             } else {
-                throw new Error("persons not loaded");
+                throw new Error("Access Groups not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Persons not loaded");
+            toast.error("Access Groups info not loaded")
         }
-    }, [isPersonMounted]);
-
-    useEffect(() => {
-        getPersons();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []);
-
-    // fetch all entrance info
-    const isEntranceMounted = useMounted();
-    const [allEntrances, setAllEntrances] = useState([]);
-    const getEntrances = useCallback( async() => {
-        try {
-            const res = await entranceApi.getEntrances();
-            if (res.status == 200) {
-                const body = await res.json();
-                setAllEntrances(body);
-            } else {
-                throw new Error("entrances not loaded");
-            }
-        } catch(e) {
-            console.error(e);
-            toast.error("Entrances info not loaded")
-        }
-    }, [isEntranceMounted]);
+    }, [isAccessGroupMounted]);
     
     useEffect(() => {
-        getEntrances();    
+        getAccessGroups();    
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [])
 
     // stores the duplicated person ids
-    const [duplicatedPerson, setDuplicatedPerson] = useState({});
+    //const [duplicatedPerson, setDuplicatedPerson] = useState({});
 
-    // store previous access group names
-    const [accessGroupNames, setAccessGroupNames] = useState({});
+    // store previous entrance names
+    const [entranceNames, setEntranceNames] = useState({});
     useEffect(() => {
-        accessGroupApi.getAccessGroups()
+        entranceApi.getEntrances()
             .then(async res => {
-                const newAccessGroupNames = {}
+                const newEntranceNames = {}
                 if (res.status == 200) {
                     const body = await res.json();
-                    body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
-                    setAccessGroupNames(newAccessGroupNames);
+                    body.forEach(e => newEntranceNames[e.entranceName] = true); 
+                    setEntranceNames(newEntranceNames);
                 }
             })
     }, []);
@@ -185,19 +158,19 @@ const EditAccessGroups = () => {
     const checkDuplicateName = (groupArr, validationArr) => {
         const duplicatedNames = formUtils.getDuplicates(
             groupArr
-                // get access group names
-                .map(group => group.accessGroupName)
+                // get entrance names
+                .map(group => group.entranceName)
                 // keep the ones that are not blank strings
                 .filter(name => !(/^\s*$/.test(name)))
         );
         for(let i=0; i<groupArr.length; i++) {
-            validationArr[i].accessGroupNameDuplicated = groupArr[i].accessGroupName in duplicatedNames;
+            validationArr[i].entranceNameDuplicated = groupArr[i].entranceName in duplicatedNames;
         }
     }
 
     // helper for removeCard and changePersonCheck
     // directly modifies validationArr, return newDuplicatedPerson
-    const checkDuplicatePerson = (groupArr, validationArr) => {
+  /*  const checkDuplicatePerson = (groupArr, validationArr) => {
         // stores id of duplicated persons
         const newDuplicatedPerson = formUtils.getDuplicates(
             groupArr.map(
@@ -217,71 +190,71 @@ const EditAccessGroups = () => {
                 );           
         }
         return newDuplicatedPerson
-    }
+    } */
 
     // remove card logic
     const removeCard = (id) => {
-        const newAccessGroupInfoArr = accessGroupInfoArr.filter(info => info.accessGroupId != id);
-        const newValidations = accessGroupValidationsArr.filter(validation => validation.accessGroupId != id);
+        const newEntranceInfoArr = entranceInfoArr.filter(info => info.entranceId != id);
+        const newValidations = entranceValidationsArr.filter(validation => validation.entranceId != id);
 
-        if (newAccessGroupInfoArr.length == 0) {
-            router.replace('/dashboard/access-groups'); // redirect if nothing left to edit
+        if (newEntranceInfoArr.length == 0) {
+            router.replace('/dashboard/entrances'); // redirect if nothing left to edit
         }
 
         // check name duplicated
-        checkDuplicateName(newAccessGroupInfoArr, newValidations);
+        checkDuplicateName(newEntranceInfoArr, newValidations);
         
         // check person duplicated
-        setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, newValidations)); 
+        //setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, newValidations)); 
 
-        setAccessGroupInfoArr(newAccessGroupInfoArr);
-        setAccessGroupValidationsArr(newValidations);       
+        setEntranceInfoArr(newEntranceInfoArr);
+        setEntranceValidationsArr(newValidations);       
     }
     
     // update methods for form inputs
     const changeTextField = (e, id) => {
-        const updatedInfo = [ ...accessGroupInfoArr ];
-        // this method is reliant on text field having a name field == key in info object ie accessGroupName, accessGroupDesc
-        updatedInfo.find(info => info.accessGroupId == id)[e.target.name] = e.target.value;
-        setAccessGroupInfoArr(updatedInfo);
+        const updatedInfo = [ ...entranceInfoArr ];
+        // this method is reliant on text field having a name field == key in info object ie entranceName, entranceDesc
+        updatedInfo.find(info => info.entranceId == id)[e.target.name] = e.target.value;
+        setEntranceInfoArr(updatedInfo);
     }
 
-    const changePerson = (newValue, id) => {
+   /* const changePerson = (newValue, id) => {
         const updatedInfo = [ ...accessGroupInfoArr ];
         updatedInfo.find(info => info.accessGroupId == id).persons = newValue;
         setAccessGroupInfoArr(updatedInfo);
-    }
+    } */
 
     // error checking methods
     const changeNameCheck = async (e, id) => {
-        const accessGroupName = e.target.value;
-        const newValidations = [ ...accessGroupValidationsArr ];
-        const validation = newValidations.find(v => v.accessGroupId == id);
+        const entranceName = e.target.value;
+        const newValidations = [ ...entranceValidationsArr ];
+        const validation = newValidations.find(v => v.entranceId == id);
 
         // store a temp updated access group info (not for updating purposes)
-        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
-        const newCurrAccessGroup = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
-        newCurrAccessGroup.accessGroupName = accessGroupName;
+        const newEntranceInfoArr = [ ...entranceInfoArr ]
+        const newCurrEntrance = newEntranceInfoArr.find(e => e.entranceId == id);
+        newCurrEntrance.entranceName = entranceName;
 
         // remove submit failed
         validation.submitFailed = false;
 
         // check name is blank?
-        validation.accessGroupNameBlank = formUtils.checkBlank(accessGroupName);
+        validation.entranceNameBlank = formUtils.checkBlank(entranceName);
 
         // check name exists?
-        validation.accessGroupNameExists = (
-            newCurrAccessGroup.originalName != accessGroupName &&
-            !!accessGroupNames[accessGroupName]
+        validation.entranceNameExists = (
+            newCurrEntrance.originalName != entranceName &&
+            !!entranceNames[entranceName]
         );
 
         // check name duplicated
-        checkDuplicateName(newAccessGroupInfoArr, newValidations);
+        checkDuplicateName(newEntranceInfoArr, newValidations);
 
-        setAccessGroupValidationsArr(newValidations);
+        setEntranceValidationsArr(newValidations);
     }
 
-    const changePersonCheck = (newValue, id) => {
+  /*  const changePersonCheck = (newValue, id) => {
         // check if person has existing access group
         const validations = [ ...accessGroupValidationsArr ];
         const validation = validations.find(v => v.accessGroupId == id);
@@ -303,26 +276,22 @@ const EditAccessGroups = () => {
         setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, validations)); 
 
         setAccessGroupValidationsArr(validations);
-    }
+    } */
 
-    // entrance logic
-    const changeEntrance = (newValue, id) => {
-        const updatedInfo = [ ...accessGroupInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
-        setAccessGroupInfoArr(updatedInfo);
+    // access group logic
+    const changeAccessGroup = (newValue, id) => {
+        const updatedInfo = [ ...entranceInfoArr ];
+        updatedInfo.find(info => info.entranceId == id).accessGroups = newValue;
+        setEntranceInfoArr(updatedInfo);
     }
 
     // currying for cleaner code
-    const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
+    const onAccessGroupChangeFactory = (id) => (newValue) => changeAccessGroup(newValue, id);
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
     const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
-    const onPersonChangeFactory = (id) => (newValue) => {
-        changePerson(newValue, id);
-        changePersonCheck(newValue, id);
-    }
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -331,7 +300,7 @@ const EditAccessGroups = () => {
 
         setSubmitted(true);
 
-        const resArr = await Promise.all(accessGroupInfoArr.map(group => accessGroupApi.updateAccessGroup(group)));
+        const resArr = await Promise.all(entranceInfoArr.map(e => entranceApi.updateEntrance(e)));
         
         const successStatus = [];
         const successfulResIndex = [];
@@ -345,12 +314,13 @@ const EditAccessGroups = () => {
             }
         });
 
+        //assign entrance to access groups
         const entranceResArr = await Promise.all(
             successfulResIndex.map(i => {
-                const accessGroup = accessGroupInfoArr[i];
-                return accessGroupEntranceApi.assignEntrancesToAccessGroup(
-                    accessGroup.entrances.map(e => e.entranceId),
-                    accessGroup.accessGroupId
+                const entrance = entranceInfoArr[i];
+                return accessGroupEntranceApi.assignAccessGroupsToEntrance(
+                    entrance.accessGroups.map(grp => grp.accessGroupId),
+                    entrance.entranceId
                 );
             })
         )
@@ -362,16 +332,16 @@ const EditAccessGroups = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
-            toast.success(`${numEdited} access groups edited`);
+            toast.success(`${numEdited} entrances edited`);
             if (numEdited == resArr.length) { // all success
-                router.replace('/dashboard/access-groups');
+                router.replace('/dashboard/entrances');
                 return;
             }
         }
 
-        toast.error('Error updating the below access groups');
-        setAccessGroupInfoArr(accessGroupInfoArr.filter((e, i) => !(successStatus[i])));
-        setAccessGroupValidationsArr(accessGroupValidationsArr.filter((e, i) => !(successStatus[i])));
+        toast.error('Error updating the below entrances');
+        setEntranceInfoArr(entranceInfoArr.filter((e, i) => !(successStatus[i])));
+        setEntranceValidationsArr(entranceValidationsArr.filter((e, i) => !(successStatus[i])));
         setSubmitted(false);
     }
 
@@ -379,7 +349,7 @@ const EditAccessGroups = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Edit Access Groups
+                    Etlas: Edit Entrances
                 </title>
             </Head>
             <Box
@@ -392,7 +362,7 @@ const EditAccessGroups = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href="/dashboard/access-groups"
+                            href="/dashboard/entrances"
                             passHref
                         >
                             <Link
@@ -408,33 +378,30 @@ const EditAccessGroups = () => {
                                     sx={{ mr: 1 }}
                                 />
                                 <Typography variant="subtitle2">
-                                    Access groups
+                                    Entrances
                                 </Typography>
                             </Link>
                         </NextLink>
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Edit Access Groups
+                            Edit Entrances
                         </Typography>
                     </Box>
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
-                            { accessGroupInfoArr.map((accessGroupInfo, i) => {
-                                const id = accessGroupInfo.accessGroupId
+                            { entranceInfoArr.map((entranceInfo, i) => {
+                                const id = entranceInfo.entranceId
                                 return (
-                                    <AccessGroupEditForm
+                                    <EntranceEditForm
                                         key={id}
-                                        accessGroupInfo={accessGroupInfo}
+                                        entranceInfo={entranceInfo}
                                         removeCard={removeCard}
-                                        allPersons={allPersons}
-                                        accessGroupValidations={accessGroupValidationsArr[i]}
+                                        entranceValidations={entranceValidationsArr[i]}
                                         onNameChange={onNameChangeFactory(id)}
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
-                                        onPersonChange={onPersonChangeFactory(id)}
-                                        duplicatedPerson={duplicatedPerson}
-                                        allEntrances={allEntrances}
-                                        onEntranceChange={onEntranceChangeFactory(id)}
+                                        allAccessGroups={allAccessGroups}
+                                        onAccessGroupChange={onAccessGroupChangeFactory(id)}
                                         edit
                                     />
                                 )
@@ -447,12 +414,11 @@ const EditAccessGroups = () => {
                                         variant="contained"
                                         disabled={
                                             submitted                      ||
-                                            accessGroupInfoArr.length == 0 || // no access groups to submit
-                                            accessGroupValidationsArr.some( // check if validations fail
-                                                validation => validation.accessGroupNameBlank        ||
-                                                              validation.accessGroupNameExists       ||
-                                                              validation.accessGroupNameDuplicated   ||
-                                                              validation.accessGroupPersonDuplicated
+                                            entranceInfoArr.length == 0 || // no entrances to submit
+                                            entranceValidationsArr.some( // check if validations fail
+                                                validation => validation.entranceNameBlank        ||
+                                                              validation.entranceNameExists       ||
+                                                              validation.entranceDuplicated
                                             )
                                         }
                                     >
@@ -461,7 +427,7 @@ const EditAccessGroups = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href="/dashboard/access-groups/"
+                                        href="/dashboard/entrances/"
                                         passHref
                                     >
                                         <Button
@@ -482,7 +448,7 @@ const EditAccessGroups = () => {
     )
 }
 
-EditAccessGroups.getLayout = (page) => (
+EditEntrances.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -490,4 +456,4 @@ EditAccessGroups.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default EditAccessGroups;
+export default EditEntrances;

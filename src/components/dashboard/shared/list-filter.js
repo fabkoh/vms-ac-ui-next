@@ -13,7 +13,6 @@ import {
   Grid
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { width } from '@mui/system';
 
 // const options = [
 //   'Create a merge commit',

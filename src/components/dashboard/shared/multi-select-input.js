@@ -10,17 +10,23 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 /*
-TODO: complete docs
 (required params)
-// options (array of objects)
-// the options in the drop down list
+    getOptionLabel : function (entity) => string
+    setSelected : function (list of entities) => null
+    filterOptions : function (list of entities, state*) => list of entitites
+    value : list of entities
+    isOptionEqualToValue : function (entity, entity) => boolean
 
-// setSelected (function)
-// setSelected will be called with 1 arguments, newValue, an array of objects, representing the selected objects in the input
+    * state is an object (check mui docs for state structure)
 
-// getOptionLabel(function)
-// called with 1 argument, the object in 
 (optional params)
+    label : string
+    placeholder : string
+    helperText : string
+    isWarning : function (entity) => boolean
+    isError : function (entity) => boolean
+    error : boolean
+
 see mui docs https://mui.com/api/autocomplete/
 */
 export default function CheckboxesTags({  
@@ -58,7 +64,7 @@ export default function CheckboxesTags({
             )}
             fullWidth
             renderInput={(params) => (
-                <TextField {...params} label={label} placeholder={placeholder} helperText={helperText} error={error} />
+                <TextField {...params} label={label} placeholder={placeholder} helperText={Boolean(helperText) && helperText} error={Boolean(error)} />
             )}
             onChange={(e, newValue) => setSelected(newValue)}
             { ...other }
@@ -69,7 +75,7 @@ export default function CheckboxesTags({
                 if (event && event.type=='blur') {
                     setInputValue('')
                 } 
-                // on every event other than reset (clicking on clear button)
+                // on every event other than reset (reset is clicking on clear button)
                 else if (reason != 'reset') {
                     setInputValue(value)
                 }
@@ -78,8 +84,8 @@ export default function CheckboxesTags({
                 value.map((option, index) => (
                     <Chip
                         color={
-                            isError(option) ? "error" :
-                            isWarning(option) ? "warning" : "default"
+                            (!!isError && isError(option)) ? "error" : // doing this allows isError and isWarning to be optional arguments
+                            (!!isWarning && isWarning(option)) ? "warning" : "default"
                         }
                         label={getOptionLabel(option)}
                         { ...getTagProps({ index })}

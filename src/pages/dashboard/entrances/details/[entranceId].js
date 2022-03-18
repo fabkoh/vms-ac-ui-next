@@ -3,6 +3,7 @@ import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
 import { accessGroupApi } from "../../../../api/access-groups";
 import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
+import entranceApi from "../../../../api/entrance";
 import NextLink from 'next/link';
 import Head from 'next/head';
 import router from 'next/router';
@@ -23,84 +24,60 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import { AccessGroupBasicDetails } from "../../../../components/dashboard/access-groups/details/access-group-basic-details";
-import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
-import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
+import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
 import { set } from "date-fns";
-import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
-import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 
-const AccessGroupDetails = () => {
+const EntranceDetails = () => {
 
-    // load access group details
+    // load entrance details
     const isMounted = useMounted();
-    const [accessGroup, setAccessGroup] = useState(null);
-    const { accessGroupId }  = router.query;
+    const [entrance, setEntrance] = useState(null);
+    const { entranceId }  = router.query;
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
-    const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
+    const [accessGroup, setAccessGroup] = useState(null);
 
-    const getAccessGroupEntranceAndSchedule = async() => {
+    const getAccessGroups = async (entranceId) => {
         try {
-            const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
+            const res = await accessGroupEntranceApi.getAccessGroupWhereEntranceId(entranceId);
             if (res.status == 200) {
                 const body = await res.json();
-                if (isMounted()) {
-                    setAccessGroupEntrance(body);
-                }
-
-                const scheduleRes = 
-                    await accessGroupScheduleApi.getAccessGroupSchedulesWhereGroupToEntranceIdsIn(
-                        body.map(groupEntrance => groupEntrance.groupToEntranceId)
-                    );
-                if (scheduleRes.status == 200) {
-                    const body = await scheduleRes.json();
-                    if (isMounted()) {
-                        setAccessGroupSchedules(body);
-                    }
-                } else {
-                    toast.error("Schedule info not loaded");
-                }
+                setAccessGroup(body.map(e => e.accessGroup));
             } else {
-                toast.error("Entrance info not loaded");
+                toast.error('Access Group info not loaded');
+                throw new Error('Access Group info not loaded');
             }
         } catch(err) {
             console.error(err);
         }
     }
 
-    const getAccessGroup = (async() => {
+    const getEntrance = useCallback(async() => {
         try {
-            const res = await accessGroupApi.getAccessGroup(accessGroupId);
+            const res = await entranceApi.getEntrance(entranceId);
             if(res.status != 200) {
-                toast.error('Access group not found');
-                router.replace('/dashboard/access-groups')
+                toast.error('Entrance not found');
+                router.replace('/dashboard/entrances')
             }
             const body = await res.json();
 
             if (isMounted()) {
-                setAccessGroup(body);
-                getEntrances(body.accessGroupId);
+                setEntrance(body);
+                getAccessGroups(body.entranceId);
             }
         } catch(err) {
             console.error(err);
         }
-    });
-
-    const getInfo = useCallback(async() => {
-        // get access group and access group entrance, then use access group entrance to get access group schedule
-        getAccessGroup();
-        getAccessGroupEntranceAndSchedule();
-    }, [isMounted])
+    }, [isMounted]);
 
     useEffect(() => {
-        getInfo();
+        getEntrance();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
@@ -128,7 +105,7 @@ const AccessGroupDetails = () => {
         (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
     }, [text]);
 
-    //Set to true if an access group is selected. controls form input visibility.
+    //Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 		setselectedState(true)
@@ -143,7 +120,7 @@ const AccessGroupDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+/*	const handleDeleteAction = () => {
         Promise.resolve(
             accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
         ).then((res)=>{
@@ -156,17 +133,17 @@ const AccessGroupDetails = () => {
         }
         })
         setDeleteOpen(false);
-    };
+    }; */
 
     // render view
-    if (!accessGroup) {
+    if (!entrance) {
         return null;
     }
     return (
         <>
             <Head>
                 <title>
-                    Etlas: Access Group Details
+                    Etlas: Entrance Details
                 </title>
             </Head>
             <Box
@@ -180,7 +157,7 @@ const AccessGroupDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href="/dashboard/access-groups"
+                                href="/dashboard/entrances"
                                 passHref
                             >
                                 <Link
@@ -195,7 +172,7 @@ const AccessGroupDetails = () => {
                                         fontSize="smal"
                                         sx={{ mr: 1 }}
                                     />
-                                    <Typography variant="subtitle2">Access Groups</Typography>
+                                    <Typography variant="subtitle2">Entrances</Typography>
                                 </Link>
                             </NextLink>
                         </Box>
@@ -214,7 +191,7 @@ const AccessGroupDetails = () => {
                             >
                                 <div>
                                     <Typography variant="h4">
-                                        { accessGroup.accessGroupName || "Access Group Not Found" }    
+                                        { entrance.entranceName || "Entrance Not Found" }    
                                     </Typography>    
                                 </div>    
                             </Grid>
@@ -238,7 +215,7 @@ const AccessGroupDetails = () => {
                                     onClose={handleActionMenuClose}
                                 >
                                     <NextLink
-                                        href="/dashboard/access-groups/create"
+                                        href="/dashboard/entrances/create"
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -249,7 +226,7 @@ const AccessGroupDetails = () => {
                                     <NextLink
                                         href={ 
                                             // put accessGroupId in the ids of params of edit url
-                                            "/dashboard/access-groups/edit?ids=" + encodeURIComponent(JSON.stringify([Number(accessGroup.accessGroupId)])) 
+                                            "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([Number(entrance.entranceId)])) 
                                         }
                                         passHref
                                     >
@@ -265,7 +242,7 @@ const AccessGroupDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
-                                    <Confirmdelete 
+                                   {/* <Confirmdelete 
                                     selectedState={selectedState}
                                     setAnchorEl={setAnchorEl} 
                                     deleteOpen={deleteOpen}
@@ -273,7 +250,7 @@ const AccessGroupDetails = () => {
                                     handleDeleteAction={handleDeleteAction}
                                     handleDeleteOpen={handleDeleteOpen}
                                     handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    deleteBlock={deleteBlock}/> */}
                                 </StyledMenu>
                             </Grid>
                         </Grid>
@@ -287,28 +264,13 @@ const AccessGroupDetails = () => {
                                 item
                                 xs={12}
                             >
-                                <AccessGroupBasicDetails accessGroup={accessGroup} />
+                                <EntranceBasicDetails entrance={entrance} />
                             </Grid>
                             <Grid
                                 item
                                 xs={12}
                             >
-                                <AccessGroupPersons accessGroup={accessGroup} />
-                            </Grid>
-                            <Grid
-                                item
-                                xs={12}
-                            >
-                                <EntranceDetails accessGroupEntrance={accessGroupEntrance} />
-                            </Grid>
-                            <Grid
-                                item
-                                xs={12}
-                            >
-                                <AccessGroupSchedules 
-                                    accessGroupEntrance={accessGroupEntrance}
-                                    accessGroupSchedules={accessGroupSchedules}
-                                />
+                                <AccessGroupDetails accessGroup={accessGroup} />
                             </Grid>
                         </Grid>
                     </Box>
@@ -318,7 +280,7 @@ const AccessGroupDetails = () => {
     )
 }
 
-AccessGroupDetails.getLayout = (page) => (
+EntranceDetails.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -326,4 +288,4 @@ AccessGroupDetails.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default AccessGroupDetails;
+export default EntranceDetails;

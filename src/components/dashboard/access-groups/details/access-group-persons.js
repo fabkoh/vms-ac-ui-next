@@ -1,59 +1,32 @@
-import { Card, CardHeader, Chip, Grid, Link, Divider } from "@mui/material";
-import NextLink from "next/link";
-import Warning from "@mui/icons-material/Warning";
-import { SeverityPill } from "../../../severity-pill";
+import { Person } from "@mui/icons-material";
+import DetailsCard from "../../shared/details_card_with_search_field";
 
 export const AccessGroupPersons = (props) => {
     const { persons } = props.accessGroup;
 
+    const getName = (person) => person.personFirstName + ' ' + person.personLastName;
+
+    const getLink = (person) => `/dashboard/persons/details/${person.personId}`
+
+    const personSearch = (persons, inputValue) => {
+        const input = inputValue.toLowerCase();
+        return persons.filter(p => (
+            getName(p).toLowerCase().includes(input)
+        ))
+    }
+
     return (
-        <Card>
-            <CardHeader 
-                title="Persons"
-                subheader="Click on person name below to go to person details page" 
-            />
-            <Divider />
-            <Grid
-                container
-                flexDirection="row"
-                paddingLeft={3}
-                paddingTop={3}
-            >
-                { (Array.isArray(persons) && persons.length > 0) ? persons.map((p,i) => (
-                    <Grid 
-                        item
-                        paddingRight={3}
-                        paddingBottom = {3}
-                        key={i}
-                    >                   
-                         { /* Link and NextLink order reverse to have pointer + underline when hover */ }
-                        <Link component="a">       
-                            <NextLink
-                                href={`/dashboard/persons/details/${p.personId}`}
-                                passHref
-                            >
-
-                                <Chip label={p.personFirstName + ' ' + p.personLastName} />
-
-                            </NextLink>
-                        </Link>
-                    </Grid>
-                )) : (
-                    <Grid
-                        item
-                        paddingRight={3}
-                        paddingBottom={3}
-                    >
-                        <SeverityPill color="warning">
-                            <Warning 
-                                fontSize="small" 
-                                sx={{ mr: 1 }} 
-                            />
-                            No persons
-                        </SeverityPill>
-                    </Grid>
-                )}
-            </Grid>
-        </Card>
+        <DetailsCard
+            title="Persons"
+            subheader="Click on person name below to go to person details page"
+            entities={ persons }
+            getLabel={ getName }
+            getLink={ getLink }
+            emptyLabel="No persons"
+            searchFilter={ personSearch } // find a file for this function as it is written multiple times
+            placeholder="Search for person name, mobile number or email"
+            noneFoundText="No persons found"
+            icon={<Person fontSize="small" sx={{mr: 1}} />}
+        />
     )
 }

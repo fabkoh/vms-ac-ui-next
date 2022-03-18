@@ -33,6 +33,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { accessGroupApi } from "../../../api/access-groups";
+import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
 import toast from "react-hot-toast";
@@ -169,10 +170,14 @@ const AccessGroupList = () => {
 
 	const getAccessGroupLocal = useCallback(async () => {
 		try {
-      //const data = await personApi.getFakePersons() 
-        const res = await accessGroupApi.getAccessGroups()
-		const data = await res.json()
+      		//const data = await personApi.getFakePersons() 
+			const res = await accessGroupApi.getAccessGroups();
+			const data = await res.json();
+			const entrancesRes = await Promise.all(data.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
+			const entrancesData = await Promise.all(entrancesRes.map(res => res.json()));
 			if (isMounted()) {
+				data.forEach((group, i) => group.entrances = entrancesData[i]);
+				console.log(data);
 				setAccessGroup(data);
 			}
 		} catch (err) {

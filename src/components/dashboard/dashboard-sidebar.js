@@ -33,6 +33,7 @@ import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
+import { DoorFront } from '@mui/icons-material';
 
 const getSections = (t) => [
   {
@@ -95,6 +96,21 @@ const getSections = (t) => [
           {
             title: t('Add'),
             path: '/dashboard/access-groups/create'
+          }
+        ]
+      },
+      {
+        title: t('Entrances'),
+        path: '/dashboard/entrances',
+        icon: <DoorFront fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/entrances'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/entrances/create'
           }
         ]
       }
