@@ -15,14 +15,16 @@ import router, { useRouter } from "next/router";
 import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceNtoNApi from "../../../api/access-group-entrance-n-to-n";
 import EditAccGrpSchedForm from "../../../components/dashboard/access-group-schedule/access-group-schedule-edit-form";
+import MultipleSelectInput from "../../../components/dashboard/shared/multi-select-input"
 
 const CreateAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
     const router = useRouter();
-    const accessGroupId = router.query;
+    const accessGroupId = router.query[""];
 
     const [accGrp, setAccGrp] = useState()
-    const [entranceArr, setEntranceArr] = useState([]) //contains grptoentId and ent obj
+    const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
+    const [allEntrances, setAllEntrances] = useState([])
 
     const getEntrance = async () => {
         const res = await accessGroupEntranceNtoNApi.getEntranceWhereAccessGroupId(accessGroupId);
@@ -31,7 +33,10 @@ const CreateAccessGroupSchedule = () => {
             router.replace("/dashboard");
         }
         const data = await res.json();
-        setEntranceArr(data);
+        setGrpToEnt(data);
+        const tempEntArray = []
+        data.forEach(grp=>{tempEntArray.push(grp.entrance)})
+        setAllEntrances(tempEntArray)
         console.log(JSON.stringify(data))
     }
     const getAccGrp = async() => {
@@ -81,41 +86,6 @@ const CreateAccessGroupSchedule = () => {
     const [accessGroupScheduleValidationsArr, 
         setAccessGroupScheduleValidationsArr] = useState([getEmptyAccessGroupScheduleValidations(0)]);
 
-    // persons logic (displaying in dropdown box) *REPLACE WITH ENTRANCES OF ACC GRP
-    // const isMounted = useMounted();
-    // const [allPersons, setAllPersons] = useState([]);
-
-    // const getPersons = useCallback( async() => {
-    //     try {
-    //         const res = await personApi.getPersons();
-    //         if (res.status == 200) {
-    //             const body = await res.json();
-    //             setAllPersons(body);
-    //         } else {
-    //             throw new Error("persons not loaded");
-    //         }
-    //     } catch(e) {
-    //         console.error(e);
-    //         toast.error("Persons not loaded");
-    //     }
-    // }, [isMounted]);
-
-    // useEffect(() => {
-    //     getPersons();
-    // },
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // []);
-    
-
-    // store previous access group names
-    const accessGroupNames = {};
-    accessGroupApi.getAccessGroups()
-        .then(async res => {
-            if (res.status == 200) {
-               const body = await res.json();
-               body.forEach(group => accessGroupNames[group.accessGroupName] = true); 
-            }
-        });
 
     // add card logic
     //returns largest accessGroupId + 1
@@ -225,6 +195,35 @@ const CreateAccessGroupSchedule = () => {
     //            })
     // }
 
+    const replaceAll = (e) => {
+        e.preventDefault();
+        console.warn("replace all")
+    }
+    const addOn = (e) => {
+        e.preventDefault();
+        console.warn("addon")
+
+    }
+
+    //for MultiSelectInput
+    const entranceEqual = (option, value) => option.entranceId == value.entranceId;
+    const getEntranceName = (e) => e.entranceName;
+    const entranceFilter = (entrances, state) => {
+        const text = state.inputValue.toLowerCase(); // case insensitive search
+        return entrances.filter(e => (
+            e.entranceName.toLowerCase().includes(text)
+        ))
+    }
+    const [entrances, setEntrances] = useState()
+    const changeEntrance = (newValue) => {
+        console.log(newValue,"SSSSSSSS")
+        setEntrances(newValue)
+        // const updatedInfo = [...accessGroupScheduleInfoArr ];
+        // updatedInfo.find(info => info.accessGroupScheduleId == id).entrances = newValue;
+        // setAccessGroupScheduleInfoArr(updatedInfo);
+        // console.log("onchangeinfoarr",accessGroupScheduleInfoArr)
+    }
+
     return(
         <>
             <Head>
@@ -268,15 +267,25 @@ const CreateAccessGroupSchedule = () => {
                             Edit Access Group Schedule
                         </Typography>
                         <Typography variant="h7">
-                            {`Editing for Access Group : ${accGrp}`}
+                        {accGrp?(`Editing for Access Group: ${accGrp.accessGroupName}`):"No access Group found"}
                         </Typography>
                     </Box>
-                    <Grid container alignItems="center">
-                        <Grid item>
+                    <Grid container alignItems="center" mb={3}>
+                        <Grid item mr={2}>
                             <Typography fontWeight="bold">Entrance</Typography>
                         </Grid>
-                        <Grid item>
-                            <TextField value="entrances linked to acc grp" />
+                        <Grid item xs={11}>
+                            <MultipleSelectInput
+                                options={allEntrances}
+                                setSelected={changeEntrance}
+                                getOptionLabel={getEntranceName}
+                                label="Entrances"
+                                noOptionsText="No entrance found"
+                                placeholder="Enter entrance details (name, description) to search"
+                                filterOptions={entranceFilter}
+                                value={entrances}
+                                isOptionEqualToValue={entranceEqual}
+                            />
                         </Grid>
                     </Grid>
                     {/* <form onSubmit={submitForm}> */}
@@ -310,6 +319,7 @@ const CreateAccessGroupSchedule = () => {
                                         type="submit"
                                         size="large"
                                         variant="contained"
+                                        onClick={replaceAll}
                                         // disabled={
                                         //     submitted                      ||
                                         //     accessGroupScheduleInfoArr.length == 0 || // no access groups to submit
@@ -329,6 +339,7 @@ const CreateAccessGroupSchedule = () => {
                                         type="submit"
                                         size="large"
                                         variant="contained"
+                                        onClick={addOn}
                                         // disabled={
                                         //     submitted                      ||
                                         //     accessGroupScheduleInfoArr.length == 0 || // no access groups to submit

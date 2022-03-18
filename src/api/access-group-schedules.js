@@ -15,6 +15,7 @@ class AccessGroupScheduleApi {
         timeStart,
         timeEnd
     }, groupToEntranceIds) {
+        console.log("groupTOEntranceIds", groupToEntranceIds)
         if (useApi) {
             return sendApi(
                 `/api/access-group-schedule?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 

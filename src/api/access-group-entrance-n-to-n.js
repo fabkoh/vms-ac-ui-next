@@ -59,7 +59,23 @@ class AccessGroupEntranceNtoNApi {
             )
     }
 
-    assignAccessGroupsToEntrance(accessGroupIds, entranceId) {
+    getGroupToEntranceId(accessGroupId,entranceId){
+        if(useApi) { return sendApi(`/api/access-group-entrance?accessGroupId=${encodeURIComponent(accessGroupId)},entranceid=${encodeURIComponent(entranceId)}`); }
+        return Promise.resolve(
+            new Response(
+                JSON.stringify(fakeAccessGroupEntranceNtoN
+                    .filter(groupEntrance => groupEntrance.entranceId == entranceId && groupEntrance.accessGroupId==accessGroupId)
+                    .map(groupEntrance => {
+                        return {
+                            groupToEntranceId: groupEntrance.groupToEntranceId,
+                            accessGroup: fakeAccessGroups.find(group => group.accessGroupId == groupEntrance.accessGroupId)
+                        }
+                    })),
+                { status: 200 })
+            )
+    }
+
+    assignAccessGroupToEntrance(entranceId, accessGroupIds) {
         if(useApi) { 
             const accessGroupIdsString = JSON.stringify(accessGroupIds);
             return sendApi(`/api/access-group-entrance/entrance/${entranceId}?accessgroupids=${encodeURIComponent(accessGroupIdsString.substring(1, accessGroupIdsString.length - 1))}`, { method: 'POST' }); 

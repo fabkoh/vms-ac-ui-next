@@ -107,12 +107,10 @@ const Rrule = (props) => {
 		allDay ? setAllDay(false) : setAllDay(true);
 	};
 	
-	const [timeStart, setTimeStart] = useState(""); //timeStart lift up state
+	const [timeStart, setTimeStart] = useState(); //timeStart lift up state
 	const handleTimeStart = (e) => {
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
-		// console.log(e.target.value)
-		// console.log(typeof(e.target.value))
 	};
 	const [timeEnd, setTimeEnd] = useState(); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
@@ -122,7 +120,7 @@ const Rrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"",timeEnd:""}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
 	}, [allDay]);
 
 	const AllDayRenderer = (allDay) => {
@@ -136,7 +134,7 @@ const Rrule = (props) => {
 						<TextField
 							type="time"
 							onChange={handleTimeStart}
-							value={timeStart}
+							value={nonChangingRule.timeStart}
 						></TextField>
 					</Grid>
 					<Grid item ml={2} mr={2} mt={1}>
@@ -146,7 +144,7 @@ const Rrule = (props) => {
 						<TextField
 							type="time"
 							onChange={handleTimeEnd}
-							value={timeEnd}
+							value={nonChangingRule.timeEnd}
 						></TextField>
 					</Grid>
 				</Grid>

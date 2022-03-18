@@ -30,6 +30,7 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
 
     const {
         accessGroupScheduleNameBlank,
+        entrancesBlank,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
         accessGroupPersonDuplicated,
@@ -41,13 +42,6 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
 
-    //handler for name
-    const [name, setName] = useState()
-    const handleName = (e) => {
-        // const temparray = [...accgrpschedinfoarr]
-        // temparray.find(sched=>sched.accgrpschedid == id)[accessGroupScheduleName] = e.target.value
-        //
-    }
     //get timestart timeend 
     const [start, setStart] = useState()
     const [end, setEnd] = useState()
@@ -83,11 +77,13 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
     
     return (
         <ErrorCard error={
+            accessGroupScheduleNameBlank        ||
+            entrancesBlank                      ||
+            submitFailed
             // accessGroupScheduleNameBlank        ||
             // accessGroupNameExists       ||
             // accessGroupNameDuplicated   ||
             // accessGroupPersonDuplicated ||
-            submitFailed
         }>
             <CardHeader
                 avatar={
@@ -149,12 +145,14 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
                             required
                             value={accessGroupScheduleName}
                             onChange={(e)=>{changeTextField(e,accessGroupScheduleId)}}
-                            // helperText={ 
-                            //     (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') ||
+                            helperText={ 
+                                (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') 
+                                // (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
                             //     (accessGroupNameDuplicated && 'Error: duplicate access group name in form')
-                            // }
-                            // error={ Boolean(accessGroupNameBlank || accessGroupNameExists || accessGroupNameDuplicated)}
+                            }
+                            // error={ accessGroupScheduleName?false:true}
+                            error={ Boolean(accessGroupScheduleNameBlank) }
                         />
                     </Grid>
                     <Collapse in={expanded}>
@@ -188,17 +186,16 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
                             </Grid>
                             <Divider />
                             <Grid
-                                item
                                 md={12}
                                 xs={12}
                                 container
                                 alignItems="center"
-                            >
+                                >
                         <Grid item mr={2}>
                             <Typography fontWeight="bold">Entrance:</Typography>
                         </Grid>
-                        <Grid item minWidth={300}>
-                            <MultipleSelectInput
+                        <Grid item mt={2} xs={11} fullwidth>
+                            <MultipleSelectInput 
                                         options={allEntrances}
                                         setSelected={onEntranceChange}
                                         getOptionLabel={getEntranceName}
@@ -208,8 +205,11 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
                                         filterOptions={entranceFilter}
                                         value={entrances}
                                         isOptionEqualToValue={entranceEqual}
+                                        helperText={
+                                            entrancesBlank&&"Error: entrance cannot be blank"
+                                        }
+                                        error={Boolean(entrancesBlank)}
                             />
-                            {/* <TextField value="entrances linked to acc grp"/> */}
                         </Grid>
                             </Grid>
                         </Stack>

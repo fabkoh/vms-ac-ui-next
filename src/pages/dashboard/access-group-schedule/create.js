@@ -31,14 +31,14 @@ const CreateAccessGroupSchedule = () => {
     //    // use accessGroupId(from the query) & entrance Id from user selection
     //    // to obtain groupToEntId. which will be added to all scheds before submit
     // }, [change whenever entrance selection change])
-    const getAllEntrances = () => {
-        const tempEntArray = [];
-        grpToEnt.forEach(grp=>{
-            tempEntArray.push(grp.entrance)
-        })
-        console.log("entrance array",tempEntArray)
-        setAllEntrances(tempEntArray)
-    }
+    // const getAllEntrances = () => {
+    //     const tempEntArray = [];
+    //     grpToEnt.forEach(grp=>{
+    //         tempEntArray.push(grp.entrance)
+    //     })
+    //     console.log("entrance array",tempEntArray)
+    //     setAllEntrances(allEntrances)
+    // }
     const getGrpToEnt = async () => {
         const res = await accessGroupEntranceNtoNApi.getEntranceWhereAccessGroupId(accessGroupId);
           if(res.status != 200) { //no entrances
@@ -47,6 +47,9 @@ const CreateAccessGroupSchedule = () => {
         }
         const data = await res.json();
         setGrpToEnt(data);
+        const tempEntArray =[]
+        data.forEach(grp=>{tempEntArray.push(grp.entrance)})
+        setAllEntrances(tempEntArray)
         console.log(JSON.stringify(data))
     }
     const getAccGrp = async() => {
@@ -57,19 +60,16 @@ const CreateAccessGroupSchedule = () => {
         }
         const data = await res.json();
         setAccGrp(data);
-        console.log(JSON.stringify(data))
+        // console.log(JSON.stringify(data))
     }
     useEffect(() => {
         try {
             getGrpToEnt()
             getAccGrp()
-            getAllEntrances()
         } catch (error) {
             console.log(error)
         }
     }, [])
-      
-    
 
     // empty objects for initialisation of new card
     const getEmptyAccessGroupScheduleInfo = (accessGroupScheduleId) => ({
@@ -78,11 +78,13 @@ const CreateAccessGroupSchedule = () => {
         rrule:"",
         timeStart:"",
         timeEnd:"",
-        groupToEntranceId:"",
+        groupToEntranceId:[],
+        entrances:[],
     });
     const getEmptyAccessGroupScheduleValidations = (accessGroupScheduleId) => ({
         accessGroupScheduleId,
         accessGroupNameScheduleNameBlank: false,
+        entrancesBlank:false,
 
         //Rrule valid(might not need due to the user workflow)
 
@@ -95,43 +97,7 @@ const CreateAccessGroupSchedule = () => {
     const [accessGroupScheduleInfoArr, 
         setAccessGroupScheduleInfoArr] = useState([getEmptyAccessGroupScheduleInfo(0)]);
     const [accessGroupScheduleValidationsArr, 
-        setAccessGroupScheduleValidationsArr] = useState([getEmptyAccessGroupScheduleValidations(0)]);
-
-    // persons logic (displaying in dropdown box) *REPLACE WITH ENTRANCES OF ACC GRP
-    // const isMounted = useMounted();
-    // const [allPersons, setAllPersons] = useState([]);
-
-    // const getPersons = useCallback( async() => {
-    //     try {
-    //         const res = await personApi.getPersons();
-    //         if (res.status == 200) {
-    //             const body = await res.json();
-    //             setAllPersons(body);
-    //         } else {
-    //             throw new Error("persons not loaded");
-    //         }
-    //     } catch(e) {
-    //         console.error(e);
-    //         toast.error("Persons not loaded");
-    //     }
-    // }, [isMounted]);
-
-    // useEffect(() => {
-    //     getPersons();
-    // },
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // []);
-    
-
-    // store previous access group names
-    const accessGroupNames = {};
-    accessGroupApi.getAccessGroups()
-        .then(async res => {
-            if (res.status == 200) {
-               const body = await res.json();
-               body.forEach(group => accessGroupNames[group.accessGroupName] = true); 
-            }
-        });
+        setAccessGroupScheduleValidationsArr] = useState([getEmptyAccessGroupScheduleValidations(0)]);    
 
     // add card logic
     //returns largest accessGroupId + 1
@@ -146,7 +112,7 @@ const CreateAccessGroupSchedule = () => {
 
 
     // remove card logic
-    const removeCard = (id) => {
+    const removeCard = (id) => {x
         const newAccessGroupScheduleInfoArr = accessGroupScheduleInfoArr.filter(info => info.accessGroupScheduleId != id);
         const newValidations = accessGroupScheduleValidationsArr.filter(validation => validation.accessGroupScheduleId != id);
 
@@ -159,7 +125,7 @@ const CreateAccessGroupSchedule = () => {
         const updatedInfo = [ ...accessGroupScheduleInfoArr ];
         // this method is reliant on text field having a name field == key in info object ie accessGroupName, accessGroupDesc
         updatedInfo.find(info => info.accessGroupScheduleId == id)[e.target.name] = e.target.value;
-        setAccessGroupScheduleInfoArr(updatedInfo);
+        // setAccessGroupScheduleInfoArr(updatedInfo);
     }
 
     //set rrule string
@@ -180,77 +146,120 @@ const CreateAccessGroupSchedule = () => {
         updatedInfo.find(info => info.accessGroupScheduleId == id)['timeEnd']=end;
         setAccessGroupScheduleInfoArr(updatedInfo);
     }
+
     // error checking methods
     const changeNameCheck = async (e, id) => {
-        const accessGroupName = e.target.value;
+        const newname = e.target.value;
         const newValidations = [ ...accessGroupScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.accessGroupId == id);
+        const validation = newValidations.find(v => v.accessGroupScheduleId == id);
 
         // store a temp updated access group info
         const newAccessGroupInfoArr = [ ...accessGroupScheduleInfoArr ]
-        newAccessGroupInfoArr.find(group => group.accessGroupScheduleId == id).accessGroupName = accessGroupName;
+        newAccessGroupInfoArr.find(group => group.accessGroupScheduleId == id).accessGroupScheduleName = newname;
 
         // remove submit failed
         validation.submitFailed = false;
 
         // check name is blank?
-        validation.accessGroupNameBlank = formUtils.checkBlank(accessGroupName);
-
-        setAccessGroupValidationsArr(newValidations);
+        validation.accessGroupScheduleNameBlank = formUtils.checkBlank(newname);
+        console.log(validation)
+        setAccessGroupScheduleValidationsArr(newValidations);
+    }
+    const changeEntranceCheck = (newValue,id) => {
+        const newentrance = newValue;
+        const newValidations = [ ...accessGroupScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.accessGroupScheduleId == id);
+        // store a temp updated access group info
+        const newAccessGroupInfoArr = [ ...accessGroupScheduleInfoArr ]
+        const oldentrance = newAccessGroupInfoArr.find(group => group.accessGroupScheduleId == id).entrances;
+        oldentrance.length == 0? (validation.entrancesBlank=true):(validation.entrancesBlank=false);
+        // console.log(validation)
     }
 
     // entrance logic
     const changeEntrance = (newValue, id) => {
-        const updatedInfo = [ ...accessGroupScheduleInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
+        console.log(newValue,"SSSSSSSS",id)
+        const updatedInfo = [...accessGroupScheduleInfoArr ];
+        updatedInfo.find(info => info.accessGroupScheduleId == id).entrances = newValue;
         setAccessGroupScheduleInfoArr(updatedInfo);
-        console.log("change entranch",newValue,id)
+        // console.log("onchangeinfoarr",accessGroupScheduleInfoArr)
     }
 
     // currying for cleaner code
-    const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
+    const onEntranceChangeFactory = (id) => (newValue) =>{ 
+        changeEntrance(newValue, id);
+        changeEntranceCheck(newValue,id)
+    }
+    const onNameChangeFactory = (id) => (e) => {
+        changeTextField(e, id);
+        changeNameCheck(e, id);
+    }
+
+    const testdate = new Date();
+    const newdate = testdate.setDate(testdate.getDate()+14)
+    console.log(new Date(newdate))
 
     const [submitted, setSubmitted] = useState(false);
+    //entranceid assignment
+    const grpToEntAssignment = () => {
+        const newarr =[...accessGroupScheduleInfoArr]
+        newarr.forEach(sched =>{
+            sched.entrances.forEach(ent =>{
+                grpToEnt.forEach(obj=>{
+                    console.log(ent,"objhereee",obj)
+                    if(obj.entrance.entranceId==ent.entranceId){
+                        sched.groupToEntranceId.push(obj.groupToEntranceId);
+                    }
+                })
+            })
+        })
+        setAccessGroupScheduleInfoArr(newarr)
+    }
 
-    // const submitForm = e => {
-    //     e.preventDefault(); 
+    const submitForm = async e => {
+        e.preventDefault(); 
 
-    //     setSubmitted(true);
-    //     accessGroupScheduleInfoArr.forEach(accGrpSched =>(accGrpSched["groupToEntranceId"]= grpToEnt["groupToEntranceId"]));
-    //     Promise.all(accessGroupScheduleInfoArr.map(accGrpSched => accessGroupScheduleApi.createAccessGroupSchedule(accGrpSched)))
-    //            .then(resArr => {
-    //                 const failedAccessGroup = [];
-    //                 const failedRes = [];
+        grpToEntAssignment()
+        setSubmitted(true);
+        // accessGroupScheduleInfoArr.forEach(accGrpSched =>(accGrpSched["groupToEntranceId"]= grpToEnt["groupToEntranceId"]));
+        Promise.all(accessGroupScheduleInfoArr.map(accGrpSched => accessGroupScheduleApi.createAccessGroupSchedule(accGrpSched,accGrpSched.groupToEntranceId)))
+               .then(resArr => {
+                    const failedAccessGroup = [];
+                    const failedRes = [];
+                    const temparr = [...accessGroupScheduleInfoArr]
+                    temparr.forEach(sched=>sched.groupToEntranceId=[])
+                    setAccessGroupScheduleInfoArr(temparr) //reset grptoentId in case fail
+                    console.log("after submit",accessGroupScheduleInfoArr)
+                    resArr.forEach((res, i) => {
+                        if (res.status != 201) {
+                            failedAccessGroup.push(accessGroupScheduleInfoArr[i])
+                            failedRes.push(res)
+                        }
+                    })
 
-    //                 resArr.forEach((res, i) => {
-    //                     if (res.status != 201) {
-    //                         failedAccessGroup.push(accessGroupScheduleInfoArr[i])
-    //                         failedRes.push(res)
-    //                     }
-    //                 })
+                    const numCreated = accessGroupScheduleInfoArr.length - failedAccessGroup.length
+                    if (numCreated) {
+                        toast.success(`${numCreated} access groups created`); 
+                    }
 
-    //                 const numCreated = accessGroupScheduleInfoArr.length - failedAccessGroup.length
-    //                 if (numCreated) {
-    //                     toast.success(`${numCreated} access groups created`); 
-    //                 }
-
-    //                 if (failedAccessGroup.length) {
-    //                     // some failed
-    //                     toast.error('Error creating the highlighted access groups');
-    //                     Promise.all(failedRes.map(res => res.json()))
-    //                            .then(failedObjArr => {
-    //                                 setSubmitted(false);
-    //                                 setAccessGroupValidationsArr(failedObjArr.map(obj => {
-    //                                     obj.submitFailed = true;
-    //                                     return obj;
-    //                                 }))
-    //                            })
-    //                 } else {
-    //                     // all passed
-    //                     router.replace('/dashboard/access-groups')
-    //                 }
-    //            })
-    // }
+                    if (failedAccessGroup.length) {
+                        // some failed
+                        toast.error('Error creating the highlighted schedules');
+                        Promise.all(failedRes.map(res => res.json()))
+                               .then(failedObjArr => {
+                                    setSubmitted(false);
+                                    setAccessGroupScheduleValidationsArr(failedObjArr.map(obj => {
+                                        obj.submitFailed = true;
+                                        return obj;
+                                    }))
+                               })
+                    } else {
+                        // all passed
+                        // router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
+                        console.warn("yay success")
+                    }
+               })
+    }
 
     return(
         <>
@@ -309,8 +318,8 @@ const CreateAccessGroupSchedule = () => {
                                     removeCard={removeCard}
                                     changeTimeStart={changeTimeStart}
                                     changeTimeEnd={changeTimeEnd}
-                                    accessGroupScheduleValidations={accessGroupScheduleValidationsArr[i]}
-                                    changeTextField={changeTextField}
+                                    accessGroupScheduleValidations={accessGroupScheduleValidationsArr[id]}
+                                    changeTextField={onNameChangeFactory(id)}
                                     changeNameCheck={changeNameCheck}
                                     changeRrule={changeRrule}
                                     onEntranceChange={onEntranceChangeFactory(id)}
@@ -333,15 +342,16 @@ const CreateAccessGroupSchedule = () => {
                                         type="submit"
                                         size="large"
                                         variant="contained"
-                                        // onClick={submitForm}
+                                        onClick={submitForm}
                                         // disabled={
-                                        //     submitted                      ||
-                                        //     accessGroupScheduleInfoArr.length == 0 || // no access groups to submit
+                                        //     submitted                     ||
+                                        // //     accessGroupScheduleInfoArr.length == 0 || // no access groups to submit
                                         //     accessGroupScheduleValidationsArr.some( // check if validations fail
-                                        //         validation => validation.accessGroupNameBlank        ||
-                                        //                       validation.accessGroupNameExists       ||
-                                        //                       validation.accessGroupNameDuplicated   ||
-                                        //                       validation.accessGroupPersonDuplicated
+                                        //         validation => validation.accessGroupScheduleNameBlank        ||
+                                        //         validation.entrancesBlank
+                                        // //                       validation.accessGroupNameExists       ||
+                                        // //                       validation.accessGroupNameDuplicated   ||
+                                        // //                       validation.accessGroupPersonDuplicated
                                         //     )
                                         // }
                                     >
