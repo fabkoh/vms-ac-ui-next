@@ -207,19 +207,15 @@ const EntranceList = () => {
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-<<<<<<< HEAD
-                                    <NextLink href={"/dashboard/entrances/edit"} passHref>    
-                                        <MenuItem 
-                                            disableRipple 
-                                            disabled={actionDisabled}
-                                        >
-=======
-                                    <NextLink href={{
-										pathname: '/dashboard/entrances/edit',
-										query: { ids: encodeURIComponent(JSON.stringify(selectedEntrances)) }
-									}} passHref>    
+                                    <NextLink 
+                                        href={{
+                                            pathname: '/dashboard/entrances/edit',
+                                            query: { ids: encodeURIComponent(JSON.stringify(selectedEntrances)) }
+									    }}
+                                        passHref
+                                        disabled={actionDisabled}
+                                    >    
                                         <MenuItem disableRipple>
->>>>>>> 732a4d78b5d06716443d8b1e4d2e5ac844d75ba7
                                             <Edit />
                                             &#8288;Edit
                                         </MenuItem>

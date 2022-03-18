@@ -25,37 +25,11 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { AccessGroupBasicDetails } from "../../../../components/dashboard/access-groups/details/access-group-basic-details";
 import { AccessGroupPersons } from "../../../../components/dashboard/access-groups/details/access-group-persons";
+import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
 import { set } from "date-fns";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
-
-const fakeAccessGroupSchedules = [
-    {
-        accessGroupScheduleId: 1,
-        accessGroupScheduleName: 'name1',
-        rrule: '',
-        timeStart: '07:00',
-        timeEnd: '19:00',
-        groupToEntranceId: 1
-    },
-    {
-        accessGroupScheduleId: 2,
-        accessGroupScheduleName: 'name2',
-        rrule: '',
-        timeStart: '09:00',
-        timeEnd: '17:00',
-        groupToEntranceId: 1
-    },
-    {
-        accessGroupScheduleId: 3,
-        accessGroupScheduleName: 'name3',
-        rrule: '',
-        timeStart: '00:00',
-        timeEnd: '23:59',
-        groupToEntranceId: 3
-    }
-]
 
 const AccessGroupDetails = () => {
 
@@ -69,7 +43,7 @@ const AccessGroupDetails = () => {
     }, [])
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
-    const [accessGroupSchedules, setAccessGroupSchedules] = useState({});
+    const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
 
     const getAccessGroupEntranceAndSchedule = async() => {
         try {
