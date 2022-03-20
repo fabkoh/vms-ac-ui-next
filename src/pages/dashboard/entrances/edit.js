@@ -10,9 +10,9 @@ import { accessGroupApi } from "../../../api/access-groups";
 import entranceApi from "../../../api/entrance";
 import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
-import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
+import router from "next/router";
 
 const EditEntrances = () => {
 
@@ -26,7 +26,7 @@ const EditEntrances = () => {
         const entrances = [];
         const validations = [];
 
-        // map each id to a fetch req for that access group
+        // map each id to a fetch req for that entrance
         const resArr = await Promise.all(ids.map(id => entranceApi.getEntrance(id)));
         const successfulRes = resArr.filter(res => res.status == 200);
 
@@ -48,9 +48,8 @@ const EditEntrances = () => {
                 entranceId: body.entranceId,
                 entranceName: body.entranceName,
                 entranceDesc: body.entranceDesc,
-                accessGroups: [],
                 originalName: body.entranceName, // fields for validation
-                originalAccessGroupIds: body.accessGroups.map(p => p.accessGroupId)
+                accessGroups: [], // for now
             });
             validations.push({
                 entranceId: body.entranceId,
@@ -80,15 +79,15 @@ const EditEntrances = () => {
         return entrances; // for extension (see useEffect() below)
     }
 
-    const getAccessGroupsEntrances = async (entrances) => {
-        const entrance = [ ...entrances ];
-        const resArr = await Promise.all(entrance.map(e => accessGroupEntranceApi.getAccessGroupWhereEntranceId(e.entranceId)));
+    const getAccessGroupsEntrances = async (accGrpEntrances) => {
+        const entrances = [ ...accGrpEntrances ];
+        const resArr = await Promise.all(entrances.map(e => accessGroupEntranceApi.getAccessGroupWhereEntranceId(e.entranceId)));
         const successfulResIndex = [];
         resArr.forEach((res, i) => {
             if (res.status == 200) {
                 successfulResIndex.push(i);
             } else {
-                toast.error(`Access Groups for ${entrance[i].entranceName} not loaded. Please clear to prevent changes`);
+                toast.error(`Access Groups for ${entrances[i].entranceName} not loaded. Please clear to prevent changes`);
             }
         });
         const bodyArr = await Promise.all(successfulResIndex.map(i => resArr[i].json()));
@@ -114,6 +113,7 @@ const EditEntrances = () => {
     // fetch all access groups info
     const isAccessGroupMounted = useMounted();
     const [allAccessGroups, setAllAccessGroups] = useState([]);
+    
     const getAccessGroups = useCallback( async() => {
         try {
             const res = await accessGroupApi.getAccessGroups();
@@ -314,7 +314,7 @@ const EditEntrances = () => {
             }
         });
 
-        //assign entrance to access groups
+        //assign access groups to entrance
         const entranceResArr = await Promise.all(
             successfulResIndex.map(i => {
                 const entrance = entranceInfoArr[i];
@@ -396,7 +396,7 @@ const EditEntrances = () => {
                                     <EntranceEditForm
                                         key={id}
                                         entranceInfo={entranceInfo}
-                                        removeCard={removeCard}
+                                       // removeCard={removeCard}
                                         entranceValidations={entranceValidationsArr[i]}
                                         onNameChange={onNameChangeFactory(id)}
                                         onDescriptionChange={onDescriptionChangeFactory(id)}

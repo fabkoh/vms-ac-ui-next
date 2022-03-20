@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
-import { accessGroupApi } from "../../../../api/access-groups";
 import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
 import entranceApi from "../../../../api/entrance";
 import NextLink from 'next/link';
@@ -41,14 +40,16 @@ const EntranceDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const [accessGroup, setAccessGroup] = useState(null);
+    const [accessGroup, setAccessGroup] = useState([]);
 
-    const getAccessGroups = async (entranceId) => {
+    const getAccessGroups = async () => {
         try {
             const res = await accessGroupEntranceApi.getAccessGroupWhereEntranceId(entranceId);
             if (res.status == 200) {
                 const body = await res.json();
-                setAccessGroup(body.map(e => e.accessGroup));
+                if (isMounted()) {
+                    setAccessGroup(body);
+                }
             } else {
                 toast.error('Access Group info not loaded');
                 throw new Error('Access Group info not loaded');
@@ -76,8 +77,14 @@ const EntranceDetails = () => {
         }
     }, [isMounted]);
 
-    useEffect(() => {
+    const getInfo = useCallback(async() => {
+        //get entrance and access group entrance
         getEntrance();
+        getAccessGroups();
+    }, [isMounted])
+
+    useEffect(() => {
+        getInfo();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
@@ -225,7 +232,7 @@ const EntranceDetails = () => {
                                     </NextLink>
                                     <NextLink
                                         href={ 
-                                            // put accessGroupId in the ids of params of edit url
+                                            // put entranceId in the ids of params of edit url
                                             "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([Number(entrance.entranceId)])) 
                                         }
                                         passHref
@@ -270,7 +277,7 @@ const EntranceDetails = () => {
                                 item
                                 xs={12}
                             >
-                                <AccessGroupDetails accessGroup={accessGroup} />
+                                <AccessGroupDetails accessGroupEntrance ={accessGroup} />
                             </Grid>
                         </Grid>
                     </Box>
