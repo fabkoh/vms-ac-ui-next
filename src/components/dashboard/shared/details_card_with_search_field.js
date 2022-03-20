@@ -1,11 +1,12 @@
 import Warning from "@mui/icons-material/Warning";
-import { Card, CardHeader, Grid, Link, Divider, Chip, TextField, Box, InputAdornment, Typography, Collapse } from "@mui/material";
+import { Card, CardHeader, Grid, Link, Divider, Chip, TextField, Box, InputAdornment, Typography, Collapse, IconButton } from "@mui/material";
 import NextLink from "next/link";
 import { SeverityPill } from "../../severity-pill";
 import { useState } from "react";
 import { Search } from "../../../icons/search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "./expand-more";
+import { Clear } from "@mui/icons-material";
 
 /*
 compulsory fields
@@ -23,6 +24,20 @@ optional fields
     icon : JSX
 */
 
+const EndAdornment = ({ inputValue, clearInput }) => {
+    if (inputValue) {
+        return (
+            <InputAdornment position="end">
+                <IconButton  onClick={clearInput}> 
+                    <Clear />
+                </IconButton>
+            </InputAdornment>
+        )
+    } else {
+        return null
+    }
+}
+
 export default function DetailsCardWithSearchField({
     title ="",
     subheader = "",
@@ -38,6 +53,7 @@ export default function DetailsCardWithSearchField({
 
     const [inputValue, setInputValue] = useState('');
     const handleChange = (e) => setInputValue(e.target.value);
+    const clearInput = () => setInputValue('');
 
     const renderContents = (entities) => {
         if (entities.length == 0) {
@@ -110,10 +126,17 @@ export default function DetailsCardWithSearchField({
                                 <InputAdornment position="start">
                                     <Search fontSize="small" />
                                 </InputAdornment>
+                            ),
+                            endAdornment: (
+                                <EndAdornment
+                                    clearInput={clearInput}
+                                    inputValue={inputValue}
+                                />
                             )
                         }}
                         placeholder={placeholder}
                         onChange={handleChange}
+                        value={inputValue}
                     />    
                 </Box>
                 <Divider />

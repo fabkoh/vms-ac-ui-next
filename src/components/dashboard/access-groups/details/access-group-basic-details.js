@@ -3,6 +3,7 @@ import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
+import BasicDetailsCard from "../../shared/basic_details_card";
 
 export const AccessGroupBasicDetails = (props) => {
     const { accessGroupName, accessGroupDesc } = props.accessGroup;
@@ -12,9 +13,7 @@ export const AccessGroupBasicDetails = (props) => {
     const align = mdUp ? 'horizontal' : 'vertical';
 
     return(
-        <Card>
-            <CardHeader title="Basic Details" />
-            <Divider />
+        <BasicDetailsCard>
             <PropertyList>
                 <PropertyListItem
                     align={align}
@@ -42,6 +41,6 @@ export const AccessGroupBasicDetails = (props) => {
                     }
                 </PropertyListItem>
             </PropertyList>
-        </Card>
+        </BasicDetailsCard>
     )
 }

@@ -93,7 +93,7 @@ export const ListFilter = (props) => {
                         selected={selectedIndex == -1}
                     >
                         <Typography fontStyle="italic">
-                            CLEAR 
+                            clear 
                         </Typography>
                     </MenuItem>
                   {options.map((option, index) => (
