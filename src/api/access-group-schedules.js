@@ -9,31 +9,32 @@ class AccessGroupScheduleApi {
         }
     }
 
-    createAccessGroupSchedule({
-        accessGroupScheduleName,
-        rrule,
-        timeStart,
-        timeEnd
-    }, groupToEntranceIds) {
-        console.log("groupTOEntranceIds", groupToEntranceIds)
-        if (useApi) {
-            return sendApi(
-                `/api/access-group-schedule?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        accessGroupScheduleName,
-                        rrule,
-                        timeStart,
-                        timeEnd
-                    })
-                }
-            );
-        }
-    }
+    // no longer in use
+    // createAccessGroupSchedule({
+    //     accessGroupScheduleName,
+    //     rrule,
+    //     timeStart,
+    //     timeEnd
+    // }, groupToEntranceIds) {
+    //     console.log("groupTOEntranceIds", groupToEntranceIds)
+    //     if (useApi) {
+    //         return sendApi(
+    //             `/api/access-group-schedule?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
+    //             {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     accessGroupScheduleName,
+    //                     rrule,
+    //                     timeStart,
+    //                     timeEnd
+    //                 })
+    //             }
+    //         );
+    //     }
+    // }
 
     replaceAccessGroupSchedules(accessGroupScheduleList, groupToEntranceIds) {
         const cleanedAccessGroupScheduleList = accessGroupScheduleList.map(

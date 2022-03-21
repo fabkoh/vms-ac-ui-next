@@ -5,42 +5,54 @@ import ExpandMore from "../../shared/expand-more";
 import { Box } from "@mui/system";
 import { ChevronDown } from "../../../../icons/chevron-down";
 import StyledMenu from "../../styled-menu";
-import { Add, Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { Scrollbar } from "../../../scrollbar";
 import { rrulestr } from "rrule";
+import AccessGroupScheduleDelete from "./access-group-schedule-delete";
 
-const accessGroupSchedules = [
-    {
-        text: "e",
-        groupToEntranceId: 3
-    }
-]
-
-export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupSchedules }) {
+export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupSchedules, deleteSchedules }) {
     // expanding card
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
 
     // schedules
-    const [schedules, setSchedules] = useState(null);
+    const [groupToEntranceId, setGroupToEntranceId] = useState("");
     const handleEntranceSelect = (e) => {
-        const groupToEntranceId = e.target.value;
-        if (groupToEntranceId == "") { // clear selected
-            setSchedules(null);
-        } else {
-            setSchedules(accessGroupSchedules.filter(schedule => schedule.groupToEntranceId == groupToEntranceId))
-        }
+        setGroupToEntranceId(e.target.value);
     }
+
+    const schedules = accessGroupSchedules.filter(schedule => schedule.groupToEntranceId == groupToEntranceId);
     
     // schedule actions
     const [actionAnchor, setActionAnchor] = useState(null);
     const actionOpen = Boolean(actionAnchor)
     const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
     const handleActionMenuClose = () => setActionAnchor(null);
-    const actionDisabled = schedules == null;
+    const actionDisabled = schedules.length == 0;
+
+    // delete schedules
+    const [openDelete, setOpenDelete] = useState(false);
+    const openDeleteDialog = () => setOpenDelete(true);
+    const closeDeleteDialog = () => {
+        setOpenDelete(false);
+        handleActionMenuClose();
+    }
+
+    const handleDeleteSchedules = (ids, allSelected) => {
+        if (allSelected) {
+            setGroupToEntranceId('');
+        }
+        deleteSchedules(ids);
+    }
 
     return (
         <Card>
+            <AccessGroupScheduleDelete
+                open={openDelete}
+                schedules={schedules}
+                handleDialogClose={closeDeleteDialog}
+                deleteSchedules={handleDeleteSchedules}
+            />
             <Box 
                 display="flex" 
                 justifyContent="space-between"
@@ -89,6 +101,7 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                 <MenuItem
                     disableRipple
                     disabled={actionDisabled}
+                    onClick={openDeleteDialog}
                 >
                     <Delete />
                     &#8288;Delete
@@ -107,9 +120,9 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                         <InputLabel>Select Entrance</InputLabel>
                         <Select
                             label="Select Entrance"
-                            defaultValue=""
                             onChange={handleEntranceSelect}
                             fullWidth
+                            value={groupToEntranceId}
                         >
                             <MenuItem value="" sx={{ fontStyle: 'italic' }}>
                                 clear
@@ -127,7 +140,7 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                 </Box>
                 <Divider />
                 {
-                    schedules && (
+                    Array.isArray(schedules) && schedules.length > 0 && (
                         <Scrollbar>
                             <Table>
                                 <TableHead sx={{ backgroundColor: "neutral.200" }}>
@@ -138,18 +151,16 @@ export default function AccessGroupSchedules({ accessGroupEntrance, accessGroupS
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        Array.isArray(schedules) && (
-                                            schedules.map((schedule, i) => (
-                                                <TableRow hover key={i}>
-                                                    <TableCell>
-                                                        { schedule.accessGroupScheduleName }
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        { rrulestr(schedule.rrule).toText() }
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        )
+                                        schedules.map((schedule, i) => (
+                                            <TableRow hover key={i}>
+                                                <TableCell>
+                                                    { schedule.accessGroupScheduleName }
+                                                </TableCell>
+                                                <TableCell>
+                                                    { rrulestr(schedule.rrule).toText() }
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
                                     }
                                 </TableBody>
                             </Table>
