@@ -1,6 +1,4 @@
 -#!/bin/sh
- sudo pkill "npm run start"
- sudo pkill node
  sudo npm install next@canary
  sudo npm ci
  sudo npm run build
@@ -13,4 +11,4 @@
  sudo cp -r /var/lib/jenkins/workspace/vms-ac-ui-next/next.config.js /home/koh_fabian/runNextTmp
  sudo cp -r /var/lib/jenkins/workspace/vms-ac-ui-next/package.json /home/koh_fabian/runNextTmp
  cd /home/koh_fabian/runNextTmp
- sudo nohup npm run start &> next.out &
+ sudo pm2 restart @devias/material-kit-pro-react
