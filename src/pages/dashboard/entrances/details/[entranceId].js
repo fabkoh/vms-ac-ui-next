@@ -25,7 +25,7 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
-import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
+import { Confirmdelete } from '../../../../components/dashboard/entrances/confirm-delete';
 import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 
@@ -95,10 +95,10 @@ const EntranceDetails = () => {
     const handleActionMenuOpen = (e) => { setActionMenuAnchorEl(e.currentTarget); }
     const handleActionMenuClose = () => { setActionMenuAnchorEl(null); } */
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const actionMenuOpen = Boolean(anchorEl);
-    const handleActionMenuOpen = (e) => { setAnchorEl(e.currentTarget); }
-    const handleActionMenuClose = () => { setAnchorEl(null); }
+    const [actionAnchor, setActionAnchor] = useState(null);
+    const open = Boolean(actionAnchor);
+    const handleActionClick = (e) => { setActionAnchor(e.currentTarget); }
+    const handleActionClose = () => { setActionAnchor(null); }
 
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
@@ -127,20 +127,20 @@ const EntranceDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-/*	const handleDeleteAction = () => {
+	const handleDeleteAction = () => {
         Promise.resolve(
-            accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
+            entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            router.replace('/dashboard/access-groups');
+            router.replace('/dashboard/entrances');
         }
         else{
             toast.error('Delete unsuccessful')
         }
         })
         setDeleteOpen(false);
-    }; */
+    }; 
 
     // render view
     if (!entrance) {
@@ -212,14 +212,14 @@ const EntranceDetails = () => {
                                     )}
                                     sx={{ m: 1 }}
                                     variant="contained"
-                                    onClick={handleActionMenuOpen}
+                                    onClick={handleActionClick}
                                 >
                                     Actions
                                 </Button>
                                 <StyledMenu
-                                    anchorEl={anchorEl}
-                                    open={actionMenuOpen}
-                                    onClose={handleActionMenuClose}
+                                    anchorEl={actionAnchor}
+                                    open={open}
+                                    onClose={handleActionClose}
                                 >
                                     <NextLink
                                         href="/dashboard/entrances/create"
@@ -249,15 +249,15 @@ const EntranceDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
-                                   {/* <Confirmdelete 
+                                   <Confirmdelete 
                                     selectedState={selectedState}
-                                    setAnchorEl={setAnchorEl} 
+                                    setActionAnchor={setActionAnchor}
                                     deleteOpen={deleteOpen}
                                     handleDeleteClose={handleDeleteClose}
                                     handleDeleteAction={handleDeleteAction}
                                     handleDeleteOpen={handleDeleteOpen}
                                     handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/> */}
+                                    deleteBlock={deleteBlock}/>
                                 </StyledMenu>
                             </Grid>
                         </Grid>

@@ -15,7 +15,8 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
     setSelected : function (list of entities) => null
     filterOptions : function (list of entities, state*) => list of entitites
     value : list of entities
-    isOptionEqualToValue : function (entity, entity) => boolean
+    isOptionEqualToValue : function (entity, entity) => boolea
+    options : list of entities
 
     * state is an object (check mui docs for state structure)
 

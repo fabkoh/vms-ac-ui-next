@@ -26,10 +26,11 @@ import { RRule, RRuleSet, rrulestr } from "rrule";
 //pass in ONLY updatable RRule fields here from addaccgrpsched
 const Rrule = (props) => {
 	const {
-		//only pass rule.totext,rule.tostring, timestart, timeend
+		//only pass RRuleobj, timestart, timeend.
 		handleRrule,
 		getStart,
 		getEnd,
+		timeEndInvalid,
 	} = props;
 
 	const [rule, setRule] = useState({
@@ -114,6 +115,11 @@ const Rrule = (props) => {
 	};
 	const [timeEnd, setTimeEnd] = useState(); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
+		if(timeEnd<timeStart){
+			console.warn("invalid time")
+			setTimeEnd(timeStart);
+			setNonChangingRule(prevState=>({...prevState,timeEnd:timeStart}))
+		}
 		setTimeEnd(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeEnd:e.target.value}))
 
@@ -130,9 +136,10 @@ const Rrule = (props) => {
 					<Grid item ml={3} mr={2} mt={1}>
 						<Typography fontWeight="bold">From</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1}>
+					<Grid item ml={2} mr={2} mt={1} fullwidth>
 						<TextField
 							type="time"
+							min
 							onChange={handleTimeStart}
 							value={nonChangingRule.timeStart}
 						></TextField>
@@ -140,10 +147,14 @@ const Rrule = (props) => {
 					<Grid item ml={2} mr={2} mt={1}>
 						<Typography fontWeight="bold">to</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1}>
+					<Grid item ml={2} mr={2} mt={1} fullwidth>
 						<TextField
 							type="time"
 							onChange={handleTimeEnd}
+							error={Boolean(timeEndInvalid)}
+							helperText={
+								(timeEndInvalid && "Error: end time must be greater than start time")
+							}
 							value={nonChangingRule.timeEnd}
 						></TextField>
 					</Grid>
@@ -351,6 +362,7 @@ const Rrule = (props) => {
 								value={rule.byweekday}
 								required
 								onChange={handleByweekday}
+								// error={Boolean(rule.byweekday.length==0)}
 								sx={{ mt: 1 }}
 							>
 								<ToggleButton value={0}>M</ToggleButton>
@@ -387,7 +399,7 @@ const Rrule = (props) => {
 									 </MenuItem>
 								<MenuItem value="2">
 									{nonChangingRule.dtstart?
-									(`the ${WeeknoHandler()} ${handleWeekarray()} of every month`):
+									(`the ${WeeknoHandler()} ${handleWeekarray()}`):
 										("select start date")
 								}
 								</MenuItem>
@@ -426,7 +438,7 @@ const Rrule = (props) => {
 	const handleEndOption = (e) => {
 		setEnd(e.target.value);
 		if(e.target.value == "after"){
-			setNonChangingRule(prevState=>({...prevState,until:null}))
+			setNonChangingRule(prevState=>({...prevState,until:null,count:1}))
 		}
 		if(e.target.value == "on"){
 			setNonChangingRule(prevState=>({...prevState,count:null}))
@@ -457,7 +469,7 @@ const Rrule = (props) => {
 					<TextField
 						sx={{ ml: 2, mr: 2, maxWidth: 150, maxWidth: 150 }}
 						type="number"
-						value={count}
+						value={nonChangingRule.count}
 						onChange={handleCount}
 					></TextField>
 					<Typography fontWeight="bold" sx={{ ml: 3, mr: 3 }}>
@@ -499,6 +511,8 @@ const Rrule = (props) => {
 					onChange={handleDtstart}
 					required
 					sx={{ minWidth: 200, mr: 10 }}
+					error={dtstart?false:true}
+					helperText={dtstart?true :"Error: no start date"}
 				/>
 				<FormControl>
 					<FormGroup>

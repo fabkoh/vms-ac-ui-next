@@ -18,6 +18,7 @@ import { Search } from "../../../icons/search";
 import EntranceListTable from "../../../components/dashboard/entrances/list/entrance-list-table";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
+import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
 
 const applyFilter = createFilter({
     query: (entrance, queryString) => entrance.entranceName.toLowerCase().includes(queryString),
@@ -161,6 +162,53 @@ const EntranceList = () => {
         setEntrances(newEntrances);
     }
 
+    //for delete action button
+	const [deleteOpen, setDeleteOpen] = useState(false);  
+	const [text, setText] = useState("");
+	const [deleteBlock, setDeleteBlock] = useState(true);
+	const handleTextChange = (e) => {
+		setText(e.target.value);
+	};
+	useEffect(() => {
+	//  console.log(text); 
+	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
+	});
+	
+	//Set to true if an access group is selected. controls form input visibility.
+	const [selectedState, setselectedState] = useState(false);
+	const checkSelected = () => {
+	  if(selectedEntrances.length>=1){
+		 setselectedState(true)
+	  }
+	};
+	useEffect(() => {
+		checkSelected()
+	}, [selectedEntrances]);
+	
+
+	const handleDeleteOpen = () => {        
+		setDeleteOpen(true);             
+
+	};
+	const handleDeleteClose = () => {
+		setDeleteOpen(false);
+	}
+	const handleDeleteAction = () => {
+		Promise.all(selectedEntrances.map(id=>{
+			return entranceApi.deleteEntrance(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 204){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful' )
+				}
+			})
+			getEntrancesLocal();
+		})
+		setDeleteOpen(false);
+	};
 
     return(
         <>
@@ -219,10 +267,23 @@ const EntranceList = () => {
                                     <MenuItem 
                                         disableRipple 
                                         disabled={actionDisabled}
+                                        onClick={handleDeleteOpen}
+
                                     >
                                         <Delete />
-                                        &#8288;Delete    
+                                        &#8288;Delete
                                     </MenuItem>
+                                    <Confirmdelete
+                                                selectedState={selectedState}
+                                        		setActionAnchor={setActionAnchor}
+                                                deleteOpen={deleteOpen} 
+                                                handleDeleteClose={handleDeleteClose}
+                                                handleDeleteAction={handleDeleteAction}
+                                                handleDeleteOpen={handleDeleteOpen}
+                                                selectedAccessGroup={selectedEntrances}
+                                                handleTextChange={handleTextChange}
+                                                deleteBlock={deleteBlock}
+                                        />    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}

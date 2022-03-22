@@ -37,10 +37,11 @@ const AccessGroupDetails = () => {
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
     const { accessGroupId }  = router.query;
-
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+
+    const link = `/dashboard/access-group-schedule/edit/${accessGroupId}`;
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
     const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
@@ -322,6 +323,7 @@ const AccessGroupDetails = () => {
                                     accessGroupEntrance={accessGroupEntrance}
                                     accessGroupSchedules={accessGroupSchedules}
                                     deleteSchedules={deleteSchedules}
+                                    link={link}
                                 />
                             </Grid>
                         </Grid>

@@ -46,11 +46,11 @@ class AccessGroupScheduleApi {
             })
         );
         if (useApi) {
-            return sendApi(`/api/access-group-schedule/replace?grouptoentrancelist=${encodeArrayForSpring(groupToEntranceIds)}`, 
+            return sendApi(`/api/access-group-schedule/replace?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
                 {
                     method: 'PUT',
                     headers: {
-                        'Content-type': 'application-json'
+                        'Content-type': 'application/json'
                     },
                     body: JSON.stringify(cleanedAccessGroupScheduleList)
                 }
@@ -68,11 +68,11 @@ class AccessGroupScheduleApi {
             })
         );
         if (useApi) {
-            return sendApi(`/api/access-group-schedule/add?grouptoentrancelist=${encodeArrayForSpring(groupToEntranceIds)}`, 
+            return sendApi(`/api/access-group-schedule/add?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
                 {
                     method: 'PUT',
                     headers: {
-                        'Content-type': 'application-json'
+                        'Content-type': 'application/json'
                     },
                     body: JSON.stringify(cleanedAccessGroupScheduleList)
                 }

@@ -194,7 +194,7 @@ const AddAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTex
                         <Grid item mr={2}>
                             <Typography fontWeight="bold">Entrance:</Typography>
                         </Grid>
-                        <Grid item mt={2} xs={11} fullwidth>
+                        <Grid item mt={2} md={6} xs={12} fullwidth>
                             <MultipleSelectInput 
                                         options={allEntrances}
                                         setSelected={onEntranceChange}
