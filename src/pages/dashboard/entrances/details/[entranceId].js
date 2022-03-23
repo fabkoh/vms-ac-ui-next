@@ -28,6 +28,8 @@ import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/entrances/confirm-delete';
 import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
+import { DoorFront, LockOpen } from "@mui/icons-material";
+import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
 
 const EntranceDetails = () => {
 
@@ -41,6 +43,7 @@ const EntranceDetails = () => {
     }, [])
 
     const [accessGroup, setAccessGroup] = useState([]);
+    const [entranceIsActive, setEntranceIsActive] = useState();
 
     const getAccessGroups = async () => {
         try {
@@ -71,6 +74,7 @@ const EntranceDetails = () => {
             if (isMounted()) {
                 setEntrance(body);
                 getAccessGroups(body.entranceId);
+                setEntranceIsActive(body.isActive);
             }
         } catch(err) {
             console.error(err);
@@ -142,6 +146,48 @@ const EntranceDetails = () => {
         setDeleteOpen(false);
     }; 
 
+    // for updating status
+    const [statusUpdateId, setStatusUpdateId] = useState([]);
+    const [updateStatus, setUpdateStatus] = useState(null);
+    const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+    const openStatusUpdateDialog = (entranceId, updatedStatus) => {
+        setStatusUpdateId(entranceId);
+        setUpdateStatus(updatedStatus);
+        setStatusUpdateDialogOpen(true);
+    }
+    const handleStatusUpdateDialogClose = () => {
+        setStatusUpdateDialogOpen(false);
+        handleActionClose();
+    }
+
+    //entrance IsActive now
+    const entranceActive = entranceIsActive == true;
+
+    const handleMultiEnable = () => openStatusUpdateDialog(entranceId, true);
+    const handleMultiUnlock = () => openStatusUpdateDialog(entranceId, false);
+    const handleStatusUpdate = async (entranceId, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        Promise.resolve(
+            entranceApi.updateEntranceStatus(entranceId, updatedStatus)
+        ).then((res)=>{
+            if (res.status == 200) {
+                toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " entrance");
+                router.replace('/dashboard/entrances');
+            } else {
+                toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " entrance");
+                router.replace('/dashboard/entrances/details/' + entranceId);
+            }
+        })
+
+        const newEntrance = () => {
+            if (entranceId.includes(entrance.entranceId)) {
+                entrance.isActive = updatedStatus;
+            }
+        };
+        setEntrance(newEntrance);
+    }
+
     // render view
     if (!entrance) {
         return null;
@@ -153,6 +199,13 @@ const EntranceDetails = () => {
                     Etlas: Entrance Details
                 </title>
             </Head>
+            <ConfirmStatusUpdate
+                entranceIds={statusUpdateId}
+                open={statusUpdateDialogOpen}
+                handleDialogClose={handleStatusUpdateDialogClose}
+                updateStatus={updateStatus}
+                handleStatusUpdate={handleStatusUpdate}
+            />
             <Box
                 component="main"
                 sx={{
@@ -258,6 +311,22 @@ const EntranceDetails = () => {
                                     handleDeleteOpen={handleDeleteOpen}
                                     handleTextChange={handleTextChange}
                                     deleteBlock={deleteBlock}/>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiEnable}
+                                        disabled={entranceActive}
+                                    >
+                                        <DoorFront />
+                                        &#8288;Enable
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiUnlock}
+                                        disabled={!entranceActive}
+                                    >
+                                        <LockOpen />
+                                        &#8288;Unlock
+                                    </MenuItem>
                                 </StyledMenu>
                             </Grid>
                         </Grid>
