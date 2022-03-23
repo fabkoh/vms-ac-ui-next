@@ -91,7 +91,7 @@ const EntranceDetails = () => {
         getInfo();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
-    [])
+    [entranceIsActive])
 
     // actions menu open/close
   /*  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null) // which component to anchor action menu to
@@ -173,16 +173,15 @@ const EntranceDetails = () => {
         ).then((res)=>{
             if (res.status == 200) {
                 toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " entrance");
-                router.replace('/dashboard/entrances');
             } else {
                 toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " entrance");
-                router.replace('/dashboard/entrances/details/' + entranceId);
             }
         })
 
         const newEntrance = () => {
             if (entranceId.includes(entrance.entranceId)) {
                 entrance.isActive = updatedStatus;
+                setEntranceIsActive(updatedStatus);
             }
         };
         setEntrance(newEntrance);
