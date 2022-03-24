@@ -41,7 +41,7 @@ const AccessGroupDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const link = `/dashboard/access-group-schedule/edit/${accessGroupId}`;
+    const link = `/dashboard/access-group-schedule/modify/${accessGroupId}`;
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
     const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
