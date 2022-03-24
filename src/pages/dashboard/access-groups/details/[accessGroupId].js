@@ -28,7 +28,6 @@ import { AccessGroupPersons } from "../../../../components/dashboard/access-grou
 import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
-import { set } from "date-fns";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 
@@ -38,10 +37,11 @@ const AccessGroupDetails = () => {
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
     const { accessGroupId }  = router.query;
-
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+
+    const link = `/dashboard/access-group-schedule/modify/${accessGroupId}`;
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
     const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
@@ -86,7 +86,6 @@ const AccessGroupDetails = () => {
 
             if (isMounted()) {
                 setAccessGroup(body);
-                getEntrances(body.accessGroupId);
             }
         } catch(err) {
             console.error(err);
@@ -124,7 +123,6 @@ const AccessGroupDetails = () => {
 		setText(e.target.value);
 	};
     useEffect(() => {
-        console.log(text);
         (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
     }, [text]);
 
@@ -157,6 +155,22 @@ const AccessGroupDetails = () => {
         })
         setDeleteOpen(false);
     };
+
+    // delete schedules
+    const deleteSchedules = async (ids) => {
+        const resArr = await Promise.all(ids.map(accessGroupScheduleApi.deleteAccessGroupSchedule));
+
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some access group schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} access group schedules`)
+        }
+
+        getInfo();
+    }
 
     // render view
     if (!accessGroup) {
@@ -308,6 +322,8 @@ const AccessGroupDetails = () => {
                                 <AccessGroupSchedules 
                                     accessGroupEntrance={accessGroupEntrance}
                                     accessGroupSchedules={accessGroupSchedules}
+                                    deleteSchedules={deleteSchedules}
+                                    link={link}
                                 />
                             </Grid>
                         </Grid>

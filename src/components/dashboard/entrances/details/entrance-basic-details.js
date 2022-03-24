@@ -50,10 +50,6 @@ export const EntranceBasicDetails = (props) => {
                     {
                         !isActive && (
                             <SeverityPill color="error">
-                                <Warning 
-                                    fontSize="small" 
-                                    sx={{ mr: 1 }}
-                                />
                                 UNLOCKED
                             </SeverityPill>
                         ) || (

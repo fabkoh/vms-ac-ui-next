@@ -98,7 +98,12 @@ const getSections = (t) => [
             path: '/dashboard/access-groups/create'
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    title: t('Facility'),
+    items: [
       {
         title: t('Entrances'),
         path: '/dashboard/entrances',

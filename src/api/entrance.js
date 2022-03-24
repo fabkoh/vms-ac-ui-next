@@ -122,6 +122,12 @@ class EntranceApi {
 
         return Promise.resolve(new Response(isActive, { status: 200 }));
     }
+
+    deleteEntrance(entranceId){
+        if(useApi){
+            return sendApi(`/api/entrance/${entranceId}`,{method: 'DELETE'})
+        }
+    }
 }
 
 const entranceApi = new EntranceApi();

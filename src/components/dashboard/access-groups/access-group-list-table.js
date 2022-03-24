@@ -176,7 +176,12 @@ export const AccessGroupListTable = (props) => {
 												>
 													<Link color="inherit" variant="headline6">
 														<Typography>
-														{accGroup.accessGroupDesc}
+														{accGroup.accessGroupDesc || (
+															<SeverityPill color="warning" align="left">
+																<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+																No Descriptions
+															</SeverityPill>
+														)}
 														</Typography>
 													</Link>
 												</NextLink>

@@ -18,7 +18,7 @@ import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 import Rrule from "./rrule-form";
 
-const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         accessGroupScheduleId,
         accessGroupScheduleName,
@@ -29,6 +29,8 @@ const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTe
 
     const {
         accessGroupScheduleNameBlank,
+        timeEndInvalid,
+        untilInvalid,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
         accessGroupPersonDuplicated,
@@ -59,9 +61,12 @@ const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTe
     //get rrule string and text from rrulecomponent
     const [description, setDescription] = useState()
     const [rrulestring, setRrulestring] = useState()
+    const [rule, setRule] = useState()
     const handleRrule = (e) => {
         setDescription(e.toText())
         setRrulestring(e.toString())
+        setRule(e)
+        // console.log(e)
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
@@ -69,6 +74,16 @@ const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTe
         changeTimeEnd(end,accessGroupScheduleId)
     }, [rrulestring,start,end])
     
+    //blocker for invalid until date
+    const [untilHolder, setUntilHolder] = useState(false)
+    const handleInvalidUntil = (bool) => {
+        setUntilHolder(bool)
+    }
+    useEffect(() => {
+        checkUntil(untilHolder)
+    }, [untilHolder])
+    
+
     return (
         <ErrorCard error={
             // accessGroupScheduleNameBlank        ||
@@ -137,12 +152,13 @@ const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTe
                             required
                             value={accessGroupScheduleName}
                             onChange={(e)=>{changeTextField(e,accessGroupScheduleId)}}
-                            // helperText={ 
-                            //     (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') ||
+                            helperText={ 
+                                (accessGroupScheduleNameBlank && 'Error: access group schedule name cannot be blank')
+                                // (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
                             //     (accessGroupNameDuplicated && 'Error: duplicate access group name in form')
-                            // }
-                            // error={ Boolean(accessGroupNameBlank || accessGroupNameExists || accessGroupNameDuplicated)}
+                            }
+                            error={ Boolean(accessGroupScheduleNameBlank)}
                         />
                     </Grid>
                     <Collapse in={expanded}>
@@ -172,6 +188,8 @@ const EditAccGrpSchedForm = ({changeTimeStart,changeTimeEnd,changeRrule,changeTe
                                     handleRrule={handleRrule}
                                     getStart={getStart}
                                     getEnd={getEnd}
+                                    timeEndInvalid={timeEndInvalid}
+                                    handleInvalidUntil={handleInvalidUntil}
                                 />
                             </Grid>         
                             <Divider />
