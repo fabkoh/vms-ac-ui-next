@@ -171,9 +171,7 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                             { 
                                 selectedAll && 
                                 <Alert icon={false} severity="error" sx={{ mt: 2, mb: 2, whiteSpace: "pre-line" }}>
-                                    Deleting all access group schedules for this entrance would not allow this access group to enter this entrance at any time.
-                                    {"\n"}
-                                    This entrance would be removed from this access group
+                                    Deleting all schedules would remove this entrance from the access group
                                 </Alert>
                                 
                             }
