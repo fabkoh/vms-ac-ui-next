@@ -307,7 +307,7 @@ const CreateAccessGroupSchedule = () => {
                             {accGrp?(`Creating for Access Group: ${accGrp.accessGroupName}`):"No access Group found"}
                         </Typography>
                     </Box>
-                    {/* <form onSubmit={submitForm}> */}
+                    <form>
                         <Stack spacing={3}>
                             { accessGroupScheduleInfoArr.map((accessGroupScheduleInfo, i) => {
                                 const id = accessGroupScheduleInfo.accessGroupScheduleId
@@ -374,7 +374,7 @@ const CreateAccessGroupSchedule = () => {
                                 </Grid>                              
                             </Grid>
                         </Stack>
-                    {/* </form> */}
+                    </form>
                 </Container>
             </Box>
         </>
