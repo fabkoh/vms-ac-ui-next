@@ -23,7 +23,7 @@ import { set } from "nprogress";
 import { useEffect, useState } from "react";
 import { RRule, RRuleSet, rrulestr } from "rrule";
 
-//pass in ONLY updatable RRule fields here from addaccgrpsched
+
 const Rrule = (props) => {
 	const {
 		//only pass RRuleobj, timestart, timeend.
@@ -31,6 +31,7 @@ const Rrule = (props) => {
 		getStart,
 		getEnd,
 		timeEndInvalid,
+		handleInvalidUntil,
 	} = props;
 
 	const [rule, setRule] = useState({
@@ -76,11 +77,11 @@ const Rrule = (props) => {
 	}, [])
 
 	const setrrule = () => {
-		const {timeStart,timeEnd,...newrule1} =nonChangingRule
+		try{const {timeStart,timeEnd,...newrule1} =nonChangingRule
 		const newrule2 = {...rule,...newrule1}
-		const rule2 = new RRule(newrule2);
+		const rule2 = new RRule(newrule2);}catch(e){console.log(e)}
 		try{console.log(rule2.toText()),handleRrule(rule2)}catch(e){console.log(e)}
-		console.log(rule2.toString());
+		// console.log(rule2.toString());
 	}
 
 	
@@ -91,7 +92,7 @@ const Rrule = (props) => {
 	}, [rule,nonChangingRule])
 	
 	//handle dtstart
-	const [dtstart, setDtstart] = useState();
+	const [dtstart, setDtstart] = useState(new Date());
 	const handleDtstart = (e) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
@@ -133,7 +134,7 @@ const Rrule = (props) => {
 		if (allDay) {
 			return (
 				<Grid container alignItems="center">
-					<Grid item ml={3} mr={2} mt={1}>
+					<Grid item ml={2} mr={2} mt={1}>
 						<Typography fontWeight="bold">From</Typography>
 					</Grid>
 					<Grid item ml={2} mr={2} mt={1} fullwidth>
@@ -141,6 +142,7 @@ const Rrule = (props) => {
 							type="time"
 							min
 							onChange={handleTimeStart}
+							onKeyDown={(e)=>e.preventDefault()}
 							value={nonChangingRule.timeStart}
 						></TextField>
 					</Grid>
@@ -152,6 +154,7 @@ const Rrule = (props) => {
 							type="time"
 							onChange={handleTimeEnd}
 							error={Boolean(timeEndInvalid)}
+							onKeyDown={(e)=>e.preventDefault()}
 							helperText={
 								(timeEndInvalid && "Error: end time must be greater than start time")
 							}
@@ -189,7 +192,7 @@ const Rrule = (props) => {
 	
 	useEffect(() => { //reininitialize fields based on freq
 		if (repeatToggle && rule.freq == RRule.WEEKLY) { //reinitialize for weekly options
-			setMonthOptionsMenu()
+			setMonthOptionsMenu(null)
 			const date = new Date();
 			const day = date.getDay();
 			const f = day;
@@ -207,13 +210,15 @@ const Rrule = (props) => {
 				//   setMonthMenuState(null)
 		} 
 		if (repeatToggle && rule.freq == RRule.MONTHLY) {//reinitialize for monthly options
+			setMonthOptionsMenu("1")
+			monthMenuSetter1()
 			setRule((prevState) => ({
 				...prevState,
 				byweekday: null,bymonth:null,bymonthday:null
 		  }));
 		}
 		if (repeatToggle && rule.freq == RRule.DAILY) {//reinitialize for daily options
-			setMonthOptionsMenu()
+			setMonthOptionsMenu(null)
 			setRule((prevState) => ({
 				...prevState,
 				byweekday: null,bymonthday:null,bysetpos:null,bymonth:null
@@ -221,7 +226,7 @@ const Rrule = (props) => {
 		//   setMonthMenuState(null)
 		}
 		if (repeatToggle && rule.freq == RRule.YEARLY) {//reinitialize for yearly options
-			setMonthOptionsMenu()
+			setMonthOptionsMenu(null)
 			setRule((prevState) => ({
 				...prevState,
 				byweekday: null,bysetpos:null,
@@ -240,11 +245,13 @@ const Rrule = (props) => {
 	}
 
 	const handleByweekday = (event, newByweekday) => {
+		if(newByweekday.length){
 		setByweekday(newByweekday);
 		setRule((prevState) => ({
 			...prevState,
 			byweekday: newByweekday,
 		}));
+		}
 	};
 	
 	useEffect(() => {
@@ -355,14 +362,14 @@ const Rrule = (props) => {
 								on
 							</Typography>
 						</Grid>
-						<Grid item justifyContent="flex-start">
+						<Grid item justifyContent="flex-start" required>
 							<ToggleButtonGroup
 								color="info"
 								flexwrap="wrap"
 								value={rule.byweekday}
 								required
+								// onChange={(e)=>console.log(e.target.value)}
 								onChange={handleByweekday}
-								// error={Boolean(rule.byweekday.length==0)}
 								sx={{ mt: 1 }}
 							>
 								<ToggleButton value={0}>M</ToggleButton>
@@ -390,6 +397,7 @@ const Rrule = (props) => {
 							<Select
 							value={monthOptionsMenu}
 							onChange={handleMonthOptionsMenu}
+							defaultValue={rule.freq==RRule.WEEKLY? "1":null}
 							// value={monthOptions}
 							// onChange={handleMonthOptions}
 							>
@@ -447,10 +455,16 @@ const Rrule = (props) => {
 			setNonChangingRule(prevState=>({...prevState,until:null,count:null}))
 		}
 	};
+
+	
 	//handle until
 	const [until, setUntil] = useState()
 	const handleUntil = (e) => {
 		const dateobj = new Date(e.target.value)
+		if(dateobj<nonChangingRule.dtstart){
+			// console.warn("INVALID DATE")
+		}
+		// console.warn("this runs after")
 		setUntil(e.target.value)
 		setNonChangingRule(prevState=>({...prevState, until:dateobj}))
 	}
@@ -461,6 +475,22 @@ const Rrule = (props) => {
 			? (setNonChangingRule((prevState) => ({ ...prevState, count: 1 })),setCount(1))
 			: (setNonChangingRule((prevState) => ({ ...prevState, count: e.target.value })),setCount(e.target.value));
 	};
+	const invalidUntil = () => {
+		//if end options != "on" , setdelete block = false. else,     fn should be passed to handle end options
+		if(end=="on" && nonChangingRule.until<nonChangingRule.dtstart){
+			handleInvalidUntil(true)
+			return true
+		}
+		//set delete block false
+		else{
+		handleInvalidUntil(false)
+		console.log("this until is valid")
+		return false
+		}
+	}
+	useEffect(() => {
+		invalidUntil()
+	}, [monthOptionsMenu])
 	
 	const endRenderer = (e) => {
 		if (e == "after") {
@@ -480,9 +510,9 @@ const Rrule = (props) => {
 		}
 		if (e == "on") {
 			return (
-				<Grid container alignItems="center" value={until} onChange={handleUntil}>
-					<TextField sx={{ ml: 2 }} type="date"></TextField>
-				</Grid>
+				<Grid container alignItems="center" mt={1}>
+					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} ax error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":false}></TextField>
+				</Grid> 								//instead of end =="on", fn if end == on && invalid until
 			);
 		}
 		if (e == "never") {
@@ -509,6 +539,8 @@ const Rrule = (props) => {
 					type="date"
 					value={dtstart}
 					onChange={handleDtstart}
+					onKeyDown={(e)=>e.preventDefault()}
+					// onKeyPress={(e)=>e.preventDefault()}
 					required
 					sx={{ minWidth: 200, mr: 10 }}
 					error={dtstart?false:true}
@@ -524,7 +556,7 @@ const Rrule = (props) => {
 					</FormGroup>
 				</FormControl>
 			</Grid>
-			<Divider />
+			<Divider style={{width:'100%'}}/>
 			<Grid container>
 				{repeatToggle && (
 					<Grid container mt={2} mb={2} alignItems="center">
@@ -541,7 +573,7 @@ const Rrule = (props) => {
 						</Grid>
 						<Grid item mt={1}>
 							<Select
-								required
+								// required={repeatToggle?true:false}
 								value={rule.freq}
 								onChange={(e) => {
 									handleFreq(e);
@@ -559,7 +591,7 @@ const Rrule = (props) => {
 					</Grid>
 				)}
 			</Grid>
-			<Divider />
+			<Divider style={{width:'100%'}}/>
 			<Grid item>
 				{repeatToggle && (
 					<Grid container alignItems="center" sx={{ mt: 2, mb: 2 }}>
@@ -585,7 +617,7 @@ const Rrule = (props) => {
 					</Grid>
 				)}
 			</Grid>
-			<Divider />
+			<Divider style={{width:'100%'}} />
 			<Grid container mt={2} ml={-2} alignItems="center">
 				<Grid item>
 					<FormControl>
