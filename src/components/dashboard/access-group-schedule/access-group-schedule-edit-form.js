@@ -18,6 +18,8 @@ import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 import Rrule from "./rrule-form";
 import rruleDescription from "../../../utils/rrule-desc";
+import { whitespace } from "stylis";
+import { WrapText } from "@mui/icons-material";
 
 const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
@@ -72,8 +74,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     }
     //Description handler
     const descriptionHandler = (e) => { //e should be the rrule obj
-        setDescription(rruleDescription(e, start, end)); // HERE
-    
+        setDescription(rruleDescription(e, start, end))
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
@@ -91,22 +92,6 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         checkUntil(untilHolder)
     }, [untilHolder])
     
-
-    const setPosHandler = (setpos) => {
-		if(setpos == 1){
-            return "the 1st"
-        }
-		if(setpos == 2){
-            return "the 2nd"
-        }
-		if(setpos == 3){
-            return "the 3rd"
-        }
-		if(setpos == 4){
-            return "the 4th"
-        }
-        return "the 5th"
-	}
     return (
         <ErrorCard error={
             // accessGroupScheduleNameBlank        ||
@@ -193,9 +178,10 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             >
                                 <TextField
                                     fullWidth
+                                    // label="Description"
                                     name="accessGroupDesc"
-                                    value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
                                     multiline
+                                    value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
                                     disabled
                                 />
                             </Grid>

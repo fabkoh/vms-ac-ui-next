@@ -22,6 +22,8 @@ import {
 import { set } from "nprogress";
 import { useEffect, useState } from "react";
 import { RRule, RRuleSet, rrulestr } from "rrule";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/styles";
 
 
 const Rrule = (props) => {
@@ -50,6 +52,9 @@ const Rrule = (props) => {
 		timeStart,
 		timeEnd,
 	})
+	// const theme = useTheme();
+	// const matches = useMediaQuery(theme.breakpoints.up);
+	// console.log("asdasda",theme.breakpoints)
 
 	//handle repeatToggle for conditional rendering
 	const [repeatToggle, setRepeatToggle] = useState(false);
@@ -123,30 +128,79 @@ const Rrule = (props) => {
 		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
 	}, [allDay]);
 
+	// const AllDayRenderer = (allDay) => {
+	// 	if (allDay) {
+	// 		return (
+	// 			// <Grid container alignItems="center" xs={12}>
+	// 			<>
+	// 			<Grid container xs={4}>
+	// 				<Grid item ml={2} mr={1}>
+	// 					<Typography mr={2} fontWeight="bold">From</Typography>
+	// 				</Grid>
+	// 				<Grid item ml={2} mr={2} mt={1}>
+	// 					<TextField
+	// 						type="time"
+	// 						// label="Start Time"
+	// 						onChange={handleTimeStart}
+	// 						helperText={nonChangingRule.timeStart==""?"Error: invalid start time": " "}
+	// 						required={allDay?false:true}
+	// 						// onKeyDown={(e)=>e.preventDefault()}
+	// 						error={nonChangingRule.timeStart==""?true:false}
+	// 						value={nonChangingRule.timeStart}
+	// 						></TextField>
+	// 					</Grid>
+	// 			</Grid>
+	// 			<Grid container xs={4}>
+	// 				<Grid item ml={2} mr={1}>
+	// 					<Typography mr={2} fontWeight="bold">to</Typography>
+	// 				</Grid>
+	// 				<Grid item ml={2} mr={2} mt={1}>
+	// 					<TextField
+	// 						type="time"
+	// 						// label="End Time"
+	// 						onChange={handleTimeEnd}
+	// 						error={Boolean(timeEndInvalid)}
+	// 						required={allDay?false:true}
+	// 						// onKeyDown={(e)=>e.preventDefault()}
+	// 						helperText={
+	// 							(timeEndInvalid && "Error: end time must be greater than start time")||
+	// 							" "
+	// 						}
+	// 						value={nonChangingRule.timeEnd}
+	// 					></TextField>
+	// 				</Grid>
+	// 			</Grid>
+	// 				</>
+	// 			// </Grid>
+	// 		);
+	// 	}
+	// };
 	const AllDayRenderer = (allDay) => {
 		if (allDay) {
 			return (
-				<Grid container alignItems="center">
-					<Grid item ml={2} mr={2} minWidth={60}>
-						<Typography fontWeight="bold">From</Typography>
+				<Grid container alignItems="center" xs={12}>
+					<Grid item ml={2} mr={2} >
+						<Typography mr={2} fontWeight="bold">From</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} minWidth={150}>
+					<Grid item ml={2} mr={2} mt={1} minWidth={150} >
 						<TextField
 							type="time"
+							// label="Start Time"
 							onChange={handleTimeStart}
 							helperText={nonChangingRule.timeStart==""?"Error: invalid start time": " "}
 							required={allDay?false:true}
 							// onKeyDown={(e)=>e.preventDefault()}
 							error={nonChangingRule.timeStart==""?true:false}
 							value={nonChangingRule.timeStart}
-						></TextField>
+							></TextField>
 					</Grid>
-					<Grid item ml={2} mr={2} minWidth={60}>
-						<Typography fontWeight="bold">to</Typography>
+					<Grid item ml={2} minWidth={50}>
+						<Typography mr={2} fontWeight="bold">to</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} fullwidth>
+					<Grid item ml={2} mr={2} mt={1} >
 						<TextField
 							type="time"
+							// label="End Time"
 							onChange={handleTimeEnd}
 							error={Boolean(timeEndInvalid)}
 							required={allDay?false:true}
@@ -439,6 +493,7 @@ const Rrule = (props) => {
 	const handleEndOption = (e) => {
 		setEnd(e.target.value);
 		if(e.target.value == "after"){
+			setUntil("")
 			handleInvalidUntil(false)
 			setNonChangingRule(prevState=>({...prevState,until:null,count:1}))
 		}
@@ -446,6 +501,7 @@ const Rrule = (props) => {
 			setNonChangingRule(prevState=>({...prevState,count:null}))
 		}
 		if(e.target.value == "never"){
+			setUntil("")
 			handleInvalidUntil(false)
 			setNonChangingRule(prevState=>({...prevState,until:null,count:null}))
 		}
@@ -509,7 +565,7 @@ const Rrule = (props) => {
 			
 			return (
 				<Grid container alignItems="center" mt={2}>
-					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} ax error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
+					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								//instead of end =="on", fn if end == on && invalid until
 			);
 		}
@@ -616,8 +672,8 @@ const Rrule = (props) => {
 				)}
 			</Grid>
 			<Divider width={repeatToggle?"100%":"0"} />
-			<Grid container mt={2} ml={-2} alignItems="center">
-				<Grid item>
+			<Grid container mt={2} ml={-2} alignItems="center" xs={12}>
+				<Grid item mr={3}>
 					<FormControl>
 						<FormGroup>
 							<FormControlLabel
