@@ -155,6 +155,7 @@ const AccessGroupDetails = () => {
         }
         })
         setDeleteOpen(false);
+        setText("");
     };
 
     // delete schedules

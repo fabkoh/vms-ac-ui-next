@@ -330,6 +330,7 @@ const AccessGroupList = () => {
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);
+		setText("");
 	};
 
 	//blank out edit and delete if no people selected

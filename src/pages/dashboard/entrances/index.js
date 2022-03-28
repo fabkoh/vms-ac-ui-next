@@ -209,6 +209,7 @@ const EntranceList = () => {
 			getEntrancesLocal();
 		})
 		setDeleteOpen(false);
+        setText("");
 	};
 
     return(

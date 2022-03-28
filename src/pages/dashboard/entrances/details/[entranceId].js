@@ -145,6 +145,7 @@ const EntranceDetails = () => {
         }
         })
         setDeleteOpen(false);
+        setText("");
     }; 
 
     // for updating status

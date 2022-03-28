@@ -341,6 +341,7 @@ const PersonList = () => {
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
+		setText("");
 	};
 
 
