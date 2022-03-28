@@ -33,10 +33,11 @@ const getDescription = (rruleObj) => {
     const rruleOptions = rruleObj.origOptions;
     // if setPos, add pos to day
     if (Array.isArray(rruleOptions.bysetpos) && rruleOptions.bysetpos.length == 1) {
+        const index = rruleText.indexOf(' on ')
         return (
-            rruleText.substring(0, 14) + // every month on 
+            rruleText.substring(0, index + 3) + // on 
             ' the ' + numberText(rruleOptions.bysetpos[0]) + // the {number}
-            rruleText.substring(14) // rest of string
+            rruleText.substring(index + 3) // rest of string
         );
     }
 
@@ -78,7 +79,7 @@ const time = (timeString) => {
     if (num <= 21) {
         return '0' + numString + rest + ' pm'
     }
-    
+
     return numString + rest + ' pm'
 }
 

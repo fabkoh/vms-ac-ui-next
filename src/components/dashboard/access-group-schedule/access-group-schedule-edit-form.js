@@ -72,7 +72,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     }
     //Description handler
     const descriptionHandler = (e) => { //e should be the rrule obj
-        rruleDescription(e, start, end); // HERE
+        console.log(rruleDescription(e, start, end)); // HERE
         //capitalize 1st letter
         console.log(e)
         try{
