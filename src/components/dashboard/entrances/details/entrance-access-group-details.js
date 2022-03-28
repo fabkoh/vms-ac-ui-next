@@ -1,5 +1,5 @@
 import DetailsCard from "../../shared/details_card_with_search_field"
-import MeetingRoom from "@mui/icons-material/MeetingRoom"
+import { LockClosed } from '../../../../icons/lock-closed';
 
 const getName = (accessGroup) => accessGroup.accessGroupName;
 const getLink = (accessGroup) => `/dashboard/access-groups/details/${accessGroup.accessGroupId}`
@@ -22,7 +22,7 @@ export default function AccessGroupDetails({ accessGroupEntrance }){
             searchFilter={ search }
             placeholder="Search for access group name"
             noneFoundText="No access groups found"
-            icon={<MeetingRoom fontSize="small" sx={{mr: 1}} />}
+            icon={<LockClosed fontSize="small" sx={{mr: 1}} />}
         />
     )
 }
