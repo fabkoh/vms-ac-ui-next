@@ -312,6 +312,7 @@ const AccessGroupList = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
+		setText("")
 		setDeleteOpen(false);
 	}
 	const handleDeleteAction = () => {

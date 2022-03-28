@@ -191,6 +191,7 @@ const EntranceList = () => {
 
 	};
 	const handleDeleteClose = () => {
+        setText("");
 		setDeleteOpen(false);
 	}
 	const handleDeleteAction = () => {

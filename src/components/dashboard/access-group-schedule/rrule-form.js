@@ -22,6 +22,8 @@ import {
 import { set } from "nprogress";
 import { useEffect, useState } from "react";
 import { RRule, RRuleSet, rrulestr } from "rrule";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/styles";
 
 
 const Rrule = (props) => {
@@ -50,18 +52,9 @@ const Rrule = (props) => {
 		timeStart,
 		timeEnd,
 	})
-
-
-	
-	
-	// useEffect(() => {
-	//   console.log(JSON.stringify(nonChangingRule))
-	// }, [rule,nonChangingRule,allDay])
-	
-
-	// useEffect(() => {
-	// 	console.log(JSON.stringify(rule));
-	// }, [rule]);
+	// const theme = useTheme();
+	// const matches = useMediaQuery(theme.breakpoints.up);
+	// console.log("asdasda",theme.breakpoints)
 
 	//handle repeatToggle for conditional rendering
 	const [repeatToggle, setRepeatToggle] = useState(false);
@@ -71,10 +64,13 @@ const Rrule = (props) => {
 			: (setRepeatToggle(true),
 			  setRule({freq:2,interval:1}),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
 	};
+
 	useEffect(() => {
-	  setRule({freq:3,interval:1});
-	  setNonChangingRule({count:1,});
+		setRule({freq:3,interval:1});
+		setNonChangingRule({count:1,});
 	}, [])
+
+
 
 	const setrrule = () => {
 		try{const {timeStart,timeEnd,...newrule1} =nonChangingRule
@@ -97,11 +93,9 @@ const Rrule = (props) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
 		setDtstart(e.target.value);
+		// console.log("date",e.target.value)
+		// console.log("datetype",typeof(e.target.value))
 		setNonChangingRule((prevState) => ({ ...prevState, dtstart:dateobj }))
-		// if(rule.freq == RRule.YEARLY){
-		// 	setDtstart(e.target.value);
-		// 	setNonChangingRule((prevState) => ({ ...prevState, dtstart:dateobj }));
-		// }
 	};
 	//start of All Day toggle + renderer
 	const [allDay, setAllDay] = useState(true);
@@ -111,13 +105,17 @@ const Rrule = (props) => {
 	
 	const [timeStart, setTimeStart] = useState(); //timeStart lift up state
 	const handleTimeStart = (e) => {
+		if(e.target.value==""){
+			console.warn("START TIME IS EMPTYYYY")
+		}
+		console.log("time start value here",e.target.value)
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
 	};
 	const [timeEnd, setTimeEnd] = useState(); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
 		if(timeEnd<timeStart){
-			console.warn("invalid time")
+			// console.warn("invalid time")
 			setTimeEnd(timeStart);
 			setNonChangingRule(prevState=>({...prevState,timeEnd:timeStart}))
 		}
@@ -130,33 +128,86 @@ const Rrule = (props) => {
 		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
 	}, [allDay]);
 
+	// const AllDayRenderer = (allDay) => {
+	// 	if (allDay) {
+	// 		return (
+	// 			// <Grid container alignItems="center" xs={12}>
+	// 			<>
+	// 			<Grid container xs={4}>
+	// 				<Grid item ml={2} mr={1}>
+	// 					<Typography mr={2} fontWeight="bold">From</Typography>
+	// 				</Grid>
+	// 				<Grid item ml={2} mr={2} mt={1}>
+	// 					<TextField
+	// 						type="time"
+	// 						// label="Start Time"
+	// 						onChange={handleTimeStart}
+	// 						helperText={nonChangingRule.timeStart==""?"Error: invalid start time": " "}
+	// 						required={allDay?false:true}
+	// 						// onKeyDown={(e)=>e.preventDefault()}
+	// 						error={nonChangingRule.timeStart==""?true:false}
+	// 						value={nonChangingRule.timeStart}
+	// 						></TextField>
+	// 					</Grid>
+	// 			</Grid>
+	// 			<Grid container xs={4}>
+	// 				<Grid item ml={2} mr={1}>
+	// 					<Typography mr={2} fontWeight="bold">to</Typography>
+	// 				</Grid>
+	// 				<Grid item ml={2} mr={2} mt={1}>
+	// 					<TextField
+	// 						type="time"
+	// 						// label="End Time"
+	// 						onChange={handleTimeEnd}
+	// 						error={Boolean(timeEndInvalid)}
+	// 						required={allDay?false:true}
+	// 						// onKeyDown={(e)=>e.preventDefault()}
+	// 						helperText={
+	// 							(timeEndInvalid && "Error: end time must be greater than start time")||
+	// 							" "
+	// 						}
+	// 						value={nonChangingRule.timeEnd}
+	// 					></TextField>
+	// 				</Grid>
+	// 			</Grid>
+	// 				</>
+	// 			// </Grid>
+	// 		);
+	// 	}
+	// };
 	const AllDayRenderer = (allDay) => {
 		if (allDay) {
 			return (
-				<Grid container alignItems="center">
-					<Grid item ml={2} mr={2} mt={1}>
-						<Typography fontWeight="bold">From</Typography>
+				<Grid container alignItems="center" xs={12}>
+					<Grid item ml={2} mr={2} >
+						<Typography mr={2} fontWeight="bold">From</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} fullwidth>
+					<Grid item ml={2} mr={2} mt={1} minWidth={150} >
 						<TextField
 							type="time"
-							min
+							// label="Start Time"
 							onChange={handleTimeStart}
-							onKeyDown={(e)=>e.preventDefault()}
+							helperText={nonChangingRule.timeStart==""?"Error: invalid start time": " "}
+							required={allDay?false:true}
+							// onKeyDown={(e)=>e.preventDefault()}
+							error={nonChangingRule.timeStart==""?true:false}
 							value={nonChangingRule.timeStart}
-						></TextField>
+							></TextField>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1}>
-						<Typography fontWeight="bold">to</Typography>
+					<Grid item ml={2} minWidth={50}>
+						<Typography mr={2} fontWeight="bold">to</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} fullwidth>
+					<Grid item ml={2} mr={2} mt={1} >
 						<TextField
 							type="time"
+							// label="End Time"
 							onChange={handleTimeEnd}
 							error={Boolean(timeEndInvalid)}
-							onKeyDown={(e)=>e.preventDefault()}
+							required={allDay?false:true}
+							// onKeyDown={(e)=>e.preventDefault()}
 							helperText={
-								(timeEndInvalid && "Error: end time must be greater than start time")
+								(timeEndInvalid && "Error: end time must be greater than start time")||
+								" "
 							}
 							value={nonChangingRule.timeEnd}
 						></TextField>
@@ -168,11 +219,11 @@ const Rrule = (props) => {
 	//end of All Day toggle + renderer
 
 	//handles interval
-	const [interval, setInterval] = useState(); //interval lift up state
+	const [interval, setInterval] = useState(1); //interval lift up state
 	const handleInterval = (e) => {
-		e.target.value < 1
-			? setRule((prevState) => ({ ...prevState, interval: 1 }))
-			: setRule((prevState) => ({ ...prevState, interval: e.target.value }));
+		e.target.value <= 1
+			? (setRule((prevState) => ({ ...prevState, interval: 1 })),setInterval(1))
+			:(setRule((prevState) => ({ ...prevState, interval: e.target.value })),setInterval(e.target.value));
 	};
 
 	//start of Freq renderer to handle RRule freq conditional rendering
@@ -268,12 +319,8 @@ const Rrule = (props) => {
 	const [bymonthday, setBymonthday] = useState()
 	const [bymonth, setBymonth] = useState()
 	const [bysetpos, setBysetpos] = useState()
-	// const date = new Date();
-	// const DD = date.getDate();
-	// const tempday = date.getDay();
-	// tempday == 0? tempday=6:false;
-	// const weekno = Math.floor(DD/7)
-	const weekarray = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+	
+	const weekarray = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 	const handleWeekarray = () => {
 		const weekarrayno = nonChangingRule.dtstart.getDay();
 		const newweekarrayno = weekarrayno - 1
@@ -446,12 +493,16 @@ const Rrule = (props) => {
 	const handleEndOption = (e) => {
 		setEnd(e.target.value);
 		if(e.target.value == "after"){
+			setUntil("")
+			handleInvalidUntil(false)
 			setNonChangingRule(prevState=>({...prevState,until:null,count:1}))
 		}
 		if(e.target.value == "on"){
 			setNonChangingRule(prevState=>({...prevState,count:null}))
 		}
 		if(e.target.value == "never"){
+			setUntil("")
+			handleInvalidUntil(false)
 			setNonChangingRule(prevState=>({...prevState,until:null,count:null}))
 		}
 	};
@@ -484,21 +535,23 @@ const Rrule = (props) => {
 		//set delete block false
 		else{
 		handleInvalidUntil(false)
-		console.log("this until is valid")
+		// console.log("this until is valid")
 		return false
 		}
 	}
 	useEffect(() => {
 		invalidUntil()
+		endRenderer(end)
 	}, [monthOptionsMenu])
 	
 	const endRenderer = (e) => {
 		if (e == "after") {
 			return (
-				<Grid container alignItems="center">
+				<Grid container alignItems="center" mt={2}>
 					<TextField
 						sx={{ ml: 2, mr: 2, maxWidth: 150, maxWidth: 150 }}
 						type="number"
+						helperText={" "}
 						value={nonChangingRule.count}
 						onChange={handleCount}
 					></TextField>
@@ -509,9 +562,10 @@ const Rrule = (props) => {
 			);
 		}
 		if (e == "on") {
+			
 			return (
-				<Grid container alignItems="center" mt={1}>
-					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} ax error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":false}></TextField>
+				<Grid container alignItems="center" mt={2}>
+					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								//instead of end =="on", fn if end == on && invalid until
 			);
 		}
@@ -591,12 +645,12 @@ const Rrule = (props) => {
 					</Grid>
 				)}
 			</Grid>
-			<Divider style={{width:'100%'}}/>
+			<Divider width={repeatToggle?"100%":"0"}/>
 			<Grid item>
 				{repeatToggle && (
-					<Grid container alignItems="center" sx={{ mt: 2, mb: 2 }}>
+					<Grid container alignItems="center" mb={2}>
 						<Grid item>
-							<Typography item fontWeight="bold" sx={{ mr: 2 }}>
+							<Typography item fontWeight="bold" mr={2}>
 								{" "}
 								Ends
 							</Typography>
@@ -613,13 +667,13 @@ const Rrule = (props) => {
 								<MenuItem value="never">never</MenuItem>
 							</Select>
 						</Grid>
-						<Grid item>{endRenderer(end)}</Grid>
+						<Grid item mt={2}>{endRenderer(end)}</Grid>
 					</Grid>
 				)}
 			</Grid>
-			<Divider style={{width:'100%'}} />
-			<Grid container mt={2} ml={-2} alignItems="center">
-				<Grid item>
+			<Divider width={repeatToggle?"100%":"0"} />
+			<Grid container mt={2} ml={-2} alignItems="center" xs={12}>
+				<Grid item mr={3}>
 					<FormControl>
 						<FormGroup>
 							<FormControlLabel
@@ -630,7 +684,9 @@ const Rrule = (props) => {
 						</FormGroup>
 					</FormControl>
 				</Grid>
-				<Grid item>{AllDayRenderer(allDay)}</Grid>
+				<Grid item>
+					{AllDayRenderer(allDay)}
+				</Grid>
 			</Grid>
 		</Grid>
 	);

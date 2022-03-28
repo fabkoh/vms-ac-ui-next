@@ -17,6 +17,9 @@ import MultipleSelectInput from "../shared/multi-select-input";
 import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 import Rrule from "./rrule-form";
+import rruleDescription from "../../../utils/rrule-desc";
+import { whitespace } from "stylis";
+import { WrapText } from "@mui/icons-material";
 
 const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
@@ -63,15 +66,21 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     const [rrulestring, setRrulestring] = useState()
     const [rule, setRule] = useState()
     const handleRrule = (e) => {
-        setDescription(e.toText())
+        descriptionHandler(e)
+        // setDescription(e.toText())
         setRrulestring(e.toString())
         setRule(e)
-        // console.log(e)
+        console.log(e.toString())
+    }
+    //Description handler
+    const descriptionHandler = (e) => { //e should be the rrule obj
+        setDescription(rruleDescription(e, start, end))
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
         changeTimeStart(start,accessGroupScheduleId)
         changeTimeEnd(end,accessGroupScheduleId)
+        descriptionHandler(rule)
     }, [rrulestring,start,end])
     
     //blocker for invalid until date
@@ -83,7 +92,6 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         checkUntil(untilHolder)
     }, [untilHolder])
     
-
     return (
         <ErrorCard error={
             // accessGroupScheduleNameBlank        ||
@@ -170,12 +178,11 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             >
                                 <TextField
                                     fullWidth
-                                    label="Description"
+                                    // label="Description"
                                     name="accessGroupDesc"
+                                    multiline
                                     value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
                                     disabled
-                                    // value={accessGroupDesc}
-                                    // onChange={onDescriptionChange}
                                 />
                             </Grid>
                             <Divider />

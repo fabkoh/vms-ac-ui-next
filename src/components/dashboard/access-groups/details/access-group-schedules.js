@@ -25,6 +25,7 @@ import { Scrollbar } from "../../../scrollbar";
 import { rrulestr } from "rrule";
 import AccessGroupScheduleDelete from "./access-group-schedule-delete";
 import NextLink from 'next/link';
+import rruleDescription from "../../../../utils/rrule-desc";
 
 
 export default function AccessGroupSchedules({
@@ -173,7 +174,7 @@ export default function AccessGroupSchedules({
 								{schedules.map((schedule, i) => (
 									<TableRow hover key={i}>
 										<TableCell>{schedule.accessGroupScheduleName}</TableCell>
-										<TableCell>{rrulestr(schedule.rrule).toText()}</TableCell>
+										<TableCell>{ rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd) }</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
