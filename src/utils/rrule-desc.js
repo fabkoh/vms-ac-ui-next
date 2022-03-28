@@ -1,0 +1,83 @@
+export default function rruleDescription(rruleObj, timeStart, timeEnd) {
+    // returns '1 time on {Date} from {timeStart} to {timeEnd}' when count == 1
+    // returns 'Every month on the {num} {day} from {timeStart} to {timeEnd}, starting {startDate}' when setPos is set
+    // appends ' from {timeStart} to {timeEnd}, starting {startDate}' for all other rules
+
+    if (rruleObj == undefined) {
+        return "Please select start date below";
+    }
+
+    const rruleOptions = rruleObj.origOptions;
+    
+    // return 'Please select start date' if start date not in object
+    if (rruleOptions.dtstart == null) {
+        return 'Please start start date below';
+    }
+
+    const dateString = rruleOptions.dtstart.toLocaleDateString("en-US", {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // return '1 time on {Date} from {timeStart} to {timeEnd} when count == 1
+    if (rruleOptions.count == 1) {
+        return `1 time on ${dateString}` + getTime(timeStart, timeEnd);
+    }
+
+    return capitalize(getDescription(rruleObj) + getTime(timeStart, timeEnd) + `, starting ${dateString}`)
+}
+
+const getDescription = (rruleObj) => {
+    const rruleText = rruleObj.toText();
+    const rruleOptions = rruleObj.origOptions;
+    // if setPos, add pos to day
+    if (Array.isArray(rruleOptions.bysetpos) && rruleOptions.bysetpos.length == 1) {
+        return (
+            rruleText.substring(0, 14) + // every month on 
+            ' the ' + numberText(rruleOptions.bysetpos[0]) + // the {number}
+            rruleText.substring(14) // rest of string
+        );
+    }
+
+    return rruleText;
+};
+
+const numberText = (n) => {
+    if (n == 1) return '1st';
+    if (n == 2) return '2nd';
+    if (n == 3) return '3rd';
+    return `${n}th`
+}
+
+const getTime = (timeStart, timeEnd) => {
+    if (timeStart == undefined || timeEnd == undefined) {
+        return ""
+    }
+
+    return ` from ${time(timeStart)} to ${time(timeEnd)}`
+};
+
+const time = (timeString) => {
+    const num = Number(timeString.substring(0, 2));
+    const rest = timeString.substring(2);
+
+    if (num == 0) {
+        return '12' + rest + ' am'
+    }
+
+    if (num <= 11) {
+        return timeString + ' am'
+    }
+
+    if (num == 12) {
+        return '12' + rest + ' pm'
+    }
+
+    return String(num - 12) + rest + ' pm'
+}
+
+const capitalize = (s) => {
+    if (s.length == 0) return "";
+    return s.charAt(0).toUpperCase() + s.substring(1);
+}

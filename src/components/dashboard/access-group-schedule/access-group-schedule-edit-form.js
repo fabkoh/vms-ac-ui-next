@@ -17,6 +17,7 @@ import MultipleSelectInput from "../shared/multi-select-input";
 import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 import Rrule from "./rrule-form";
+import rruleDescription from "../../../utils/rrule-desc";
 
 const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
@@ -71,6 +72,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     }
     //Description handler
     const descriptionHandler = (e) => { //e should be the rrule obj
+        rruleDescription(e, start, end); // HERE
         //capitalize 1st letter
         console.log(e)
         try{
