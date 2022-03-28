@@ -63,15 +63,54 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     const [rrulestring, setRrulestring] = useState()
     const [rule, setRule] = useState()
     const handleRrule = (e) => {
-        setDescription(e.toText())
+        descriptionHandler(e)
+        // setDescription(e.toText())
         setRrulestring(e.toString())
         setRule(e)
-        // console.log(e)
+        console.log(e.toString())
+    }
+    //Description handler
+    const descriptionHandler = (e) => { //e should be the rrule obj
+        //capitalize 1st letter
+        console.log(e)
+        try{
+            if(e.origOptions.dtstart==null||e.origOptions.dtstart==""){
+                return setDescription("Please select start date")
+            }
+        const setpos = e.origOptions.bysetpos;
+        const temp = e.toText()
+        const caps = temp.charAt(0).toUpperCase() + temp.slice(1)
+        //if "every day for 1 time", change entire string to "once on DD/MM/YYYY""
+        const date = new Date(e.origOptions.dtstart)
+        const datestring = JSON.stringify(date)
+        const year = datestring.slice(1,5)
+        const month = datestring.slice(6,8)
+        const day = datestring.slice(9,11)
+        // console.log("year",year)
+        // console.log("month",month)
+        // console.log("day",day)
+        if(setpos.length>0){
+        const intervalmonth = caps.slice(0,14)
+        const remainingstring = caps.slice(14,caps.length)
+        return setDescription(`${intervalmonth} ${setPosHandler(setpos)}${remainingstring}`)
+        }
+        }catch(e){console.log(e)}
+        if(caps == "Every day for 1 time"){
+            const special = `Once on ${day}/${month}/${year}`
+            return setDescription(special)
+        }
+        // const date = new Date(rule.dtstart)
+        // console.log("rrulehere",JSON.stringify(e.origOptions.dtstart))
+        // console.log("DTSRTHERE",typeof(date))
+        // console.log("DTSRTHERE",JSON.stringify(date).slice(0,11))
+        // console.log("DTSRTHERE",new Date(rule.dtstart))
+        setDescription(caps)
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
         changeTimeStart(start,accessGroupScheduleId)
         changeTimeEnd(end,accessGroupScheduleId)
+        descriptionHandler(rule)
     }, [rrulestring,start,end])
     
     //blocker for invalid until date
@@ -84,6 +123,21 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     }, [untilHolder])
     
 
+    const setPosHandler = (setpos) => {
+		if(setpos == 1){
+            return "the 1st"
+        }
+		if(setpos == 2){
+            return "the 2nd"
+        }
+		if(setpos == 3){
+            return "the 3rd"
+        }
+		if(setpos == 4){
+            return "the 4th"
+        }
+        return "the 5th"
+	}
     return (
         <ErrorCard error={
             // accessGroupScheduleNameBlank        ||

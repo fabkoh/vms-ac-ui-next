@@ -74,7 +74,7 @@ const CreateAccessGroupSchedule = () => {
         accessGroupScheduleNameBlank: false,
 
         timeEndInvalid:false,
-
+        timeStartInvalid:false,
         //Entrance valid(might not need as field is select. cannot custom add)
         untilInvalid:false,
         // submit failed
@@ -128,6 +128,7 @@ const CreateAccessGroupSchedule = () => {
         const updatedInfo = [ ...accessGroupScheduleInfoArr ];
         updatedInfo.find(info => info.accessGroupScheduleId == id)['timeStart']=start;
         setAccessGroupScheduleInfoArr(updatedInfo);
+        checkTimeStart(start,id)
     }
     const changeTimeEnd = (end,id) =>{
         const updatedInfo = [ ...accessGroupScheduleInfoArr ];
@@ -146,10 +147,20 @@ const CreateAccessGroupSchedule = () => {
         if(tempStartTime=="00:00"){
             validation.timeEndInvalid = false;
             setAccessGroupScheduleValidationsArr(newValidations)
-            console.log(newValidations)
+            // console.log(newValidations)
         }
         
         validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<tempStartTime);
+        // validation.timeEndInvalid = formUtils.checkBlank(endTime);
+        // console.log(validation)
+        setAccessGroupScheduleValidationsArr(newValidations)
+    }
+    const checkTimeStart = (start,id) => {
+        const starttime = start;
+        const newValidations = [ ...accessGroupScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.accessGroupScheduleId == id);
+
+        validation.timeStartInvalid = (formUtils.checkBlank(starttime));
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
         setAccessGroupScheduleValidationsArr(newValidations)
@@ -182,7 +193,7 @@ const CreateAccessGroupSchedule = () => {
         const newValidations = [ ...accessGroupScheduleValidationsArr ];
         const validation = newValidations.find(v => v.accessGroupScheduleId == id);
         validation.untilInvalid = e
-        console.log("newValidations",newValidations)
+        // console.log("newValidations",newValidations)
         setAccessGroupScheduleValidationsArr(newValidations);
 
     }
@@ -292,7 +303,6 @@ const CreateAccessGroupSchedule = () => {
                     <Box marginBottom={3}>
                         <Typography variant="h3">
                             Modify Access Group Schedule
-                            <Tooltip enterTouchDelay={0} title="Quick tip : Schedules can be quickly applied to all selected entrances via the modify page. If you wish to delete all schedules, a faster way would be to delete entrances linked to the access group instead"><Info fontSize="small"/></Tooltip>
                         </Typography>
                         <Grid container>
                             <Grid item mr={1}>
@@ -363,7 +373,7 @@ const CreateAccessGroupSchedule = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item marginRight={3} mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
@@ -378,7 +388,8 @@ const CreateAccessGroupSchedule = () => {
                                             accessGroupScheduleValidationsArr.some( // check if validations fail
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
-                                                validation.untilInvalid
+                                                validation.untilInvalid ||
+                                                validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
@@ -388,7 +399,7 @@ const CreateAccessGroupSchedule = () => {
                                         Replace all
                                     </Button>
                                 </Grid>
-                                <Grid item marginRight={3}>
+                                <Grid item marginRight={3} mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
@@ -403,7 +414,8 @@ const CreateAccessGroupSchedule = () => {
                                             accessGroupScheduleValidationsArr.some( // check if validations fail
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
-                                                validation.untilInvalid
+                                                validation.untilInvalid ||
+                                                validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
