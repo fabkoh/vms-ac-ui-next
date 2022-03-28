@@ -18,8 +18,6 @@ import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 import Rrule from "./rrule-form";
 import rruleDescription from "../../../utils/rrule-desc";
-import { whitespace } from "stylis";
-import { WrapText } from "@mui/icons-material";
 
 const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
@@ -70,65 +68,12 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         // setDescription(e.toText())
         setRrulestring(e.toString())
         setRule(e)
-<<<<<<< HEAD
         console.log(e.toString())
     }
     //Description handler
     const descriptionHandler = (e) => { //e should be the rrule obj
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        console.log(rruleDescription(e, start, end)); // HERE
-        //capitalize 1st letter
-        console.log(e)
-        try{
-            if(e.origOptions.dtstart==null||e.origOptions.dtstart==""){
-                return setDescription("Please select start date")
-            }
-        const setpos = e.origOptions.bysetpos;
-        const temp = e.toText()
-        const caps = temp.charAt(0).toUpperCase() + temp.slice(1)
-        //if "every day for 1 time", change entire string to "once on DD/MM/YYYY""
-        const date = new Date(e.origOptions.dtstart)
-        const datestring = JSON.stringify(date)
-        const year = datestring.slice(1,5)
-        const month = datestring.slice(6,8)
-        const day = datestring.slice(9,11)
-        // console.log("year",year)
-        // console.log("month",month)
-        // console.log("day",day)
-        if(setpos.length>0){
-        const intervalmonth = caps.slice(0,14)
-        const remainingstring = caps.slice(14,caps.length)
-        return setDescription(`${intervalmonth} ${setPosHandler(setpos)}${remainingstring}`)
-        }
-        }catch(e){console.log(e)}
-        if(caps == "Every day for 1 time"){
-            const special = `Once on ${day}/${month}/${year}`
-            return setDescription(special)
-        }
-        // const date = new Date(rule.dtstart)
-        // console.log("rrulehere",JSON.stringify(e.origOptions.dtstart))
-        // console.log("DTSRTHERE",typeof(date))
-        // console.log("DTSRTHERE",JSON.stringify(date).slice(0,11))
-        // console.log("DTSRTHERE",new Date(rule.dtstart))
-        setDescription(caps)
-=======
-        // console.log(e)
->>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
-=======
-        setDescription(rruleDescription(e, start, end))
->>>>>>> Stashed changes
-=======
-        setDescription(rruleDescription(e, start, end))
->>>>>>> Stashed changes
-=======
-        setDescription(rruleDescription(e, start, end))
->>>>>>> Stashed changes
-=======
-        setDescription(rruleDescription(e, start, end))
->>>>>>> Stashed changes
+        setDescription(rruleDescription(e, start, end)); // HERE
+    
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
@@ -146,12 +91,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         checkUntil(untilHolder)
     }, [untilHolder])
     
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
-<<<<<<< HEAD
     const setPosHandler = (setpos) => {
 		if(setpos == 1){
             return "the 1st"
@@ -167,16 +107,6 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         }
         return "the 5th"
 	}
-=======
->>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     return (
         <ErrorCard error={
             // accessGroupScheduleNameBlank        ||
@@ -263,13 +193,10 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             >
                                 <TextField
                                     fullWidth
-                                    // label="Description"
                                     name="accessGroupDesc"
-                                    multiline
                                     value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
+                                    multiline
                                     disabled
-                                    // value={accessGroupDesc}
-                                    // onChange={onDescriptionChange}
                                 />
                             </Grid>
                             <Divider />

@@ -193,11 +193,7 @@ const CreateAccessGroupSchedule = () => {
         const newValidations = [ ...accessGroupScheduleValidationsArr ];
         const validation = newValidations.find(v => v.accessGroupScheduleId == id);
         validation.untilInvalid = e
-<<<<<<< HEAD
         // console.log("newValidations",newValidations)
-=======
-        console.log("newValidations",newValidations)
->>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
         setAccessGroupScheduleValidationsArr(newValidations);
 
     }
@@ -392,12 +388,8 @@ const CreateAccessGroupSchedule = () => {
                                             accessGroupScheduleValidationsArr.some( // check if validations fail
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
-<<<<<<< HEAD
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid
-=======
-                                                validation.untilInvalid
->>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
@@ -422,12 +414,8 @@ const CreateAccessGroupSchedule = () => {
                                             accessGroupScheduleValidationsArr.some( // check if validations fail
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
-<<<<<<< HEAD
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid
-=======
-                                                validation.untilInvalid
->>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
