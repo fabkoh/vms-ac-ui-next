@@ -2,6 +2,7 @@ import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";
 import { rrulestr } from "rrule";
+import rruleDescription from "../../../../utils/rrule-desc";
 import { Scrollbar } from "../../../scrollbar";
 
 const steps = ['Select schedules to delete', 'Confirm delete'];
@@ -100,7 +101,9 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                                                     const {
                                                         accessGroupScheduleId,
                                                         accessGroupScheduleName,
-                                                        rrule
+                                                        rrule,
+                                                        timeStart,
+                                                        timeEnd
                                                     } = schedule;
                                                     const isScheduleSelected = selected.includes(accessGroupScheduleId);
                                                     const handleSelect = handleSelectFactory(accessGroupScheduleId);
@@ -118,7 +121,7 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                                                                 { accessGroupScheduleName }
                                                             </TableCell>
                                                             <TableCell>
-                                                                { rrulestr(rrule).toText() }
+                                                                { rruleDescription(rrulestr(rrule), timeStart, timeEnd) }
                                                             </TableCell>
                                                         </TableRow>
                                                     )

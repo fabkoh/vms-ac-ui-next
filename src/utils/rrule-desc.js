@@ -74,7 +74,12 @@ const time = (timeString) => {
         return '12' + rest + ' pm'
     }
 
-    return String(num - 12) + rest + ' pm'
+    const numString = String(num-12);
+    if (num <= 21) {
+        return '0' + numString + rest + ' pm'
+    }
+    
+    return numString + rest + ' pm'
 }
 
 const capitalize = (s) => {
