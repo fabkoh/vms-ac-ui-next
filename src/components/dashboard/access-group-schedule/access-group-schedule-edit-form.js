@@ -78,6 +78,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         console.log(rruleDescription(e, start, end)); // HERE
         //capitalize 1st letter
         console.log(e)
@@ -125,6 +126,9 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
 =======
         setDescription(rruleDescription(e, start, end))
 >>>>>>> Stashed changes
+=======
+        setDescription(rruleDescription(e, start, end))
+>>>>>>> Stashed changes
     }
     useEffect(() => {
         changeRrule(rrulestring,accessGroupScheduleId)
@@ -142,6 +146,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         checkUntil(untilHolder)
     }, [untilHolder])
     
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -164,6 +169,8 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
 	}
 =======
 >>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======

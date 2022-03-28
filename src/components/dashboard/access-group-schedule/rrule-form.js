@@ -181,6 +181,7 @@ const Rrule = (props) => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 				<Grid container alignItems="center">
 <<<<<<< HEAD
 					<Grid item ml={2} mr={2}>
@@ -188,6 +189,11 @@ const Rrule = (props) => {
 					<Grid item ml={2} mr={2} mt={1}>
 >>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
 						<Typography fontWeight="bold">From</Typography>
+=======
+				<Grid container alignItems="center" xs={12}>
+					<Grid item ml={2} mr={2} >
+						<Typography mr={2} fontWeight="bold">From</Typography>
+>>>>>>> Stashed changes
 =======
 				<Grid container alignItems="center" xs={12}>
 					<Grid item ml={2} mr={2} >
@@ -606,11 +612,15 @@ const Rrule = (props) => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} ax error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 =======
 				<Grid container alignItems="center" mt={1}>
 					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} ax error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":false}></TextField>
 >>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
+=======
+					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
+>>>>>>> Stashed changes
 =======
 					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 >>>>>>> Stashed changes
@@ -734,11 +744,16 @@ const Rrule = (props) => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 			<Divider style={{width:'100%'}} />
 >>>>>>> 70699ca70a88e3988f97e9a0eabe38cda8f9aa70
 			<Grid container mt={2} ml={-2} alignItems="center">
 				<Grid item>
+=======
+			<Grid container mt={2} ml={-2} alignItems="center" xs={12}>
+				<Grid item mr={3}>
+>>>>>>> Stashed changes
 =======
 			<Grid container mt={2} ml={-2} alignItems="center" xs={12}>
 				<Grid item mr={3}>
