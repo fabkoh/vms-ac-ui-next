@@ -165,16 +165,13 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                             &#8288;Confirm delete?
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
+                            <DialogContentText sx={{ whiteSpace: "pre-line", mb: 1}}>
                                 Are you sure you want to delete schedule(s)? This action cannot be undone.
+                                {
+                                    selectedAll && 
+                                    <strong>{"\nDeleting all schedules would remove this entrance from the access group"}</strong>
+                                }
                             </DialogContentText>
-                            { 
-                                selectedAll && 
-                                <Alert icon={false} severity="error" sx={{ mt: 2, mb: 2, whiteSpace: "pre-line" }}>
-                                    Deleting all schedules would remove this entrance from the access group
-                                </Alert>
-                                
-                            }
                             <form onSubmit={handleDeleteSchedules}>
                                 <TextField
                                     variant="filled"
