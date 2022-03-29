@@ -345,6 +345,9 @@ const PersonList = () => {
 	};
 
 
+	useEffect(() => {
+		console.log(selectedPersons)
+	}, [selectedPersons])
 	
 
 	

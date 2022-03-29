@@ -123,6 +123,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             <Button
                                 variant="outlined"
                                 color="error"
+                                sx={{mt:1}}
                                 onClick={() => removeCard(accessGroupScheduleId)}
                             >
                                 Clear

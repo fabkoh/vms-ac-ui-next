@@ -212,6 +212,18 @@ const EntranceList = () => {
         setText("");
 	};
 
+    // Reset selectedEntrances when entrances change
+	useEffect(
+		() => {
+			if (selectedEntrances.length) {
+				setSelectedEntrances([]);
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[entrances]
+	);
+    
+
     return(
         <>
             <Head>
