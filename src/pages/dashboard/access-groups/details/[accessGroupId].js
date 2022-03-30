@@ -30,6 +30,8 @@ import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import { getAccessGroupScheduleEditLink } from "../../../../utils/access-group-schedule";
+import { accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink } from "../../../../utils/access-group";
 
 const AccessGroupDetails = () => {
 
@@ -41,7 +43,7 @@ const AccessGroupDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const link = `/dashboard/access-group-schedule/modify/${accessGroupId}`;
+    const link = getAccessGroupScheduleEditLink(accessGroupId);
 
     const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
     const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
@@ -80,7 +82,7 @@ const AccessGroupDetails = () => {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
             if(res.status != 200) {
                 toast.error('Access group not found');
-                router.replace('/dashboard/access-groups')
+                router.replace(accessGroupListLink);
             }
             const body = await res.json();
 
@@ -148,7 +150,7 @@ const AccessGroupDetails = () => {
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            router.replace('/dashboard/access-groups');
+            router.replace(accessGroupListLink);
         }
         else{
             toast.error('Delete unsuccessful')
@@ -196,7 +198,7 @@ const AccessGroupDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href="/dashboard/access-groups"
+                                href={accessGroupListLink}
                                 passHref
                             >
                                 <Link
@@ -254,7 +256,7 @@ const AccessGroupDetails = () => {
                                     onClose={handleActionMenuClose}
                                 >
                                     <NextLink
-                                        href="/dashboard/access-groups/create"
+                                        href={accessGroupCreateLink}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -263,10 +265,7 @@ const AccessGroupDetails = () => {
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
-                                        href={ 
-                                            // put accessGroupId in the ids of params of edit url
-                                            "/dashboard/access-groups/edit?ids=" + encodeURIComponent(JSON.stringify([Number(accessGroup.accessGroupId)])) 
-                                        }
+                                        href={getAccessGroupEditLink(accessGroup)}
                                         passHref
                                     >
                                         <MenuItem disableRipple>

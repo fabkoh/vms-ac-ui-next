@@ -30,6 +30,7 @@ import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
+import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
 
 const EntranceDetails = () => {
 
@@ -67,7 +68,7 @@ const EntranceDetails = () => {
             const res = await entranceApi.getEntrance(entranceId);
             if(res.status != 200) {
                 toast.error('Entrance not found');
-                router.replace('/dashboard/entrances')
+                router.replace(entranceListLink);
             }
             const body = await res.json();
 
@@ -138,7 +139,7 @@ const EntranceDetails = () => {
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            router.replace('/dashboard/entrances');
+            router.replace(entranceListLink);
         }
         else{
             toast.error('Delete unsuccessful')
@@ -218,7 +219,7 @@ const EntranceDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href="/dashboard/entrances"
+                                href={entranceListLink}
                                 passHref
                             >
                                 <Link
@@ -276,7 +277,7 @@ const EntranceDetails = () => {
                                     onClose={handleActionClose}
                                 >
                                     <NextLink
-                                        href="/dashboard/entrances/create"
+                                        href={entranceCreateLink}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -285,10 +286,7 @@ const EntranceDetails = () => {
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
-                                        href={ 
-                                            // put entranceId in the ids of params of edit url
-                                            "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([Number(entrance.entranceId)])) 
-                                        }
+                                        href={getEntranceEditLink([entrance])}
                                         passHref
                                     >
                                         <MenuItem disableRipple>

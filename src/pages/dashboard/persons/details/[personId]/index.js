@@ -25,6 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { Confirmdelete } from '../../../../../components/dashboard/persons/confirm-delete';
 import toast from 'react-hot-toast';
+import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
 
 const PersonDetails = () => {
 
@@ -43,7 +44,7 @@ const PersonDetails = () => {
       const res = await personApi.getPerson(personId);
       if(res.status != 200) { // person not found
         toast.error("Person not found");
-        router.replace("/dashboard/persons");
+        router.replace(personListLink);
       }
       const body = await res.json();
 
@@ -68,7 +69,7 @@ const PersonDetails = () => {
   const handleClose = () => { setAnchorEl(null); }
 
   // link to edit page
-  const editLink = "/dashboard/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
+  const editLink = getPersonsEditLink([person]);
 
   // handle delete action. put this in parent component
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
@@ -85,7 +86,7 @@ const PersonDetails = () => {
     ).then((res)=>{
       if (res.status == 204){
         toast.success('Delete success');
-        router.replace('/dashboard/persons');
+        router.replace(personListLink);
       }
       else{
         toast.error('Delete unsuccessful')
@@ -114,7 +115,7 @@ const PersonDetails = () => {
 		  <div>
 			<Box sx={{ mb: 4 }}>
 			  <NextLink
-				href="/dashboard/persons"
+				href={personListLink}
 				passHref
 			  >
 				<Link
@@ -150,7 +151,7 @@ const PersonDetails = () => {
 			  >
 				<div>
 				  <Typography variant="h4">
-					{person.personFirstName + ' ' + person.personLastName}
+            { getPersonName(person) }
 				  </Typography>
 				</div>
 			  </Grid>

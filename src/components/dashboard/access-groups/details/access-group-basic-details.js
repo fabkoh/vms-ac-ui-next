@@ -3,7 +3,7 @@ import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
-import BasicDetailsCard from "../../shared/basic_details_card";
+import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const AccessGroupBasicDetails = (props) => {
     const { accessGroupName, accessGroupDesc } = props.accessGroup;

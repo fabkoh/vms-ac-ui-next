@@ -19,10 +19,11 @@ import EntranceListTable from "../../../components/dashboard/entrances/list/entr
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
+import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 
 const applyFilter = createFilter({
-    query: (entrance, queryString) => entrance.entranceName.toLowerCase().includes(queryString),
-    status: (entrance, state) => state == null || entrance.isActive == state
+    query: filterEntranceByString,
+    status: filterEntranceByStatus
 })
 
 const EntranceList = () => {
@@ -251,16 +252,13 @@ const EntranceList = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    <NextLink href={"/dashboard/entrances/create"} passHref>
+                                    <NextLink href={entranceCreateLink} passHref>
                                         <MenuItem disableRipple>
                                             <Add />
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href={{
-                                        pathname: '/dashboard/entrances/edit',
-                                        query: { ids: encodeURIComponent(JSON.stringify(selectedEntrances)) }
-                                    }} passHref>    
+                                    <NextLink href={getEntranceIdsEditLink(selectedEntrances)} passHref>    
                                         <MenuItem disableRipple disabled={actionDisabled}>
                                             <Edit />
                                             &#8288;Edit
@@ -357,7 +355,7 @@ const EntranceList = () => {
                                             </InputAdornment>
                                         )
                                     }}
-                                    placeholder="Search for entrance name"
+                                    placeholder={filterEntranceByStringPlaceholder}
                                 />                                   
                             </Box>
                         </Box>
