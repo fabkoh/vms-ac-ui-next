@@ -154,7 +154,7 @@ export const AccessGroupListTable = (props) => {
 												display: "flex",
 											}}
 										>
-											<Box sx={{ ml: 1, width:100}}>
+											
 												<NextLink
 													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
 													passHref
@@ -165,30 +165,29 @@ export const AccessGroupListTable = (props) => {
 														</Typography>
 													</Link>
 												</NextLink>
-											</Box>
+											
 										</Box>
 									</TableCell>
-                                    <TableCell width="20%" align="center">
-											<Box sx={{ ml: -9, width:230}}>
-												<NextLink
-													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
-													passHref
-												>
-													<Link color="inherit" variant="headline6">
-														<Typography>
-														{accGroup.accessGroupDesc || (
-															<SeverityPill color="warning" align="left">
-																<WarningIcon fontSize="small" sx={{ mr: 1 }} />
-																No Descriptions
-															</SeverityPill>
-														)}
-														</Typography>
-													</Link>
-												</NextLink>
-											</Box>
+                                    <TableCell width="25%">
+											
+										<NextLink
+											href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
+											passHref
+										>
+											<Link color="inherit" variant="headline6">
+												<Typography>
+												{accGroup.accessGroupDesc || (
+													<SeverityPill color="warning" align="left">
+														<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+														No Descriptions
+													</SeverityPill>
+												)}
+												</Typography>
+											</Link>
+										</NextLink>
 									</TableCell>
 									<TableCell width="20%">
-										<Typography width={130} marginLeft="-10px" noWrap>
+										<Typography width={130} noWrap>
 											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
 												<SeverityPill color="warning" align="left">
 													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
