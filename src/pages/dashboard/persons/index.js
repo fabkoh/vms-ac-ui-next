@@ -37,6 +37,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
 import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
 import toast from "react-hot-toast";
+import { createFilter } from "../../../utils/list-utils";
+import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink } from "../../../utils/persons";
 
 const tabs = [
 	{
@@ -76,44 +78,10 @@ const sortOptions = [
 	},
 ];
 
-const applyFilters = (Persons, filters) => 
-	Persons.filter((person) => {
-		if (filters.query) {
-			let queryMatched = false;
-			const properties = ["personEmail", "personFirstName","personLastName","personUid","personMobileNumber"];
-
-			properties.forEach((property) => {
-				if (
-					person[property].toLowerCase().includes(filters.query.toLowerCase())
-				) {
-					queryMatched = true;
-				}
-			});
-
-			if (!queryMatched) {
-				return false;
-			}
-		}
-
-		if (filters.accessGroup) {
-			if (!(person.accessGroup && person.accessGroup.accessGroupName == filters.accessGroup)) {
-				return false;
-			}
-		}
-		// if (filters.hasAcceptedMarketing && !person.hasAcceptedMarketing) {
-		// 	return false;
-		// }
-
-		// if (filters.isProspect && !person.isProspect) {
-		// 	return false;
-		// }
-
-		// if (filters.isReturning && !person.isReturning) {
-		// 	return false;
-		// }
-
-		return true;
-	});
+const applyFilter = createFilter({
+	query: filterPersonByString,
+	accessGroup: filterPersonByAccessGroupName
+})
 
 const descendingComparator = (a, b, orderBy) => {
 	if (b[orderBy] < a[orderBy]) {
@@ -163,7 +131,7 @@ const PersonList = () => {
 	const [sort, setSort] = useState(sortOptions[0].value);
 	const [filters, setFilters] = useState({
 		query: "",
-		accessGroup: false, // stores the access group name to filter by, or false if no filter
+		accessGroup: null, // stores the access group name to filter by, or null if no filter
 		// hasAcceptedMarketing: null,
 		// isProspect: null,
 		// isReturning: null,
@@ -239,7 +207,7 @@ const PersonList = () => {
 	};
 
 	// Usually query is done on backend with indexing solutions
-	const filteredPersons = applyFilters(Persons, filters);
+	const filteredPersons = applyFilter(Persons, filters);
 	const sortedPersons = applySort(filteredPersons, sort);
 	const paginatedPersons = applyPagination(
 		sortedPersons,
@@ -369,7 +337,7 @@ const PersonList = () => {
 	const onSelect = (i) => {
 		const newFilters = { ...filters };
 		if (i == -1) {
-			newFilters.accessGroup = false;
+			newFilters.accessGroup = null;
 		} else {
 			newFilters.accessGroup = accessGroupNames[i];
 		}
@@ -408,16 +376,13 @@ const PersonList = () => {
 									open={open}
 									onClose={handleClose}
 								>
-									<NextLink href={"/dashboard/persons/create"} passHref>
+									<NextLink href={personCreateLink} passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
 											&#8288;Create
 										</MenuItem>
 									</NextLink>
-									<NextLink href={{
-										pathname: '/dashboard/persons/edit',
-										query: { ids: encodeURIComponent(JSON.stringify(selectedPersons)) }
-									}} passHref>
+									<NextLink href={getPersonIdsEditLink(selectedPersons)} passHref>
 										<MenuItem disableRipple disabled={buttonBlock}>
 											<EditIcon />
 											&#8288;Edit
@@ -508,7 +473,7 @@ const PersonList = () => {
 											</InputAdornment>
 										),
 									}}
-									placeholder="Search for Name, Email, Mobile Number or UID"
+									placeholder={filterPersonByStringPlaceholder}
 								/>
 							</Box>
 							{/* <TextField

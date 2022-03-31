@@ -16,6 +16,8 @@ import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../../../components/dashboard/shared/edit_form_tooltip";
+import { filterPersonByStringPlaceholder, filterPersonsByState, getPersonName, isPersonEqual } from "../../../../utils/persons";
+import { filterEntranceByStringPlaceholder, filterEntrancesByState, getEntranceLabel, isEntranceEqual } from "../../../../utils/entrance";
 
 const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, allPersons, onNameChange, onDescriptionChange, onPersonChange, duplicatedPerson, edit, allEntrances, onEntranceChange }) => {
     const {
@@ -39,19 +41,6 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
     // expanding form
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
-
-    // person logic
-    const getPersonName = (p) => p.personFirstName + ' ' + p.personLastName;
-
-    // entrance logic
-    const getEntranceName = (e) => e.entranceName;
-    const entranceFilter = (entrances, state) => {
-        const text = state.inputValue.toLowerCase(); // case insensitive search
-        return entrances.filter(e => (
-            e.entranceName.toLowerCase().includes(text)
-        ))
-    }
-    const entranceEqual = (option, value) => option.entranceId == value.entranceId;
 
     return (
         <ErrorCard error={
@@ -176,23 +165,8 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                         getOptionLabel={getPersonName}
                                         label="Persons"
                                         noOptionsText="No persons found"
-                                        placeholder="Enter person details (name, org/dept) to search"
-                                        filterOptions={
-                                            (persons, state) => {
-                                                const text = state.inputValue.toLowerCase();
-                                                return persons.filter(p => (
-                                                    (p.personFirstName.toLowerCase().includes(text) ||
-                                                     p.personLastName.toLowerCase().includes(text) ||
-                                                     p.personUid.toLowerCase().includes(text) ||
-                                                     (p.personEmail && p.personEmail.toLowerCase().includes(text)) ||
-                                                     (p.personMobileNumber && p.personMobileNumber.toLowerCase().includes(text)) ||
-                                                     // full name check
-                                                     getPersonName(p).toLowerCase().includes(text)) ||
-                                                     //access group name check
-                                                     (p.accessGroup && p.accessGroup.accessGroupName.toLowerCase().includes(text))
-                                                ))
-                                            }
-                                        }
+                                        placeholder={filterPersonByStringPlaceholder}
+                                        filterOptions={filterPersonsByState}
                                         helperText={
                                             (accessGroupPersonDuplicated && "Error: person(s) in red are present in another access group form") ||
                                             (accessGroupPersonHasAccessGroup && "Note: person(s) in yellow already has an access group. Submitting the form would update their access group.")}
@@ -200,7 +174,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                         isError={person => duplicatedPerson[person.personId]}
                                         error={accessGroupPersonDuplicated}
                                         value={persons}
-                                        isOptionEqualToValue={(option, value) => option.personId == value.personId}
+                                        isOptionEqualToValue={isPersonEqual}
                                     />                                 
                                 </Grid>
                             </Grid>
@@ -233,13 +207,13 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                     <MultipleSelectInput 
                                         options={allEntrances}
                                         setSelected={onEntranceChange}
-                                        getOptionLabel={getEntranceName}
+                                        getOptionLabel={getEntranceLabel}
                                         label="Entrances"
                                         noOptionsText="No entrance found"
-                                        placeholder="Enter entrance details (name, description) to search"
-                                        filterOptions={entranceFilter}
+                                        placeholder={filterEntranceByStringPlaceholder}
+                                        filterOptions={filterEntrancesByState}
                                         value={entrances}
-                                        isOptionEqualToValue={entranceEqual}
+                                        isOptionEqualToValue={isEntranceEqual}
                                     />                                 
                                 </Grid>
                             </Grid>

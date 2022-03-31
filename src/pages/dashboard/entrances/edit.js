@@ -396,7 +396,7 @@ const EditEntrances = () => {
                                     <EntranceEditForm
                                         key={id}
                                         entranceInfo={entranceInfo}
-                                       // removeCard={removeCard}
+                                        removeCard={removeCard}
                                         entranceValidations={entranceValidationsArr[i]}
                                         onNameChange={onNameChangeFactory(id)}
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
