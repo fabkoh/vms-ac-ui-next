@@ -61,6 +61,7 @@ export const Confirmdelete = (props) => {
 							fullWidth
 							helperText="Please type in DELETE to proceed"
 							onChange={handleTextChange}
+							autoFocus
 						/>
 					</DialogContentText>
 				</DialogContent>
