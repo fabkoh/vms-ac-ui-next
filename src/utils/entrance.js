@@ -11,7 +11,7 @@
  * users type in the query to filter entrances by (like in entrance list)
 **/
 
-import { isObject, stringIn } from "./utils";
+import { filterByState, isObject, stringIn } from "./utils";
 
 // for textfield placeholder
 const filterEntranceByStringPlaceholder = "Search for entrance name or description";
@@ -46,4 +46,8 @@ const filterEntrancesByString = (entrances, queryString) => {
     return entrances.filter(e => stringFilterHelper(e, query))
 }
 
-export { filterEntranceByStringPlaceholder, filterEntranceByString, filterEntranceByStatus, entranceListLink, entranceCreateLink, getEntranceEditLink, getEntranceIdsEditLink, getEntranceDetailsLink, getEntranceLabel, filterEntrancesByString }
+const filterEntrancesByState = filterByState(filterEntrancesByString);
+
+const isEntranceEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.entranceId != null && e1.entranceId === e2.entranceId;
+
+export { filterEntranceByStringPlaceholder, filterEntranceByString, filterEntranceByStatus, entranceListLink, entranceCreateLink, getEntranceEditLink, getEntranceIdsEditLink, getEntranceDetailsLink, getEntranceLabel, filterEntrancesByString, filterEntrancesByState, isEntranceEqual }

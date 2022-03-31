@@ -16,7 +16,7 @@ import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../shared/edit_form_tooltip";
-import { getAccessGroupLabel, filterAccessGroupsByState, filterAccessGroupByStringPlaceholder, accessGroupEqual } from "../../../../utils/access-group"
+import { getAccessGroupLabel, filterAccessGroupsByState, filterAccessGroupByStringPlaceholder, isAccessGroupEqual } from "../../../../utils/access-group"
 
 const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameChange, onDescriptionChange, onAccessGroupChange, edit, allAccessGroups }) => {
     const {
@@ -164,7 +164,7 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                                         placeholder={filterAccessGroupByStringPlaceholder}
                                         filterOptions={filterAccessGroupsByState}
                                         value={accessGroups}
-                                        isOptionEqualToValue={accessGroupEqual}
+                                        isOptionEqualToValue={isAccessGroupEqual}
                                     />                                 
                                 </Grid>
                             </Grid>

@@ -2,13 +2,6 @@ import DetailsCard from "../../shared/details-card-with-search-field";
 import MeetingRoom from "@mui/icons-material/MeetingRoom";
 import { getEntranceLabel, getEntranceDetailsLink, filterEntrancesByString, filterEntranceByStringPlaceholder } from "../../../../utils/entrance";
 
-const search = (entrances, inputValue) => {
-    const input = inputValue.toLowerCase();
-    return entrances.filter(e => (
-        e.entranceName.toLowerCase().includes(input)
-    ));
-}
-
 export default function EntranceDetails({ accessGroupEntrance }){
     return (
         <DetailsCard 

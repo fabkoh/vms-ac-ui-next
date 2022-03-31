@@ -35,7 +35,7 @@ const getAccessGroupLabel = accessGroup => accessGroup.accessGroupName;
 
 const getAccessGroupDetailsLink = accessGroup => `/dashboard/access-groups/details/${accessGroup.accessGroupId}`;
 
-const accessGroupEqual = (group1, group2) => isObject(group1) && isObject(group2) && group1.accessGroupId && group1.accessGroupId == group2.accessGroupId
+const isAccessGroupEqual = (group1, group2) => isObject(group1) && isObject(group2) && group1.accessGroupId && group1.accessGroupId == group2.accessGroupId
 
 const accessGroupListLink = '/dashboard/access-groups';
 
@@ -43,4 +43,4 @@ const accessGroupCreateLink = '/dashboard/access-groups/create';
 
 const getAccessGroupEditLink = (accessGroup) => isObject(accessGroup) && ('/dashboard/access-group/edit?ids=' + encodeURIComponent(JSON.stringify([accessGroup.accessGroupId])))
 
-export { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, filterAccessGroupsByString, getAccessGroupLabel, getAccessGroupDetailsLink, accessGroupEqual, filterAccessGroupsByState, accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink };
+export { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, filterAccessGroupsByString, getAccessGroupLabel, getAccessGroupDetailsLink, isAccessGroupEqual, filterAccessGroupsByState, accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink };
