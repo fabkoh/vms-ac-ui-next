@@ -247,7 +247,6 @@ const PersonList = () => {
 		selectedPersons.length > 0 && selectedPersons.length < Persons.length;
 	const selectedAllPersons = selectedPersons.length === Persons.length;
 	
-	
 
 	// Reset selected Persons when Persons change
 	useEffect(
@@ -260,17 +259,8 @@ const PersonList = () => {
 		[Persons]
 	);
 
-	//for delete action button
+	//for delete action button: opens the delete form
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
-	/*const [text, setText] = React.useState("");*/
-	/*const [deleteBlock, setDeleteBlock] = React.useState(true);
-	const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-	useEffect(() => {
-	//  console.log(text); 
-	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	}, [text]); */
 	
 	//Set to true if multiple people are selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -291,26 +281,8 @@ const PersonList = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-		//setText("");
 		setDeleteOpen(false);
 	}
-	/*const handleDeleteAction = () => {
-		Promise.all(selectedPersons.map(id=>{
-			return personApi.deletePerson(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 204){
-					toast.success('Delete success',{duration:2000},);
-				}
-				else{
-					toast.error('Delete unsuccessful' )
-				}
-			})
-			getPersonsLocal();
-		})
-		setDeleteOpen(false);
-		setText("");
-	}; */
 
 	useEffect(() => {
 		console.log(selectedPersons)
@@ -331,7 +303,6 @@ const PersonList = () => {
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
-		//setText("");
 	}
 	
 	//blank out edit and delete if no people selected
@@ -411,7 +382,8 @@ const PersonList = () => {
 									 	open={deleteOpen} 
 									 	handleDialogClose={handleDeleteClose}
 										selectedPersons={selectedPersons}
-										deletePersons={deletePersons}/>
+										deletePersons={deletePersons}
+										setAnchorEl={setAnchorEl} />
 								</StyledMenu>
 							</Grid>
 						</Grid>

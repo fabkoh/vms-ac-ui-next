@@ -16,31 +16,18 @@ import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
 	const {selectedState, open, handleDialogClose, deletePersons} = props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
-
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
-
-	//move text state here
 
 	//text field
 	const [value, setValue] = useState("");
 	const handleTextChange = (e) => setValue(e.target.value);
 	const deleteDisabled = value != 'DELETE';
+
+	//blocking the delete button
+	const [deleteBlock, setDeleteBlock] = useState(true);
+
+	useEffect(() => {
+		deleteDisabled? setDeleteBlock(true):setDeleteBlock(false)
+	}, [value]);
 
 	// closing actions
     const handleClose = () => { 
@@ -66,7 +53,7 @@ export const Confirmdelete = (props) => {
 					<WarningAmberOutlinedIcon
 						sx={{ color: "#F44336", m: -0.5, width: 50 }}
 					/>{" "}
-					&#8288;Confirm delete?
+					&#8288;Confirm Delete?
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
@@ -74,25 +61,31 @@ export const Confirmdelete = (props) => {
 						undone.
 					</DialogContentText>
 					<form onSubmit={handleDeletePersons}>
-						<TextField 
+						{selectedState && <TextField 
 							variant="filled"
 							fullWidth 
-							helperText='Type in DELETE to proceed'
+							helperText='Please type in DELETE to proceed'
 							onChange={handleTextChange} 
 							autoFocus 
-						/>
-						<Box display="flex" justifyContent="space-between" mt={1}>
-							<Button 
-								type="submit"
+						/> }
+						<Box display="flex" justifyContent="flex-end" mt={1}>
+							<Button
 								color="error" 
-								disabled={deleteDisabled}
+								disabled={selectedState? deleteBlock:false}
 								variant="contained"
-								sx={{ borderRadius: 8 }}
+								sx={{ borderRadius: 8, marginRight: 1}}
+								onClick={() => {
+									deletePersons();
+									props.setAnchorEl(null);
+								}}
 							>
 								Delete
 							</Button>
 							<Button
-								onClick={handleClose}
+								onClick={() => {
+									handleClose();
+									props.setAnchorEl(null);
+								}}
 								variant="outlined"
 								sx={{ borderRadius: 8, color: "main.primary" }}
 							>
@@ -100,41 +93,6 @@ export const Confirmdelete = (props) => {
 							</Button>
 						</Box>
 					</form>
-
-
-{/*
-						{ selectedState && <DialogContentText>
-							
-								<TextField variant="filled" fullWidth 
-								helperText='Type in DELETE to proceed' 
-								onChange={handleTextChange} 
-								autoFocus />
-						
-						</DialogContentText>}
-				</DialogContent>
-				<DialogActions>
-					<Button
-						disabled={selectedState? deleteBlock:false}
-						variant="contained"
-						onClick={() => {
-							props.handleDeleteAction();
-							props.setAnchorEl(null);
-						}}
-						sx={{ borderRadius: 8, bgcolor: "#F44336" }}
-					>
-						<Typography sx={{ color: "white" }}>Delete</Typography>
-					</Button>
-					<Button
-						variant="outlined"
-						onClick={() => {
-							props.handleDeleteClose();
-							props.setAnchorEl(null);
-						}}
-						sx={{ borderRadius: 8, color: "main.primary" }}
-					>
-						Cancel
-					</Button>
-					</DialogActions> */}
 				</DialogContent>
 			</Dialog>
 		</>
