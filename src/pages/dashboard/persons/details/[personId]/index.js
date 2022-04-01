@@ -17,7 +17,7 @@ import { useMounted } from '../../../../../hooks/use-mounted';
 import { ChevronDown as ChevronDownIcon } from '../../../../../icons/chevron-down';
 import { gtm } from '../../../../../lib/gtm';
 import { personApi } from '../../../../../api/person';
-import { PersonBasicDetails } from '../../../../../components/dashboard/person/person-basic-details';
+import { PersonBasicDetails } from '../../../../../components/dashboard/persons/person-basic-details';
 import StyledMenu from '../../../../../components/dashboard/styled-menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';

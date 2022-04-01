@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { PersonAddForm } from '../../../components/dashboard/person/person-add-form';
+import { PersonAddForm } from '../../../components/dashboard/persons/person-add-form';
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 import router from 'next/router';
