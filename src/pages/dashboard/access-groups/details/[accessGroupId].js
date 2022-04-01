@@ -119,14 +119,6 @@ const AccessGroupDetails = () => {
 
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
-    const [text, setText] = useState("");
-    const [deleteBlock, setDeleteBlock] = useState(true);
-    const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-    useEffect(() => {
-        (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-    }, [text]);
 
     //Set to true if an access group is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -141,10 +133,9 @@ const AccessGroupDetails = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteAccessGroup = async() => {
         Promise.resolve(
             accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
         ).then((res)=>{
@@ -157,7 +148,6 @@ const AccessGroupDetails = () => {
         }
         })
         setDeleteOpen(false);
-        setText("");
     };
 
     // delete schedules
@@ -281,14 +271,10 @@ const AccessGroupDetails = () => {
                                         &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete 
-                                    selectedState={selectedState}
                                     setAnchorEl={setAnchorEl} 
-                                    deleteOpen={deleteOpen}
-                                    handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    open={deleteOpen}
+                                    handleDialogClose={handleDeleteClose}
+                                    deleteAccessGroups={deleteAccessGroup} />
                                 </StyledMenu>
                             </Grid>
                         </Grid>

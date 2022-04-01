@@ -303,7 +303,7 @@ const PersonList = () => {
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
-	}
+	};
 	
 	//blank out edit and delete if no people selected
 	const [buttonBlock, setbuttonBlock] = useState(true);

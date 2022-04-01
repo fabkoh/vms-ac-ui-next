@@ -165,17 +165,8 @@ const EntranceList = () => {
 
     //for delete action button
 	const [deleteOpen, setDeleteOpen] = useState(false);  
-	const [text, setText] = useState("");
-	const [deleteBlock, setDeleteBlock] = useState(true);
-	const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-	useEffect(() => {
-	//  console.log(text); 
-	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	});
 	
-	//Set to true if an access group is selected. controls form input visibility.
+	//Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 	  if(selectedEntrances.length>=1){
@@ -188,14 +179,12 @@ const EntranceList = () => {
 	
 
 	const handleDeleteOpen = () => {        
-		setDeleteOpen(true);             
-
+		setDeleteOpen(true);           
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteEntrances = async() => {
 		Promise.all(selectedEntrances.map(id=>{
 			return entranceApi.deleteEntrance(id)
 		})).then( resArr => {
@@ -210,7 +199,6 @@ const EntranceList = () => {
 			getEntrancesLocal();
 		})
 		setDeleteOpen(false);
-        setText("");
 	};
 
     // Reset selectedEntrances when entrances change
@@ -286,16 +274,12 @@ const EntranceList = () => {
                                         &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete
-                                                selectedState={selectedState}
-                                        		setActionAnchor={setActionAnchor}
-                                                deleteOpen={deleteOpen} 
-                                                handleDeleteClose={handleDeleteClose}
-                                                handleDeleteAction={handleDeleteAction}
-                                                handleDeleteOpen={handleDeleteOpen}
-                                                selectedAccessGroup={selectedEntrances}
-                                                handleTextChange={handleTextChange}
-                                                deleteBlock={deleteBlock}
-                                        />    
+                                        setActionAnchor={setActionAnchor}
+                                        open={deleteOpen} 
+                                        handleDialogClose={handleDeleteClose}
+                                        selectedEntrances={selectedEntrances}
+                                        deleteEntrances={deleteEntrances}
+                                    />    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}

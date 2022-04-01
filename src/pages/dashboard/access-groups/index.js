@@ -286,7 +286,7 @@ const AccessGroupList = () => {
 
 	//for delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
-	const [text, setText] = React.useState("");
+/* 	const [text, setText] = React.useState("");
 	const [deleteBlock, setDeleteBlock] = React.useState(true);
 	const handleTextChange = (e) => {
 		setText(e.target.value);
@@ -294,10 +294,10 @@ const AccessGroupList = () => {
 	useEffect(() => {
 	//  console.log(text); 
 	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	});
+	}); */
 	
 	//Set to true if an access group is selected. controls form input visibility.
-	const [selectedState, setselectedState] = useState(false);
+	/*const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 	  if(selectedAccessGroup.length>=1){
 		 setselectedState(true)
@@ -305,17 +305,16 @@ const AccessGroupList = () => {
 	};
 	useEffect(() => {
 		checkSelected()
-	}, [selectedAccessGroup]);
+	}, [selectedAccessGroup]); */
 	
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-		setText("")
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteAccessGroups = async() => {
 		Promise.all(selectedAccessGroup.map(id=>{
 			return accessGroupApi.deleteAccessGroup(id)
 		})).then( resArr => {
@@ -330,7 +329,6 @@ const AccessGroupList = () => {
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);
-		setText("");
 	};
 
 	//blank out edit and delete if no people selected
@@ -399,15 +397,11 @@ const AccessGroupList = () => {
 										<DeleteIcon />
 										&#8288;Delete
 									</MenuItem>
-									<Confirmdelete selectedState={selectedState} 
+									<Confirmdelete 
 									setAnchorEl={setAnchorEl}
-									deleteOpen={deleteOpen} 
-									handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    selectedAccessGroup={selectedAccessGroup}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+									open={deleteOpen} 
+									handleDialogClose={handleDeleteClose}
+									deleteAccessGroups={deleteAccessGroups} />
 								</StyledMenu>
 							</Grid>
 						</Grid>

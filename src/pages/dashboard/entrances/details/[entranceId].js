@@ -107,15 +107,6 @@ const EntranceDetails = () => {
 
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
-    const [text, setText] = useState("");
-    const [deleteBlock, setDeleteBlock] = useState(true);
-    const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-    useEffect(() => {
-        console.log(text);
-        (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-    }, [text]);
 
     //Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -130,10 +121,9 @@ const EntranceDetails = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteEntrance = async() => {
         Promise.resolve(
             entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
@@ -146,7 +136,6 @@ const EntranceDetails = () => {
         }
         })
         setDeleteOpen(false);
-        setText("");
     }; 
 
     // for updating status
@@ -304,12 +293,10 @@ const EntranceDetails = () => {
                                    <Confirmdelete 
                                     selectedState={selectedState}
                                     setActionAnchor={setActionAnchor}
-                                    deleteOpen={deleteOpen}
-                                    handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    open={deleteOpen}
+                                    handleDialogClose={handleDeleteClose}
+                                    deleteEntrances={deleteEntrance}/>
+                                    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
