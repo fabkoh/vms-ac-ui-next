@@ -7,7 +7,7 @@ import { useState, useRef } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
 
-const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation }) => {
+const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation, cardError }) => {
 
     // update logic
     const personFirstNameRef = useRef(person.personFirstName);
@@ -43,7 +43,7 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
     const onExpandedClick = () => setExpanded(!expanded);
     
     return (
-        <ErrorCard>
+        <ErrorCard error={ cardError(validation) }> 
             <CardHeader
                 avatar={
                     <ExpandMore
@@ -86,7 +86,7 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                             required
                             error={validation.firstNameBlank}
                             helperText={
-                                validation.firstNameBlank && 'First Name cannot be blank'
+                                validation.firstNameBlank && 'Error: first name cannot be blank'
                             }
                         />
                     </Grid>
@@ -105,7 +105,7 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                             required
                             error={validation.lastNameBlank}
                             helperText={
-                                validation.lastNameBlank && 'Last Name cannot be blank'
+                                validation.lastNameBlank && 'Error: last name cannot be blank'
                             }
                         />
                     </Grid>
@@ -131,6 +131,12 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                                         inputProps={{ ref: personUidRef }}
                                         onChange={handlePersonUidChange}
                                         defaultValue={person.personUid}
+                                        error={validation.uidInUse || validation.uidRepeated}
+                                        helperText={
+                                            (validation.uidInUse && "Error: uid taken") ||
+                                            (validation.uidRepeated && "Error: duplicate uid in form") ||
+                                            "Unique identity number. Auto-generated if empty"
+                                        }
                                     />
                                 </Grid>
                                 <Grid
@@ -146,7 +152,11 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                                         onChange={handlePersonMobileNumberChange}
                                         inputProps={{ ref: personMobileNumberRef }}
                                         value={person.personMobileNumber} 
-                                        variant="outlined"   
+                                        variant="outlined"
+                                        helperText={
+                                            (validation.numberInUse && "Note: number taken") ||
+                                            (validation.numberRepeated && "Note: duplicate number in form")
+                                        }
                                     />
                                 </Grid>
                                 <Grid
@@ -156,11 +166,16 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                                 >
                                     <TextField
                                         fullWidth
+                                        type="email"
                                         label="Email"
                                         name="email"
                                         inputProps={{ ref: personEmailRef }}
                                         onChange={handlePersonEmailChange}
                                         defaultValue={person.personEmail}
+                                        helperText={
+                                            (validation.emailInUse && "Note: email taken") ||
+                                            (validation.emailRepeated && "Note: duplicate email in form")
+                                        }
                                     />
                                 </Grid>
                                 <Grid
