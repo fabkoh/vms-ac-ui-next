@@ -120,7 +120,6 @@ const CreatePersonsTwo = () => {
     const changeTextField = (key, id, ref) => {
         // do not use setState to prevent rerender
         personsInfo.find(p => p.personId === id)[key] = ref.current?.value;
-        console.log(personsInfo); // todo: DELETE THIS
     };
 
     // returns true if personsValidation is changed
@@ -220,35 +219,39 @@ const CreatePersonsTwo = () => {
 
     const [disableSubmit, setDisableSubmit] = useState(false);
 
-    const submitForm = async () => {
+    const submitForm = async (e) => {
+        e.preventDefault();
         setDisableSubmit(true);
 
         // send res
-        const resArr = await Promise.all(personsInfo.map(p => personApi.createPerson(p)));
+        try {
+            const resArr = await Promise.all(personsInfo.map(p => personApi.createPerson(p)));
+            // find failed res
+            const failedResIndex = [];
+            resArr.forEach((res, i) => {
+                if (res.status != 201) {
+                    failedResIndex.push(i);
+                }
+            });
 
-        // find failed res
-        const failedResIndex = [];
-        resArr.forEach((res, i) => {
-            if (res.status != 201) {
-                failedResIndex.push(i);
+            // success toast
+            const numSuccess = resArr.length - failedResIndex.length;
+            if (numSuccess) { toast.success(`Successfully created ${numSuccess} persons`); }
+
+            // if some failed
+            if (failedResIndex.length) {
+                toast.error("Unable to create persons below");    
+                // filter failed personsInfo and personsValidation
+                setPersonsInfo(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+                setPersonsValidation(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+            } else {
+                // all success
+                router.replace(personListLink);
             }
-        });
-
-        // success toast
-        const numSuccess = resArr.length - failedResIndex.length;
-        if (numSuccess) { toast.success(`Successfully created ${numSuccess} persons`); }
-
-        // if some failed
-        if (failedResIndex.length) {
-            toast.error("Unable to create persons below");    
-            // filter failed personsInfo and personsValidation
-            setPersonsInfo(personsInfo.filter((p, i) => failedResIndex.includes(i)));
-            setPersonsValidation(personsInfo.filter((p, i) => failedResIndex.includes(i)));
-            setDisableSubmit(false);
-        } else {
-            // all success
-            router.replace(personListLink);
-        }
+        } catch {
+            toast.error("Unable to submit form");
+        }        
+        setDisableSubmit(false);
     }
 
     return (
