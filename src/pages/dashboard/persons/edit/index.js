@@ -14,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthGuard } from '../../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
-import { PersonEditForm } from '../../../../components/dashboard/person/person-edit-form';
+import { PersonEditForm } from '../../../../components/dashboard/persons/person-edit-form';
 import { personApi } from '../../../../api/person';
 import toast from 'react-hot-toast';
 import { accessGroupApi } from '../../../../api/access-groups';

@@ -41,6 +41,6 @@ const accessGroupListLink = '/dashboard/access-groups';
 
 const accessGroupCreateLink = '/dashboard/access-groups/create';
 
-const getAccessGroupEditLink = (accessGroup) => isObject(accessGroup) && ('/dashboard/access-group/edit?ids=' + encodeURIComponent(JSON.stringify([accessGroup.accessGroupId])))
+const getAccessGroupEditLink = (accessGroup) => isObject(accessGroup) && ('/dashboard/access-groups/edit?ids=' + encodeURIComponent(JSON.stringify([accessGroup.accessGroupId])))
 
 export { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, filterAccessGroupsByString, getAccessGroupLabel, getAccessGroupDetailsLink, isAccessGroupEqual, filterAccessGroupsByState, accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink };

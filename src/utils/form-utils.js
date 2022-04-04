@@ -38,4 +38,24 @@ class FormUtils {
 
 const formUtils = new FormUtils();
 
+const createCounterObject = (n) => () => {
+    n += 1;
+    return n;
+}
+
+const getDuplicates = (infoArr) => {
+    const seenBefore = {}; // info seen before
+    const ans = {}; // duplicated info
+    infoArr.forEach(info => {
+        if(seenBefore[info]) {
+            ans[info] = true;
+        } else {
+            seenBefore[info] = true;
+        }
+    })
+    return ans;
+}
+
 export default formUtils;
+
+export { createCounterObject, getDuplicates };
