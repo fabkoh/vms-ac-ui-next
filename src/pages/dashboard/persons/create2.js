@@ -11,6 +11,9 @@ import PersonAddFormTwo from "../../../components/dashboard/persons/person-add-f
 import { useMounted } from "../../../hooks/use-mounted";
 import { accessGroupApi } from "../../../api/access-groups";
 import { personApi } from '../../../api/person';
+import { isObject } from "../../../utils/utils";
+import toast from "react-hot-toast";
+import router from "next/router";
 
 const getNextId = createCounterObject(0);
 
@@ -31,13 +34,14 @@ const getNewPersonValidation = (id) => ({
     lastNameBlank: false,
     uidInUse: false,
     uidRepeated: false,
-    emailInvalid: false,
     // note
     numberInUse: false,
     numberRepeated: false,
     emailInUse: false,
     emailRepeated: false,
 })
+
+const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated);
 
 const CreatePersonsTwo = () => {
 
@@ -119,67 +123,83 @@ const CreatePersonsTwo = () => {
         console.log(personsInfo); // todo: DELETE THIS
     };
 
+    // returns true if personsValidation is changed
     const blankCheckHelper = (id, key, value) => {
-        let isBlank = false;
-        if (typeof(value) === 'string' && /^\s*$/.test(value)) {
-            isBlank = true;
-        }
+        let isBlank = typeof(value) === 'string' && /^\s*$/.test(value);
 
         // only update if different
-        if (personsValidation.find(p => p.personId === id)[key] != isBlank) {
-            const newValidation = [ ...personsValidation ];
-            newValidation.find(p => p.personId)[key] = isBlank;
-            setPersonsValidation(newValidation);
+        const personValidation = personsValidation.find(p => p.personId === id);
+        if (isObject(personValidation) && personValidation[key] != isBlank) {
+            personValidation[key] = isBlank; // modifies personsValidation, remember to setState after calling this function
+            return true;
         }
+
+        return false;
     };
 
+    // returns if personsValidation is changed
     const checkDuplicatesAndInUseHelper = (id, key, value, arrayOfUsedValues, inUseKey, duplicateKey) => {
-        if (value === "") return;
-
-        const newValidations = [ ...personsValidation ];
         let toChange = false;
 
-        const inUse = arrayOfUsedValues.includes(value);
-        if (inUse != newValidations[id][inUseKey]) {
-            newValidations[id][inUseKey] = inUse;
-            toChange = true;
+        if (value != "") {
+            const inUse = arrayOfUsedValues.includes(value);
+            const personValidation = personsValidation.find(p => p.personId == id);
+            if (inUse != personValidation[inUseKey]) {
+                personValidation[inUseKey] = inUse;
+                toChange = true;
+            }
         }
-        
+
         const duplicateKeys = getDuplicates(personsInfo.map(p => p[key]));
 
         personsInfo.forEach((p, i) => {
-            const v = p[key] in duplicateKeys;
-            if (newValidations[i][duplicateKey] != v) {
-                newValidations[i][duplicateKey] = v;
+            const v = p[key];
+            const b = v != "" && v in duplicateKeys; // ignores empty strings
+            if (personsValidation[i][duplicateKey] != b) {
+                personsValidation[i][duplicateKey] = b;
                 toChange = true;
             }
         })
 
-        if (toChange) {
-            setPersonsValidation(newValidations);
-        }
+        return toChange
     }
 
     const onPersonFirstNameChangeFactory = (id) => (ref) => {
         changeTextField("personFirstName", id, ref);
-        blankCheckHelper(id, "firstNameBlank", ref.current?.value);
+        const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value);
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onPersonLastNameChangeFactory = (id) => (ref) => {
         changeTextField("personLastName", id, ref);
-        blankCheckHelper(id, "lastNameBlank", ref.current?.value);
+        const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value);
+        
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onPersonUidChangeFactory = (id) => (ref) => {
         changeTextField("personUid", id, ref);
+
+        const b1 = checkDuplicatesAndInUseHelper(id, "personUid", ref.current?.value, personUids, "uidInUse", "uidRepeated");
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onPersonMobileNumberChangeFactory = (id) => (ref) => {
-        changeTextField("personMobileNumber", id, ref)
+        changeTextField("personMobileNumber", id, ref);
+
+        const b1 = checkDuplicatesAndInUseHelper(id, "personMobileNumber", ref.current?.value, personMobileNumbers, "numberInUse", "numberRepeated");
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onPersonEmailChangeFactory = (id) => (ref) => {
-        changeTextField("personEmail", id, ref)
+        changeTextField("personEmail", id, ref);
+
+        const b1 = checkDuplicatesAndInUseHelper(id, "personEmail", ref.current?.value, personEmails, "emailInUse", "emailRepeated");
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onAccessGroupChangeFactory = (id) => (e) => {
@@ -191,6 +211,44 @@ const CreatePersonsTwo = () => {
             newInfo.find(p => p.personId === id).accessGroup = accessGroups.find(group => group.accessGroupName === value);
         }
         setPersonsInfo(newInfo);
+    };
+
+    const submitDisabled = (
+        personsInfo.length == 0 ||
+        personsValidation.some(cardError)
+    );
+
+    const [disableSubmit, setDisableSubmit] = useState(false);
+
+    const submitForm = async () => {
+        setDisableSubmit(true);
+
+        // send res
+        const resArr = await Promise.all(personsInfo.map(p => personApi.createPerson(p)));
+
+        // find failed res
+        const failedResIndex = [];
+        resArr.forEach((res, i) => {
+            if (res.status != 201) {
+                failedResIndex.push(i);
+            }
+        });
+
+        // success toast
+        const numSuccess = resArr.length - failedResIndex.length;
+        if (numSuccess) { toast.success(`Successfully created ${numSuccess} persons`); }
+
+        // if some failed
+        if (failedResIndex.length) {
+            toast.error("Unable to create persons below");    
+            // filter failed personsInfo and personsValidation
+            setPersonsInfo(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+            setPersonsValidation(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+            setDisableSubmit(false);
+        } else {
+            // all success
+            router.replace(personListLink);
+        }
     }
 
     return (
@@ -231,7 +289,7 @@ const CreatePersonsTwo = () => {
                         <div>
                             <Typography variant="h3">Add Persons</Typography>
                         </div>
-                        <form onSubmit={(e) => { e.preventDefault(); console.log(e) }}>
+                        <form onSubmit={submitForm}>
                             <Stack spacing={3}>
                                 { 
                                     Array.isArray(personsInfo) && personsInfo.map((p,i) => {
@@ -249,6 +307,7 @@ const CreatePersonsTwo = () => {
                                                 accessGroups={accessGroups}
                                                 handleAccessGroupChange={onAccessGroupChangeFactory(id)}
                                                 validation={personsValidation[i]}
+                                                cardError={cardError}
                                             />
                                         )
                                     })
@@ -270,7 +329,7 @@ const CreatePersonsTwo = () => {
                                         type="submit"
                                         sx={{ mr: 3 }}
                                         variant="contained"
-                                        // disabled=
+                                        disabled={submitDisabled || disableSubmit}
                                     >
                                         Submit
                                     </Button>
