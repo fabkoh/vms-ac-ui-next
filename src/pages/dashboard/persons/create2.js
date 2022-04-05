@@ -112,8 +112,15 @@ const CreatePersonsTwo = () => {
     }
 
     const removePersonFactory = (id) => () => {
-        setPersonsInfo(personsInfo.filter(p => p.personId != id));
-        setPersonsValidation(personsValidation.filter(p => p.personId != id));
+        const newPersonsInfo = personsInfo.filter(p => p.personId != id);
+        const newPersonsValidation = personsValidation.filter(p => p.personId != id);
+
+        checkDuplicateHelper("personUid", "uidRepeated", newPersonsValidation, newPersonsInfo);
+        checkDuplicateHelper("personMobileNumber", "numberRepeated", newPersonsValidation, newPersonsInfo);
+        checkDuplicateHelper("personEmail", "emailRepeated", newPersonsValidation, newPersonsInfo);
+
+        setPersonsInfo(newPersonsInfo);
+        setPersonsValidation(newPersonsValidation);
     };
 
     // editing logic
@@ -123,56 +130,58 @@ const CreatePersonsTwo = () => {
     };
 
     // returns true if personsValidation is changed
-    const blankCheckHelper = (id, key, value) => {
+    const blankCheckHelper = (id, key, value, validArr) => {
         let isBlank = typeof(value) === 'string' && /^\s*$/.test(value);
 
         // only update if different
-        const personValidation = personsValidation.find(p => p.personId === id);
+        const personValidation = validArr.find(p => p.personId === id);
         if (isObject(personValidation) && personValidation[key] != isBlank) {
-            personValidation[key] = isBlank; // modifies personsValidation, remember to setState after calling this function
+            personValidation[key] = isBlank; // modifies validArr, remember to setState after calling this function
             return true;
         }
 
         return false;
     };
 
-    // returns if personsValidation is changed
-    const checkDuplicatesAndInUseHelper = (id, key, value, arrayOfUsedValues, inUseKey, duplicateKey) => {
-        let toChange = false;
-
-        if (value != "") {
+    // returns if validArr is changed
+    const checkInUseHelper = (id, value, arrayOfUsedValues, inUseKey, validArr) => {
+        if (value != "") { // in use ignores empty strings
             const inUse = arrayOfUsedValues.includes(value);
-            const personValidation = personsValidation.find(p => p.personId == id);
-            if (inUse != personValidation[inUseKey]) {
+            const personValidation = validArr.find(p => p.personId == id);
+            if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
                 personValidation[inUseKey] = inUse;
-                toChange = true;
+                return true;
             }
         }
+        return false;
+    };
 
-        const duplicateKeys = getDuplicates(personsInfo.map(p => p[key]));
+    // returns if validArr is changed
+    const checkDuplicateHelper = (key, duplicateKey, validArr, infoArr) => {
+        let toChange = false;
 
-        personsInfo.forEach((p, i) => {
+        const duplicateKeys = getDuplicates(infoArr.map(p => p[key]));
+        infoArr.forEach((p, i) => {
             const v = p[key];
-            const b = v != "" && v in duplicateKeys; // ignores empty strings
-            if (personsValidation[i][duplicateKey] != b) {
-                personsValidation[i][duplicateKey] = b;
+            const b = v != "" && v != undefined && v != null && v in duplicateKeys; // ignores empty strings
+            if (validArr[i][duplicateKey] != b) {
+                validArr[i][duplicateKey] = b;
                 toChange = true;
             }
         })
-
         return toChange
     }
 
     const onPersonFirstNameChangeFactory = (id) => (ref) => {
         changeTextField("personFirstName", id, ref);
-        const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value);
+        const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value, personsValidation);
 
         if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onPersonLastNameChangeFactory = (id) => (ref) => {
         changeTextField("personLastName", id, ref);
-        const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value);
+        const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value, personsValidation);
         
         if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
@@ -180,25 +189,28 @@ const CreatePersonsTwo = () => {
     const onPersonUidChangeFactory = (id) => (ref) => {
         changeTextField("personUid", id, ref);
 
-        const b1 = checkDuplicatesAndInUseHelper(id, "personUid", ref.current?.value, personUids, "uidInUse", "uidRepeated");
+        const b1 = checkDuplicateHelper("personUid", "uidRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personUids, "uidInUse", personsValidation);
 
-        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onPersonMobileNumberChangeFactory = (id) => (ref) => {
         changeTextField("personMobileNumber", id, ref);
 
-        const b1 = checkDuplicatesAndInUseHelper(id, "personMobileNumber", ref.current?.value, personMobileNumbers, "numberInUse", "numberRepeated");
+        const b1 = checkDuplicateHelper("personMobileNumber", "numberRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personMobileNumbers, "numberInUse", personsValidation);
 
-        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onPersonEmailChangeFactory = (id) => (ref) => {
         changeTextField("personEmail", id, ref);
 
-        const b1 = checkDuplicatesAndInUseHelper(id, "personEmail", ref.current?.value, personEmails, "emailInUse", "emailRepeated");
+        const b1 = checkDuplicateHelper("personEmail", "emailRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personEmails, "emailInUse", personsValidation);
 
-        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     const onAccessGroupChangeFactory = (id) => (e) => {
