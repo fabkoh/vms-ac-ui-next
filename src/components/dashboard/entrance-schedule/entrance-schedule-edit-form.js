@@ -21,17 +21,17 @@ import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
-const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
-        accessGroupScheduleId,
-        accessGroupScheduleName,
+        entranceScheduleId,
+        entranceSchedule,
         rrule,
         timeStart,
         timeEnd,
     } = accessGroupScheduleInfo;
 
     const {
-        accessGroupScheduleNameBlank,
+        entranceScheduleBlank,
         timeEndInvalid,
         untilInvalid,
         accessGroupNameDuplicated,
@@ -48,7 +48,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     const [name, setName] = useState()
     const handleName = (e) => {
         // const temparray = [...accgrpschedinfoarr]
-        // temparray.find(sched=>sched.accgrpschedid == id)[accessGroupScheduleName] = e.target.value
+        // temparray.find(sched=>sched.accgrpschedid == id)[entranceSchedule] = e.target.value
         //
     }
     //get timestart timeend 
@@ -77,9 +77,9 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         setDescription(rruleDescription(e, start, end))
     }
     useEffect(() => {
-        changeRrule(rrulestring,accessGroupScheduleId)
-        changeTimeStart(start,accessGroupScheduleId)
-        changeTimeEnd(end,accessGroupScheduleId)
+        changeRrule(rrulestring,entranceScheduleId)
+        changeTimeStart(start,entranceScheduleId)
+        changeTimeEnd(end,entranceScheduleId)
         descriptionHandler(rule)
     }, [rrulestring,start,end])
     
@@ -94,7 +94,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     
     return (
         <ErrorCard error={
-            // accessGroupScheduleNameBlank        ||
+            // entranceScheduleBlank        ||
             // accessGroupNameExists       ||
             // accessGroupNameDuplicated   ||
             // accessGroupPersonDuplicated ||
@@ -124,7 +124,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                                 variant="outlined"
                                 color="error"
                                 sx={{mt:1}}
-                                onClick={() => removeCard(accessGroupScheduleId)}
+                                onClick={() => removeCard(entranceScheduleId)}
                             >
                                 Clear
                             </Button>
@@ -157,17 +157,17 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                         <TextField
                             fullWidth
                             label="Name"
-                            name="accessGroupScheduleName"
+                            name="entranceSchedule"
                             required
-                            value={accessGroupScheduleName}
-                            onChange={(e)=>{changeTextField(e,accessGroupScheduleId)}}
+                            value={entranceSchedule}
+                            onChange={(e)=>{changeTextField(e,entranceScheduleId)}}
                             helperText={ 
-                                (accessGroupScheduleNameBlank && 'Error: access group schedule name cannot be blank')
-                                // (accessGroupScheduleNameBlank && 'Error: access group name cannot be blank') ||
+                                (entranceScheduleBlank && 'Error: access group schedule name cannot be blank')
+                                // (entranceScheduleBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
                             //     (accessGroupNameDuplicated && 'Error: duplicate access group name in form')
                             }
-                            error={ Boolean(accessGroupScheduleNameBlank)}
+                            error={ Boolean(entranceScheduleBlank)}
                         />
                     </Grid>
                     <Collapse in={expanded}>
@@ -217,4 +217,4 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     )
 }
 
-export default EditAccGrpSchedForm;
+export default EditEntSchedForm;

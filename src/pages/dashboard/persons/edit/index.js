@@ -1,402 +1,419 @@
-import { useEffect, useState } from 'react';
-import Head from 'next/head';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router'
-import {
-  Box,
-  Container,
-  Link,
-  Typography,
-  Stack,
-  Button
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AuthGuard } from '../../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
-import { PersonEditForm } from '../../../../components/dashboard/persons/person-edit-form';
+import { Add, ArrowBack } from "@mui/icons-material";
+import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
+import Head from "next/head";
+import NextLink from "next/link";
+import { AuthGuard } from "../../../../components/authentication/auth-guard";
+import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
+import formUtils, { createCounterObject, getDuplicates } from "../../../../utils/form-utils";
+import { personListLink } from "../../../../utils/persons";
+import { useCallback, useEffect, useState } from 'react';
+import { useMounted } from "../../../../hooks/use-mounted";
+import { accessGroupApi } from "../../../../api/access-groups";
 import { personApi } from '../../../../api/person';
-import toast from 'react-hot-toast';
-import { accessGroupApi } from '../../../../api/access-groups';
+import { isObject } from "../../../../utils/utils";
+import toast from "react-hot-toast";
+import router, { useRouter } from "next/router";
+import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
 
-const EditPersons = () => {
+// const getNextId = createCounterObject(0);
 
-  const router = useRouter();
-  const ids = JSON.parse(decodeURIComponent(router.query.ids));
-  const [personsInfo, setPersonsInfo] = useState([])
+const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank);
 
-  const getPersons = ids => {
-	Promise.all(ids.map(id => personApi.getPerson(id)))
-	  .then(resArray => {
-      Promise.all(resArray.filter(res => res.status == 200).map( res => res.json() ))
-        .then(personArray => {
-          setPersonsInfo(personArray.map(person => {
-            if(person.accessGroup){
-            return {
-              id: person.personId,
-              firstName: person.personFirstName,
-              lastName: person.personLastName,
-              uid: person.personUid,
-              mobileNumber: person.personMobileNumber,
-              email: person.personEmail,
-              accessGroup:{
-                accessGroupId:person.accessGroup.accessGroupId,
-                accessGroupName:person.accessGroup.accessGroupName,
-                accessGroupDesc:person.accessGroup.accessGroupDesc,
-              },
-              valid: {
-                firstName: true,
-                lastName: true,
-                uidNotRepeated: true,
-                uidNotInUse: true,
-                mobileNumber: true,
-                email: true,
-                submitOk: true
-              }
-            }
-          }
-          return {
-            id: person.personId,
-            firstName: person.personFirstName,
-            lastName: person.personLastName,
-            uid: person.personUid,
-            mobileNumber: person.personMobileNumber,
-            email: person.personEmail,
-            accessGroup:{
-              accessGroupId:"",
-              accessGroupName:"",
-              accessGroupDesc:"",
-            },
-            valid: {
-              firstName: true,
-              lastName: true,
-              uidNotRepeated: true,
-              uidNotInUse: true,
-              mobileNumber: true,
-              email: true,
-              submitOk: true
-            }
-          }
-          }))
-        }).catch(err => console.log(err));
-    }).catch(err => console.log(err));}
+const EditPersonsTwo = () => {
 
-  useEffect(() => {
-	  getPersons(ids);
-  }, [])
-  
+    const router = useRouter();
+    const ids = JSON.parse(decodeURIComponent(router.query.ids));
 
-  const getNextId = () => {
-    if(personsInfo.length == 0){
-      return 0
+    // stores list of person objects
+    const [personsInfo, setPersonsInfo] = useState([]);
+    const [personsValidation, setPersonsValidation] = useState([]);
+
+    // access groups for access group select
+    const [accessGroups, setAccessGroups] = useState([]);
+
+    // info for checking
+    const [personUids, setPersonUids] = useState([]);
+    const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
+    const [personEmails, setPersonEmails] = useState([]);
+
+    // get info
+    const isMounted = useMounted(); 
+    const getPersonsLocal = async ids => {
+        const personsInfoArr = [];
+        const validations = [];
+
+        // map each id to a fetch req for that access group
+        const resArr = await Promise.all(ids.map(id => personApi.getPerson(id)));
+        const successfulRes = resArr.filter(res => res.status == 200);
+
+        // no persons to edit
+        if (successfulRes.length == 0) {
+            toast.error('Error editing persons. Please try again');
+            router.replace('/dashboard/persons');
+        }
+
+        // some persons not found
+        if (successfulRes.length != resArr.length) {
+            toast.error('Some persons were not found');
+        }
+
+        const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
+
+        bodyArr.forEach(body => {
+            personsInfoArr.push({
+                personId: body.personId,
+                personFirstName: body.personFirstName,
+                personLastName:  body.personLastName,
+                personUid:  body.personUid,
+                personMobileNumber:  body.personMobileNumber,
+                personEmail:  body.personEmail,
+                personOriginalEmail:  body.personEmail,
+                personOriginalUid:  body.personUid,
+                personOriginalMobileNumber:  body.personMobileNumber,
+                accessGroup: body.accessGroup
+            });
+            
+            validations.push({
+                personId: body.personId,
+                firstNameBlank:false,
+                lastNameBlank:false,
+                uidInUse:false,
+                uidRepeated:false,
+                uidBlank:false,
+                // note
+                numberInUse: false,
+                numberRepeated: false,
+                emailInUse: false,
+                emailRepeated: false,
+
+                // submit failed
+                submitFailed: false
+            });
+        });
+        setPersonsValidation(validations);
+        setPersonsInfo(personsInfoArr);
+
     }
-    return personsInfo.at(-1).id + 1;
-  }
 
-  const removePerson = (id) => {
-    setPersonsInfo(personsInfo.filter(person => person.id != id))
-    // if last person is removed, redirect back to persons list
-    if(personsInfo.length == 1){
-      router.push('/dashboard/persons')
+    const getPersons = async () => {
+        try {
+            const res = await personApi.getPersons();
+            if (res.status != 200) {
+                throw new Error("person info not loaded");
+            }
+            const body = await res.json();
+            setPersonUids(body.map(p => p.personUid));
+            setPersonMobileNumbers(body.map(p => p.personMobileNumber));
+            setPersonEmails(body.map(p => p.personEmail));
+        } catch(e) {
+            console.error(e)
+        }
     }
-  }
-
-  const onFieldChange = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo[e.target.name] = e.target.value;
-
-    setPersonsInfo(newPersonsInfo)
-  }
-
-  const onNameChange = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id)
-    newPersonInfo[e.target.name] = e.target.value;
+    useEffect(() => {
+        console.log(personMobileNumbers)
+    }, [personMobileNumbers])
     
-    // check if input is blank
-    if(/^\s*$/.test(e.target.value)) {
-      newPersonInfo.valid[e.target.name] = false;
-    } else {
-      newPersonInfo.valid[e.target.name] = true;
-    }
+    const getAccessGroups = async () => {
+        try {
+            const res = await accessGroupApi.getAccessGroups();
+            if (res.status != 200) {
+                throw new Error("access group info not loaded");
+            }
+            const body = await res.json();
+            setAccessGroups(body);
+        } catch(e) {
+            console.error(e);
+            toast.error("Access groups failed to load");
+        }
+    };
 
-    setPersonsInfo(newPersonsInfo);
-  }
+    const getInfo = useCallback(() => {
+        // put methods here
+        getPersonsLocal(ids)
+        getAccessGroups();
+        getPersons();
+    }, [isMounted]);
 
-  const onEmailChange = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.email = e.target.value;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(getInfo, []);
 
-    // test if email is valid
-    newPersonInfo.valid.email = (
-      e.target.value == "" || /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e.target.value)
-    );
+    // add / remove person logic
+    // const addPerson = () => {
+    //     const id = getNextId();
+    //     setPersonsInfo([ ...personsInfo, getNewPersonInfo(id) ]);
+    //     setPersonsValidation([ ...personsValidation, getNewPersonValidation(id)]);
+    // };
 
-    setPersonsInfo(newPersonsInfo);
-  }
+    // done like this as putting getNextId in useState causes getNextId to be called 
+    // an additional time every re-render
+    // if (personsInfo.length == 0) {
+    //     addPerson();
+    // }
 
+    const removePersonFactory = (id) => () => {
+        setPersonsInfo(personsInfo.filter(p => p.personId != id));
+        setPersonsValidation(personsValidation.filter(p => p.personId != id));
+        if(personsInfo.length==1){
+            router.push("/dashboard/persons")
+        }
+    };
 
-  const onNumberChange = async(e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
+    // editing logic
+    const changeTextField = (key, id, ref) => {
+        // do not use setState to prevent rerender
+        personsInfo.find(p => p.personId === id)[key] = ref.current?.value;
+    };
 
-    newPersonInfo.mobileNumber = e;
+    // returns true if personsValidation is changed
+    const blankCheckHelper = (id, key, value) => {
+        let isBlank = typeof(value) === 'string' && /^\s*$/.test(value);
 
-    // test if mobile number is valid
-    // newPersonInfo.valid.mobileNumber = (
-    //   e == ""  || /^\+\d{1,7}/.test(e)
-    // );
-    newPersonInfo.valid.mobileNumber = true;
-    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
-      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
-      const data = await res.json();
-      newPersonInfo.valid.mobileNumber = !(data);
-    }
-    setPersonsInfo(newPersonsInfo);
-  }
+        // only update if different
+        const personValidation = personsValidation.find(p => p.personId === id);
+        if (isObject(personValidation) && personValidation[key] != isBlank) {
+            personValidation[key] = isBlank; // modifies personsValidation, remember to setState after calling this function
+            return true;
+        }
 
-  const onUidChange = async (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.uid = e.target.value;
+        return false;
+    };
 
-    // test if uids are repeated
-    // maps uid to the first occurence of uid in new persons info
-    const uidMap = {}
-    for(let i=0; i<newPersonsInfo.length; i++) {
+    // returns if personsValidation is changed
+    const checkDuplicatesAndInUseHelper = (id, key, value, arrayOfUsedValues, inUseKey, duplicateKey,originalKey) => {
+        let toChange = false;
 
-      if(newPersonsInfo[i].uid == "") { 
-        newPersonsInfo[i].valid.uidNotRepeated = true;
-        continue;  
-      }
-      
-      const uid = newPersonsInfo[i].uid
-      if(uid in uidMap) {
-        newPersonsInfo[i].valid.uidNotRepeated = false;
-        newPersonsInfo[uidMap[uid]].valid.uidNotRepeated = false;
-      } else {
-        uidMap[uid] = i;
-        newPersonsInfo[i].valid.uidNotRepeated = true;
-      }
-    }
+        if (value != "") {
+            // const temp = arrayOfUsedValues.filter(v=>v!=value) //this allows user to set own value again
+            // const inUse = temp.includes(value);                //values can thus be swapped which shouldnt be allowed.
+            const inUse = arrayOfUsedValues.includes(value);
+            const personValidation = personsValidation.find(p => p.personId == id);
+            if (inUse != personValidation[inUseKey]) {
+                personValidation[inUseKey] = inUse;
+                toChange = true;
+            }
+        }
+        const duplicateKeys = getDuplicates(personsInfo.map(p => p[key]));
 
-    newPersonInfo.valid.uidNotInUse = true;
-    // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
-    if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      newPersonInfo.valid.uidNotInUse = !( await personApi.uidInUse(newPersonInfo.uid, newPersonInfo.id));
-    }
-
-    setPersonsInfo(newPersonsInfo);
-  }
-
-  const [submitted, setSubmitted] = useState(false);
-
-  const submitForm = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    personsInfo.map(personInfo=> {
-      if(personInfo.accessGroup == null || personInfo.accessGroup.accessGroupId == "") {
-        personInfo.accessGroup=null;
-      }
-    })
-
-    Promise.all(personsInfo.map( personInfo => personApi.updatePerson({
-      personId: personInfo.id,
-      personFirstName: personInfo.firstName,
-      personLastName:personInfo.lastName,
-      personUid:personInfo.uid,
-      personMobileNumber:personInfo.mobileNumber,
-      personEmail:personInfo.email,
-      accessGroup:personInfo.accessGroup,
-    })))
-      .then( resArr => {
-        const failedPersons = [];
-
-        resArr.forEach((res, i) => {
-          if(res.status != 200) {
-            failedPersons.push(personsInfo[i]);
-            personsInfo[i].valid.submitOk=false;
-            setSubmitted(false);
-          }
+        personsInfo.forEach((p, i) => {
+            const v = p[key];
+            const b = v != "" && v in duplicateKeys; // ignores empty strings
+            if (personsValidation[i][duplicateKey] != b) {
+                personsValidation[i][duplicateKey] = b;
+                toChange = true;
+            }
         })
 
-        const successfulEditCount = personsInfo.length - failedPersons.length;
-        if (successfulEditCount) {
-          toast.success(`Edit ${successfulEditCount == 1 ? '1 person' : `${successfulEditCount} persons`}`);
-        }
+        return toChange
+    }
 
-        if (failedPersons.length) {
-          toast.error('Edit failed for highlighted persons');
-          setPersonsInfo(failedPersons);
+    const onPersonFirstNameChangeFactory = (id) => (ref) => {
+        changeTextField("personFirstName", id, ref);
+        const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value);
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonLastNameChangeFactory = (id) => (ref) => {
+        changeTextField("personLastName", id, ref);
+        const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value);
+        
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonUidChangeFactory = (id) => (ref) => {
+        changeTextField("personUid", id, ref);
+
+        const b1 = checkDuplicatesAndInUseHelper(id, "personUid", ref.current?.value, personUids, "uidInUse", "uidRepeated") ||
+        blankCheckHelper(id,"uidBlank",ref.current?.value);
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonMobileNumberChangeFactory = (id) => (ref) => {
+        changeTextField("personMobileNumber", id, ref);
+        console.log(ref.current?.value)
+        console.log(typeof(ref.current?.value))
+        const b1 = checkDuplicatesAndInUseHelper(id, "personMobileNumber", ref.current?.value, personMobileNumbers, "numberInUse", "numberRepeated");
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onPersonEmailChangeFactory = (id) => (ref) => {
+        changeTextField("personEmail", id, ref);
+
+        const b1 = checkDuplicatesAndInUseHelper(id, "personEmail", ref.current?.value, personEmails, "emailInUse", "emailRepeated");
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onAccessGroupChangeFactory = (id) => (e) => {
+        const newInfo = [ ...personsInfo ];
+        const value = e.target.value;
+        if (value == null) {
+            newInfo.find(p => p.personId === id).accessGroup = e.target.value;
         } else {
-          router.replace('/dashboard/persons');
+            newInfo.find(p => p.personId === id).accessGroup = accessGroups.find(group => group.accessGroupName === value);
         }
+        setPersonsInfo(newInfo);
+    };
 
-      })
-    }
-
-    //reroute if empty
-    // useEffect(() => {
-    //  if(personsInfo.length==0){
-    //    router.push('/dashboard/persons')
-    //  }
-    // }, [personsInfo]);
+    const submitDisabled = (
+        personsInfo.length == 0 ||
+        personsValidation.some(cardError)
+    );
     
-    const [allAccGroups, setAllAccGroups] = useState([])
-    const getAccGroups = async() => {
-      const res = await accessGroupApi.getAccessGroups();
-      const data = await res.json();
-      setAllAccGroups(data);
-     }
-     useEffect(() => {
-      getAccGroups();
-      personsInfo.map(person=> person.accessGroup?true:person.accessGroup="");
-     }, [])
-     
-    const [accGroupName, setAccGroupName] = useState('')
-    // const handleAccGrpChg = (e,id) => {
-    //   const newPersonsInfo = [...personsInfo];
-    //   const newPersonInfo = newPersonsInfo.find(person=> person.id == id);
-    //   if(e.target.value == "clear"){
-    //     setAccGroupName("")
-    //     newPersonInfo.accessGroup = null
-    //     setPersonsInfo(newPersonsInfo)
-    //   }
-    //   else{
-    //   setAccGroupName(e.target.value)
-    //   const temp = allAccGroups.find(grp=>grp.accessGroupName==e.target.value)
-    //   console.log(typeof(e.target.value))
+    const [disableSubmit, setDisableSubmit] = useState(false);
 
-    //   newPersonInfo.accessGroup.accessGroupId= temp.accessGroupId
-    //   setPersonsInfo(newPersonsInfo)
-    // }
-    // }
+    const submitForm = async (e) => {
+        e.preventDefault();
+        setDisableSubmit(true);
 
-    const handleAccGrpChg = (e, id) => {
-      const newPersonsInfo = [ ...personsInfo ];
-      const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-      if(e.target.value == "clear") {
-        newPersonInfo.accessGroup = null
-      } else {
-        const accGroup = allAccGroups.find(grp => grp.accessGroupName == e.target.value);
-        newPersonInfo.accessGroup = accGroup
-      }
-      setPersonsInfo(newPersonsInfo)
+        // send res
+        try {
+            const resArr = await Promise.all(personsInfo.map(p => personApi.updatePerson(p)));
+            // find failed res
+            const failedResIndex = [];
+            resArr.forEach((res, i) => {
+                if (res.status != 200) {
+                    failedResIndex.push(i);
+                }
+            });
+
+            // success toast
+            const numSuccess = resArr.length - failedResIndex.length;
+            if (numSuccess) { toast.success(`Successfully updated ${numSuccess} persons`); }
+
+            // if some failed
+            if (failedResIndex.length) {
+                toast.error("Unable to update persons below");    
+                // filter failed personsInfo and personsValidation
+                setPersonsInfo(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+                setPersonsValidation(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+            } else {
+                // all success
+                router.replace(personListLink);
+            }
+        } catch {
+            toast.error("Unable to submit form");
+        }        
+        setDisableSubmit(false);
     }
-  
 
-  return (
-    <>
-      <Head>
-        <title>
-          Etlas : Edit Persons
-        </title>
-      </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8
-        }}
-      >
-        <Container maxWidth="xl">
-          <Box sx={{ mb: 4 }}>
-            <NextLink
-              href="/dashboard/persons"
-              passHref
-            >
-              <Link
-                color="textPrimary"
-                component="a"
+    return (
+        <>
+            <Head>
+                <title>Etlas: Edit Persons</title>
+            </Head>
+            <Box
+                component="main"
                 sx={{
-                  alignItems: 'center',
-                  display: 'flex'
+                    flexGrow: 1,
+                    py: 8
                 }}
-              >
-                <ArrowBackIcon
-                  fontSize="small"
-                  sx={{ mr: 1 }}
-                />
-                <Typography variant="subtitle2">
-                  Persons
-                </Typography>
-              </Link>
-            </NextLink>
-          </Box>
-          <Stack spacing={3}>
-            <div>
-              <Typography variant="h3">
-                Edit Persons
-              </Typography>
-            </div>
-            <form onSubmit={submitForm}>
-              <Stack spacing={3}>
-                {personsInfo.map(person => (
-                  <PersonEditForm
-                    allAccGroups={allAccGroups}
-                    handleAccGrpChg={handleAccGrpChg}
-                    accGroupName={accGroupName}
-                    setAccGroupName={setAccGroupName}
-                    person={person}
-                    removePerson={removePerson}
-                    onFieldChange={onFieldChange}
-                    onUidChange={onUidChange}
-                    onNameChange={onNameChange}
-                    onNumberChange={onNumberChange}
-                    onEmailChange={onEmailChange}
-                    key={person.id}
-                  />
-                ))}
-                <div>
-                </div>
-                <div>
-                  <Button
-                    size="large"
-                    type="submit"
-                    sx={{ mr: 3 }}
-                    variant="contained"
-                    disabled={
-                      submitted ||
-                      personsInfo.length == 0 ||
-                      !personsInfo.every(person => person.valid.firstName &&
-                                                  person.valid.lastName &&
-                                                  person.valid.uidNotRepeated &&
-                                                  person.valid.uidNotInUse &&
-                                                  person.valid.mobileNumber &&
-                                                  person.valid.email)}
-                  >
-                      Submit
-                  </Button>
-                  <NextLink
-                    href="/dashboard/persons"
-                  >
-                    <Button
-                      size="large"
-                      sx={{ mr: 3 }}
-                      variant="outlined"
-                      color="error"
-                    >
-                        Cancel
-                    </Button>
-                  </NextLink>
-                </div>
-              </Stack>
-            </form>
-          </Stack>
-        </Container>
-      </Box>
-    </>
-  );
-};
+            >
+                <Container maxWidth="xl">
+                    <Box sx={{ mb: 4 }}>
+                        <NextLink
+                            href={personListLink}
+                            passHref
+                        >
+                            <Link
+                                color="textPrimary"
+                                component="a"
+                                sx={{
+                                    alignItems: 'center',
+                                    display: 'flex'
+                                }}
+                            >
+                                <ArrowBack
+                                    fontSize="small"
+                                    sx={{ mr: 1 }}
+                                />
+                                <Typography variant="subtitle2">Persons</Typography>
+                            </Link>
+                        </NextLink>
+                    </Box>
+                    <Stack spacing={3}>
+                        <div>
+                            <Typography variant="h3">Edit Persons</Typography>
+                        </div>
+                        <form onSubmit={submitForm}>
+                            <Stack spacing={3}>
+                                { 
+                                    Array.isArray(personsInfo) && personsInfo.map((p,i) => {
+                                        console.log("validationrender",personsValidation)
+                                        const id = p.personId;                                        
+                                        return (
+                                            <PersonEditFormTwo 
+                                                key={id}
+                                                onClear={removePersonFactory(id)}
+                                                person={p}
+                                                onPersonFirstNameChange={onPersonFirstNameChangeFactory(id)}
+                                                onPersonLastNameChange={onPersonLastNameChangeFactory(id)}
+                                                onPersonUidChange={onPersonUidChangeFactory(id)}
+                                                onPersonMobileNumberChange={onPersonMobileNumberChangeFactory(id)}
+                                                onPersonEmailChange={onPersonEmailChangeFactory(id)}
+                                                accessGroups={accessGroups}
+                                                handleAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                                // validation={personsValidation.find(p=>p.personId==id)}
+                                                validation={personsValidation[i]}
+                                                // validation={()=>{personsValidation[i]}}
+                                                // validation={personsValidation.filter(v=>v.personId==id)}
+                                                cardError={cardError}
+                                            />
+                                        )
+                                    })
+                                }
+                                {/* <div>
+                                    <Button
+                                        size="large"
+                                        sx={{ mr: 3 }}
+                                        variant="outlined"
+                                        startIcon={<Add />}
+                                        onClick={addPerson}
+                                    >
+                                        Add person
+                                    </Button>
+                                </div> */}
+                                <div>
+                                    <Button 
+                                        size="large"
+                                        type="submit"
+                                        sx={{ mr: 3 }}
+                                        variant="contained"
+                                        disabled={submitDisabled || disableSubmit}
+                                    >
+                                        Submit
+                                    </Button>
+                                    <NextLink
+                                        href={personListLink}
+                                        passHref
+                                    >
+                                        <Button
+                                            size="large"
+                                            sx={{ mr: 3 }}
+                                            variant="outlined"
+                                            color="error"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </NextLink>
+                                </div>
+                            </Stack>
+                        </form>
+                    </Stack>
+                </Container>
+            </Box>
+        </>
+    )
+}
 
-EditPersons.getLayout = (page) => (
-  <AuthGuard>
-    <DashboardLayout>
-      {page}
-    </DashboardLayout>
-  </AuthGuard>
+EditPersonsTwo.getLayout = (page) => (
+    <AuthGuard>
+        <DashboardLayout>
+            {page}
+        </DashboardLayout>
+    </AuthGuard>
 );
 
-export default EditPersons;
+export default EditPersonsTwo;
