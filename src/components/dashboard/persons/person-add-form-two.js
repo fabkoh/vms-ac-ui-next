@@ -6,8 +6,10 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
+import CredentialForm from "./credential-form";
+import { isObject } from "../../../utils/utils";
 
-const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation, cardError }) => {
+const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation, cardError, addCredential, removeCredentialFactory, credTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory }) => {
 
     // update logic
     const personFirstNameRef = useRef(person.personFirstName);
@@ -188,8 +190,9 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                                         label="Access Group"
                                         getLabel={getAccessGroupLabel}
                                         onChange={handleAccessGroupChange}
-                                        value={person.accessGroup}
+                                        value={isObject(person.accessGroup) ? person.accessGroup.accessGroupId : ''}
                                         options={accessGroups}
+                                        getValue={(accessGroup) => accessGroup.accessGroupId}
                                     />
                                 </Grid>
                             </Grid>
@@ -197,6 +200,21 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                     </Grid>
                 </Grid>
             </CardContent>
+            <Collapse in={expanded}>
+                <Divider />
+                <CredentialForm
+                    credentials={person.credentials}
+                    addCredential={addCredential}
+                    removeCredentialFactory={removeCredentialFactory}
+                    credTypes={credTypes}
+                    onCredTypeChangeFactory={onCredTypeChangeFactory}
+                    onCredUidChangeFactory={onCredUidChangeFactory}
+                    onCredTTLChangeFactory={onCredTTLChangeFactory}
+                    onCredValidChangeFactory={onCredValidChangeFactory}
+                    onCredPermChangeFactory={onCredPermChangeFactory}
+                    validation={validation}
+                />
+            </Collapse>
         </ErrorCard>
     );
 };

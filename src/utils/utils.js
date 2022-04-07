@@ -6,4 +6,16 @@ const filterByState = (filterFunction) => (v, state) => filterFunction(v, state.
 // obj can be anything, case insensitive search
 const stringIn = (s, obj) => typeof(obj) === 'string' && obj.toLowerCase().includes(s);
 
-export { isObject, filterByState, stringIn }
+// compares arr1 and arr2 contents
+const arraySameContents = (arr1, arr2) => {
+    if (arr1.length != arr2.length) {
+        return false;
+    }
+
+    const arr1Obj = {};
+    arr1.forEach(i => arr1Obj[i] == true);
+    
+    return arr2.every(i => arr1Obj[i]);
+}
+
+export { isObject, filterByState, stringIn, arraySameContents }
