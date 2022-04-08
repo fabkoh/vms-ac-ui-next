@@ -52,4 +52,18 @@ const saveCredentialApi = (
         }
     }
 
-export { getCredentialsApi, saveCredentialApi }
+const getCredentialWherePersonIdApi = (personId) => {
+    if (useApi) {
+        return sendApi('/api/credentials?personid=' + encodeURIComponent(personId));
+    }
+}
+
+const enableCredentialWithIdApi = (credId) => {
+    if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}/enable`, { method: 'PUT' })
+}
+
+const disableCredentialWithIdApi = (credId) => {
+    if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}/disable`, { method: 'PUT' })
+}
+
+export { getCredentialsApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi }

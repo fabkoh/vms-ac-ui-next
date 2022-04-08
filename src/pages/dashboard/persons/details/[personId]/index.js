@@ -26,13 +26,15 @@ import AddIcon from '@mui/icons-material/Add';
 import { Confirmdelete } from '../../../../../components/dashboard/persons/confirm-delete';
 import toast from 'react-hot-toast';
 import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
-import PersonCredentials from '../../../../../components/dashboard/persons/credential-info';
+import PersonCredentials from '../../../../../components/dashboard/persons/person-credentials';
+import { getCredentialWherePersonIdApi } from '../../../../../api/credentials';
 
 const PersonDetails = () => {
 
   // load person details
   const isMounted = useMounted();
-  const [person, setPerson] = useState(null);  
+  const [person, setPerson] = useState(null); 
+  const [credentials, setCredentials] = useState([]);
   const router = useRouter();
   const { personId } = router.query;
 
@@ -40,7 +42,23 @@ const PersonDetails = () => {
 	gtm.push({ event: 'page_view' });
   }, []);
 
-  const getPerson = useCallback(async () => {
+  const getCredentials = async() => {
+    try {
+      const res = await getCredentialWherePersonIdApi(personId);
+      if (res.status != 200) { // credentials not found
+        throw new Error("Credentials not loaded");
+      }
+      const body = await res.json();
+      if (isMounted()) {
+        setCredentials(body);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Error loading credentials");
+    }
+  }
+
+  const getPerson = async() => {
     try {
       const res = await personApi.getPerson(personId);
       if(res.status != 200) { // person not found
@@ -48,17 +66,21 @@ const PersonDetails = () => {
         router.replace(personListLink);
       }
       const body = await res.json();
-
       if(isMounted()) {
         setPerson(body);
       }
-    } catch (err) {
-      console.error(err);
+    } catch(err) {
+      console.log(err);
     }
+  }
+
+  const getInfo = useCallback( () => {
+    getPerson();
+    getCredentials();
   }, [isMounted]);
 
   useEffect(() => {
-    getPerson();
+    getInfo();
   }, 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
@@ -219,7 +241,7 @@ const PersonDetails = () => {
             item
             xs={12}
           >
-            <PersonCredentials />
+            <PersonCredentials credentials={credentials} />
           </Grid>
 			  </Grid>
 		  </Box>
