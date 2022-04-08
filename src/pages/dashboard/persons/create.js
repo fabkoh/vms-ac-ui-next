@@ -1,406 +1,579 @@
-import { useEffect, useState, useCallback } from 'react';
-import Head from 'next/head';
-import NextLink from 'next/link';
-import {
-  Box,
-  Container,
-  Link,
-  Typography,
-  Stack,
-  Button
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AuthGuard } from '../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { PersonAddForm } from '../../../components/dashboard/persons/person-add-form';
-import { personApi } from '../../../api/person';
-import toast from 'react-hot-toast';
-import router from 'next/router';
-import { accessGroupApi } from '../../../api/access-groups';
+import { Add, ArrowBack } from "@mui/icons-material";
+import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
+import Head from "next/head";
+import NextLink from "next/link";
+import { AuthGuard } from "../../../components/authentication/auth-guard";
+import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
+import { createCounterObject, getDuplicates } from "../../../utils/form-utils";
+import { personListLink } from "../../../utils/persons";
+import { useCallback, useEffect, useState } from 'react';
+import PersonAddFormTwo from "../../../components/dashboard/persons/person-add-form-two";
 import { useMounted } from "../../../hooks/use-mounted";
+import { accessGroupApi } from "../../../api/access-groups";
+import { personApi } from '../../../api/person';
+import { getCredTypesApi } from "../../../api/credential-types";
+import { arraySameContents, isObject } from "../../../utils/utils";
+import toast from "react-hot-toast";
+import router from "next/router";
+import { getCredentialsApi, saveCredentialApi } from "../../../api/credentials";
+import { getPersonName } from "../../../utils/persons";
 
-const CreatePersons = () => {
+const getNextId = createCounterObject(1);
 
-  const personInfo = (id) => ({
-    id,
-    firstName: '',
-    lastName: '',
-    uid: '',
-    mobileNumber: '',
-    email: '',
-    accessGroup: {
-      accessGroupId:"",
-      accessGroupName:"",
-      accessGroupDesc:"",
-    },
-    valid: {
-      firstName: true,
-      lastName: true,
-      uidNotRepeated: true,
-      uidNotInUse: true,
-      mobileNumber: true,
-      mobileNumberNotRepeated: true,
-      mobileNumberNotInUse: true,
-      email: true,
-      emailNotRepeated: true,
-      emailNotInUse: true,
-      accessGroup: true,
-      submitOk: true
+const getNewPersonInfo = (id) => ({
+    personId: id,
+    personFirstName: '',
+    personLastName: '',
+    personUid: '',
+    personMobileNumber: '',
+    personEmail: '',
+    accessGroup: null,
+    credentials: []
+});
+
+const getNewPersonValidation = (id) => ({
+    personId: id,
+    //error
+    firstNameBlank: false,
+    lastNameBlank: false,
+    uidInUse: false,
+    uidRepeated: false,
+    credentialInUseIds: [],
+    credentialRepeatedIds:[], // stores the ids of repeated credentials (repeated = credType and credUid same)
+    // note
+    numberInUse: false,
+    numberRepeated: false,
+    emailInUse: false,
+    emailRepeated: false,
+});
+
+const getNewCredential = (id) => ({
+    credId: id,
+    credTypeId: '',
+    credUid: '',
+    credTTL: null,
+    isValid: true,
+    isPerm: false
+});
+
+const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0);
+
+const CreatePersonsTwo = () => {
+
+    // stores list of person objects
+    const [personsInfo, setPersonsInfo] = useState([getNewPersonInfo(0)]);
+    const [personsValidation, setPersonsValidation] = useState([getNewPersonValidation(0)]);
+
+    // access groups for access group select
+    const [accessGroups, setAccessGroups] = useState([]);
+
+    // info for checking
+    const [personUids, setPersonUids] = useState([]);
+    const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
+    const [personEmails, setPersonEmails] = useState([]);
+
+    // credTypes
+    const [credTypes, setCredTypes] = useState([]);
+    const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
+
+    // get info
+    const isMounted = useMounted(); 
+
+    const getCredentials = async() => {
+        try {
+            const res = await getCredentialsApi();
+            if (res.status != 200) {
+                throw new Error("credentials not loaded");
+            }
+            const body = await res.json();
+            const newCredentials = {};
+            body.forEach(cred => {
+                const credTypeId = cred.credType?.credTypeId;
+                if (!(credTypeId in newCredentials)) {
+                    newCredentials[credTypeId] = [];
+                }
+                newCredentials[credTypeId].push(cred.credUid);
+            })
+            console.log(newCredentials);
+            setCredentials(newCredentials);
+        } catch(e) {
+            console.error(e);
+            toast.error("Error loading credentials");
+        }
     }
-  });
 
-  const [personsInfo, setPersonsInfo] = useState([personInfo(0)])
-
-  const getNextId = () => {
-    if(personsInfo.length == 0){
-      return 0
+    const getCredTypes = async () => {
+        try {
+            const res = await getCredTypesApi();
+            if (res.status != 200) {
+                throw new Error("cred types info not loaded");
+            }
+            const body = await res.json();
+            setCredTypes(body);
+        } catch(e) {
+            console.error(e);
+            toast.error("Error loading credential types");
+        }
     }
-    return personsInfo.at(-1).id + 1;
-  }
 
-  const addPerson = () => {
-    setPersonsInfo([ ...personsInfo, personInfo(getNextId()) ]);
-  };
+    const getPersons = async () => {
+        try {
+            const res = await personApi.getPersons();
+            if (res.status != 200) {
+                throw new Error("person info not loaded");
+            }
+            const body = await res.json();
+            setPersonUids(body.map(p => p.personUid));
+            setPersonMobileNumbers(body.map(p => p.personMobileNumber));
+            setPersonEmails(body.map(p => p.personEmail));
+        } catch(e) {
+            console.error(e)
+        }
+    }
 
-  const removePerson = (id) => {
-    setPersonsInfo(personsInfo.filter(person => person.id != id))
-  }
+    const getAccessGroups = async () => {
+        try {
+            const res = await accessGroupApi.getAccessGroups();
+            if (res.status != 200) {
+                throw new Error("access group info not loaded");
+            }
+            const body = await res.json();
+            setAccessGroups(body);
+        } catch(e) {
+            console.error(e);
+            toast.error("Access groups failed to load");
+        }
+    };
 
-  const onNameChange = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id)
-    newPersonInfo[e.target.name] = e.target.value;
+    const getInfo = useCallback(() => {
+        // put methods here
+        getCredentials();
+        getCredTypes();
+        getAccessGroups();
+        getPersons();
+    }, [isMounted]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(getInfo, []);
+
+    // add / remove person logic
+    const addPerson = () => {
+        const id = getNextId();
+        setPersonsInfo([ ...personsInfo, getNewPersonInfo(id) ]);
+        setPersonsValidation([ ...personsValidation, getNewPersonValidation(id)]);
+    };
+
+    // done like this as putting getNextId in useState causes getNextId to be called 
+    // an additional time every re-render
+
+    const removePersonFactory = (id) => () => {
+        const newPersonsInfo = personsInfo.filter(p => p.personId != id);
+        const newPersonsValidation = personsValidation.filter(p => p.personId != id);
+
+        checkDuplicateHelper("personUid", "uidRepeated", newPersonsValidation, newPersonsInfo);
+        checkDuplicateHelper("personMobileNumber", "numberRepeated", newPersonsValidation, newPersonsInfo);
+        checkDuplicateHelper("personEmail", "emailRepeated", newPersonsValidation, newPersonsInfo);
+
+        setPersonsInfo(newPersonsInfo);
+        setPersonsValidation(newPersonsValidation);
+    };
+
+    //add / remove credential logic
+    const addCredentialFactory = (personId) => () => {
+        const newPersons = [ ...personsInfo ];
+        newPersons.find(p => p.personId == personId).credentials.push(getNewCredential(getNextId()));
+        setPersonsInfo(newPersons);
+    };
     
-    // check if input is blank
-    if(/^\s*$/.test(e.target.value)) {
-      newPersonInfo.valid[e.target.name] = false;
-    } else {
-      newPersonInfo.valid[e.target.name] = true;
+    const removeCredentialFactory = (personId) => (credId) => () => {
+        const newPersons = [ ...personsInfo ];
+        const person = newPersons.find(p => p.personId == personId);
+        person.credentials = person.credentials.filter(c => c.credId != credId);
+        setPersonsInfo(newPersons);
+
+        const b1 = checkCredInUseHelper(newPersons, personsValidation);
+        const b2 = checkCredRepeatedHelper(newPersons, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    // editing logic
+    const changeTextField = (key, id, ref) => {
+        // do not use setState to prevent rerender
+        personsInfo.find(p => p.personId === id)[key] = ref.current?.value;
+    };
+
+    // returns true if personsValidation is changed
+    const blankCheckHelper = (id, key, value, validArr) => {
+        let isBlank = typeof(value) === 'string' && /^\s*$/.test(value);
+
+        // only update if different
+        const personValidation = validArr.find(p => p.personId === id);
+        if (isObject(personValidation) && personValidation[key] != isBlank) {
+            personValidation[key] = isBlank; // modifies validArr, remember to setState after calling this function
+            return true;
+        }
+
+        return false;
+    };
+
+    // returns if validArr is changed
+    const checkInUseHelper = (id, value, arrayOfUsedValues, inUseKey, validArr) => {
+        const inUse = value != "" && arrayOfUsedValues.includes(value);
+        const personValidation = validArr.find(p => p.personId == id);
+        if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
+            personValidation[inUseKey] = inUse;
+            return true;
+        }
+        return false;
+    };
+
+    // returns if validArr is changed
+    const checkDuplicateHelper = (key, duplicateKey, validArr, infoArr) => {
+        let toChange = false;
+
+        const duplicateKeys = getDuplicates(infoArr.map(p => p[key]));
+        infoArr.forEach((p, i) => {
+            const v = p[key];
+            const b = v != "" && v != undefined && v != null && v in duplicateKeys; // ignores empty strings
+            if (validArr[i][duplicateKey] != b) {
+                validArr[i][duplicateKey] = b;
+                toChange = true;
+            }
+        })
+        return toChange
     }
 
-    setPersonsInfo(newPersonsInfo);
-  }
+    // returns if validArr is changed
+    const checkCredInUseHelper = (infoArr, validArr) => {
+        let toChange = false;
 
-  const onEmailChange = async (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.email = e.target.value;
+        infoArr.forEach((person, i) => {
+            const newCredentialsInUse = []
+            person.credentials.forEach(cred => { // populate the above array
+                if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
+                    const inUseValues = credentials[cred.credTypeId];
+                    if (inUseValues.includes(cred.credUid)) {
+                        newCredentialsInUse.push(cred.credId);
+                    }
+                }
+            });
+            if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
+                toChange = true;
+                validArr[i].credentialInUseIds = newCredentialsInUse;
+            }
+        });
 
-    // test if email is valid
-    newPersonInfo.valid.email = (
+        return toChange
+    }
 
-      //to prevent matching multiple @ signs
-      e.target.value == "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)
+    // returns if validArr is changed
+    const checkCredRepeatedHelper = (infoArr, validArr) => {
+        let toChange = false;
+
+        const credMap = {}; // maps credTypeId to array of credUid
+        const repeatedCred = []; // array of [credTypeId, credUid]
+        infoArr.forEach(person => 
+            person.credentials.forEach(
+                cred => {
+                    const credTypeId = cred.credTypeId;
+                    const uid = cred.credUid;
+                    if (credTypeId != '' && uid != '') {
+                        if (!(credTypeId in credMap)) {
+                            credMap[credTypeId] = [];
+                        }
+                        const arr = credMap[credTypeId];
+                        if (arr.some(e => e == uid)) {
+                            repeatedCred.push([credTypeId, uid]);
+                        } else {
+                            arr.push(uid);
+                        }
+                    }
+                }
+            )
+        );
+
+        infoArr.forEach(
+            (person, i) => {
+                const repeatedCredIds = [];
+                person.credentials.forEach(
+                    cred => {
+                        if (repeatedCred.some(c => c[0] == cred.credTypeId && c[1] == cred.credUid)) {
+                            repeatedCredIds.push(cred.credId);
+                        }
+                    }
+                );
+                if (!arraySameContents(repeatedCredIds, validArr[i].credentialRepeatedIds)) {
+                    toChange = true;
+                    validArr[i].credentialRepeatedIds = repeatedCredIds;
+                }
+            }
+        );
+
+        return toChange;
+    }
+
+    const onPersonFirstNameChangeFactory = (id) => (ref) => {
+        changeTextField("personFirstName", id, ref);
+        const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value, personsValidation);
+
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonLastNameChangeFactory = (id) => (ref) => {
+        changeTextField("personLastName", id, ref);
+        const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value, personsValidation);
+        
+        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonUidChangeFactory = (id) => (ref) => {
+        changeTextField("personUid", id, ref);
+
+        const b1 = checkDuplicateHelper("personUid", "uidRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personUids, "uidInUse", personsValidation);
+
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onPersonMobileNumberChangeFactory = (id) => (ref) => {
+        changeTextField("personMobileNumber", id, ref);
+
+        const b1 = checkDuplicateHelper("personMobileNumber", "numberRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personMobileNumbers, "numberInUse", personsValidation);
+
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onPersonEmailChangeFactory = (id) => (ref) => {
+        changeTextField("personEmail", id, ref);
+
+        const b1 = checkDuplicateHelper("personEmail", "emailRepeated", personsValidation, personsInfo);
+        const b2 = checkInUseHelper(id, ref.current?.value, personEmails, "emailInUse", personsValidation);
+
+        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
+    const onAccessGroupChangeFactory = (id) => (e) => {
+        const newInfo = [ ...personsInfo ];
+        const value = e.target.value;
+        if (value == null) {
+            newInfo.find(p => p.personId === id).accessGroup = value;
+        } else {
+            newInfo.find(p => p.personId === id).accessGroup = accessGroups.find(group => group.accessGroupId === value);
+        }
+        setPersonsInfo(newInfo);
+    };
+
+    const onCredTypeChangeFactory = (personId) => (credId) => (e) => {
+        const newInfo = [ ...personsInfo ];
+        newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
+        setPersonsInfo(newInfo);
+
+        const b1 = checkCredInUseHelper(newInfo, personsValidation);
+        const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
+        
+        const b1 = checkCredInUseHelper(personsInfo, personsValidation);
+        const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onCredValidChangeFactory = (personId) => (credId) => (bool) => {
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).isValid = bool;
+    }
+
+    const onCredPermChangeFactory = (personId) => (credId) => (bool) => {
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).isPerm = bool;
+    }
+
+    const onCredTTLChangeFactory = (personId) => (credId) => (dateObj) => {
+        console.log(dateObj);
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTTL = dateObj;
+    }
+
+    useEffect(() => {console.log(personsInfo); console.log(personsValidation)}, [personsInfo, personsValidation]);
+
+    const submitDisabled = (
+        personsInfo.length == 0 ||
+        personsValidation.some(cardError)
     );
 
-    // test if email are repeated
-    // maps email to the first occurrence of email in new persons info
-    const emailMap = {}
-    for(let i=0; i<newPersonsInfo.length; i++) {
-      if(newPersonsInfo[i].email == "") {
-        newPersonsInfo[i].valid.emailNotRepeated = true;
-        continue;
-      }
-
-      const email = newPersonsInfo[i].email;
-      if(email in emailMap) {
-        newPersonsInfo[i].valid.emailNotRepeated = false;
-        newPersonsInfo[emailMap[email]].valid.emailNotRepeated = false;
-      } else {
-        emailMap[email] = i;
-        newPersonsInfo[i].valid.emailNotRepeated = true;
-      }
-    }
-
-    // check against the db too
-    newPersonInfo.valid.emailNotInUse = true;
-    if(!(/^\s*$/.test(newPersonInfo.email))) {
-      const res = await personApi.emailExists(newPersonInfo.email);
-      const data = await res.json();
-      newPersonInfo.valid.emailNotInUse = !(data);
-    }
-
-    setPersonsInfo(newPersonsInfo);
-  }
+    const [disableSubmit, setDisableSubmit] = useState(false);
 
 
-  const onNumberChange = async (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.mobileNumber = e;
+    // return true if the person creation was successful
+    const createPerson = async (person) => {
+        try {
+            const res = await personApi.createPerson(person);
+            if (res.status != 201) {
+                throw new Error("Unable to create person")
+            }
+            const body = await res.json();
+            const personId = body.personId;
 
-   // newPersonInfo.valid.mobileNumber = (
-   //   e.target.value == ""  || /^\+\d{1,3} \d+$/.test(e.target.value)
-    //  e == "12345678"
-   // );
+            const credResArr = await Promise.all(person.credentials.map(cred => saveCredentialApi(cred, personId, true)));
+            if (credResArr.some(res => res.status != 201)) { // some failed
+                toast.error("Unable to create credential for " + getPersonName(body));
+            }
 
-    // test if mobile number are repeated
-    // maps mobileNumber to the first occurrence of mobileNumber in new persons info
-    const mobileNumberMap = {}
-    for(let i=0; i<newPersonsInfo.length; i++) {
-
-      if(newPersonsInfo[i].mobileNumber == "") {
-        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
-        continue;
-      }
-
-      const mobileNumber = newPersonsInfo[i].mobileNumber
-      if(mobileNumber in mobileNumberMap) {
-        newPersonsInfo[i].valid.mobileNumberNotRepeated = false;
-        newPersonsInfo[mobileNumberMap[mobileNumber]].valid.mobileNumberNotRepeated = false;
-      } else {
-        mobileNumberMap[mobileNumber] = i;
-        newPersonsInfo[i].valid.mobileNumberNotRepeated = true;
-      }
-    }
-
-    // check against the db too
-    newPersonInfo.valid.mobileNumberNotInUse = true;
-    if(!(/^\s*$/.test(newPersonInfo.mobileNumber))) {
-      const res = await personApi.mobileNumberExists(newPersonInfo.mobileNumber);
-      const data = await res.json();
-      newPersonInfo.valid.mobileNumberNotInUse = !(data);
-    }
-
-    setPersonsInfo(newPersonsInfo);
-  }
-
-  const onUidChange = async (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-    const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-    newPersonInfo.uid = e.target.value;
-
-    // test if uids are repeated
-    // maps uid to the first occurence of uid in new persons info
-    const uidMap = {}
-    for(let i=0; i<newPersonsInfo.length; i++) {
-
-      if(newPersonsInfo[i].uid == "") { 
-        newPersonsInfo[i].valid.uidNotRepeated = true;
-        continue;  
-      }
-
-      const uid = newPersonsInfo[i].uid
-      if(uid in uidMap) {
-        newPersonsInfo[i].valid.uidNotRepeated = false;
-        newPersonsInfo[uidMap[uid]].valid.uidNotRepeated = false;
-      } else {
-        uidMap[uid] = i;
-        newPersonsInfo[i].valid.uidNotRepeated = true;
-      }
-    }
-
-    // newPersonInfo.valid.uidNotInUse = !(await personApi.fakeUidExists(newPersonInfo.uid));
-    newPersonInfo.valid.uidNotInUse = true;
-    if(!(/^\s*$/.test(newPersonInfo.uid))) {
-      const res = await personApi.uidExists(newPersonInfo.uid);
-      const data = await res.json();
-      newPersonInfo.valid.uidNotInUse = !(data);
-    }
-
-    setPersonsInfo(newPersonsInfo);
-  }
-
-  const handleAccessGroup = (e, id) => {
-    const newPersonsInfo = [ ...personsInfo ];
-      const newPersonInfo = newPersonsInfo.find(person => person.id == id);
-      if(e.target.value == "clear") {
-        newPersonInfo.accessGroup = null
-      } else {
-        const accGroup = allAccessgroups.find(grp => grp.accessGroupName == e.target.value);
-        newPersonInfo.accessGroup = accGroup
-      }
-      setPersonsInfo(newPersonsInfo)
-  }
-
-  //access group logic (displaying in dropdownlist)
-  //const isMounted = useMounted();
-  const [allAccessgroups, setAllAccessgroups] = useState([]);
-
-  const getAccessGroups = async() => {
-    const res = await accessGroupApi.getAccessGroups();
-    const data = await res.json();
-
-       /* data.forEach(a => {
-          accessGroups[a.accessGroupId] = a.accessGroupName;
-        }) */
-    setAllAccessgroups(data);
-  };
-
-  useEffect(() => {
-    getAccessGroups();
-  }, []);
-
-  const [accGroupName, setAccGroupName] = useState('');
-
-  const [submitted, setSubmitted] = useState(false);
-
-  const submitForm = e => {
-    e.preventDefault();
-    personsInfo.map(personInfo=> {
-      if(personInfo.accessGroup == null || personInfo.accessGroup.accessGroupId == "") {
-        personInfo.accessGroup=null;
-      }
-    })
-
-
-    setSubmitted(true);
-    Promise.all(personsInfo.map(person => {
-      person.valid.submitOk = true;
-      return personApi.createPerson({
-        personFirstName: person.firstName,
-        personLastName: person.lastName,
-        personUid: person.uid,
-        personMobileNumber: person.mobileNumber,
-        personEmail: person.email,
-        accessGroup: person.accessGroup
-      })
-    })).then(values => {
-      let allSuccess = true;
-
-      values.forEach((res, i) => {
-        if (res.status != 201) {
-          allSuccess = false;
-          personsInfo[i].valid.submitOk = false;
+            return true;
+        } catch(e) {
+            console.error(e);
+            return false;
         }
-      })
-      
-      if(allSuccess) {
-        toast.success('Persons created')
-        router.replace('/dashboard/persons')
-      } else {
-        toast.error('Error creating the highlighted persons')
-        setSubmitted(false);
-      }
-    })
-  }
+    }
 
-  return (
-    <>
-      <Head>
-        <title>
-          Etlas: Create Persons
-        </title>
-      </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8
-        }}
-      >
-        <Container maxWidth="xl">
-          <Box sx={{ mb: 4 }}>
-            <NextLink
-              href="/dashboard/persons"
-              passHref
-            >
-              <Link
-                color="textPrimary"
-                component="a"
+    const submitForm = async (e) => {
+        e.preventDefault();
+        setDisableSubmit(true);
+
+        // send res
+        try {
+            const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
+
+            // success toast
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) { toast.success(`Successfully created ${numSuccess} persons`); }
+
+            // if some failed
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to create persons below");    
+                // filter failed personsInfo and personsValidation
+                setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
+                setPersonsValidation(personsInfo.filter((p, i) => !boolArr[i]));
+            } else {
+                // all success
+                router.replace(personListLink);
+            }
+        } catch {
+            toast.error("Unable to submit form");
+        }        
+        setDisableSubmit(false);
+    }
+
+    return (
+        <>
+            <Head>
+                <title>Etlas: Create Person</title>
+            </Head>
+            <Box
+                component="main"
                 sx={{
-                  alignItems: 'center',
-                  display: 'flex'
+                    flexGrow: 1,
+                    py: 8
                 }}
-              >
-                <ArrowBackIcon
-                  fontSize="small"
-                  sx={{ mr: 1 }}
-                />
-                <Typography variant="subtitle2">
-                  Persons
-                </Typography>
-              </Link>
-            </NextLink>
-          </Box>
-          <Stack spacing={3}>
-            <div>
-              <Typography variant="h3">
-                Add Persons
-              </Typography>
-            </div>
-            <form onSubmit={submitForm}>
-              <Stack spacing={3}>
-                {personsInfo.map(person => (
-                  <PersonAddForm
-                    person={person}
-                    removePerson={removePerson}
-                    onUidChange={onUidChange}
-                    onNameChange={onNameChange}
-                    onNumberChange={onNumberChange}
-                    onEmailChange={onEmailChange}
-                    key={person.id}
-                    allAccessgroups={allAccessgroups}
-                    handleAccessGroup={handleAccessGroup}
-                    accGroupName={accGroupName}
-                    setAccGroupName={setAccGroupName}
-                  />
-                ))}
-                <div>
-                  <Button
-                    size="large"
-                    sx={{ mr: 3 }}
-                    variant="contained"
-                    startIcon={(
-                      <AddIcon />
-                    )}
-                    onClick={addPerson}
-                  >
-                      Add person
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    size="large"
-                    type="submit"
-                    sx={{ mr: 3 }}
-                    variant="contained"
-                    disabled={
-                      submitted ||
-                      personsInfo.length == 0 ||
-                      !personsInfo.every(person => person.valid.firstName &&
-                                                  person.valid.lastName &&
-                                                  person.valid.uidNotRepeated &&
-                                                  person.valid.uidNotInUse &&
-                                                  person.valid.mobileNumber &&
-                                                  person.valid.mobileNumberNotRepeated &&
-                                                  person.valid.mobileNumberNotInUse &&
-                                                  person.valid.email &&
-                                                  person.valid.emailNotRepeated &&
-                                                  person.valid.emailNotInUse &&
-                                                  person.valid.accessGroup)}
-                  >
-                      Submit
-                  </Button>
-                  <NextLink
-                    href="/dashboard/persons"
-                  >
-                    <Button
-                      size="large"
-                      sx={{ mr: 3 }}
-                      variant="outlined"
-                      color="error"
-                    >
-                        Cancel
-                    </Button>
-                  </NextLink>
-                </div>
-              </Stack>
-            </form>
-          </Stack>
-        </Container>
-      </Box>
-    </>
-  );
-};
+            >
+                <Container maxWidth="xl">
+                    <Box sx={{ mb: 4 }}>
+                        <NextLink
+                            href={personListLink}
+                            passHref
+                        >
+                            <Link
+                                color="textPrimary"
+                                component="a"
+                                sx={{
+                                    alignItems: 'center',
+                                    display: 'flex'
+                                }}
+                            >
+                                <ArrowBack
+                                    fontSize="small"
+                                    sx={{ mr: 1 }}
+                                />
+                                <Typography variant="subtitle2">Persons</Typography>
+                            </Link>
+                        </NextLink>
+                    </Box>
+                    <Stack spacing={3}>
+                        <div>
+                            <Typography variant="h3">Add Persons</Typography>
+                        </div>
+                        <form onSubmit={submitForm}>
+                            <Stack spacing={3}>
+                                { 
+                                    Array.isArray(personsInfo) && personsInfo.map((p,i) => {
+                                        const id = p.personId;                                        
+                                        return (
+                                            <PersonAddFormTwo 
+                                                key={id}
+                                                onClear={removePersonFactory(id)}
+                                                person={p}
+                                                onPersonFirstNameChange={onPersonFirstNameChangeFactory(id)}
+                                                onPersonLastNameChange={onPersonLastNameChangeFactory(id)}
+                                                onPersonUidChange={onPersonUidChangeFactory(id)}
+                                                onPersonMobileNumberChange={onPersonMobileNumberChangeFactory(id)}
+                                                onPersonEmailChange={onPersonEmailChangeFactory(id)}
+                                                accessGroups={accessGroups}
+                                                handleAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                                validation={personsValidation[i]}
+                                                cardError={cardError}
+                                                addCredential={addCredentialFactory(id)}
+                                                removeCredentialFactory={removeCredentialFactory(id)}
+                                                credTypes={credTypes}
+                                                onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
+                                                onCredUidChangeFactory={onCredUidChangeFactory(id)}
+                                                onCredTTLChangeFactory={onCredTTLChangeFactory(id)}
+                                                onCredValidChangeFactory={onCredValidChangeFactory(id)}
+                                                onCredPermChangeFactory={onCredPermChangeFactory(id)}
+                                            />
+                                        )
+                                    })
+                                }
+                                <div>
+                                    <Button
+                                        size="large"
+                                        sx={{ mr: 3 }}
+                                        variant="outlined"
+                                        startIcon={<Add />}
+                                        onClick={addPerson}
+                                    >
+                                        Add person
+                                    </Button>
+                                </div>
+                                <div>
+                                    <Button 
+                                        size="large"
+                                        type="submit"
+                                        sx={{ mr: 3 }}
+                                        variant="contained"
+                                        disabled={submitDisabled || disableSubmit}
+                                    >
+                                        Submit
+                                    </Button>
+                                    <NextLink
+                                        href={personListLink}
+                                        passHref
+                                    >
+                                        <Button
+                                            size="large"
+                                            sx={{ mr: 3 }}
+                                            variant="outlined"
+                                            color="error"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </NextLink>
+                                </div>
+                            </Stack>
+                        </form>
+                    </Stack>
+                </Container>
+            </Box>
+        </>
+    )
+}
 
-CreatePersons.getLayout = (page) => (
-  <AuthGuard>
-    <DashboardLayout>
-      {page}
-    </DashboardLayout>
-  </AuthGuard>
+CreatePersonsTwo.getLayout = (page) => (
+    <AuthGuard>
+        <DashboardLayout>
+            {page}
+        </DashboardLayout>
+    </AuthGuard>
 );
 
-export default CreatePersons;
+export default CreatePersonsTwo;

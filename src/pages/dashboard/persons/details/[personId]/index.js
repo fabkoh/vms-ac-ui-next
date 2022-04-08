@@ -26,6 +26,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Confirmdelete } from '../../../../../components/dashboard/persons/confirm-delete';
 import toast from 'react-hot-toast';
 import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
+import PersonCredentials from '../../../../../components/dashboard/persons/credential-info';
 
 const PersonDetails = () => {
 
@@ -213,6 +214,12 @@ const PersonDetails = () => {
             xs={12}
           >
             <PersonBasicDetails person={person} />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <PersonCredentials />
           </Grid>
 			  </Grid>
 		  </Box>
