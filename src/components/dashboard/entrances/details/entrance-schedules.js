@@ -5,11 +5,8 @@ import {
 	CardHeader,
 	Collapse,
 	Divider,
-	FormControl,
 	Grid,
-	InputLabel,
 	MenuItem,
-	Select,
 	Table,
 	TableBody,
 	TableCell,
@@ -42,9 +39,6 @@ export default function EntranceSchedules({
 
 	// schedules
 	const [entranceId, setEntranceId] = useState("");
-/*	const handleEntranceSelect = (e) => {
-		setEntranceId(e.target.value);
-	}; */
 
 	const schedules = entranceSchedules.filter(
 		(schedule) => schedule.entranceId == entrance.entranceId
@@ -134,36 +128,9 @@ export default function EntranceSchedules({
 				</MenuItem>
 			</StyledMenu>
 			<Collapse in={expanded}>
+				{/*<Divider /> */}
 				<Divider />
-				{/*<Box
-					component="form"
-					sx={{
-						flexGrow: 1,
-						m: 1.5,
-					}}
-				>
-					<FormControl fullWidth>
-						<InputLabel>Select Entrance</InputLabel>
-						<Select
-							label="Select Entrance"
-							onChange={handleEntranceSelect}
-							fullWidth
-							value={groupToEntranceId}
-						>
-							<MenuItem value="" sx={{ fontStyle: "italic" }}>
-								clear
-							</MenuItem>
-							{Array.isArray(accessGroupEntrance) &&
-								accessGroupEntrance.map((groupEntrance, i) => (
-									<MenuItem key={i} value={groupEntrance.groupToEntranceId}>
-										{groupEntrance.entrance.entranceName}
-									</MenuItem>
-								))}
-						</Select>
-					</FormControl>
-				</Box> */}
-				<Divider />
-				{(Array.isArray(schedules) && schedules.length > 0) ? (
+				{(Array.isArray(schedules) && schedules.length > 0) ?
 					<Scrollbar>
 						<Table>
 							<TableHead sx={{ backgroundColor: "neutral.200" }}>
@@ -181,10 +148,24 @@ export default function EntranceSchedules({
 								))}
 							</TableBody>
 						</Table>
-					</Scrollbar>
-				) : (
-					<WarningChip text="No schedules" />
-				)}
+					</Scrollbar> 
+					: (
+						<Grid
+							container
+							flexDirection="row"
+							paddingLeft={3}
+							paddingTop={3}
+						>
+							<Grid
+								item
+								paddingRight={3}
+								paddingBottom={3}
+							>
+								<WarningChip text="No schedules" />
+							</Grid>
+						</Grid>
+					)
+				}
 			</Collapse>
 		</Card>
 	);
