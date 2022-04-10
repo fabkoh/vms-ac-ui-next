@@ -54,7 +54,7 @@ class EntranceScheduleApi {
     }
 
     deleteEntranceSchedule(entranceScheduleId) {
-        if (useApi) { return sendApi(`/api/entrance-schedule/${entranceScheduleId}`, { method: 'DELETE' }); }
+        if (useApi) { return sendApi(`/api/entrance-schedule/delete/${entranceScheduleId}`, { method: 'DELETE' }); }
     }
 }
 
