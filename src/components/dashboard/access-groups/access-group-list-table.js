@@ -105,10 +105,10 @@ export const AccessGroupListTable = (props) => {
 				</Button> */}
 			</Box>
 			<Scrollbar>
-				<Table sx={{ minWidth: 800 }}>
+				<Table sx={{ minWidth: 700 }}>
 					<TableHead
 					// sx={{ visibility: props.enableBulkActions ? "collapse" : "visible" }}
-					sx={{backgroundColor: "neutral.200",}}
+					sx={{backgroundColor: "neutral.200"}}
 					>
 						<TableRow>
 							<TableCell padding="checkbox">
@@ -149,9 +149,8 @@ export const AccessGroupListTable = (props) => {
 									<TableCell width="20%">
 										<Box
 											sx={{
-												m: 1,
 												//alignItems: "center",
-												display: "flex",
+												display: "flex"
 											}}
 										>
 											
@@ -177,8 +176,8 @@ export const AccessGroupListTable = (props) => {
 											<Link color="inherit" variant="headline6">
 												<Typography>
 												{accGroup.accessGroupDesc || (
-													<SeverityPill color="warning" align="left">
-														<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+													<SeverityPill color="warning">
+														<WarningIcon fontSize="small" sx={{ mr: 1 }}/>
 														No Descriptions
 													</SeverityPill>
 												)}
@@ -189,7 +188,7 @@ export const AccessGroupListTable = (props) => {
 									<TableCell width="20%">
 										<Typography width={130} noWrap>
 											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
-												<SeverityPill color="warning" align="left">
+												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 													No Persons
 												</SeverityPill>
@@ -201,7 +200,7 @@ export const AccessGroupListTable = (props) => {
 											(Array.isArray(accGroup.entrances) && accGroup.entrances.length > 0) ? (
 												<Typography>{accGroup.entrances.length}</Typography>
 											) : (
-												<SeverityPill color="warning" align="left">
+												<SeverityPill color="warning">
 													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
 													No entrances
 												</SeverityPill>
