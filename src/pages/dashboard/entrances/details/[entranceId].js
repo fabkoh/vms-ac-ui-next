@@ -31,6 +31,9 @@ import AccessGroupDetails from "../../../../components/dashboard/entrances/detai
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
 import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
+import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
+import { entranceScheduleApi } from "../../../../api/entrance-schedule";
+import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
 
 const EntranceDetails = () => {
 
@@ -42,6 +45,10 @@ const EntranceDetails = () => {
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+
+    const link = getEntranceScheduleEditLink(entranceId);
+
+    const [entranceSchedules, setEntranceSchedules] = useState([]);
 
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
@@ -80,12 +87,34 @@ const EntranceDetails = () => {
         } catch(err) {
             console.error(err);
         }
-    }, [isMounted]);
+    });
+
+    const getEntranceSchedules = async() => {
+        try {
+            const scheduleRes = await entranceScheduleApi.getEntranceSchedulesWhereEntranceIdsIn(entranceId);
+
+            if (scheduleRes.status == 200) {
+                const body = await scheduleRes.json();
+                if (isMounted()) {
+                    setEntranceSchedules(body);
+                }
+            }
+            else {
+                toast.error("Entrance Schedule Info Not Loaded");
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    
 
     const getInfo = useCallback(async() => {
         //get entrance and access group entrance
         getEntrance();
         getAccessGroups();
+        getEntranceSchedules();
     }, [isMounted])
 
     useEffect(() => {
@@ -107,15 +136,6 @@ const EntranceDetails = () => {
 
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
-    const [text, setText] = useState("");
-    const [deleteBlock, setDeleteBlock] = useState(true);
-    const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-    useEffect(() => {
-        console.log(text);
-        (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-    }, [text]);
 
     //Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -130,10 +150,9 @@ const EntranceDetails = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteEntrance = async() => {
         Promise.resolve(
             entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
@@ -146,8 +165,23 @@ const EntranceDetails = () => {
         }
         })
         setDeleteOpen(false);
-        setText("");
     }; 
+
+    //delete entrance schedules
+    const deleteSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some entrance schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    }
 
     // for updating status
     const [statusUpdateId, setStatusUpdateId] = useState([]);
@@ -304,12 +338,10 @@ const EntranceDetails = () => {
                                    <Confirmdelete 
                                     selectedState={selectedState}
                                     setActionAnchor={setActionAnchor}
-                                    deleteOpen={deleteOpen}
-                                    handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    open={deleteOpen}
+                                    handleDialogClose={handleDeleteClose}
+                                    deleteEntrances={deleteEntrance}/>
+                                    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
@@ -346,6 +378,17 @@ const EntranceDetails = () => {
                                 xs={12}
                             >
                                 <AccessGroupDetails accessGroupEntrance ={accessGroup} />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <EntranceSchedules 
+                                    entrance={entrance}
+                                    entranceSchedules={entranceSchedules}
+                                    deleteSchedules={deleteSchedules}
+                                    link={link} 
+                                />
                             </Grid>
                         </Grid>
                     </Box>

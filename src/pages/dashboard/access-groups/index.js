@@ -38,6 +38,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
 import toast from "react-hot-toast";
 import { Confirmdelete } from "../../../components/dashboard/access-groups/confirm-delete";
+import { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, accessGroupCreateLink, getAccessGroupEditLink } from "../../../utils/access-group";
+import { applyPagination, createFilter } from "../../../utils/list-utils";
 
 const tabs = [
 	{
@@ -77,6 +79,7 @@ const sortOptions = [
 	},
 ];
 
+/*
 const applyFilters = (accessGroup, filters) =>
     accessGroup.filter((accGroup) => {
 		if (filters.query) {
@@ -109,7 +112,11 @@ const applyFilters = (accessGroup, filters) =>
 		// }
 
 		return true;
-	});
+	}); */
+
+const applyFilter = createFilter({
+	query: filterAccessGroupByString
+})
 
 const descendingComparator = (a, b, orderBy) => {
 	if (b[orderBy] < a[orderBy]) {
@@ -146,8 +153,9 @@ const getComparator = (order, orderBy) =>
 	return stabilizedThis.map((el) => el[0]);
 };
 
+/*
 const applyPagination = (accessGroup, page, rowsPerPage) =>
-	accessGroup.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+	accessGroup.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); */
 
 const AccessGroupList = () => {
 	const isMounted = useMounted();
@@ -209,6 +217,7 @@ const AccessGroupList = () => {
 	// 	setCurrentTab(value);
 	// };
 
+	//query filter
 	const handleQueryChange = (event) => {
 		event.preventDefault();
 		setFilters((prevState) => ({
@@ -221,9 +230,7 @@ const AccessGroupList = () => {
 	// 	setSort(event.target.value);
 	// };
 
-	const handlePageChange = (event, newPage) => {
-		setPage(newPage);
-	};
+	const handlePageChange = (event, newPage) => setPage(newPage);
 
 	const handleRowsPerPageChange = (event) => {
 		setRowsPerPage(parseInt(event.target.value, 10));
@@ -231,10 +238,10 @@ const AccessGroupList = () => {
 
 	// Usually query is done on backend with indexing solutions
 	// rn it's for search query 
-	const filteredAccessGroup = applyFilters(accessGroup, filters);
-	const sortedAccessGroup = applySort(filteredAccessGroup, sort);
+	const filteredAccessGroup = applyFilter(accessGroup, filters);
+	//const sortedAccessGroup = applySort(filteredAccessGroup, sort);
 	const paginatedAccessGroup = applyPagination(
-		sortedAccessGroup,
+		filteredAccessGroup,
 		page,
 		rowsPerPage
 	);
@@ -286,7 +293,7 @@ const AccessGroupList = () => {
 
 	//for delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
-	const [text, setText] = React.useState("");
+/* 	const [text, setText] = React.useState("");
 	const [deleteBlock, setDeleteBlock] = React.useState(true);
 	const handleTextChange = (e) => {
 		setText(e.target.value);
@@ -294,10 +301,10 @@ const AccessGroupList = () => {
 	useEffect(() => {
 	//  console.log(text); 
 	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	});
+	}); */
 	
 	//Set to true if an access group is selected. controls form input visibility.
-	const [selectedState, setselectedState] = useState(false);
+	/*const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 	  if(selectedAccessGroup.length>=1){
 		 setselectedState(true)
@@ -305,17 +312,16 @@ const AccessGroupList = () => {
 	};
 	useEffect(() => {
 		checkSelected()
-	}, [selectedAccessGroup]);
+	}, [selectedAccessGroup]); */
 	
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-		setText("")
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteAccessGroups = async() => {
 		Promise.all(selectedAccessGroup.map(id=>{
 			return accessGroupApi.deleteAccessGroup(id)
 		})).then( resArr => {
@@ -330,7 +336,6 @@ const AccessGroupList = () => {
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);
-		setText("");
 	};
 
 	//blank out edit and delete if no people selected
@@ -399,15 +404,11 @@ const AccessGroupList = () => {
 										<DeleteIcon />
 										&#8288;Delete
 									</MenuItem>
-									<Confirmdelete selectedState={selectedState} 
+									<Confirmdelete 
 									setAnchorEl={setAnchorEl}
-									deleteOpen={deleteOpen} 
-									handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    selectedAccessGroup={selectedAccessGroup}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+									open={deleteOpen} 
+									handleDialogClose={handleDeleteClose}
+									deleteAccessGroups={deleteAccessGroups} />
 								</StyledMenu>
 							</Grid>
 						</Grid>
@@ -479,7 +480,7 @@ const AccessGroupList = () => {
 											</InputAdornment>
 										),
 									}}
-									placeholder="Search for Access Group Name or Description"
+									placeholder={filterAccessGroupByStringPlaceholder}
 								/>
 							</Box>
 							{/* <TextField

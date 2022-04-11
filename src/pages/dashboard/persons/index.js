@@ -247,7 +247,6 @@ const PersonList = () => {
 		selectedPersons.length > 0 && selectedPersons.length < Persons.length;
 	const selectedAllPersons = selectedPersons.length === Persons.length;
 	
-	
 
 	// Reset selected Persons when Persons change
 	useEffect(
@@ -260,17 +259,8 @@ const PersonList = () => {
 		[Persons]
 	);
 
-	//for delete action button
+	//for delete action button: opens the delete form
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
-	const [text, setText] = React.useState("");
-	const [deleteBlock, setDeleteBlock] = React.useState(true);
-	const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-	useEffect(() => {
-	//  console.log(text); 
-	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	}, [text]);
 	
 	//Set to true if multiple people are selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -291,10 +281,14 @@ const PersonList = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-		setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+
+	useEffect(() => {
+		console.log(selectedPersons)
+	}, [selectedPersons])
+	
+	const deletePersons = async() => {
 		Promise.all(selectedPersons.map(id=>{
 			return personApi.deletePerson(id)
 		})).then( resArr => {
@@ -309,15 +303,8 @@ const PersonList = () => {
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
-		setText("");
 	};
-
-
 	
-
-	
-	
-
 	//blank out edit and delete if no people selected
 	const [buttonBlock, setbuttonBlock] = useState(true);
 	useEffect(() => {
@@ -390,15 +377,13 @@ const PersonList = () => {
 										<DeleteIcon />
 										&#8288;Delete
 									</MenuItem>
-									<Confirmdelete selectedState={selectedState} 
-									setAnchorEl={setAnchorEl}
-									 deleteOpen={deleteOpen} 
-									 handleDeleteClose={handleDeleteClose}
-			handleDeleteAction={handleDeleteAction}
-			handleDeleteOpen={handleDeleteOpen}
-			selectedPersons={selectedPersons}
-			handleTextChange={handleTextChange}
-			deleteBlock={deleteBlock}/>
+									<Confirmdelete
+										selectedState={selectedState}
+									 	open={deleteOpen} 
+									 	handleDialogClose={handleDeleteClose}
+										selectedPersons={selectedPersons}
+										deletePersons={deletePersons}
+										setAnchorEl={setAnchorEl} />
 								</StyledMenu>
 							</Grid>
 						</Grid>

@@ -103,7 +103,7 @@ const PersonDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deletePersons = async() => {
     Promise.resolve(
       personApi.deletePerson(person.personId)
     ).then((res)=>{
@@ -219,9 +219,11 @@ const PersonDetails = () => {
               <DeleteIcon />
               Delete
             </MenuItem>
-            <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
-			handleDeleteAction={handleDeleteAction}
-			handleDeleteOpen={handleDeleteOpen}/>
+            <Confirmdelete 
+              setAnchorEl={setAnchorEl}
+              open={deleteOpen}
+              handleDialogClose={handleDeleteClose}
+              deletePersons={deletePersons} />
           </StyledMenu>
 			  </Grid>
 			</Grid>
