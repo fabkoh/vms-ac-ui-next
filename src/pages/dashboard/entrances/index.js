@@ -151,8 +151,8 @@ const EntranceList = () => {
             }
         })
 
-        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " some entrances"); }
-        if (successCount) { toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " some entrances"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
 
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
@@ -290,7 +290,7 @@ const EntranceList = () => {
                                         disabled={actionDisabled}
                                     >
                                         <DoorFront />
-                                        &#8288;Enable
+                                        &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple

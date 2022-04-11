@@ -1,11 +1,12 @@
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
-import { Card, CardContent, CardHeader, Collapse, Divider, Switch, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
+import { Card, CardContent, CardHeader, Collapse, Divider, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
 import { useState } from "react";
 import ExpandMore from "../shared/expand-more";
 import WarningChip from "../shared/warning-chip";
 import { Scrollbar } from "../../scrollbar";
 import HiddenField from "../shared/hidden-field";
 import { disableCredentialWithIdApi, enableCredentialWithIdApi } from "../../../api/credentials";
+import Switch from "../shared/custom-toggle";
 import toast from "react-hot-toast";
 
 const toDateString = (date) => {
@@ -23,15 +24,17 @@ const PersonCredentials = ({ credentials }) => {
 
     const handleToggleFactory = (credId) => async (e) => {
         const bool = e.target.checked;
-        const verb = bool ? 'enabled' : 'deactivated';
+        const verb = bool ? 'activated' : 'deactivated';
         try {
             const res = await (bool ? enableCredentialWithIdApi(credId) : disableCredentialWithIdApi(credId));
             if (res.status != 200) throw new Error("Failed to send req");
             toast.success(`Successfully ${verb} credential`);
+            return true
         } catch(e) {
             console.error(e);
-            const errorVerb = bool ? 'enable' : 'deactivate';
-            toast.error(`Failed to ${errorVerb} credential`)
+            const errorVerb = bool ? 'activate' : 'deactivate';
+            toast.error(`Failed to ${errorVerb} credential`);
+            return false
         }
     }
 
@@ -59,7 +62,7 @@ const PersonCredentials = ({ credentials }) => {
                                         <TableCell>Type</TableCell>
                                         <TableCell>Values</TableCell>
                                         <TableCell>Expiry</TableCell>
-                                        <TableCell>Enabled</TableCell>
+                                        <TableCell>Active</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

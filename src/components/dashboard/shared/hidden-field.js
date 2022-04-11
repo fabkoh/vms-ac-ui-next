@@ -8,13 +8,19 @@ const HiddenField = ({ text, ...props }) => {
     const handleShowClick = () => setShow(!show);
 
     return (
-        <Box display="flex" justifyContent="space-between">
+        <Box display="flex" { ...props }>
             <p>{show ? text : '********' }</p>
-            <IconButton
-                onClick={handleShowClick}
+            <Box 
+                ml={3}
+                display="flex"
+                alignItems="center"
             >
-                { show ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" /> }
-            </IconButton>
+                <IconButton
+                    onClick={handleShowClick}
+                >
+                    { show ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" /> }
+                </IconButton>
+            </Box>
         </Box>
     )
 }

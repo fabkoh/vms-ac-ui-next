@@ -71,7 +71,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={2}
                 xs={4}
                 display="flex"
-                alignItems="center"
+                alignItems="start"
             >
                 <SingleSelect 
                     fullWidth
@@ -91,7 +91,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={2}
                 xs={4}
                 display="flex"
-                alignItems="center"
+                alignItems="start"
             >
                 <PasswordField
                     required
@@ -110,7 +110,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={2}
                 xs={4}
                 display='flex'
-                alignItems='center'
+                alignItems='start'
             >
                 <Toggle 
                     checked={valid}
@@ -123,7 +123,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={2}
                 xs={4}
                 display='flex'
-                alignItems='center'
+                alignItems='start'
             >
                 <Toggle 
                     checked={perm}
@@ -136,7 +136,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={3}
                 xs={6}
                 display="flex"
-                alignItems="center"
+                alignItems="start"
             >
                 {
                     !isPerm && (
@@ -159,7 +159,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 md={1}
                 xs={2}
                 display="flex"
-                alignItems="center"
+                alignItems="start"
             >
                 <Button
                     variant="outlined"

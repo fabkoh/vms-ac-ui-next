@@ -175,9 +175,9 @@ const EntranceDetails = () => {
             entranceApi.updateEntranceStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " entrance");
+                toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
             } else {
-                toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " entrance");
+                toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
             }
         })
 
