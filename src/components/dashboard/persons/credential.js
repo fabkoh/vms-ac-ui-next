@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from "@mui/material";
+import { Box, Button, Divider, Grid, TextField } from "@mui/material";
 import SingleSelect from "../shared/single-select-input";
 import Toggle from "../shared/toggle";
 import { getCredTypeId, getCredTypeName } from "../../../utils/credential-type";
@@ -56,7 +56,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
         setPerm(bool);
     }
 
-    const TTLHelperText = (endDate != null && endDate < today) ? "Note: expiry is before today" : "Expiry is end date inclusive";
+    const TTLHelperText = (endDate != null && endDate < today) ? "Note: expiry is before today" : "Expiry is end inclusive";
     const credentialInUse = validation.credentialInUseIds.includes(credId);
     const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 
@@ -64,9 +64,9 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
         <Grid
             item
             container
-            spacing={1}
         >
             <Grid
+                container
                 item
                 display="flex"
                 justifyContent="space-between"
@@ -74,38 +74,54 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 flexWrap="wrap"
                 md={6}
                 xs={12}
-            >
-                 <SingleSelect
-                    sx={{ minWidth: '90px' }}
-                    label="Type"
-                    getLabel={getCredTypeName}
-                    onChange={onCredTypeChange}
-                    value={credTypeId ? credTypeId : '' }
-                    options={credTypes}
-                    getValue={getCredTypeId}
-                    noclear
-                    required
-                    helperText=' '
-                />
-
-                <PasswordField
-                    required
-                    label="Value"
-                    handleChange={handleCredUidChange}
-                    inputRef={credUidRef}
-                    error={credentialInUse || credentialRepeated}
-                    helperText={
-                        (credentialInUse && "Repeated type & value") ||
-                        (credentialRepeated && "Repeated type & value in form") || ' '
-                    }
-                    sx={{ maxWidth: '220px' }}
-                />
-
-                <Toggle 
-                    checked={valid}
-                    handleChange={handleCredValidChange} 
-                    label="Enabled" 
-                />
+                spacing={1}
+                mb={1}
+            >   
+                <Grid
+                    item
+                    md={3}
+                >
+                    <SingleSelect
+                        fullWidth
+                        sx={{ minWidth: '90px' }}
+                        label="Type"
+                        getLabel={getCredTypeName}
+                        onChange={onCredTypeChange}
+                        value={credTypeId ? credTypeId : '' }
+                        options={credTypes}
+                        getValue={getCredTypeId}
+                        noclear
+                        required
+                        helperText=' '
+                    />
+                </Grid>
+                <Grid
+                    item
+                    md={5}
+                >
+                    <PasswordField
+                        fullWidth
+                        required
+                        label="Value"
+                        handleChange={handleCredUidChange}
+                        inputRef={credUidRef}
+                        error={credentialInUse || credentialRepeated}
+                        helperText={
+                            (credentialInUse && "Repeated type & value") ||
+                            (credentialRepeated && "Repeated type & value in form") || ' '
+                        }
+                    />
+                </Grid>
+                <Grid
+                    item
+                    md={4}
+                >
+                    <Toggle 
+                        checked={valid}
+                        handleChange={handleCredValidChange} 
+                        label="Enabled" 
+                    />
+                </Grid>
             </Grid>
             <Grid
                 item
@@ -115,39 +131,54 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 flexWrap="wrap"
                 md={6}
                 xs={12}
+                mb={1}
+                container
+                spacing={1}
             >
-                 <Toggle 
-                    checked={perm}
-                    handleChange={handleCredPermChange} 
-                    label="Permanent"
-                />
-
-                {
-                    !isPerm && (
-                        <TextField // ref does not work as removing and re rendering it removes the date, even though ref.current?.value still has the prev date
-                            required
-                            label="Expiry Date"
-                            type="date" 
-                            InputLabelProps={{ shrink: true }}
-                            helperText={TTLHelperText}
-                            onChange={handleCredTTLChange}
-                            value={toDateInputString(endDate)} // this takes in yyyy-mm-dd
+                    <Grid
+                        item
+                        md={5}
+                        mb={1}
+                    >   
+                        <Toggle 
+                            checked={perm}
+                            handleChange={handleCredPermChange} 
+                            label="Permanent"
                         />
-                    )
-                }
-
-                <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={removeCredential}
+                    </Grid>
+                    <Grid
+                        item
+                        md={5}
+                    >
+                        {
+                            !isPerm && (
+                                <TextField // ref does not work as removing and re rendering it removes the date, even though ref.current?.value still has the prev date
+                                    required
+                                    label="Expiry Date"
+                                    type="date" 
+                                    InputLabelProps={{ shrink: true }}
+                                    helperText={TTLHelperText}
+                                    onChange={handleCredTTLChange}
+                                    value={toDateInputString(endDate)} // this takes in yyyy-mm-dd
+                                    fullWidth
+                                />
+                            )
+                        }
+                    </Grid>
+                <Grid
+                    item
+                    md={2}
                 >
-                    Clear
-                </Button>
-
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={removeCredential}
+                    >
+                        Clear
+                    </Button>
+                </Grid>
             </Grid>
-               
- 
-               
+            <Divider sx={{ width: '100%' }} />
         </Grid>
     )
 }
