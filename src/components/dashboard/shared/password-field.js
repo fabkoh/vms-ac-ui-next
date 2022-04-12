@@ -1,6 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { FormControl, FormHelperText, IconButton, Input, InputAdornment, InputLabel, OutlinedInput } from "@mui/material"
-import { useRef, useState } from "react"
+import { useState } from "react"
 
 const PasswordField = ({
     // required
@@ -11,7 +11,7 @@ const PasswordField = ({
     handleChange, // function (event -> null) : callback to event onChange
     error,
     helperText,
-    ...props // with this i guess it is possible to use value={value} but not tested yet
+    ...props 
 }) => {
 
     const [show, setShow] = useState(false);
@@ -19,7 +19,7 @@ const PasswordField = ({
     const handleMouseDownPassword = (e) => e.preventDefault();
 
     return (
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" { ...props }>
             <InputLabel required={required} error={error}>{label}</InputLabel>
             <OutlinedInput
                 label={label}
@@ -36,7 +36,6 @@ const PasswordField = ({
                         </IconButton>
                     </InputAdornment>
                 }
-                { ...props }
                 required={required}
                 error={error}
                 

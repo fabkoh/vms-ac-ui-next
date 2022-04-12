@@ -3,8 +3,8 @@ import { useState } from "react";
 
 const CustomToggle = (
     { 
-        onChange, // function : (event) => bool (runs when toggle is clicked. returns true if successful, returns false otherwise)
-        defaultChecked 
+        onChange, // function : async (event) => bool (runs when toggle is clicked. returns true if successful, returns false otherwise)
+        defaultChecked // boolean
     }
 ) => {
     const [initialValue, setInitialValue] = useState(defaultChecked); // tries to mirror db state, only changed when fetch is successful

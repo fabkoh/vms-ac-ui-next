@@ -68,13 +68,15 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
         >
             <Grid
                 item
-                md={2}
-                xs={4}
                 display="flex"
+                justifyContent="space-between"
                 alignItems="start"
+                flexWrap="wrap"
+                md={6}
+                xs={12}
             >
-                <SingleSelect 
-                    fullWidth
+                 <SingleSelect
+                    sx={{ minWidth: '90px' }}
                     label="Type"
                     getLabel={getCredTypeName}
                     onChange={onCredTypeChange}
@@ -85,14 +87,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                     required
                     helperText=' '
                 />
-            </Grid>
-            <Grid
-                item
-                md={2}
-                xs={4}
-                display="flex"
-                alignItems="start"
-            >
+
                 <PasswordField
                     required
                     label="Value"
@@ -103,15 +98,9 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                         (credentialInUse && "Repeated type & value") ||
                         (credentialRepeated && "Repeated type & value in form") || ' '
                     }
+                    sx={{ maxWidth: '220px' }}
                 />
-            </Grid>
-            <Grid
-                item
-                md={2}
-                xs={4}
-                display='flex'
-                alignItems='start'
-            >
+
                 <Toggle 
                     checked={valid}
                     handleChange={handleCredValidChange} 
@@ -120,28 +109,22 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
             </Grid>
             <Grid
                 item
-                md={2}
-                xs={4}
-                display='flex'
-                alignItems='start'
+                display="flex"
+                justifyContent="space-between"
+                alignItems="start"
+                flexWrap="wrap"
+                md={6}
+                xs={12}
             >
-                <Toggle 
+                 <Toggle 
                     checked={perm}
                     handleChange={handleCredPermChange} 
                     label="Permanent"
                 />
-            </Grid>
-            <Grid
-                item
-                md={3}
-                xs={6}
-                display="flex"
-                alignItems="start"
-            >
+
                 {
                     !isPerm && (
                         <TextField // ref does not work as removing and re rendering it removes the date, even though ref.current?.value still has the prev date
-                            fullWidth
                             required
                             label="Expiry Date"
                             type="date" 
@@ -152,15 +135,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                         />
                     )
                 }
-                
-            </Grid>
-            <Grid
-                item
-                md={1}
-                xs={2}
-                display="flex"
-                alignItems="start"
-            >
+
                 <Button
                     variant="outlined"
                     color="error"
@@ -168,7 +143,11 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                 >
                     Clear
                 </Button>
+
             </Grid>
+               
+ 
+               
         </Grid>
     )
 }
