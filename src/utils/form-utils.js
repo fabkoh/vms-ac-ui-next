@@ -56,6 +56,11 @@ const getDuplicates = (infoArr) => {
     return ans;
 }
 
+const createNegativeCounterObject = (n) => () => {
+    n -= 1;
+    return n;
+}
+
 export default formUtils;
 
-export { createCounterObject, getDuplicates };
+export { createCounterObject, getDuplicates, createNegativeCounterObject };

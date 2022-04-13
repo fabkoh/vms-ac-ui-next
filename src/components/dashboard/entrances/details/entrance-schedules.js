@@ -113,14 +113,16 @@ export default function EntranceSchedules({
 					}
 					passHref
 				>
-					<MenuItem disableRipple disabled={actionDisabled}>
+					<MenuItem disableRipple 
+					// disabled={actionDisabled}
+					>
 						<Edit />
 						&#8288;Modify
 					</MenuItem>
 				</NextLink>
 				<MenuItem
 					disableRipple
-					disabled={actionDisabled}
+					// disabled={actionDisabled}
 					onClick={openDeleteDialog}
 				>
 					<Delete />

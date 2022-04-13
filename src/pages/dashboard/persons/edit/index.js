@@ -4,18 +4,29 @@ import Head from "next/head";
 import NextLink from "next/link";
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import formUtils, { createCounterObject, getDuplicates } from "../../../../utils/form-utils";
-import { personListLink } from "../../../../utils/persons";
+import formUtils, { createCounterObject, createNegativeCounterObject, getDuplicates } from "../../../../utils/form-utils";
+import { getPersonName, personListLink } from "../../../../utils/persons";
 import { useCallback, useEffect, useState } from 'react';
 import { useMounted } from "../../../../hooks/use-mounted";
 import { accessGroupApi } from "../../../../api/access-groups";
 import { personApi } from '../../../../api/person';
-import { isObject } from "../../../../utils/utils";
+import { arraySameContents, isObject } from "../../../../utils/utils";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
 import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
+import { deleteCredential, deleteCredentialApi, getCredentialsApi, getCredentialWherePersonIdApi, saveCredentialApi } from "../../../../api/credentials";
+import { getCredTypesApi } from "../../../../api/credential-types";
 
 // const getNextId = createCounterObject(0);
+const getNextCredId = createNegativeCounterObject(-1);
+const getNewCredential = (id) => ({
+    credId: id,
+    credTypeId:'',
+    credUid: '',
+    credTTL: null,
+    isValid: true,
+    isPerm: false
+});
 
 const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank);
 
@@ -36,16 +47,62 @@ const EditPersonsTwo = () => {
     const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
     const [personEmails, setPersonEmails] = useState([]);
 
+    // credTypes
+    const [credTypes, setCredTypes] = useState([]);
+    const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
+    
     // get info
     const isMounted = useMounted(); 
+    useEffect(() => {
+    console.log("personsinfo",personsInfo)
+    }, [personsInfo])
+    
+    const getCredentials = async() => {
+        try {
+            const res = await getCredentialsApi();
+            if (res.status != 200) {
+                throw new Error("credentials not loaded");
+            }
+            const body = await res.json();
+            const newCredentials = {};
+            body.forEach(cred => {
+                const credTypeId = cred.credType?.credTypeId;
+                if (!(credTypeId in newCredentials)) {
+                    newCredentials[credTypeId] = [];
+                }
+                newCredentials[credTypeId].push(cred.credUid);
+            })
+            console.log(newCredentials);
+            setCredentials(newCredentials);
+        } catch(e) {
+            console.error(e);
+            toast.error("Error loading credentials");
+        }
+    }
+
+    const getCredTypes = async () => {
+        try {
+            const res = await getCredTypesApi();
+            if (res.status != 200) {
+                throw new Error("cred types info not loaded");
+            }
+            const body = await res.json();
+            setCredTypes(body);
+        } catch(e) {
+            console.error(e);
+            toast.error("Error loading credential types");
+        }
+    }
+
     const getPersonsLocal = async ids => {
         const personsInfoArr = [];
         const validations = [];
 
         // map each id to a fetch req for that access group
-        const resArr = await Promise.all(ids.map(id => personApi.getPerson(id)));
+        const resArr = await Promise.all(ids.map(id => personApi.getPerson(id)
+        ));
         const successfulRes = resArr.filter(res => res.status == 200);
-
+        
         // no persons to edit
         if (successfulRes.length == 0) {
             toast.error('Error editing persons. Please try again');
@@ -57,29 +114,39 @@ const EditPersonsTwo = () => {
             toast.error('Some persons were not found');
         }
 
+        const resArr2 = await Promise.all(ids.map(id=>getCredentialWherePersonIdApi(id)))
+        const credArr = await Promise.all(resArr2.map(res=>res.json()))
+        credArr.forEach(creds => {creds.forEach(cred=>{cred.credTypeId=cred.credType.credTypeId})})
+        // credArr.forEach(cred =>{ cred.credTypeId=cred.credType.credTypeId})
         const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
-
-        bodyArr.forEach(body => {
+        bodyArr.forEach((body,i) => {
+            const credIdArr = []
+            credArr[i].forEach(cred=>credIdArr.push(cred.credId))
             personsInfoArr.push({
-                personId: body.personId,
-                personFirstName: body.personFirstName,
-                personLastName:  body.personLastName,
-                personUid:  body.personUid,
-                personMobileNumber:  body.personMobileNumber,
-                personEmail:  body.personEmail,
-                personOriginalEmail:  body.personEmail,
-                personOriginalUid:  body.personUid,
-                personOriginalMobileNumber:  body.personMobileNumber,
-                accessGroup: body.accessGroup
+                personId: bodyArr[i].personId,
+                personFirstName: bodyArr[i].personFirstName,
+                personLastName: bodyArr[i].personLastName,
+                personUid:  bodyArr[i].personUid,
+                personMobileNumber:  bodyArr[i].personMobileNumber,
+                personEmail:  bodyArr[i].personEmail,
+                personOriginalEmail:  bodyArr[i].personEmail,
+                personOriginalUid:  bodyArr[i].personUid,
+                personOriginalMobileNumber:  bodyArr[i].personMobileNumber,
+                accessGroup: bodyArr[i].accessGroup,
+                credentials: credArr[i],
+                originalCredId:credIdArr,
             });
             
             validations.push({
-                personId: body.personId,
+                personId: bodyArr[i].personId,
                 firstNameBlank:false,
                 lastNameBlank:false,
                 uidInUse:false,
                 uidRepeated:false,
                 uidBlank:false,
+                credentialInUseIds: [],
+                credentialRepeatedIds:[],
+
                 // note
                 numberInUse: false,
                 numberRepeated: false,
@@ -92,9 +159,13 @@ const EditPersonsTwo = () => {
         });
         setPersonsValidation(validations);
         setPersonsInfo(personsInfoArr);
-
     }
 
+    const getCredentialsLocal = async(personId) => {
+        const res = await getCredentialWherePersonIdApi(personId)
+        const data = await res.json();
+        return data
+    }
     const getPersons = async () => {
         try {
             const res = await personApi.getPersons();
@@ -109,9 +180,7 @@ const EditPersonsTwo = () => {
             console.error(e)
         }
     }
-    useEffect(() => {
-        console.log(personMobileNumbers)
-    }, [personMobileNumbers])
+
     
     const getAccessGroups = async () => {
         try {
@@ -132,8 +201,10 @@ const EditPersonsTwo = () => {
         getPersonsLocal(ids)
         getAccessGroups();
         getPersons();
+        getCredentials();
+        getCredTypes();
     }, [isMounted]);
-
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(getInfo, []);
 
@@ -157,6 +228,25 @@ const EditPersonsTwo = () => {
             router.push("/dashboard/persons")
         }
     };
+
+     //add / remove credential logic
+     const addCredentialFactory = (personId) => () => {
+        const newPersons = [ ...personsInfo ];
+        newPersons.find(p => p.personId == personId).credentials.push(getNewCredential(getNextCredId()));
+        setPersonsInfo(newPersons);
+    };
+    
+    const removeCredentialFactory = (personId) => (credId) => () => {
+        const newPersons = [ ...personsInfo ];
+        const person = newPersons.find(p => p.personId == personId);
+        person.credentials = person.credentials.filter(c => c.credId != credId);
+        setPersonsInfo(newPersons);
+
+        const b1 = checkCredInUseHelper(newPersons, personsValidation);
+        const b2 = checkCredRepeatedHelper(newPersons, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    };
+
 
     // editing logic
     const changeTextField = (key, id, ref) => {
@@ -206,6 +296,75 @@ const EditPersonsTwo = () => {
         return toChange
     }
 
+    // returns if validArr is changed
+    const checkCredInUseHelper = (infoArr, validArr) => {
+        let toChange = false;
+
+        infoArr.forEach((person, i) => {
+            const newCredentialsInUse = []
+            person.credentials.forEach(cred => { // populate the above array
+                if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
+                    const inUseValues = credentials[cred.credTypeId];
+                    if (inUseValues.includes(cred.credUid)) {
+                        newCredentialsInUse.push(cred.credId);
+                    }
+                }
+            });
+            if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
+                toChange = true;
+                validArr[i].credentialInUseIds = newCredentialsInUse;
+            }
+        });
+
+        return toChange
+    }
+
+    // returns if validArr is changed
+    const checkCredRepeatedHelper = (infoArr, validArr) => {
+        let toChange = false;
+
+        const credMap = {}; // maps credTypeId to array of credUid
+        const repeatedCred = []; // array of [credTypeId, credUid]
+        infoArr.forEach(person => 
+            person.credentials.forEach(
+                cred => {
+                    const credTypeId = cred.credTypeId;
+                    const uid = cred.credUid;
+                    if (credTypeId != '' && uid != '') {
+                        if (!(credTypeId in credMap)) {
+                            credMap[credTypeId] = [];
+                        }
+                        const arr = credMap[credTypeId];
+                        if (arr.some(e => e == uid)) {
+                            repeatedCred.push([credTypeId, uid]);
+                        } else {
+                            arr.push(uid);
+                        }
+                    }
+                }
+            )
+        );
+
+        infoArr.forEach(
+            (person, i) => {
+                const repeatedCredIds = [];
+                person.credentials.forEach(
+                    cred => {
+                        if (repeatedCred.some(c => c[0] == cred.credTypeId && c[1] == cred.credUid)) {
+                            repeatedCredIds.push(cred.credId);
+                        }
+                    }
+                );
+                if (!arraySameContents(repeatedCredIds, validArr[i].credentialRepeatedIds)) {
+                    toChange = true;
+                    validArr[i].credentialRepeatedIds = repeatedCredIds;
+                }
+            }
+        );
+
+        return toChange;
+    }
+
     const onPersonFirstNameChangeFactory = (id) => (ref) => {
         changeTextField("personFirstName", id, ref);
         const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value);
@@ -238,6 +397,39 @@ const EditPersonsTwo = () => {
         if (b1) { setPersonsValidation([ ...personsValidation ]); }
     }
 
+    const onCredTypeChangeFactory = (personId) => (credId) => (e) => {
+        const newInfo = [ ...personsInfo ];
+        newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
+        // console.log("credtypechange",newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId))
+        setPersonsInfo(newInfo);
+
+        const b1 = checkCredInUseHelper(newInfo, personsValidation);
+        const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
+        // personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref;
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
+        
+        const b1 = checkCredInUseHelper(personsInfo, personsValidation);
+        const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+    }
+
+    const onCredValidChangeFactory = (personId) => (credId) => (bool) => {
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).isValid = bool;
+    }
+
+    const onCredPermChangeFactory = (personId) => (credId) => (bool) => {
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).isPerm = bool;
+    }
+
+    const onCredTTLChangeFactory = (personId) => (credId) => (dateObj) => {
+        console.log(dateObj);
+        personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTTL = dateObj;
+    }
+
     const onPersonEmailChangeFactory = (id) => (ref) => {
         changeTextField("personEmail", id, ref);
 
@@ -250,9 +442,9 @@ const EditPersonsTwo = () => {
         const newInfo = [ ...personsInfo ];
         const value = e.target.value;
         if (value == null) {
-            newInfo.find(p => p.personId === id).accessGroup = e.target.value;
+            newInfo.find(p => p.personId === id).accessGroup = value;
         } else {
-            newInfo.find(p => p.personId === id).accessGroup = accessGroups.find(group => group.accessGroupName === value);
+            newInfo.find(p => p.personId === id).accessGroup = accessGroups.find(group => group.accessGroupId === value);
         }
         setPersonsInfo(newInfo);
     };
@@ -264,31 +456,54 @@ const EditPersonsTwo = () => {
     
     const [disableSubmit, setDisableSubmit] = useState(false);
 
+    // return true if the person creation was successful
+    const createPerson = async (person) => {
+        try {
+            const res = await personApi.updatePerson(person);
+            if (res.status != 200) {
+                throw new Error("Unable to update person")
+            }
+            const body = await res.json();
+            const personId = body.personId;
+            // const toDelete = person.credentials.filter(cred=>!person.originalCredId.includes(cred.credId)).filter(credId=>credId>0)
+            const newCredIds = person.credentials.map(cred => cred.credId)
+            const toDelete = person.originalCredId.filter(id=> !newCredIds.includes(id))
+            
+            const delRes = await Promise.all(toDelete.map(credId=>deleteCredentialApi(credId)))
+            if(delRes.some(res=> res.status!=204)){
+                toast.error("Unable to delete some credentials")
+            }
+            const credResArr = await Promise.all(person.credentials.map((cred, i) => saveCredentialApi(cred, personId, cred.credId < 0)));
+            console.log("credResArr",credResArr)
+            if (credResArr.some(res => res.status > 201)) { // some failed
+                toast.error("Unable to create credential for " + getPersonName(body));
+            }
+
+            return true;
+        } catch(e) {
+            console.error(e);
+            return false;
+        }
+    }
+
     const submitForm = async (e) => {
         e.preventDefault();
         setDisableSubmit(true);
 
         // send res
         try {
-            const resArr = await Promise.all(personsInfo.map(p => personApi.updatePerson(p)));
-            // find failed res
-            const failedResIndex = [];
-            resArr.forEach((res, i) => {
-                if (res.status != 200) {
-                    failedResIndex.push(i);
-                }
-            });
-
+            const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
+            console.log("boolArr",boolArr)
             // success toast
-            const numSuccess = resArr.length - failedResIndex.length;
-            if (numSuccess) { toast.success(`Successfully updated ${numSuccess} persons`); }
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) { toast.success(`Successfully edited ${numSuccess} persons`); }
 
             // if some failed
-            if (failedResIndex.length) {
-                toast.error("Unable to update persons below");    
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to edit persons below");    
                 // filter failed personsInfo and personsValidation
-                setPersonsInfo(personsInfo.filter((p, i) => failedResIndex.includes(i)));
-                setPersonsValidation(personsInfo.filter((p, i) => failedResIndex.includes(i)));
+                setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
+                setPersonsValidation(personsInfo.filter((p, i) => !boolArr[i]));
             } else {
                 // all success
                 router.replace(personListLink);
@@ -298,7 +513,6 @@ const EditPersonsTwo = () => {
         }        
         setDisableSubmit(false);
     }
-
     return (
         <>
             <Head>
@@ -341,7 +555,6 @@ const EditPersonsTwo = () => {
                             <Stack spacing={3}>
                                 { 
                                     Array.isArray(personsInfo) && personsInfo.map((p,i) => {
-                                        console.log("validationrender",personsValidation)
                                         const id = p.personId;                                        
                                         return (
                                             <PersonEditFormTwo 
@@ -355,11 +568,16 @@ const EditPersonsTwo = () => {
                                                 onPersonEmailChange={onPersonEmailChangeFactory(id)}
                                                 accessGroups={accessGroups}
                                                 handleAccessGroupChange={onAccessGroupChangeFactory(id)}
-                                                // validation={personsValidation.find(p=>p.personId==id)}
                                                 validation={personsValidation[i]}
-                                                // validation={()=>{personsValidation[i]}}
-                                                // validation={personsValidation.filter(v=>v.personId==id)}
                                                 cardError={cardError}
+                                                addCredential={addCredentialFactory(id)}
+                                                removeCredentialFactory={removeCredentialFactory(id)}
+                                                credTypes={credTypes}
+                                                onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
+                                                onCredUidChangeFactory={onCredUidChangeFactory(id)}
+                                                onCredTTLChangeFactory={onCredTTLChangeFactory(id)}
+                                                onCredValidChangeFactory={onCredValidChangeFactory(id)}
+                                                onCredPermChangeFactory={onCredPermChangeFactory(id)}
                                             />
                                         )
                                     })
