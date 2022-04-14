@@ -94,7 +94,6 @@ const CreatePersonsTwo = () => {
                 }
                 newCredentials[credTypeId].push(cred.credUid);
             })
-            console.log(newCredentials);
             setCredentials(newCredentials);
         } catch(e) {
             console.error(e);
@@ -391,11 +390,8 @@ const CreatePersonsTwo = () => {
     }
 
     const onCredTTLChangeFactory = (personId) => (credId) => (dateObj) => {
-        console.log(dateObj);
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTTL = dateObj;
     }
-
-    useEffect(() => {console.log(personsInfo); console.log(personsValidation)}, [personsInfo, personsValidation]);
 
     const submitDisabled = (
         personsInfo.length == 0 ||

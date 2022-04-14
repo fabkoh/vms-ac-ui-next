@@ -56,7 +56,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
         setPerm(bool);
     }
 
-    const TTLHelperText = (endDate != null && endDate < today) ? "Note: expiry is before today" : "Expiry is end inclusive";
+    const TTLHelperText = (endDate != null && endDate < today) ? "Note: expiry is before today" : "Expiry date is end inclusive";
     const credentialInUse = validation.credentialInUseIds.includes(credId);
     const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 
