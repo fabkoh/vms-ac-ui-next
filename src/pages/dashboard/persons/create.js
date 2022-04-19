@@ -39,7 +39,7 @@ const getNewPersonValidation = (id) => ({
     uidInUse: false,
     uidRepeated: false,
     credentialInUseIds: [],
-    credentialRepeatedIds:[], // stores the ids of repeated credentials (repeated = credType and credUid same)
+    credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
     // note
     numberInUse: false,
     numberRepeated: false,

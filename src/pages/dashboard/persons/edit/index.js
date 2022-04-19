@@ -28,17 +28,16 @@ const getNewCredential = (id) => ({
     isPerm: false
 });
 
-const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank);
 
 const EditPersonsTwo = () => {
-
+    
     const router = useRouter();
     const ids = JSON.parse(decodeURIComponent(router.query.ids));
-
+    
     // stores list of person objects
     const [personsInfo, setPersonsInfo] = useState([]);
     const [personsValidation, setPersonsValidation] = useState([]);
-
+    
     // access groups for access group select
     const [accessGroups, setAccessGroups] = useState([]);
 
@@ -46,7 +45,7 @@ const EditPersonsTwo = () => {
     const [personUids, setPersonUids] = useState([]);
     const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
     const [personEmails, setPersonEmails] = useState([]);
-
+    
     // credTypes
     const [credTypes, setCredTypes] = useState([]);
     const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
@@ -54,7 +53,7 @@ const EditPersonsTwo = () => {
     // get info
     const isMounted = useMounted(); 
     useEffect(() => {
-    console.log("personsinfo",personsInfo)
+        console.log("personsinfo",personsInfo)
     }, [personsInfo])
     
     const getCredentials = async() => {
@@ -93,11 +92,11 @@ const EditPersonsTwo = () => {
             toast.error("Error loading credential types");
         }
     }
-
+    
     const getPersonsLocal = async ids => {
         const personsInfoArr = [];
         const validations = [];
-
+        
         // map each id to a fetch req for that access group
         const resArr = await Promise.all(ids.map(id => personApi.getPerson(id)
         ));
@@ -108,16 +107,17 @@ const EditPersonsTwo = () => {
             toast.error('Error editing persons. Please try again');
             router.replace('/dashboard/persons');
         }
-
+        
         // some persons not found
         if (successfulRes.length != resArr.length) {
             toast.error('Some persons were not found');
         }
-
+        
         const resArr2 = await Promise.all(ids.map(id=>getCredentialWherePersonIdApi(id)))
         const credArr = await Promise.all(resArr2.map(res=>res.json()))
         credArr.forEach(creds => {creds.forEach(cred=>{cred.credTypeId=cred.credType.credTypeId})})
         // credArr.forEach(cred =>{ cred.credTypeId=cred.credType.credTypeId})
+        let credArr2 = JSON.parse(JSON.stringify(credArr))
         const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
         bodyArr.forEach((body,i) => {
             const credIdArr = []
@@ -134,7 +134,7 @@ const EditPersonsTwo = () => {
                 personOriginalMobileNumber:  bodyArr[i].personMobileNumber,
                 accessGroup: bodyArr[i].accessGroup,
                 credentials: credArr[i],
-                originalCredId:credIdArr,
+                originalCreds: credArr2[i],
             });
             
             validations.push({
@@ -152,7 +152,7 @@ const EditPersonsTwo = () => {
                 numberRepeated: false,
                 emailInUse: false,
                 emailRepeated: false,
-
+                
                 // submit failed
                 submitFailed: false
             });
@@ -160,7 +160,18 @@ const EditPersonsTwo = () => {
         setPersonsValidation(validations);
         setPersonsInfo(personsInfoArr);
     }
-
+    useEffect(() => {
+        console.log("personsvalidations",personsValidation)
+    }, [personsValidation])
+    
+    const cardError = (v) => {
+        if (isObject(v)) {
+            console.log("card Error", v);
+        }
+        
+        
+        return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0);
+    }
     const getCredentialsLocal = async(personId) => {
         const res = await getCredentialWherePersonIdApi(personId)
         const data = await res.json();
@@ -230,7 +241,7 @@ const EditPersonsTwo = () => {
     };
 
      //add / remove credential logic
-     const addCredentialFactory = (personId) => () => {
+    const addCredentialFactory = (personId) => () => {
         const newPersons = [ ...personsInfo ];
         newPersons.find(p => p.personId == personId).credentials.push(getNewCredential(getNextCredId()));
         setPersonsInfo(newPersons);
@@ -301,14 +312,40 @@ const EditPersonsTwo = () => {
         let toChange = false;
 
         infoArr.forEach((person, i) => {
-            const newCredentialsInUse = []
+            const newCredentialsInUse = [] //stores cred Ids currently used. 
             person.credentials.forEach(cred => { // populate the above array
                 if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
-                    const inUseValues = credentials[cred.credTypeId];
-                    if (inUseValues.includes(cred.credUid)) {
+                    const inUseValues = credentials[cred.credTypeId]; //credentials is from db. stores credUid for the credIds of form person. doesnt add when new cred added?
+                    // console.log("inusevalues",inUseValues)
+                    // console.log("cred",cred) created creds are in person.credentials array. correct behaviour.
+                    // person.originalCreds.forEach(oCred=>{
+                    //     // console.log("ocred",oCred)
+                    //     // console.log("ocred",person.originalCreds)
+                    // if (inUseValues.includes(cred.credUid)&& (cred.credTypeId == oCred.credTypeId) && (cred.credUid == oCred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
+                    //     newCredentialsInUse.push(cred.credId);
+                    // }
+                    // })
+                    // const orig={1:[],2:[]}
+                    const origUids = []
+                    const origIds = []
+                    person.originalCreds.forEach(oCred=>{
+                        origUids.push(oCred.credUid)
+                        origIds.push(oCred.credId)
+                    })
+                    // person.originalCreds.forEach(oCred=>{
+                    //     orig[oCred.credTypeId].push(oCred.credUid)
+                    // })
+                    // !credentials[credtypeid].includes(orig[credtypeid].map(uid=>return uid)) means u reuse so not in use? 
+                    // console.log("orig",orig)
+                    // console.log("origUids",origUids)
+                    // if (inUseValues.includes(cred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
+                    //     newCredentialsInUse.push(cred.credId);
+                    // }
+                    if (inUseValues.includes(cred.credUid)&& !origIds.includes(cred.credId)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
                         newCredentialsInUse.push(cred.credId);
                     }
                 }
+                // console.log("newCredentialsInUse",newCredentialsInUse)
             });
             if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
                 toChange = true;
@@ -323,7 +360,7 @@ const EditPersonsTwo = () => {
     const checkCredRepeatedHelper = (infoArr, validArr) => {
         let toChange = false;
 
-        const credMap = {}; // maps credTypeId to array of credUid
+        const credMap = {}; // maps credTypeId to array of credUid  //should this contain db map of credId:CredUid?
         const repeatedCred = []; // array of [credTypeId, credUid]
         infoArr.forEach(person => 
             person.credentials.forEach(
@@ -348,6 +385,7 @@ const EditPersonsTwo = () => {
         infoArr.forEach(
             (person, i) => {
                 const repeatedCredIds = [];
+                // console.log("repeatedCredIds",repeatedCredIds)
                 person.credentials.forEach(
                     cred => {
                         if (repeatedCred.some(c => c[0] == cred.credTypeId && c[1] == cred.credUid)) {
@@ -405,15 +443,17 @@ const EditPersonsTwo = () => {
 
         const b1 = checkCredInUseHelper(newInfo, personsValidation);
         const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
+        // if( b1) { setPersonsValidation([ ...personsValidation ]); }
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
         // personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref;
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
-        
+        // console.log("uidchange,originalcreds?",personsInfo.find(p => p.personId == personId).originalCreds)
         const b1 = checkCredInUseHelper(personsInfo, personsValidation);
         const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        // if( b1) { setPersonsValidation([ ...personsValidation ]); }
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     }
 
@@ -467,9 +507,9 @@ const EditPersonsTwo = () => {
             const personId = body.personId;
             // const toDelete = person.credentials.filter(cred=>!person.originalCredId.includes(cred.credId)).filter(credId=>credId>0)
             const newCredIds = person.credentials.map(cred => cred.credId)
-            const toDelete = person.originalCredId.filter(id=> !newCredIds.includes(id))
+            const toDelete = person.originalCreds.filter(cred=> !newCredIds.includes(cred.credId))
             
-            const delRes = await Promise.all(toDelete.map(credId=>deleteCredentialApi(credId)))
+            const delRes = await Promise.all(toDelete.map(cred=>deleteCredentialApi(cred.credId)))
             if(delRes.some(res=> res.status!=204)){
                 toast.error("Unable to delete some credentials")
             }
@@ -485,7 +525,7 @@ const EditPersonsTwo = () => {
             return false;
         }
     }
-
+    
     const submitForm = async (e) => {
         e.preventDefault();
         setDisableSubmit(true);
@@ -503,7 +543,7 @@ const EditPersonsTwo = () => {
                 toast.error("Unable to edit persons below");    
                 // filter failed personsInfo and personsValidation
                 setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
-                setPersonsValidation(personsInfo.filter((p, i) => !boolArr[i]));
+                setPersonsValidation(personsValidation.filter((p, i) => !boolArr[i]));
             } else {
                 // all success
                 router.replace(personListLink);

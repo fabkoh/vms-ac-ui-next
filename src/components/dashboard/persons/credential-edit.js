@@ -1,5 +1,6 @@
 import {
 	Button,
+	Divider,
 	Grid,
 	IconButton,
 	InputAdornment,
@@ -85,16 +86,33 @@ const CredentialEdit = ({
 		endDate != null && endDate < today
 			? "Note: expiry is before today"
 			: "Expiry is end date inclusive";
-	// const credentialInUse = validation.credentialInUseIds.includes(credId);
-	// const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
+	const credentialInUse = validation.credentialInUseIds.includes(credId);
+	const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
+	console.log("validation",credentialInUse)
 
 	// const [show, setShow] = useState(true);
 	// const handleShowPasswordClick = () => setShow(!show);
 	return (
-		<Grid item container spacing={1}>
-			<Grid item md={2} xs={4} display="flex" alignItems="center">
+		<Grid item container>
+			<Grid 
+				container
+				item
+				display="flex"
+				justifyContent="space-between"
+				alignItems="start"
+				flexWrap="wrap"
+				md={6}
+				xs={12}
+				spacing={1}
+				mb={1}
+			>
+				    <Grid
+                    item
+                    md={3}
+                >
 				<SingleSelect
 					fullWidth
+					sx={{ minWidth: '90px' }}
 					label="Type"
 					getLabel={getCredTypeName}
 					onChange={onCredTypeChange}
@@ -106,24 +124,9 @@ const CredentialEdit = ({
 					required
 					helperText=" "
 				/>
-			</Grid>
-			<Grid item md={2} xs={4} display="flex" alignItems="center">
-				{/* <TextField
-					type={show ? "text" : "password"}
-					value={credUid}
-					onChange={handleCredUidChange}
-					endAdornment={
-						<InputAdornment position="end">
-							<IconButton onClick={handleShowPasswordClick}>
-								{show ? (
-									<VisibilityOff fontSize="small" />
-								) : (
-									<Visibility fontSize="small" />
-								)}
-							</IconButton>
-						</InputAdornment>
-					}
-				/> */}
+				</Grid>
+			<Grid item
+                    md={5}>
 				<PasswordField
                     required
                     label="Value"
@@ -136,29 +139,45 @@ const CredentialEdit = ({
                     // value={credUidRef.current.value}
                     // value={credUidRef.current.value}  undef
                     // value={credUidRef.current?.value} undef
-                    // error={credentialInUse || credentialRepeated}
-                    // helperText={
-                    //     (credentialInUse && "Repeated type & value") ||
-                    //     (credentialRepeated && "Repeated type & value in form") || ' '
-                    // }
+                    // error={credentialInUse }
+                    error={credentialInUse || credentialRepeated}
+                    helperText={
+                        (credentialInUse && "credential type and value in use") ||
+                        (credentialRepeated && "Repeated type & value in form") || ' '
+                    }
                     defaultValue={credUid}
                 />
 			</Grid>
-			<Grid item md={2} xs={4} display="flex" alignItems="center">
+			<Grid item md={4}>
 				<Toggle
 					checked={valid}
 					handleChange={handleCredValidChange}
 					label="Enabled"
 				/>
 			</Grid>
-			<Grid item md={2} xs={4} display="flex" alignItems="center">
+			</Grid>
+			<Grid            
+				item
+                display="flex"
+                justifyContent="space-between"
+                alignItems="start"
+                flexWrap="wrap"
+                md={6}
+                xs={12}
+                mb={1}
+                container
+                spacing={1}>
+					<Grid
+					  item
+					  md={5}
+					  mb={1}>
 				<Toggle
 					checked={perm}
 					handleChange={handleCredPermChange}
 					label="Permanent"
 				/>
-			</Grid>
-			<Grid item md={3} xs={6} display="flex" alignItems="center">
+				</Grid>
+			<Grid item md={5}>
 				{!isPerm && (
 					<TextField // ref does not work as removing and re rendering it removes the date, even though ref.current?.value still has the prev date
 						fullWidth
@@ -173,11 +192,15 @@ const CredentialEdit = ({
 					/>
 				)}
 			</Grid>
-			<Grid item md={1} xs={2} display="flex" alignItems="center">
+			<Grid
+			item
+			md={2}>
 				<Button variant="outlined" color="error" onClick={removeCredential}>
 					Clear
 				</Button>
-			</Grid>
+		</Grid>
+		</Grid>
+		<Divider sx={{width:'100%'}}/>
 		</Grid>
 	);
 };
