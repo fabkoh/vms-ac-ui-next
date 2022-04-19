@@ -6,9 +6,10 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
+import { isObject } from "../../../utils/utils";
+import CredentialEditForm from "./credential-form-edit";
 
-const PersonEditFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation, cardError }) => {
-    console.log("first",validation)
+const PersonEditFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonUidChange, onPersonEmailChange, accessGroups, handleAccessGroupChange, validation, cardError,addCredential, removeCredentialFactory, credTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory }) => {
     // update logic
     const personFirstNameRef = useRef(person.personFirstName);
     const personLastNameRef = useRef(person.personLastName);
@@ -188,8 +189,9 @@ const PersonEditFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonL
                                         label="Access Group"
                                         getLabel={getAccessGroupLabel}
                                         onChange={handleAccessGroupChange}
-                                        value={person.accessGroup}
+                                        value={isObject(person.accessGroup) ? person.accessGroup.accessGroupId : ''}
                                         options={accessGroups}
+                                        getValue={(accessGroup) => accessGroup.accessGroupId}
                                     />
                                 </Grid>
                             </Grid>
@@ -197,6 +199,21 @@ const PersonEditFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonL
                     </Grid>
                 </Grid>
             </CardContent>
+            <Collapse in={expanded}>
+                <Divider />
+                <CredentialEditForm
+                    credentials={person.credentials}
+                    addCredential={addCredential}
+                    removeCredentialFactory={removeCredentialFactory}
+                    credTypes={credTypes}
+                    onCredTypeChangeFactory={onCredTypeChangeFactory}
+                    onCredUidChangeFactory={onCredUidChangeFactory}
+                    onCredTTLChangeFactory={onCredTTLChangeFactory}
+                    onCredValidChangeFactory={onCredValidChangeFactory}
+                    onCredPermChangeFactory={onCredPermChangeFactory}
+                    validation={validation}
+                />
+            </Collapse>
         </ErrorCard>
     );
 };

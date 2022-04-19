@@ -110,7 +110,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                         <ExpandMoreIcon />
                     </ExpandMore>
                 }
-                title="Access Group Schedule"
+                title="Entrance Schedule"
                 action={
                     // action are children flushed to the right
                     (
@@ -162,7 +162,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                             value={entranceSchedule}
                             onChange={(e)=>{changeTextField(e,entranceScheduleId)}}
                             helperText={ 
-                                (entranceScheduleBlank && 'Error: access group schedule name cannot be blank')
+                                (entranceScheduleBlank && 'Error: entrance schedule name cannot be blank')
                                 // (entranceScheduleBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
                             //     (accessGroupNameDuplicated && 'Error: duplicate access group name in form')
@@ -180,7 +180,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                                 <TextField
                                     fullWidth
                                     // label="Description"
-                                    name="accessGroupDesc"
+                                    name="Desc"
                                     multiline
                                     value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
                                     disabled

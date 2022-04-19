@@ -46,7 +46,8 @@ const saveCredentialApi = (
                     credTTL,
                     isValid,
                     isPerm,
-                    credTypeId
+                    credTypeId,
+                    personId
                 })
             });
         }
@@ -66,4 +67,8 @@ const disableCredentialWithIdApi = (credId) => {
     if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}/disable`, { method: 'PUT' })
 }
 
-export { getCredentialsApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi }
+const deleteCredentialApi = (credId) => {
+    if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}`, { method: 'DELETE' })
+}
+
+export { getCredentialsApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi,deleteCredentialApi }

@@ -8,10 +8,19 @@ const formatString = (num, length) => {
     return numString;
 }
 
+const toStringFromStringOrObject = (datestring) =>{
+    if(typeof(datestring)=="string"){
+    const temp = datestring.slice(0,10)
+    return temp
+    }
+    if(typeof(datestring)=="object"){
+        return toDateInputString(datestring)
+    }
+}
 
 const toDateInputString = (date) => {
     if (date == null) { return ''; }
     return formatString(date.getFullYear(), 4) + '-' + formatString(date.getMonth() + 1, 2) + '-' + formatString(date.getDate(), 2);
 }
 
-export { toDateInputString }
+export { toDateInputString,toStringFromStringOrObject }
