@@ -47,6 +47,22 @@ const getSections = (t) => [
     ]
   },
   {
+    title: t('Authentication'),
+    items: [
+      {
+        title: t('Credentials'),
+        path: '/dashboard/credentials/create',
+        icon: <UsersIcon fontSize="small" />,
+        children: [
+          {
+            title: 'Add',
+            path: '/dashboard/credentials/create'
+          }
+        ]
+      }
+    ]
+  },
+  {
     title: t('People'),
     items: [
       {
