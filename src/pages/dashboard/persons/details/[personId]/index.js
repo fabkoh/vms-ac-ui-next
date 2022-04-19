@@ -17,7 +17,7 @@ import { useMounted } from '../../../../../hooks/use-mounted';
 import { ChevronDown as ChevronDownIcon } from '../../../../../icons/chevron-down';
 import { gtm } from '../../../../../lib/gtm';
 import { personApi } from '../../../../../api/person';
-import { PersonBasicDetails } from '../../../../../components/dashboard/person/person-basic-details';
+import { PersonBasicDetails } from '../../../../../components/dashboard/persons/person-basic-details';
 import StyledMenu from '../../../../../components/dashboard/styled-menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,12 +25,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { Confirmdelete } from '../../../../../components/dashboard/persons/confirm-delete';
 import toast from 'react-hot-toast';
+import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
+import PersonCredentials from '../../../../../components/dashboard/persons/person-credentials';
+import { getCredentialWherePersonIdApi } from '../../../../../api/credentials';
 
 const PersonDetails = () => {
 
   // load person details
   const isMounted = useMounted();
-  const [person, setPerson] = useState(null);  
+  const [person, setPerson] = useState(null); 
+  const [credentials, setCredentials] = useState([]);
   const router = useRouter();
   const { personId } = router.query;
 
@@ -38,25 +42,45 @@ const PersonDetails = () => {
 	gtm.push({ event: 'page_view' });
   }, []);
 
-  const getPerson = useCallback(async () => {
+  const getCredentials = async() => {
+    try {
+      const res = await getCredentialWherePersonIdApi(personId);
+      if (res.status != 200) { // credentials not found
+        throw new Error("Credentials not loaded");
+      }
+      const body = await res.json();
+      if (isMounted()) {
+        setCredentials(body);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Error loading credentials");
+    }
+  }
+
+  const getPerson = async() => {
     try {
       const res = await personApi.getPerson(personId);
       if(res.status != 200) { // person not found
         toast.error("Person not found");
-        router.replace("/dashboard/persons");
+        router.replace(personListLink);
       }
       const body = await res.json();
-
       if(isMounted()) {
         setPerson(body);
       }
-    } catch (err) {
-      console.error(err);
+    } catch(err) {
+      console.log(err);
     }
+  }
+
+  const getInfo = useCallback( () => {
+    getPerson();
+    getCredentials();
   }, [isMounted]);
 
   useEffect(() => {
-    getPerson();
+    getInfo();
   }, 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
@@ -68,7 +92,7 @@ const PersonDetails = () => {
   const handleClose = () => { setAnchorEl(null); }
 
   // link to edit page
-  const editLink = "/dashboard/persons/edit?ids=" + encodeURIComponent(JSON.stringify([Number(personId)]));
+  const editLink = getPersonsEditLink([person]);
 
   // handle delete action. put this in parent component
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
@@ -79,13 +103,13 @@ const PersonDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deletePersons = async() => {
     Promise.resolve(
       personApi.deletePerson(person.personId)
     ).then((res)=>{
       if (res.status == 204){
         toast.success('Delete success');
-        router.replace('/dashboard/persons');
+        router.replace(personListLink);
       }
       else{
         toast.error('Delete unsuccessful')
@@ -114,7 +138,7 @@ const PersonDetails = () => {
 		  <div>
 			<Box sx={{ mb: 4 }}>
 			  <NextLink
-				href="/dashboard/persons"
+				href={personListLink}
 				passHref
 			  >
 				<Link
@@ -150,7 +174,7 @@ const PersonDetails = () => {
 			  >
 				<div>
 				  <Typography variant="h4">
-					{person.personFirstName + ' ' + person.personLastName}
+            { getPersonName(person) }
 				  </Typography>
 				</div>
 			  </Grid>
@@ -195,9 +219,11 @@ const PersonDetails = () => {
               <DeleteIcon />
               Delete
             </MenuItem>
-            <Confirmdelete setAnchorEl={setAnchorEl} deleteOpen={deleteOpen} handleDeleteClose={handleDeleteClose}
-			handleDeleteAction={handleDeleteAction}
-			handleDeleteOpen={handleDeleteOpen}/>
+            <Confirmdelete 
+              setAnchorEl={setAnchorEl}
+              open={deleteOpen}
+              handleDialogClose={handleDeleteClose}
+              deletePersons={deletePersons} />
           </StyledMenu>
 			  </Grid>
 			</Grid>
@@ -212,6 +238,12 @@ const PersonDetails = () => {
             xs={12}
           >
             <PersonBasicDetails person={person} />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <PersonCredentials credentials={credentials} />
           </Grid>
 			  </Grid>
 		  </Box>

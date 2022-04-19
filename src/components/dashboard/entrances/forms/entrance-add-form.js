@@ -16,6 +16,7 @@ import ExpandMore from "../../shared/expand-more";
 import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../shared/edit_form_tooltip";
+import { getAccessGroupLabel, filterAccessGroupsByState, filterAccessGroupByStringPlaceholder, isAccessGroupEqual } from "../../../../utils/access-group"
 
 const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameChange, onDescriptionChange, onAccessGroupChange, edit, allAccessGroups }) => {
     const {
@@ -37,17 +38,6 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
     // expanding form
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
-
-    // access group logic
-    const getAccessGroupName = (e) => e.accessGroupName;
-    const accessGroupFilter = (accGroup, state) => {
-        const text = state.inputValue.toLowerCase(); // case insensitive search
-        return accGroup.filter(e => (
-            e.accessGroupName.toLowerCase().includes(text)
-        ))
-    }
-    const accessGroupEqual = (option, value) => option.accessGroupId == value.accessGroupId;
-
 
     return (
         <ErrorCard error={
@@ -168,13 +158,13 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                                     <MultipleSelectInput 
                                         options={allAccessGroups}
                                         setSelected={onAccessGroupChange}
-                                        getOptionLabel={getAccessGroupName}
+                                        getOptionLabel={getAccessGroupLabel}
                                         label="Access Groups"
                                         noOptionsText="No access group found"
-                                        placeholder="Enter access group details (name, description) to search"
-                                        filterOptions={accessGroupFilter}
+                                        placeholder={filterAccessGroupByStringPlaceholder}
+                                        filterOptions={filterAccessGroupsByState}
                                         value={accessGroups}
-                                        isOptionEqualToValue={accessGroupEqual}
+                                        isOptionEqualToValue={isAccessGroupEqual}
                                     />                                 
                                 </Grid>
                             </Grid>

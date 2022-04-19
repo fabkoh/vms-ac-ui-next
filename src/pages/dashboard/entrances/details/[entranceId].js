@@ -30,6 +30,10 @@ import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
+import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
+import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
+import { entranceScheduleApi } from "../../../../api/entrance-schedule";
+import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
 
 const EntranceDetails = () => {
 
@@ -41,6 +45,10 @@ const EntranceDetails = () => {
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+
+    const link = getEntranceScheduleEditLink(entranceId);
+
+    const [entranceSchedules, setEntranceSchedules] = useState([]);
 
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
@@ -67,7 +75,7 @@ const EntranceDetails = () => {
             const res = await entranceApi.getEntrance(entranceId);
             if(res.status != 200) {
                 toast.error('Entrance not found');
-                router.replace('/dashboard/entrances')
+                router.replace(entranceListLink);
             }
             const body = await res.json();
 
@@ -79,12 +87,34 @@ const EntranceDetails = () => {
         } catch(err) {
             console.error(err);
         }
-    }, [isMounted]);
+    });
+
+    const getEntranceSchedules = async() => {
+        try {
+            const scheduleRes = await entranceScheduleApi.getEntranceSchedulesWhereEntranceIdsIn(entranceId);
+
+            if (scheduleRes.status == 200) {
+                const body = await scheduleRes.json();
+                if (isMounted()) {
+                    setEntranceSchedules(body);
+                }
+            }
+            else {
+                toast.error("Entrance Schedule Info Not Loaded");
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    
 
     const getInfo = useCallback(async() => {
         //get entrance and access group entrance
         getEntrance();
         getAccessGroups();
+        getEntranceSchedules();
     }, [isMounted])
 
     useEffect(() => {
@@ -106,15 +136,6 @@ const EntranceDetails = () => {
 
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
-    const [text, setText] = useState("");
-    const [deleteBlock, setDeleteBlock] = useState(true);
-    const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-    useEffect(() => {
-        console.log(text);
-        (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-    }, [text]);
 
     //Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -129,16 +150,15 @@ const EntranceDetails = () => {
 		setDeleteOpen(true);                        
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteEntrance = async() => {
         Promise.resolve(
             entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            router.replace('/dashboard/entrances');
+            router.replace(entranceListLink);
         }
         else{
             toast.error('Delete unsuccessful')
@@ -146,6 +166,22 @@ const EntranceDetails = () => {
         })
         setDeleteOpen(false);
     }; 
+
+    //delete entrance schedules
+    const deleteSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some entrance schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    }
 
     // for updating status
     const [statusUpdateId, setStatusUpdateId] = useState([]);
@@ -173,9 +209,9 @@ const EntranceDetails = () => {
             entranceApi.updateEntranceStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " entrance");
+                toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
             } else {
-                toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " entrance");
+                toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
             }
         })
 
@@ -217,7 +253,7 @@ const EntranceDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href="/dashboard/entrances"
+                                href={entranceListLink}
                                 passHref
                             >
                                 <Link
@@ -275,7 +311,7 @@ const EntranceDetails = () => {
                                     onClose={handleActionClose}
                                 >
                                     <NextLink
-                                        href="/dashboard/entrances/create"
+                                        href={entranceCreateLink}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -284,10 +320,7 @@ const EntranceDetails = () => {
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink
-                                        href={ 
-                                            // put entranceId in the ids of params of edit url
-                                            "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([Number(entrance.entranceId)])) 
-                                        }
+                                        href={getEntranceEditLink([entrance])}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -305,12 +338,10 @@ const EntranceDetails = () => {
                                    <Confirmdelete 
                                     selectedState={selectedState}
                                     setActionAnchor={setActionAnchor}
-                                    deleteOpen={deleteOpen}
-                                    handleDeleteClose={handleDeleteClose}
-                                    handleDeleteAction={handleDeleteAction}
-                                    handleDeleteOpen={handleDeleteOpen}
-                                    handleTextChange={handleTextChange}
-                                    deleteBlock={deleteBlock}/>
+                                    open={deleteOpen}
+                                    handleDialogClose={handleDeleteClose}
+                                    deleteEntrances={deleteEntrance}/>
+                                    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
@@ -347,6 +378,17 @@ const EntranceDetails = () => {
                                 xs={12}
                             >
                                 <AccessGroupDetails accessGroupEntrance ={accessGroup} />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <EntranceSchedules 
+                                    entrance={entrance}
+                                    entranceSchedules={entranceSchedules}
+                                    deleteSchedules={deleteSchedules}
+                                    link={link} 
+                                />
                             </Grid>
                         </Grid>
                     </Box>

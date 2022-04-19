@@ -11,7 +11,7 @@ export default function rruleDescription(rruleObj, timeStart, timeEnd) {
     
     // return 'Please select start date' if start date not in object
     if (rruleOptions.dtstart == null) {
-        return 'Please start start date below';
+        return 'Please select start date below';
     }
 
     const dateString = rruleOptions.dtstart.toLocaleDateString("en-US", {

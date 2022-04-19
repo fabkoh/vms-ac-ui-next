@@ -5,6 +5,8 @@ import { PropertyList } from '../../property-list';
 import { PropertyListItem } from '../../property-list-item';
 import { SeverityPill } from '../../severity-pill';
 import WarningIcon from '@mui/icons-material/Warning';
+import BasicDetailsCard from '../shared/basic-details-card';
+import { getAccessGroupDetailsLink, getAccessGroupLabel } from "../../../utils/access-group";
 
 export const PersonBasicDetails = (props) => {
   const { 
@@ -21,9 +23,7 @@ export const PersonBasicDetails = (props) => {
   const align = mdUp ? 'horizontal' : 'vertical';
 
   return (
-    <Card>
-      <CardHeader title="Basic Details" />
-      <Divider />
+    <BasicDetailsCard>
       <PropertyList>
         <PropertyListItem
           align={align}
@@ -81,8 +81,8 @@ export const PersonBasicDetails = (props) => {
           {
             accessGroup ? (
               <Link component="a">
-                <NextLink href={`/dashboard/access-groups/details/${accessGroup.accessGroupId}`} passHref>                
-                  <Chip label={accessGroup.accessGroupName} />
+                <NextLink href={getAccessGroupDetailsLink(accessGroup)} passHref>                
+                  <Chip label={getAccessGroupLabel(accessGroup)} />
                 </NextLink>
               </Link>
             ) : (
@@ -94,7 +94,7 @@ export const PersonBasicDetails = (props) => {
           }
         </PropertyListItem>
       </PropertyList>
-    </Card>
+    </BasicDetailsCard>
   );
 };
 

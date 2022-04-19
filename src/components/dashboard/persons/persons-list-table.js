@@ -33,6 +33,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import { useRouter } from "next/router";
 import { width } from "@mui/system";
 import { ListFilter } from "../shared/list-filter";
+import { getPersonDetailsLink, getPersonName, getPersonsEditLink } from "../../../utils/persons";
 
 export const PersonsListTable = (props) => {
 	const {
@@ -181,12 +182,12 @@ export const PersonsListTable = (props) => {
 											</Avatar>
 											<Box sx={{ ml: 1, width:100}}>
 												<NextLink
-													href={"/dashboard/persons/details/" + person.personId}
+													href={getPersonDetailsLink(person)}
 													passHref
 												>
 													<Link color="inherit" variant="subtitle2">
 														<Typography noWrap>
-														{person.personFirstName} {person.personLastName}
+														{getPersonName(person)}
 														</Typography>
 													</Link>
 												</NextLink>
@@ -246,14 +247,7 @@ export const PersonsListTable = (props) => {
                   </TableCell> */}
 									<TableCell width="10%" align="left">
 										<NextLink
-											href={{
-												pathname: "/dashboard/persons/edit",
-												query: {
-													ids: encodeURIComponent(
-														JSON.stringify([person.personId])
-													),
-												},
-											}}
+											href={getPersonsEditLink([person])}
 											passHref
 										>
 											<IconButton component="a">
@@ -261,7 +255,7 @@ export const PersonsListTable = (props) => {
 											</IconButton>
 										</NextLink>
 										<NextLink
-											href={"/dashboard/persons/details/" + person.personId}
+											href={getPersonDetailsLink(person)}
 											passHref
 										>
 											<IconButton component="a">

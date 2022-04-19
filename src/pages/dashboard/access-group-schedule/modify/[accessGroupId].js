@@ -16,7 +16,7 @@ import MultipleSelectInput from "../../../../components/dashboard/shared/multi-s
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
 
-const CreateAccessGroupSchedule = () => {
+const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
     const router = useRouter();
     const temp = router.query;
@@ -37,7 +37,7 @@ const CreateAccessGroupSchedule = () => {
         const tempEntArray = []
         data.forEach(grp=>{tempEntArray.push(grp.entrance)})
         setAllEntrances(tempEntArray)
-        // console.log(JSON.stringify(data))
+        console.log("all entrances here",JSON.stringify(tempEntArray))
     }
     const getAccGrp = async() => {
         const res = await accessGroupApi.getAccessGroup(accessGroupId);
@@ -247,7 +247,7 @@ const CreateAccessGroupSchedule = () => {
     }
     const [entrances, setEntrances] = useState([])
     const changeEntrance = (newValue) => {
-        // console.log(newValue,"SSSSSSSS")
+        console.log(newValue,"SSSSSSSS")
         setEntrances(newValue)
     }
     // const [grpToEntIdArr, setGrpToEntIdArr] = useState([])
@@ -448,7 +448,7 @@ const CreateAccessGroupSchedule = () => {
     )
 }
 
-CreateAccessGroupSchedule.getLayout = (page) => (
+ModifyAccessGroupSchedule.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -456,4 +456,4 @@ CreateAccessGroupSchedule.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default CreateAccessGroupSchedule;
+export default ModifyAccessGroupSchedule;

@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import { ListFilter } from "../../shared/list-filter";
+import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
 
 // for status options
 const statusOptions = ['Unlocked', 'Active'];
@@ -50,8 +51,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                 } = entrance
                                 const isEntranceSelected = selectedEntrances.includes(entranceId);
                                 const handleSelect = handleSelectFactory(entranceId);
-                                const detailsLink = "/dashboard/entrances/details/" + entranceId;
-                                const editLink = "/dashboard/entrances/edit?ids=" + encodeURIComponent(JSON.stringify([entranceId]));
+                                const detailsLink = getEntranceDetailsLink(entrance);
+                                const editLink = getEntranceIdsEditLink([entranceId]);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
                                 return(
                                     <TableRow
@@ -125,7 +126,7 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                                 </IconButton>    
                                             </NextLink>
                                             <NextLink 
-                                                href={ "/dashboard/entrances/details/" + entranceId }
+                                                href={ detailsLink }
                                                 passHref
                                             >
                                                 <IconButton component="a">

@@ -15,6 +15,7 @@ import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
+import { accessGroupListLink } from "../../../utils/access-group";
 
 const CreateAccessGroups = () => {
 
@@ -351,7 +352,7 @@ const CreateAccessGroups = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href="/dashboard/access-groups"
+                            href={accessGroupListLink}
                             passHref
                         >
                             <Link

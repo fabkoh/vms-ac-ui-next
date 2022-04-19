@@ -16,7 +16,7 @@ import ExpandMore from "../shared/expand-more";
 import MultipleSelectInput from "../shared/multi-select-input";
 import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
-import Rrule from "./rrule-form";
+import Rrule from "../shared/rrule-form";
 import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
@@ -123,6 +123,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             <Button
                                 variant="outlined"
                                 color="error"
+                                sx={{mt:1}}
                                 onClick={() => removeCard(accessGroupScheduleId)}
                             >
                                 Clear

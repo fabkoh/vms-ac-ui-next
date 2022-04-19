@@ -1,14 +1,6 @@
-import DetailsCard from "../../shared/details_card_with_search_field"
-import MeetingRoom from "@mui/icons-material/MeetingRoom"
-
-const getName = (entrance) => entrance.entranceName;
-const getLink = (entrance) => `/dashboard/entrances/details/${entrance.entranceId}`
-const search = (entrances, inputValue) => {
-    const input = inputValue.toLowerCase();
-    return entrances.filter(e => (
-        e.entranceName.toLowerCase().includes(input)
-    ));
-}
+import DetailsCard from "../../shared/details-card-with-search-field";
+import MeetingRoom from "@mui/icons-material/MeetingRoom";
+import { getEntranceLabel, getEntranceDetailsLink, filterEntrancesByString, filterEntranceByStringPlaceholder } from "../../../../utils/entrance";
 
 export default function EntranceDetails({ accessGroupEntrance }){
     return (
@@ -16,11 +8,11 @@ export default function EntranceDetails({ accessGroupEntrance }){
             title="Entrances"
             subheader="Click on entrance below to go to entrance details page"
             entities={ accessGroupEntrance.map(groupEntrance => groupEntrance.entrance) }
-            getLabel={ getName }
-            getLink={ getLink }
+            getLabel={ getEntranceLabel }
+            getLink={ getEntranceDetailsLink }
             emptyLabel="No entrances"
-            searchFilter={ search }
-            placeholder="Search for entrance name"
+            searchFilter={ filterEntrancesByString }
+            placeholder={ filterEntranceByStringPlaceholder }
             noneFoundText="No entrances found"
             icon={<MeetingRoom fontSize="small" sx={{mr: 1}} />}
         />

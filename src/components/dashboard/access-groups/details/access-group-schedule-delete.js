@@ -175,13 +175,6 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                                     <strong>{"\nDeleting all schedules would remove this entrance from the access group"}</strong>
                                 }
                             </DialogContentText>
-                            { 
-                                selectedAll && 
-                                <Alert icon={false} severity="error" sx={{ mt: 2, mb: 2, whiteSpace: "pre-line" }}>
-                                    Deleting all schedules would remove this entrance from the access group
-                                </Alert>
-                                
-                            }
                             <form onSubmit={handleDeleteSchedules}>
                                 <TextField
                                     variant="filled"

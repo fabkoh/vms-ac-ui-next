@@ -14,6 +14,7 @@ import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
+import { entranceListLink } from "../../../utils/entrance";
 
 const CreateEntrances = () => {
 
@@ -321,7 +322,7 @@ const CreateEntrances = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href="/dashboard/entrances"
+                            href={entranceListLink}
                             passHref
                         >
                             <Link

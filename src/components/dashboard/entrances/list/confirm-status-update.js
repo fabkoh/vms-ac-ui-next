@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { useState } from "react";
 
 export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, handleDialogClose, handleStatusUpdate}) {
-    const action = updateStatus ? "enable" : "unlock";
+    const action = updateStatus ? "activate" : "unlock";
     const helperText = `Type in ${action.toUpperCase()} to proceed`;
 
     // for text field

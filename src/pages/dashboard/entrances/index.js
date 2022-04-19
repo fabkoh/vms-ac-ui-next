@@ -19,10 +19,11 @@ import EntranceListTable from "../../../components/dashboard/entrances/list/entr
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
+import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 
 const applyFilter = createFilter({
-    query: (entrance, queryString) => entrance.entranceName.toLowerCase().includes(queryString),
-    status: (entrance, state) => state == null || entrance.isActive == state
+    query: filterEntranceByString,
+    status: filterEntranceByStatus
 })
 
 const EntranceList = () => {
@@ -150,8 +151,8 @@ const EntranceList = () => {
             }
         })
 
-        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "enable" : "unlock") + " some entrances"); }
-        if (successCount) { toast.success("Successfully " + (updatedStatus ? "enabled" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " some entrances"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
 
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
@@ -164,17 +165,8 @@ const EntranceList = () => {
 
     //for delete action button
 	const [deleteOpen, setDeleteOpen] = useState(false);  
-	const [text, setText] = useState("");
-	const [deleteBlock, setDeleteBlock] = useState(true);
-	const handleTextChange = (e) => {
-		setText(e.target.value);
-	};
-	useEffect(() => {
-	//  console.log(text); 
-	 (text=='DELETE')? setDeleteBlock(false):setDeleteBlock(true)
-	});
 	
-	//Set to true if an access group is selected. controls form input visibility.
+	//Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 	  if(selectedEntrances.length>=1){
@@ -187,14 +179,12 @@ const EntranceList = () => {
 	
 
 	const handleDeleteOpen = () => {        
-		setDeleteOpen(true);             
-
+		setDeleteOpen(true);           
 	};
 	const handleDeleteClose = () => {
-        setText("");
 		setDeleteOpen(false);
 	}
-	const handleDeleteAction = () => {
+	const deleteEntrances = async() => {
 		Promise.all(selectedEntrances.map(id=>{
 			return entranceApi.deleteEntrance(id)
 		})).then( resArr => {
@@ -210,6 +200,18 @@ const EntranceList = () => {
 		})
 		setDeleteOpen(false);
 	};
+
+    // Reset selectedEntrances when entrances change
+	useEffect(
+		() => {
+			if (selectedEntrances.length) {
+				setSelectedEntrances([]);
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[entrances]
+	);
+    
 
     return(
         <>
@@ -250,16 +252,13 @@ const EntranceList = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    <NextLink href={"/dashboard/entrances/create"} passHref>
+                                    <NextLink href={entranceCreateLink} passHref>
                                         <MenuItem disableRipple>
                                             <Add />
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href={{
-                                        pathname: '/dashboard/entrances/edit',
-                                        query: { ids: encodeURIComponent(JSON.stringify(selectedEntrances)) }
-                                    }} passHref>    
+                                    <NextLink href={getEntranceIdsEditLink(selectedEntrances)} passHref>    
                                         <MenuItem disableRipple disabled={actionDisabled}>
                                             <Edit />
                                             &#8288;Edit
@@ -275,23 +274,19 @@ const EntranceList = () => {
                                         &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete
-                                                selectedState={selectedState}
-                                        		setActionAnchor={setActionAnchor}
-                                                deleteOpen={deleteOpen} 
-                                                handleDeleteClose={handleDeleteClose}
-                                                handleDeleteAction={handleDeleteAction}
-                                                handleDeleteOpen={handleDeleteOpen}
-                                                selectedAccessGroup={selectedEntrances}
-                                                handleTextChange={handleTextChange}
-                                                deleteBlock={deleteBlock}
-                                        />    
+                                        setActionAnchor={setActionAnchor}
+                                        open={deleteOpen} 
+                                        handleDialogClose={handleDeleteClose}
+                                        selectedEntrances={selectedEntrances}
+                                        deleteEntrances={deleteEntrances}
+                                    />    
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
                                         disabled={actionDisabled}
                                     >
                                         <DoorFront />
-                                        &#8288;Enable
+                                        &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
@@ -356,7 +351,7 @@ const EntranceList = () => {
                                             </InputAdornment>
                                         )
                                     }}
-                                    placeholder="Search for entrance name"
+                                    placeholder={filterEntranceByStringPlaceholder}
                                 />                                   
                             </Box>
                         </Box>

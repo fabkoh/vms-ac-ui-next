@@ -185,7 +185,6 @@ const Rrule = (props) => {
 					<Grid item ml={2} mr={2} mt={1} minWidth={150} >
 						<TextField
 							type="time"
-							// label="Start Time"
 							onChange={handleTimeStart}
 							helperText={nonChangingRule.timeStart==""?"Error: invalid start time": " "}
 							required={allDay?false:true}
@@ -200,7 +199,6 @@ const Rrule = (props) => {
 					<Grid item ml={2} mr={2} mt={1} >
 						<TextField
 							type="time"
-							// label="End Time"
 							onChange={handleTimeEnd}
 							error={Boolean(timeEndInvalid)}
 							required={allDay?false:true}
@@ -412,12 +410,12 @@ const Rrule = (props) => {
 						<Grid item justifyContent="flex-start" required>
 							<ToggleButtonGroup
 								color="info"
-								flexwrap="wrap"
+								// flexwrap="wrap"
 								value={rule.byweekday}
 								required
 								// onChange={(e)=>console.log(e.target.value)}
 								onChange={handleByweekday}
-								sx={{ mt: 1 }}
+								sx={{ mt: 1 ,flexWrap:"wrap"}}
 							>
 								<ToggleButton value={0}>M</ToggleButton>
 								<ToggleButton value={1}>T</ToggleButton>
@@ -549,7 +547,7 @@ const Rrule = (props) => {
 			return (
 				<Grid container alignItems="center" mt={2}>
 					<TextField
-						sx={{ ml: 2, mr: 2, maxWidth: 150, maxWidth: 150 }}
+						sx={{ ml: 2, mr: 2, maxWidth: 150 }}
 						type="number"
 						helperText={" "}
 						value={nonChangingRule.count}
@@ -566,10 +564,17 @@ const Rrule = (props) => {
 			return (
 				<Grid container alignItems="center" mt={2}>
 					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
-				</Grid> 								//instead of end =="on", fn if end == on && invalid until
+				</Grid> 								
 			);
 		}
-		if (e == "never") {
+		if (e == "never") {      //renders nothing but empty container is used for consistent sizing
+			return(
+				<Grid container mt={2} minHeight={79}>  
+					<Grid item>
+						<Typography>{" "}</Typography>
+					</Grid>
+				</Grid>
+			)
 			//set count and until to null.done
 		}
 	};
