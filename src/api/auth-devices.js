@@ -2,22 +2,6 @@ import { useApi, fakeAccessGroups, fakePersons , fakeAccessGroupSchedule, fakeCo
 import { encodeArrayForSpring, sendApi } from './api-helpers';
 
 class AuthDeviceApi {
-
-    // getAuthDevices() {
-    //     if (useApi) { 
-    //         return sendApi(`/api/controllers`);
-    //     }
-    //     const controllers = fakeControllers.map(controller => {
-    //         return{...controller}
-    //     })
-    //     controllers.forEach(controller => {
-    //             // populate authDevice
-    //             controller.authDevice = fakeAuthDevices.filter(device => device.controllerId == controller.controllerId);
-
-    //         return controller
-    //     })
-    //     return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
-    // }
     
     getAuthDevice(authDeviceId) {
         if (useApi) { 
@@ -35,52 +19,49 @@ class AuthDeviceApi {
         ));
     }
 
-    replaceAccessGroupSchedules(accessGroupScheduleList, groupToEntranceIds) {
-        const cleanedAccessGroupScheduleList = accessGroupScheduleList.map(
-            schedule => ({
-                accessGroupScheduleName: schedule.accessGroupScheduleName,
-                rrule: schedule.rrule,
-                timeStart: schedule.timeStart,
-                timeEnd: schedule.timeEnd
-            })
-        );
+    updateAuthdevice(authdevice, authdeviceId) {
         if (useApi) {
-            return sendApi(`/api/access-group-schedule/replace?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
+            return sendApi(`/api/authdevice/${authdeviceId}`, 
                 {
                     method: 'PUT',
                     headers: {
                         'Content-type': 'application/json'
                     },
-                    body: JSON.stringify(cleanedAccessGroupScheduleList)
+                    body: JSON.stringify(authdevice)
                 }
             );
         }
     }
+    
+    getAvailableEntrances(){
+        if(useApi){
+            return sendApi(`/api/availableEntrances`);
+        }
+    }
 
-    addAccessGroupSchedules(accessGroupScheduleList, groupToEntranceIds) {
-        const cleanedAccessGroupScheduleList = accessGroupScheduleList.map(
-            schedule => ({
-                accessGroupScheduleName: schedule.accessGroupScheduleName,
-                rrule: schedule.rrule,
-                timeStart: schedule.timeStart,
-                timeEnd: schedule.timeEnd
-            })
-        );
+    assignEntrance(authdevices, entranceId) {   //to remove entrance, set entranceId = null
         if (useApi) {
-            return sendApi(`/api/access-group-schedule/add?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
+            return sendApi(`/api/authdevice/entrance?entranceid=${entranceId}`, 
                 {
                     method: 'PUT',
                     headers: {
                         'Content-type': 'application/json'
                     },
-                    body: JSON.stringify(cleanedAccessGroupScheduleList)
+                    body: JSON.stringify(authdevices)
                 }
             );
         }
     }
+    enableMasterpin(authdeviceId) {
+        if (useApi) { return sendApi(`/api/authdevice/masterpinToTrue/${authdeviceId}`, { method: 'PUT' }); }
+    }
 
-    deleteAccessGroupSchedule(accessGroupScheduleId) {
-        if (useApi) { return sendApi(`/api/access-group-schedule/${accessGroupScheduleId}`, { method: 'DELETE' }); }
+    disableMasterpin(authdeviceId) {
+        if (useApi) { return sendApi(`/api/authdevice/masterpinToFalse/${authdeviceId}`, { method: 'PUT' }); }
+    }
+
+    deleteAuthdevice(authdeviceId) {
+        if (useApi) { return sendApi(`/api/authdevice/delete/${authdeviceId}`, { method: 'DELETE' }); }
     }
 }
 
