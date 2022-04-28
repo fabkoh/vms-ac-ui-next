@@ -36,44 +36,43 @@ class ControllerApi {
         ));
     }
 
-    updateController(controller) {
+    updateController({
+        controllerId,
+        controllerIP,
+        controllerName,
+        controllerIPStatic,
+        controllerMAC,
+        controllerSerialNo,
+    }) {
         if (useApi) {
-            return sendApi(`/api/controller`, 
+            return sendApi(`/api/controller/${controllerId}`, 
                 {
                     method: 'PUT',
                     headers: {
                         'Content-type': 'application/json'
                     },
-                    body: JSON.stringify(controller)
+                    body: JSON.stringify({
+                        controllerId,
+                        controllerIP,
+                        controllerName,
+                        controllerIPStatic,
+                        controllerMAC,
+                        controllerSerialNo,
+                    })
                 }
             );
         }
     }
 
-    addAccessGroupSchedules(accessGroupScheduleList, groupToEntranceIds) {
-        const cleanedAccessGroupScheduleList = accessGroupScheduleList.map(
-            schedule => ({
-                accessGroupScheduleName: schedule.accessGroupScheduleName,
-                rrule: schedule.rrule,
-                timeStart: schedule.timeStart,
-                timeEnd: schedule.timeEnd
-            })
-        );
-        if (useApi) {
-            return sendApi(`/api/access-group-schedule/add?grouptoentranceids=${encodeArrayForSpring(groupToEntranceIds)}`, 
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify(cleanedAccessGroupScheduleList)
-                }
-            );
-        }
+    getAuthStatus(controllerId){
+        if(useApi){return sendApi(`/api/controllerConnection/${controllerId}`)}
     }
 
-    deleteAccessGroupSchedule(accessGroupScheduleId) {
-        if (useApi) { return sendApi(`/api/access-group-schedule/${accessGroupScheduleId}`, { method: 'DELETE' }); }
+    deleteController(controllerId) {
+        if (useApi) { return sendApi(`/api/controller/delete/${controllerId}`, { method: 'DELETE' }); }
+    }
+    resetController(controllerId) {
+        if (useApi) { return sendApi(`/api/controller/reset/${controllerId}`, { method: 'DELETE' }); }
     }
 }
 
