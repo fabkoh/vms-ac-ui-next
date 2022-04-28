@@ -67,12 +67,12 @@ const getSections = (t) => [
     items: [
       {
         title: t('Controllers'),
-        path: '/dashboard/credentials/create',
+        path: '/dashboard/controllers/',
         icon: <SelectAll fontSize="small" />,
         children: [
           {
             title: 'List',
-            path: '/dashboard/credentials/create'
+            path: '/dashboard/controllers/'
           }
         ]
       }

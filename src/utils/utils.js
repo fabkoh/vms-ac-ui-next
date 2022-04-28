@@ -18,4 +18,7 @@ const arraySameContents = (arr1, arr2) => {
     return arr2.every(i => arr1Obj[i]);
 }
 
-export { isObject, filterByState, stringIn, arraySameContents }
+// default URL (see getControllerDetailsLink in ./controller)
+const DEFAULT_URL = '/dashboard'
+
+export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL }
