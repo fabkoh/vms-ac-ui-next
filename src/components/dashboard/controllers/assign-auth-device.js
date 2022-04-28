@@ -81,19 +81,18 @@ const AssignAuthDevice = ({ }) => {
                         <ExpandMoreIcon />
                     </ExpandMore>
                 }
-                title="Entrance E1 :"
-                sx={{ width: '50%', flexWrap: "wrap" }}
-                action={
-                    <SingleSelect
-                            fullWidth
-                            label="Select Entrance"
-                            // getLabel={getAccessGroupLabel}
-                            // onChange={handleAccessGroupChange}
-                            // value={isObject(person.accessGroup) ? person.accessGroup.accessGroupId : ''}
-                            // options={accessGroups}
-                            // getValue={(accessGroup) => accessGroup.accessGroupId}
-                        />
+                // title="Entrance E1 :"
+                title={
+                    <Grid container alignItems="center" >
+                        <Grid item md={2} xs={2}>
+                            <Typography variant="h6">E1 Entrance : </Typography>
+                        </Grid>
+                        <Grid item md={6} xs={8}>
+                            <SingleSelect fullWidth label="Select Entrance"/>
+                        </Grid>
+                    </Grid>
                 }
+                sx={{ width: '100%', flexWrap: "wrap" }}
             />
             <Divider />
             <CardContent>

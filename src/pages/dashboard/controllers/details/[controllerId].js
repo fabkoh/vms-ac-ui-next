@@ -37,6 +37,7 @@ import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule
 import { controllerApi } from "../../../../api/controllers";
 import { ControllerBasicDetails } from "../../../../components/dashboard/controllers/details/controller-basic-details";
 import AuthDevicePair from "../../../../components/dashboard/controllers/details/controller-auth-device-pair";
+import { getControllerEditLink, getControllerListLink } from "../../../../utils/controller";
 
 const ControllerDetails = () => {
 
@@ -81,74 +82,11 @@ const ControllerDetails = () => {
         setE2(E2)
     }
 
-
+    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(entranceId)) //change to controllerId
     const link = getEntranceScheduleEditLink(entranceId);
 
-    const [entranceSchedules, setEntranceSchedules] = useState([]);
-
-    const [accessGroup, setAccessGroup] = useState([]);
-    const [entranceIsActive, setEntranceIsActive] = useState();
-
-    // const getAccessGroups = async () => {
-    //     try {
-    //         const res = await accessGroupEntranceApi.getAccessGroupWhereEntranceId(entranceId);
-    //         if (res.status == 200) {
-    //             const body = await res.json();
-    //             if (isMounted()) {
-    //                 setAccessGroup(body);
-    //             }
-    //         } else {
-    //             toast.error('Access Group info not loaded');
-    //             throw new Error('Access Group info not loaded');
-    //         }
-    //     } catch(err) {
-    //         console.error(err);
-    //     }
-    // }
-
-    // const getEntrance = useCallback(async() => {
-    //     try {
-    //         const res = await entranceApi.getEntrance(entranceId);
-    //         if(res.status != 200) {
-    //             toast.error('Entrance not found');
-    //             router.replace(entranceListLink);
-    //         }
-    //         const body = await res.json();
-
-    //         if (isMounted()) {
-    //             setEntrance(body);
-    //             getAccessGroups(body.entranceId);
-    //             setEntranceIsActive(body.isActive);
-    //         }
-    //     } catch(err) {
-    //         console.error(err);
-    //     }
-    // });
-
-    // const getEntranceSchedules = async() => {
-    //     try {
-    //         const scheduleRes = await entranceScheduleApi.getEntranceSchedulesWhereEntranceIdsIn(entranceId);
-
-    //         if (scheduleRes.status == 200) {
-    //             const body = await scheduleRes.json();
-    //             if (isMounted()) {
-    //                 setEntranceSchedules(body);
-    //             }
-    //         }
-    //         else {
-    //             toast.error("Entrance Schedule Info Not Loaded");
-    //         }
-    //     }
-    //     catch (err) {
-    //         console.error(err);
-    //     }
-    // }
 
     const getInfo = useCallback(async() => {
-        //get entrance and access group entrance
-        // getEntrance();
-        // getAccessGroups();
-        // getEntranceSchedules();
         getController(1)
     }, [isMounted])
 
@@ -230,7 +168,7 @@ const ControllerDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href={entranceListLink} //change to controller list view
+                                href={getControllerListLink()} 
                                 passHref
                             >
                                 <Link
@@ -296,15 +234,15 @@ const ControllerDetails = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    {/* <NextLink
-                                        href={getEntranceEditLink([entrance])}
+                                    <NextLink
+                                        href={getControllerEditLink(controllerInfo)}
                                         passHref
-                                    > */}
+                                    >
                                         <MenuItem disableRipple>
                                             <EditIcon />
                                             &#8288;Edit
                                         </MenuItem>
-                                    {/* </NextLink> */}
+                                    </NextLink>
                                     <MenuItem
                                         disableRipple
                                         onClick={handleDeleteOpen}

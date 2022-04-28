@@ -3,107 +3,30 @@ import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import AccessGroupEditForm from "../../../components/dashboard/access-groups/forms/access-group-add-form";
-import { AuthGuard } from '../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import { personApi } from "../../../api/person";
-import { accessGroupApi } from "../../../api/access-groups";
-import entranceApi from "../../../api/entrance";
-import { useMounted } from "../../../hooks/use-mounted";
+import AccessGroupEditForm from "../../../../components/dashboard/access-groups/forms/access-group-add-form";
+import { AuthGuard } from '../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
+import { personApi } from "../../../../api/person";
+import { accessGroupApi } from "../../../../api/access-groups";
+import entranceApi from "../../../../api/entrance";
+import { useMounted } from "../../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
-import formUtils from "../../../utils/form-utils";
-import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
-import ControllerEditForm from "../../../components/dashboard/controllers/controller-edit-form";
-import AssignAuthDevice from "../../../components/dashboard/controllers/assign-auth-device";
+import formUtils from "../../../../utils/form-utils";
+import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
+import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
+import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
+import { getControllerListLink } from "../../../../utils/controller";
 
-const EditAccessGroups = () => {
+const EditController = () => {
 
     // edited access groups logic
     const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
     const [accessGroupValidationsArr, 
         setAccessGroupValidationsArr] = useState([]);
+    
+        //         await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
 
-    // load access groups to be edited
-    const getAccessGroups = async ids => {
-        const accessGroups = [];
-        const validations = [];
-
-        // map each id to a fetch req for that access group
-        const resArr = await Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)));
-        const successfulRes = resArr.filter(res => res.status == 200);
-
-        // no access groups to edit
-        if (successfulRes.length == 0) {
-            toast.error('Error editing access groups. Please try again');
-            router.replace('/dashboard/access-groups');
-        }
-
-        // some groups not found
-        if (successfulRes.length != resArr.length) {
-            toast.error('Some access groups were not found');
-        }
-
-        const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
-
-        bodyArr.forEach(body => {
-            accessGroups.push({
-                accessGroupId: body.accessGroupId,
-                accessGroupName: body.accessGroupName,
-                accessGroupDesc: body.accessGroupDesc,
-                persons: body.persons,
-                entrances: [], // for now
-                originalName: body.accessGroupName, // fields for validation
-                originalPersonIds: body.persons.map(p => p.personId)
-            });
-            validations.push({
-                accessGroupId: body.accessGroupId,
-                accessGroupNameBlank: false,
-                accessGroupDescBlank: false,
-
-                // name in database (error)
-                accessGroupNameExists: false,
-
-                // name duplicated in form (error)
-                accessGroupNameDuplicated: false,
-
-                // person has access group (note)
-                accessGroupPersonHasAccessGroup: false,
-
-                // person in two access groups in same form (error) 
-                accessGroupPersonDuplicated: false,
-
-                // submit failed
-                submitFailed: false
-            });
-        });
-
-        setAccessGroupValidationsArr(validations);
-        setAccessGroupInfoArr(accessGroups);
-
-        return accessGroups; // for extension (see useEffect() below)
-    }
-
-    const getGroupEntrances = async (groups) => {
-        const accessGroups = [ ...groups ];
-        const resArr = await Promise.all(accessGroups.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
-        const successfulResIndex = [];
-        resArr.forEach((res, i) => {
-            if (res.status == 200) {
-                successfulResIndex.push(i);
-            } else {
-                toast.error(`Entrances for ${accessGroups[i].accessGroupName} not loaded. Please clear to prevent changes to entrance`);
-            }
-        });
-        const bodyArr = await Promise.all(successfulResIndex.map(i => resArr[i].json()));
-        bodyArr.forEach((body, i) => {
-            accessGroups[successfulResIndex[i]].entrances = body.map(e => e.entrance);
-        })
-
-        setAccessGroupInfoArr(accessGroups);
-
-        return accessGroups; // for extension (see useEffect() below)
-    }
 
     useEffect( async () => {
         // try {
@@ -221,24 +144,6 @@ const EditAccessGroups = () => {
         return newDuplicatedPerson
     }
 
-    // remove card logic
-    const removeCard = (id) => {
-        const newAccessGroupInfoArr = accessGroupInfoArr.filter(info => info.accessGroupId != id);
-        const newValidations = accessGroupValidationsArr.filter(validation => validation.accessGroupId != id);
-
-        if (newAccessGroupInfoArr.length == 0) {
-            router.replace('/dashboard/access-groups'); // redirect if nothing left to edit
-        }
-
-        // check name duplicated
-        checkDuplicateName(newAccessGroupInfoArr, newValidations);
-        
-        // check person duplicated
-        setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, newValidations)); 
-
-        setAccessGroupInfoArr(newAccessGroupInfoArr);
-        setAccessGroupValidationsArr(newValidations);       
-    }
     
     // update methods for form inputs
     const changeTextField = (e, id) => {
@@ -252,59 +157,6 @@ const EditAccessGroups = () => {
         const updatedInfo = [ ...accessGroupInfoArr ];
         updatedInfo.find(info => info.accessGroupId == id).persons = newValue;
         setAccessGroupInfoArr(updatedInfo);
-    }
-
-    // error checking methods
-    const changeNameCheck = async (e, id) => {
-        const accessGroupName = e.target.value;
-        const newValidations = [ ...accessGroupValidationsArr ];
-        const validation = newValidations.find(v => v.accessGroupId == id);
-
-        // store a temp updated access group info (not for updating purposes)
-        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
-        const newCurrAccessGroup = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
-        newCurrAccessGroup.accessGroupName = accessGroupName;
-
-        // remove submit failed
-        validation.submitFailed = false;
-
-        // check name is blank?
-        validation.accessGroupNameBlank = formUtils.checkBlank(accessGroupName);
-
-        // check name exists?
-        validation.accessGroupNameExists = (
-            newCurrAccessGroup.originalName != accessGroupName &&
-            !!accessGroupNames[accessGroupName]
-        );
-
-        // check name duplicated
-        checkDuplicateName(newAccessGroupInfoArr, newValidations);
-
-        setAccessGroupValidationsArr(newValidations);
-    }
-
-    const changePersonCheck = (newValue, id) => {
-        // check if person has existing access group
-        const validations = [ ...accessGroupValidationsArr ];
-        const validation = validations.find(v => v.accessGroupId == id);
-
-        const newAccessGroupInfoArr = [ ...accessGroupInfoArr ];
-        const newAccessGroupInfo = newAccessGroupInfoArr.find(group => group.accessGroupId == id);
-        newAccessGroupInfo.persons = newValue; // hold an updated copy of access group info for validation checks
-
-        // remove submit failed
-        validation.submitFailed = false;
-
-        // some selected persons has access group already
-        const originalPersonIds = newAccessGroupInfo.originalPersonIds;
-        validation.accessGroupPersonHasAccessGroup = newValue.some(
-            person => person.accessGroup && !originalPersonIds.includes(person.personId)
-        );
-
-        // check person duplicated
-        setDuplicatedPerson(checkDuplicatePerson(newAccessGroupInfoArr, validations)); 
-
-        setAccessGroupValidationsArr(validations);
     }
 
     // entrance logic
@@ -394,7 +246,7 @@ const EditAccessGroups = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href="/dashboard/access-groups" //change to controller list
+                            href={getControllerListLink()} 
                             passHref
                         >
                             <Link
@@ -423,7 +275,10 @@ const EditAccessGroups = () => {
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
                                 <ControllerEditForm/>
-                                <AssignAuthDevice/>
+                                <AssignAuthDevice
+                                />
+                                <AssignAuthDevice
+                                />
                             <Grid container>
                                 <Grid item marginRight={3}>
                                     <Button
@@ -431,22 +286,25 @@ const EditAccessGroups = () => {
                                         size="large"
                                         variant="contained"
                                         disabled={
-                                            submitted                      ||
-                                            accessGroupInfoArr.length == 0 || // no access groups to submit
-                                            accessGroupValidationsArr.some( // check if validations fail
-                                                validation => validation.accessGroupNameBlank        ||
-                                                              validation.accessGroupNameExists       ||
-                                                              validation.accessGroupNameDuplicated   ||
-                                                              validation.accessGroupPersonDuplicated
-                                            )
+                                            true
                                         }
+                                        // disabled={
+                                        //     submitted                      ||
+                                        //     accessGroupInfoArr.length == 0 || // no access groups to submit
+                                        //     accessGroupValidationsArr.some( // check if validations fail
+                                        //         validation => validation.accessGroupNameBlank        ||
+                                        //                       validation.accessGroupNameExists       ||
+                                        //                       validation.accessGroupNameDuplicated   ||
+                                        //                       validation.accessGroupPersonDuplicated
+                                        //     )
+                                        // }
                                     >
                                         Submit
                                     </Button>
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href="/dashboard/access-groups/" //change to controller list view
+                                        href={getControllerListLink()} 
                                         passHref
                                     >
                                         <Button
@@ -467,7 +325,7 @@ const EditAccessGroups = () => {
     )
 }
 
-EditAccessGroups.getLayout = (page) => (
+EditController.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -475,4 +333,4 @@ EditAccessGroups.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default EditAccessGroups;
+export default EditController;
