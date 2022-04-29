@@ -6,6 +6,7 @@ import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import { getEntranceDetailsLink } from "../../../../utils/entrance"
 import { getControllerDetailsLink, getControllerEditLink } from "../../../../utils/controller";
+import { CloudOff, CloudQueue } from "@mui/icons-material";
 
 const EntranceComponent = ({ entrance, ...props }) => {
     if (entrance == null)
@@ -25,7 +26,10 @@ const EntranceComponent = ({ entrance, ...props }) => {
     )
 }
 
-const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange }) => {
+const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange, controllerCount, controllersStatus }) => {
+    
+    const statusLoaded = controllersStatus !== null;
+
     return (
         <div>
             <Scrollbar>
@@ -50,7 +54,7 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                     </TableHead>
                     <TableBody>
                         {
-                            controllers.map(controller => {
+                            controllers.map((controller, i) => {
                                 const {
                                     controllerId,
                                     controllerName,
@@ -65,6 +69,8 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                 const handleSelect = handleSelectFactory(controllerId);
 
                                 const detailsLink = getControllerDetailsLink(controller);
+
+                                const offline = statusLoaded && Object.keys(controllersStatus[i]).length == 0;
                                 return(
                                     <TableRow
                                         hover
@@ -89,7 +95,13 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                             </NextLink>
                                         </TableCell>
                                         <TableCell>
-                                            <CircularProgress size='1rem' />
+                                            {
+                                                statusLoaded ? 
+                                                (offline ? 
+                                                <CloudOff color="error" /> :
+                                                <CloudQueue color="success" />) :
+                                                <CircularProgress size='1rem' />
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             <Typography>{ controllerIP }</Typography>
@@ -106,7 +118,11 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                             </Box>
                                         </TableCell>
                                         <TableCell>
-                                            <CircularProgress size='1rem' />
+                                            {
+                                                statusLoaded ? 
+                                                <div /> :
+                                                <CircularProgress size='1rem' />
+                                            }
                                         </TableCell>
                                         <TableCell>
                                                 date
@@ -138,7 +154,7 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
             </Scrollbar>
             <TablePagination
                 component="div"
-                count={controllers.length}
+                count={controllerCount}
                 onPageChange={onPageChange}
                 onRowsPerPageChange={onRowsPerPageChange}
                 page={page}

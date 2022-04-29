@@ -1,7 +1,7 @@
 import { BuildCircle, Delete, HelpOutline, Refresh, Search } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head"
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthGuard } from "../../../components/authentication/auth-guard"
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout"
 import StyledMenu from "../../../components/dashboard/styled-menu";
@@ -11,122 +11,28 @@ import { Download } from "../../../icons/download";
 import ControllerListTable from "../../../components/dashboard/controllers/list/controller-list";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { filterControllerByString, filterControllerByStringPlaceholder } from "../../../utils/controller";
-
-const testData = [   {
-    "controllerId": 5,
-    "controllerIPStatic": true,
-    "controllerName": "1233",
-    "controllerIP": "2,",
-    "controllerMAC": "2,",
-    "controllerSerialNo": "1233",
-    "lastOnline": "2022-04-26T12:01:38.147703",
-    "pinAssignmentConfig": "testpin",
-    "settingsConfig": "testsettings",
-    "authDevices": [
-        {
-            "authDeviceId": 1,
-            "authDeviceName": "Auth Device 1",
-            "authDeviceDirection": "E1 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 2,
-            "authDeviceName": "Auth Device 2",
-            "authDeviceDirection": "E1 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 3,
-            "authDeviceName": "Auth Device 3",
-            "authDeviceDirection": "E2 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 4,
-            "authDeviceName": "Auth Device 4",
-            "authDeviceDirection": "E2 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        }
-    ]
-}, 
-{
-    "controllerId": 6,
-    "controllerIPStatic": true,
-    "controllerName": "1233",
-    "controllerIP": "2,",
-    "controllerMAC": "2,",
-    "controllerSerialNo": "1233",
-    "lastOnline": "2022-04-26T12:01:38.147703",
-    "pinAssignmentConfig": "testpin",
-    "settingsConfig": "testsettings",
-    "authDevices": [
-        {
-            "authDeviceId": 1,
-            "authDeviceName": "Auth Device 1",
-            "authDeviceDirection": "E1 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": {
-                "entranceId": 2,
-                "entranceName": "MainDoor2",
-                "entranceDesc": "123",
-                "isActive": true,
-                "deleted": false
-            }
-        },
-        {
-            "authDeviceId": 2,
-            "authDeviceName": "Auth Device 2",
-            "authDeviceDirection": "E1 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": {
-                "entranceId": 2,
-                "entranceName": "MainDoor2",
-                "entranceDesc": "123",
-                "isActive": true,
-                "deleted": false
-            }
-        },
-        {
-            "authDeviceId": 3,
-            "authDeviceName": "Auth Device 3",
-            "authDeviceDirection": "E2 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 4,
-            "authDeviceName": "Auth Device 4",
-            "authDeviceDirection": "E2 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        }
-    ]}];
+import { gtm } from "../../../lib/gtm";
+import { useMounted } from "../../../hooks/use-mounted";
+import { controllerApi } from "../../../api/controllers";
+import toast from "react-hot-toast";
 
 const applyFilter = createFilter({
     query: filterControllerByString
 })
 
+const resToJsonHelper = res => {
+    if (res.status == 200) {
+        return res.json();
+    }
+    return Promise.resolve({});
+}
+
 const ControllerList = () => {
+
+    // copied
+    useEffect(() => {
+        gtm.push({ event: "page_view" });
+    })
 
     // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
@@ -134,8 +40,31 @@ const ControllerList = () => {
     const handleActionClick = (e) => setActionAnchor(e.currentTarget);
     const handleActionClose = () => setActionAnchor(null);
 
-    // to change
-    const controllers = testData;
+    // data
+    const [controllers, setControllers] = useState([]);
+    const [controllersStatus, setControllersStatus] = useState(null);
+    const isMounted = useMounted();
+
+    const getInfo = useCallback(async() => {
+        const controllersRes = await controllerApi.getControllers();
+        if (controllersRes.status !== 200) {
+            toast.error("Controllers not loaded");
+            return;
+        }
+        const controllersJson = await controllersRes.json();
+        if (isMounted()){
+            setControllers(controllersJson);
+        }
+
+        const statusResArr = await Promise.all(controllersJson.map(c => controllerApi.getAuthStatus(c.controllerId)));
+        const statusJsonArr = await Promise.all(statusResArr.map(res => resToJsonHelper(res)));
+        if (isMounted()) {
+            setControllersStatus(statusJsonArr);
+        }
+    }, [isMounted]);
+
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => getInfo(), [])
 
     // for selection of checkboxes
     const [selectedControllers, setSelectedControllers] = useState([]); // stores the ids of selected
@@ -170,6 +99,7 @@ const ControllerList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
     const paginatedControllers = applyPagination(filteredControllers, page, rowsPerPage);
+    const controllerCount = filteredControllers.length;
 
     return (
         <>
@@ -300,7 +230,7 @@ const ControllerList = () => {
                             </Box>
                         </Box>
                         <ControllerListTable 
-                            controllers={filteredControllers}
+                            controllers={paginatedControllers}
                             selectedAllControllers={selectedAllControllers}
                             selectedSomeControllers={selectedSomeControllers}
                             handleSelectAllControllers={handleSelectAllControllers}
@@ -310,6 +240,8 @@ const ControllerList = () => {
                             rowsPerPage={rowsPerPage}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
+                            controllerCount={controllerCount}
+                            controllersStatus={controllersStatus}
                         />
                     </Card>
                 </Container>
