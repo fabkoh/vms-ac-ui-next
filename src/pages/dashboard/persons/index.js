@@ -437,7 +437,6 @@ const PersonList = () => {
 							}}
 						>
 							<Box
-								component="form"
 								onChange={handleQueryChange}
 								sx={{
 									flexGrow: 1,
