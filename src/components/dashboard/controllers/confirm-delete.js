@@ -74,7 +74,7 @@ export const Confirmdelete = (props) => {
 						be undone.
 					</DialogContentText>
 					<DialogContentText>
-						Related auth devices of selected controller(s) will be deleted.
+						Authentication devices of selected controller(s) will be deleted.
 					</DialogContentText>
 
 					<form onSubmit={handleDeleteControllers}>

@@ -25,7 +25,8 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
-import { Confirmdelete } from '../../../../components/dashboard/entrances/confirm-delete';
+import { Confirmdelete } from '../../../../components/dashboard/controllers/confirm-delete';
+import { ConfirmReset } from '../../../../components/dashboard/controllers/confirm-reset';
 import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
@@ -44,7 +45,7 @@ const ControllerDetails = () => {
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    const { entranceId }  = router.query; //change to controller Id
+    const { controllerId }  = router.query; //change to controller Id
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -82,8 +83,8 @@ const ControllerDetails = () => {
         setE2(E2)
     }
 
-    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(entranceId)) //change to controllerId
-    const link = getEntranceScheduleEditLink(entranceId);
+    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(controllerId)) //change to controllerId
+    const link = getEntranceScheduleEditLink(controllerId);
 
 
     const getInfo = useCallback(async() => {
@@ -127,21 +128,44 @@ const ControllerDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrance = async() => {
+	const deleteController = async() => {
         Promise.resolve(
-            entranceApi.deleteEntrance(entranceId)
+            controllerApi.deleteController(controllerId)
         ).then((res)=>{
-        if (res.status == 204){
-            toast.success('Delete success');
-            router.replace(entranceListLink);
-        }
-        else{
-            toast.error('Delete unsuccessful')
-        }
+            if (res.status == 204){
+                toast.success('Delete success');
+               // router.replace(controllerListLink);
+            }
+            else{
+                toast.error('Delete unsuccessful')
+            }
         })
         setDeleteOpen(false);
     }; 
 
+    //Reset controller
+    const [resetOpen, setResetOpen] = useState(false);
+
+    const handleResetOpen = () => {        
+		setResetOpen(true);                        
+	};
+	const handleResetClose = () => {
+		setResetOpen(false);
+	}
+	const resetController = async() => {
+        Promise.resolve(
+            controllerApi.resetController(controllerId)
+        ).then((res)=>{
+            if (res.status == 204){
+                toast.success('Reset controller success');
+               // router.replace(controllerListLink);
+            }
+            else{
+                toast.error('Reset unsuccessful')
+            }
+        })
+        setResetOpen(false);
+    }; 
 
 
 

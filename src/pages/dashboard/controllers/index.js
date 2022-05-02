@@ -1,7 +1,7 @@
 import { BuildCircle, Delete, HelpOutline, Refresh, Search } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head"
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { AuthGuard } from "../../../components/authentication/auth-guard"
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout"
 import StyledMenu from "../../../components/dashboard/styled-menu";
@@ -11,6 +11,10 @@ import { Download } from "../../../icons/download";
 import ControllerListTable from "../../../components/dashboard/controllers/list/controller-list";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { filterControllerByString, filterControllerByStringPlaceholder } from "../../../utils/controller";
+import { Confirmdelete } from "../../../components/dashboard/controllers/confirm-delete";
+import { ConfirmReset } from "../../../components/dashboard/controllers/confirm-reset";
+import { controllerApi } from "../../../api/controllers";
+import toast from "react-hot-toast";
 
 const testData = [   {
     "controllerId": 5,
@@ -204,7 +208,7 @@ const ControllerList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			})
-			getControllersLocal();
+			getInfo();
 		})
 		setDeleteOpen(false);
 	};
@@ -241,7 +245,7 @@ const ControllerList = () => {
 					toast.error('Reset unsuccessful' )
 				}
 			})
-			getControllersLocal();
+			getInfo();
 		})
 		setResetOpen(false);
 	};
