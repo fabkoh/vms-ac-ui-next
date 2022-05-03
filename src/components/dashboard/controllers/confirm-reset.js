@@ -58,7 +58,7 @@ export const ConfirmReset = (props) => {
 						<TextField
 							variant="filled"
 							fullWidth
-							helperText="Please type in RESET to proceed"
+							helperText="Please type in RESET to continue"
 							onChange={handleTextChange}
 							autoFocus
 						/>

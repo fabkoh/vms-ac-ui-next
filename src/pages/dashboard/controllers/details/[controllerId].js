@@ -113,7 +113,7 @@ const ControllerDetails = () => {
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-    //Set to true if an entrance is selected. controls form input visibility.
+    //Set to true if controller is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 		setselectedState(true)
@@ -274,14 +274,25 @@ const ControllerDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
+                                    <Confirmdelete 
+                                    setAnchorEl={setActionAnchor} 
+                                    open={deleteOpen}
+                                    handleDialogClose={handleDeleteClose}
+                                    deleteControllers={deleteController} />
+
                                     <MenuItem 
                                         disableRipple
-                                        // onClick={handleMultiUnlock}
-                                        // disabled={!entranceActive}
+                                        onClick={handleResetOpen}
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
+                                    <ConfirmReset 
+                                    setAnchorEl={setActionAnchor} 
+                                    open={resetOpen}
+                                    handleDialogClose={handleResetClose}
+                                    resetControllers={resetController} />
+
                                 </StyledMenu>
                             </Grid>
                         </Grid>
