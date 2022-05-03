@@ -39,6 +39,7 @@ import WarningChip from "../../shared/warning-chip";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
+//import AuthDeviceReset from "../../const";
 
 export default function AuthDevicePair({ authPair }) {
 	console.log(authPair);
@@ -82,11 +83,11 @@ export default function AuthDevicePair({ authPair }) {
 	const handleActionMenuClose = () => setActionAnchor(null);
 	// const actionDisabled = schedules.length == 0;
 
-	// delete schedules
-	const [openDelete, setOpenDelete] = useState(false);
-	const openDeleteDialog = () => setOpenDelete(true);
-	const closeDeleteDialog = () => {
-		setOpenDelete(false);
+	// reset auth devices
+	const [openReset, setOpenReset] = useState(false);
+	const openResetDialog = () => setOpenReset(true);
+	const closeResetDialog = () => {
+		setOpenReset(false);
 		handleActionMenuClose();
 	};
 	// useEffect(() => {
@@ -95,7 +96,7 @@ export default function AuthDevicePair({ authPair }) {
 
 	return (
 		<Card>
-			{/* <EntranceScheduleDelete
+			{/* <AuthDeviceReset
 				open={openDelete}
 				schedules={schedules}
 				handleDialogClose={closeDeleteDialog}
