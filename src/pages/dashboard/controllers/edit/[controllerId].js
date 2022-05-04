@@ -275,9 +275,9 @@ const EditController = () => {
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
                                 <ControllerEditForm/>
-                                <AssignAuthDevice
+                                <AssignAuthDevice       //split 2 components E1 and E2? 
                                 />
-                                <AssignAuthDevice
+                                <AssignAuthDevice       //split 2 components E1 and E2? 
                                 />
                             <Grid container>
                                 <Grid item marginRight={3}>

@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = process.env.NEXT_PUBLIC_USE_API || false;
+const useApi = process.env.NEXT_PUBLIC_USE_API || true;
 
 // fake data
 const fakePersons = [
@@ -118,7 +118,8 @@ const fakeControllers = [
         "controllerIP":"192.168.1.1",
         "controllerMAC":"495162159654",
         "controllerSerialNo":"5e86805e2bafd54f66cc95c3",
-        "firstOnline":"2022-18-04    09:52:23",
+        "created":"2022-18-04    09:52:23",
+        "masterController":true,
         "pinAssignmentConfig":"",
         "settingsConfig":"",
         "lastOnline":"2022-18-04    09:52:23",
@@ -130,7 +131,7 @@ const fakeControllers = [
         "controllerIP":"",
         "controllerMAC":"",
         "controllerSerialNo":"",
-        "firstOnline":"",
+        "created":"",
         "pinAssignmentConfig":"",
         "settingsConfig":"",
         "lastOnline":"",
