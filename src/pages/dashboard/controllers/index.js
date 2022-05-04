@@ -21,7 +21,7 @@ const applyFilter = createFilter({
 })
 
 const resToJsonHelper = res => {
-    if (res.status == 200) {
+    if (res?.status == 200) {
         return res.json();
     }
     return Promise.resolve({});
@@ -41,7 +41,7 @@ const ControllerList = () => {
     const handleActionClose = () => setActionAnchor(null);
 
     // data
-    const [controllers, setControllers] = useState([]);
+    const [controllers, setControllers] = useState([]);              
     const [controllersStatus, setControllersStatus] = useState(null);
     const isMounted = useMounted();
 
