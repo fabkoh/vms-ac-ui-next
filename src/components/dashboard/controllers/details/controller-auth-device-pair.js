@@ -165,6 +165,7 @@ export default function AuthDevicePair({ authPair,controllerId,status }) {
 				<MenuItem
 					disableRipple
 					// disabled={actionDisabled}
+					onClick={openResetDialog}
 				>
 					<BuildCircle />
 					&#8288;Reset
@@ -173,7 +174,7 @@ export default function AuthDevicePair({ authPair,controllerId,status }) {
 				<MenuItem
 					disableRipple
 					// disabled={actionDisabled}
-					onClick={openDeleteDialog}
+					//onClick={openDeleteDialog}
 				>
 					<Delete />
 					&#8288;Remove
