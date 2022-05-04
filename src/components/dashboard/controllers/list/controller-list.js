@@ -32,7 +32,7 @@ const authDeviceKeys = ["E1_IN", "E1_OUT", "E2_IN", "E2_OUT"];
 
 const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange, controllerCount, controllersStatus }) => {
     
-    const statusLoaded = controllersStatus !== null;
+const statusLoaded = controllersStatus !== null;
 
     return (
         <div>
@@ -58,7 +58,7 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                     </TableHead>
                     <TableBody>
                         {
-                            controllers.map(controller => {
+                            controllers.map((controller, i) => {
                                 const {
                                     controllerId,
                                     controllerName,
@@ -109,7 +109,13 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                             </NextLink>
                                         </TableCell>
                                         <TableCell>
-                                            <CircularProgress size='1rem' />
+                                            {
+                                                statusLoaded ? 
+                                                (offline ? 
+                                                <CloudOff color="error" /> :
+                                                <CloudQueue color="success" />) :
+                                                <CircularProgress size='1rem' />
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             <Typography>{ controllerIP }</Typography>
@@ -173,7 +179,7 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
             </Scrollbar>
             <TablePagination
                 component="div"
-                count={controllers.length}
+                count={controllerCount}
                 onPageChange={onPageChange}
                 onRowsPerPageChange={onRowsPerPageChange}
                 page={page}

@@ -25,8 +25,7 @@ import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
-import { Confirmdelete } from '../../../../components/dashboard/controllers/confirm-delete';
-import { ConfirmReset } from '../../../../components/dashboard/controllers/confirm-reset';
+import { Confirmdelete } from '../../../../components/dashboard/entrances/confirm-delete';
 import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
@@ -45,7 +44,7 @@ const ControllerDetails = () => {
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    const { controllerId }  = router.query; //change to controller Id
+    const { entranceId }  = router.query; //change to controller Id
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -83,8 +82,8 @@ const ControllerDetails = () => {
         setE2(E2)
     }
 
-    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(controllerId)) //change to controllerId
-    const link = getEntranceScheduleEditLink(controllerId);
+    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(entranceId)) //change to controllerId
+    const link = getEntranceScheduleEditLink(entranceId);
 
 
     const getInfo = useCallback(async() => {
@@ -113,7 +112,7 @@ const ControllerDetails = () => {
     //for delete button
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-    //Set to true if controller is selected. controls form input visibility.
+    //Set to true if an entrance is selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
 	const checkSelected = () => {
 		setselectedState(true)
@@ -128,44 +127,21 @@ const ControllerDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteController = async() => {
+	const deleteEntrance = async() => {
         Promise.resolve(
-            controllerApi.deleteController(controllerId)
+            entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
-            if (res.status == 204){
-                toast.success('Delete success');
-               // router.replace(controllerListLink);
-            }
-            else{
-                toast.error('Delete unsuccessful')
-            }
+        if (res.status == 204){
+            toast.success('Delete success');
+            router.replace(entranceListLink);
+        }
+        else{
+            toast.error('Delete unsuccessful')
+        }
         })
         setDeleteOpen(false);
     }; 
 
-    //Reset controller
-    const [resetOpen, setResetOpen] = useState(false);
-
-    const handleResetOpen = () => {        
-		setResetOpen(true);                        
-	};
-	const handleResetClose = () => {
-		setResetOpen(false);
-	}
-	const resetController = async() => {
-        Promise.resolve(
-            controllerApi.resetController(controllerId)
-        ).then((res)=>{
-            if (res.status == 204){
-                toast.success('Reset controller success');
-               // router.replace(controllerListLink);
-            }
-            else{
-                toast.error('Reset unsuccessful')
-            }
-        })
-        setResetOpen(false);
-    }; 
 
 
 
@@ -275,25 +251,14 @@ const ControllerDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
-                                    <Confirmdelete 
-                                    setAnchorEl={setActionAnchor} 
-                                    open={deleteOpen}
-                                    handleDialogClose={handleDeleteClose}
-                                    deleteControllers={deleteController} />
-
                                     <MenuItem 
                                         disableRipple
-                                        onClick={handleResetOpen}
+                                        // onClick={handleMultiUnlock}
+                                        // disabled={!entranceActive}
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
-                                    <ConfirmReset 
-                                    setAnchorEl={setActionAnchor} 
-                                    open={resetOpen}
-                                    handleDialogClose={handleResetClose}
-                                    resetControllers={resetController} />
-
                                 </StyledMenu>
                             </Grid>
                         </Grid>

@@ -1,7 +1,7 @@
 import { BuildCircle, Delete, HelpOutline, Refresh, Search } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head"
-import { useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthGuard } from "../../../components/authentication/auth-guard"
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout"
 import StyledMenu from "../../../components/dashboard/styled-menu";
@@ -11,120 +11,10 @@ import { Download } from "../../../icons/download";
 import ControllerListTable from "../../../components/dashboard/controllers/list/controller-list";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { filterControllerByString, filterControllerByStringPlaceholder } from "../../../utils/controller";
-import { Confirmdelete } from "../../../components/dashboard/controllers/confirm-delete";
-import { ConfirmReset } from "../../../components/dashboard/controllers/confirm-reset";
+import { gtm } from "../../../lib/gtm";
+import { useMounted } from "../../../hooks/use-mounted";
 import { controllerApi } from "../../../api/controllers";
 import toast from "react-hot-toast";
-
-const testData = [   {
-    "controllerId": 5,
-    "controllerIPStatic": true,
-    "controllerName": "1233",
-    "controllerIP": "2,",
-    "controllerMAC": "2,",
-    "controllerSerialNo": "1233",
-    "lastOnline": "2022-04-26T12:01:38.147703",
-    "pinAssignmentConfig": "testpin",
-    "settingsConfig": "testsettings",
-    "authDevices": [
-        {
-            "authDeviceId": 1,
-            "authDeviceName": "Auth Device 1",
-            "authDeviceDirection": "E1 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 2,
-            "authDeviceName": "Auth Device 2",
-            "authDeviceDirection": "E1 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 3,
-            "authDeviceName": "Auth Device 3",
-            "authDeviceDirection": "E2 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 4,
-            "authDeviceName": "Auth Device 4",
-            "authDeviceDirection": "E2 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        }
-    ]
-}, 
-{
-    "controllerId": 6,
-    "controllerIPStatic": true,
-    "controllerName": "1233",
-    "controllerIP": "2,",
-    "controllerMAC": "2,",
-    "controllerSerialNo": "1233",
-    "lastOnline": "2022-04-26T12:01:38.147703",
-    "pinAssignmentConfig": "testpin",
-    "settingsConfig": "testsettings",
-    "authDevices": [
-        {
-            "authDeviceId": 1,
-            "authDeviceName": "Auth Device 1",
-            "authDeviceDirection": "E1 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": {
-                "entranceId": 2,
-                "entranceName": "MainDoor2",
-                "entranceDesc": "123",
-                "isActive": true,
-                "deleted": false
-            }
-        },
-        {
-            "authDeviceId": 2,
-            "authDeviceName": "Auth Device 2",
-            "authDeviceDirection": "E1 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": {
-                "entranceId": 2,
-                "entranceName": "MainDoor2",
-                "entranceDesc": "123",
-                "isActive": true,
-                "deleted": false
-            }
-        },
-        {
-            "authDeviceId": 3,
-            "authDeviceName": "Auth Device 3",
-            "authDeviceDirection": "E2 IN",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        },
-        {
-            "authDeviceId": 4,
-            "authDeviceName": "Auth Device 4",
-            "authDeviceDirection": "E2 OUT",
-            "lastOnline": null,
-            "masterpin": true,
-            "defaultAuthMethod": "CardAndPin",
-            "entrance": null
-        }
-    ]}];
 
 const applyFilter = createFilter({
     query: filterControllerByString
@@ -138,6 +28,11 @@ const resToJsonHelper = res => {
 }
 
 const ControllerList = () => {
+
+    // copied
+    useEffect(() => {
+        gtm.push({ event: "page_view" });
+    })
 
     // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
@@ -184,9 +79,6 @@ const ControllerList = () => {
         }
     }
 
-    //disable action button if no controller is being selected
-    const actionDisabled = selectedControllers.length == 0;
-
     // for filtering
     const [filters, setFilters] = useState({
         query: ""
@@ -207,78 +99,7 @@ const ControllerList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
     const paginatedControllers = applyPagination(filteredControllers, page, rowsPerPage);
-
-    //for delete action button
-    const [deleteOpen, setDeleteOpen] = useState(false);
-    const [selectedState, setSelectedState] = useState(false);
-    const checkSelected = () => {
-        if(selectedControllers.length>=1){
-           setSelectedState(true)
-        }
-    };
-    useEffect(() => {
-        checkSelected()
-    }, [selectedControllers]);
-
-    const handleDeleteOpen = () => {        
-		setDeleteOpen(true);           
-	};
-	const handleDeleteClose = () => {
-		setDeleteOpen(false);
-	}
-	const deleteControllers = async() => {
-		Promise.all(selectedControllers.map(id=>{
-			return controllerApi.deleteController(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 204){
-					toast.success('Delete success',{duration:2000},);
-				}
-				else{
-					toast.error('Delete unsuccessful' )
-				}
-			})
-			getInfo();
-		})
-		setDeleteOpen(false);
-	};
-    
-    // Reset selectedControllers when controllers change
-	useEffect(
-		() => {
-			if (selectedControllers.length) {
-				setSelectedControllers([]);
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[controllers]
-	);
-
-    //for reset controllers
-    const [resetOpen, setResetOpen] = useState(false);
-
-    const handleResetOpen = () => {        
-		setResetOpen(true);           
-	};
-	const handleResetClose = () => {
-		setResetOpen(false);
-	}
-	const resetControllers = async() => {
-		Promise.all(selectedControllers.map(id=>{
-			return controllerApi.resetController(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 204){
-					toast.success('Reset success',{duration:2000},);
-				}
-				else{
-					toast.error('Reset unsuccessful' )
-				}
-			})
-			getInfo();
-		})
-		setResetOpen(false);
-	};
+    const controllerCount = filteredControllers.length;
 
     return (
         <>
@@ -324,35 +145,20 @@ const ControllerList = () => {
                                 >
                                     <MenuItem
                                         disableRipple
-                                        disabled={actionDisabled}
-                                        onClick={handleDeleteOpen}
+                                        // disabled
+                                        // onClick
                                     >
                                         <Delete />
                                         &#8288;Delete
                                     </MenuItem>
-                                    <Confirmdelete
-                                        setActionAnchor={setActionAnchor}
-                                        open={deleteOpen} 
-                                        handleDialogClose={handleDeleteClose}
-                                        selectedControllers={selectedControllers}
-                                        deleteControllers={deleteControllers}
-                                    /> 
-
                                     <MenuItem
                                         disableRipple
-                                        disabled={actionDisabled}
-                                        onClick={handleResetOpen}
+                                        // disabled
+                                        // onClick
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
-                                    <ConfirmReset
-                                        setActionAnchor={setActionAnchor}
-                                        open={resetOpen} 
-                                        handleDialogClose={handleResetClose}
-                                        selectedControllers={selectedControllers}
-                                        resetControllers={resetControllers}
-                                    />
                                 </StyledMenu>
                             </Grid>
                         </Grid>
@@ -424,7 +230,7 @@ const ControllerList = () => {
                             </Box>
                         </Box>
                         <ControllerListTable 
-                            controllers={filteredControllers}
+                            controllers={paginatedControllers}
                             selectedAllControllers={selectedAllControllers}
                             selectedSomeControllers={selectedSomeControllers}
                             handleSelectAllControllers={handleSelectAllControllers}
@@ -434,6 +240,8 @@ const ControllerList = () => {
                             rowsPerPage={rowsPerPage}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
+                            controllerCount={controllerCount}
+                            controllersStatus={controllersStatus}
                         />
                     </Card>
                 </Container>
