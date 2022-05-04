@@ -192,6 +192,7 @@ const ControllerDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
+                                // href={`/dashboard/controllers/auth-device/id?=${1}`} 
                                 href={getControllerListLink()} 
                                 passHref
                             >

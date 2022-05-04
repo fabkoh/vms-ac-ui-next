@@ -130,6 +130,13 @@ const applyFilter = createFilter({
     query: filterControllerByString
 })
 
+const resToJsonHelper = res => {
+    if (res?.status == 200) {
+        return res.json();
+    }
+    return Promise.resolve({});
+}
+
 const ControllerList = () => {
 
     // for actions button
@@ -138,8 +145,31 @@ const ControllerList = () => {
     const handleActionClick = (e) => setActionAnchor(e.currentTarget);
     const handleActionClose = () => setActionAnchor(null);
 
-    // to change
-    const controllers = testData;
+    // data
+    const [controllers, setControllers] = useState([]);              
+    const [controllersStatus, setControllersStatus] = useState(null);
+    const isMounted = useMounted();
+
+    const getInfo = useCallback(async() => {
+        const controllersRes = await controllerApi.getControllers();
+        if (controllersRes.status !== 200) {
+            toast.error("Controllers not loaded");
+            return;
+        }
+        const controllersJson = await controllersRes.json();
+        if (isMounted()){
+            setControllers(controllersJson);
+        }
+
+        const statusResArr = await Promise.all(controllersJson.map(c => controllerApi.getAuthStatus(c.controllerId)));
+        const statusJsonArr = await Promise.all(statusResArr.map(res => resToJsonHelper(res)));
+        if (isMounted()) {
+            setControllersStatus(statusJsonArr);
+        }
+    }, [isMounted]);
+
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => getInfo(), [])
 
     // for selection of checkboxes
     const [selectedControllers, setSelectedControllers] = useState([]); // stores the ids of selected

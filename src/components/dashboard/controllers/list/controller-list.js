@@ -6,11 +6,11 @@ import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import { getEntranceDetailsLink } from "../../../../utils/entrance"
 import { getControllerDetailsLink, getControllerEditLink } from "../../../../utils/controller";
-import { CloudOff, CloudQueue } from "@mui/icons-material";
+import { Circle, CloudOff, CloudQueue } from "@mui/icons-material";
 import { isObject } from "../../../../utils/utils";
 
 const EntranceComponent = ({ entrance, ...props }) => {
-    if (isObject(entrance) && entranceName in entrance) {
+    if (isObject(entrance) && "entranceName" in entrance) {
         return (
             <Box { ...props }>
                 <NextLink
@@ -28,7 +28,12 @@ const EntranceComponent = ({ entrance, ...props }) => {
     return <WarningChip text="No entrance" { ...props }/>;
 }
 
-const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange }) => {
+const authDeviceKeys = ["E1_IN", "E1_OUT", "E2_IN", "E2_OUT"];
+
+const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange, controllerCount, controllersStatus }) => {
+    
+    const statusLoaded = controllersStatus !== null;
+
     return (
         <div>
             <Scrollbar>
@@ -58,16 +63,28 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                     controllerId,
                                     controllerName,
                                     controllerIP,
-                                    authDevices
+                                    authDevices = []
                                 } = controller;
 
-                                const entrance1 = Array.isArray(authDevices) && authDevices.length >= 1 && authDevices[0].entrance;
-                                const entrance2 = Array.isArray(authDevices) && authDevices.length >= 3 && authDevices[2].entrance;
+                                const authDevicesIsArray = Array.isArray(authDevices);
+
+                                const e1InDevice  = authDevicesIsArray && authDevices.find(device => device.authDeviceDirection == authDeviceKeys[0]);
+                                const e1OutDevice = authDevicesIsArray && authDevices.find(device => device.authDeviceDirection == authDeviceKeys[1]);
+                                const e2InDevice  = authDevicesIsArray && authDevices.find(device => device.authDeviceDirection == authDeviceKeys[2]);
+                                const e2OutDevice = authDevicesIsArray && authDevices.find(device => device.authDeviceDirection == authDeviceKeys[3]);
+
+                                const deviceArr = [e1InDevice, e1OutDevice, e2InDevice, e2OutDevice];
+
+                                const entrance1 = isObject(e1InDevice) && e1InDevice.entrance;
+                                const entrance2 = isObject(e2InDevice) && e2InDevice.entrance;
 
                                 const controllerSelected = selectedControllers.includes(controllerId);
                                 const handleSelect = handleSelectFactory(controllerId);
 
                                 const detailsLink = getControllerDetailsLink(controller);
+
+                                const offline = statusLoaded && Object.keys(controllersStatus[i]).length == 0;
+
                                 return(
                                     <TableRow
                                         hover
@@ -109,7 +126,22 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                             </Box>
                                         </TableCell>
                                         <TableCell>
-                                            <CircularProgress size='1rem' />
+                                            {
+                                                statusLoaded ? 
+                                                (deviceArr.map(device => (
+                                                    <Circle
+                                                        key={device?.authDeviceId}
+                                                        color={
+                                                            device?.lastOnline ?
+                                                                (controllersStatus[i][device?.authDeviceDirection] ?
+                                                                    "success" :
+                                                                    "error") :
+                                                                "disabled"
+                                                        }
+                                                    />
+                                                ))) :
+                                                <CircularProgress size='1rem' />
+                                            }
                                         </TableCell>
                                         <TableCell>
                                                 date

@@ -39,7 +39,7 @@ import WarningChip from "../../shared/warning-chip";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
-//import AuthDeviceReset from "../../const";
+import { getAuthdeviceDetailsLink } from "../../../../utils/controller";
 
 export default function AuthDevicePair({ authPair }) {
 	console.log(authPair);
@@ -204,20 +204,22 @@ export default function AuthDevicePair({ authPair }) {
 						</TableHead>
 						<TableBody>
 							{authPair.map((device, i) => {
-								const id = device.authDeviceId;
+								const authDeviceId = device.authDeviceId;
+								const controllerId = device.controllerId
 								return (
 									<TableRow hover key={i}>
 										<TableCell padding="checkbox">
 											<Checkbox
-												checked={selectedDevices.includes(id)}
-												onChange={(e) => handleSelect(id)}
+												checked={selectedDevices.includes(authDeviceId)}
+												onChange={(e) => handleSelect(authDeviceId)}
 												// value={selectedDevices.includes(id)}
 											/>{" "}
 										</TableCell>
-										<TableCell>
-											<NextLink href={"/dashboard"} passHref>
+										<TableCell>							
+											<NextLink href={getAuthdeviceDetailsLink(controllerId,authDeviceId)} passHref> 
+											{/* <NextLink href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`} passHref>  */}
 												<Link color="inherit">
-													{device.authDeviceName}
+													{device.authDeviceName} 
 												</Link>
 											</NextLink>
 										</TableCell>
@@ -227,6 +229,7 @@ export default function AuthDevicePair({ authPair }) {
 											{<Switch checked={device.masterpin} />}
 										</TableCell>
 										<TableCell>
+											{/* <Circle color="disabled" /> */}
 											<Circle color={device.lastOnline ? "success" : "error"} />
 										</TableCell>
 										<TableCell>
