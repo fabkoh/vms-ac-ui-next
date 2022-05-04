@@ -63,7 +63,7 @@ export const AuthDeviceBasicDetails = (props) => {
                     align={align}
                     divider
                     label="Last Online"
-                    value={deviceInfo.lastOnline}
+                    value={deviceInfo?.lastOnline?deviceInfo.lastOnline:"never"}
                     // value={controllerMAC}
                 />
                 <PropertyListItem

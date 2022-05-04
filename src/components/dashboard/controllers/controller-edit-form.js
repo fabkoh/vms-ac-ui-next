@@ -14,17 +14,29 @@ import {
     FormGroup,
     FormControlLabel,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ExpandMore from "../shared/expand-more";
 import MultipleSelectInput from "../shared/multi-select-input";
 import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../../../components/dashboard/shared/edit_form_tooltip";
+import { useMounted } from "../../../hooks/use-mounted";
 
-const ControllerEditForm = ({}) => {
+const ControllerEditForm = ({controllerInfo,changeText,changeIPStatic,changeIP}) => {
+	
+	// const controllerName = useRef(controllerInfo['controllerName'])
+	
+
 	// expanding form
 	const [expanded, setExpanded] = useState(true);
 	const handleExpandClick = () => setExpanded(!expanded);
 
+	// let storedInfo = controllerInfo;
+	// const storedInfo = controllerInfo?JSON.parse(JSON.stringify(controllerInfo)):""
+	
+
+	if(!controllerInfo){
+		return null
+	}
 	return (
 		<ErrorCard
 		// error={
@@ -82,9 +94,10 @@ const ControllerEditForm = ({}) => {
 						<TextField
 							fullWidth
 							label="Name"
-							name="accessGroupName"
+							name="controllerName"
 							required
-							// value={accessGroupName}
+							value={controllerInfo.controllerName}
+							onChange={changeText}
 							// onChange={onNameChange}
 							// helperText={
 							//     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
@@ -101,22 +114,23 @@ const ControllerEditForm = ({}) => {
 									<TextField
 										fullWidth
 										label="IP Address"
-										name="accessGroupDesc"
-										disabled="true"
-                                        required
+										name="controllerIP"
+										disabled={controllerInfo.controllerIPStatic?false:true}
+                                        required={controllerInfo.controllerIPStatic?false:true}
 										// disabled={controller.controllerIpStatic}
-										value={"192.168.1.64"}
-										// value={controllerIp}
-										// onChange={onDescriptionChange}
+										value={controllerInfo.controllerIP}
+										// helperText={storedInfo? storedInfo.controllerIP:""}
+										onChange={changeIP}
+										error={!/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(controllerInfo.controllerIP)}
 									/>
 								</Grid>
 								<Grid item ml={1}>
 									<FormGroup>
 										<FormControlLabel
 											control={<Switch 
-                                                checked="true" 
-                                                // checked={controller.controllerIPStatic}
-                                                //onChange={handleStaticIP}
+                                                // checked="true" 
+                                                checked={controllerInfo.controllerIPStatic}
+                                                onChange={changeIPStatic}
                                                 />}
                                             labelPlacement="start"
 											label={<Typography fontWeight="bold">Static IP</Typography>}

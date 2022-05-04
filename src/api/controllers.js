@@ -26,7 +26,7 @@ class ControllerApi {
         const controller = fakeControllers.find(c => c.controllerId==controllerId)
 
         if(controller){
-            controller.authDevice = fakeAuthDevices.filter(d=>d.controllerId==controllerId)
+            controller.authDevices = fakeAuthDevices.filter(d=>d.controllerId==controllerId)
             return Promise.resolve(new Response(JSON.stringify(controller), { status: 200 }));
         }
 
