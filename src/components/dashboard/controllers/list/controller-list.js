@@ -7,23 +7,25 @@ import { ArrowRight } from "../../../../icons/arrow-right";
 import { getEntranceDetailsLink } from "../../../../utils/entrance"
 import { getControllerDetailsLink, getControllerEditLink } from "../../../../utils/controller";
 import { CloudOff, CloudQueue } from "@mui/icons-material";
+import { isObject } from "../../../../utils/utils";
 
 const EntranceComponent = ({ entrance, ...props }) => {
-    if (entrance == null)
-        return <WarningChip text="No entrance" { ...props }/>;
+    if (isObject(entrance) && entranceName in entrance) {
+        return (
+            <Box { ...props }>
+                <NextLink
+                    href={getEntranceDetailsLink(entrance)}
+                    passHref
+                >
+                    <Link color="inherit">
+                        <Typography noWrap>{ entrance.entranceName }</Typography>
+                    </Link>
+                </NextLink>
+            </Box>
+        )
+    }
     
-    return (
-        <Box { ...props }>
-            <NextLink
-                href={getEntranceDetailsLink(entrance)}
-                passHref
-            >
-                <Link color="inherit">
-                    <Typography noWrap>{ entrance.entranceName }</Typography>
-                </Link>
-            </NextLink>
-        </Box>
-    )
+    return <WarningChip text="No entrance" { ...props }/>;
 }
 
 const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange, controllerCount, controllersStatus }) => {
@@ -62,8 +64,8 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                                     authDevices
                                 } = controller;
 
-                                const entrance1 = authDevices[0].entrance;
-                                const entrance2 = authDevices[2].entrance;
+                                const entrance1 = Array.isArray(authDevices) && authDevices.length >= 1 && authDevices[0].entrance;
+                                const entrance2 = Array.isArray(authDevices) && authDevices.length >= 3 && authDevices[2].entrance;
 
                                 const controllerSelected = selectedControllers.includes(controllerId);
                                 const handleSelect = handleSelectFactory(controllerId);
