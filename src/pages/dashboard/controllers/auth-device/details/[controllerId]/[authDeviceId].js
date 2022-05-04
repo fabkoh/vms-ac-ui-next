@@ -56,7 +56,7 @@ const AuthDeviceDetails = () => {
 
     const [deviceInfo, setDeviceInfo] = useState(null)
 
-    const getAuthDevice = async(authDeviceId) => {
+    const getAuthDevice = async() => {
         try{
             const res = await authDeviceApi.getAuthDevice(router.query.authDeviceId)
             if(res.status!=200){
@@ -118,7 +118,7 @@ const AuthDeviceDetails = () => {
     useEffect(() => {
         // getController(1)
         // getPairs(deviceInfo)
-        getAuthDevice(1)
+        getAuthDevice()
         // getInfo();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 

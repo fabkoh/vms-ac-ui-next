@@ -40,9 +40,10 @@ import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
 import { getAuthdeviceDetailsLink } from "../../../../utils/controller";
+import { controllerApi } from "../../../../api/controllers";
 
-export default function AuthDevicePair({ authPair }) {
-	console.log(authPair);
+export default function AuthDevicePair({ authPair,controllerId,status }) {
+	// console.log("controllerId",controllerId);
 
 	// for selection of checkboxes
 	const [selectedDevices, setSelectedDevices] = useState([]);
@@ -205,7 +206,7 @@ export default function AuthDevicePair({ authPair }) {
 						<TableBody>
 							{authPair.map((device, i) => {
 								const authDeviceId = device.authDeviceId;
-								const controllerId = device.controllerId
+								// const controllerId = device.controllerId
 								return (
 									<TableRow hover key={i}>
 										<TableCell padding="checkbox">
@@ -230,10 +231,10 @@ export default function AuthDevicePair({ authPair }) {
 										</TableCell>
 										<TableCell>
 											{/* <Circle color="disabled" /> */}
-											<Circle color={device.lastOnline ? "success" : "error"} />
+											<Circle color={device?.lastOnline ? (status[device?.authDeviceDirection]? "success":"error") : "disabled"} />
 										</TableCell>
 										<TableCell>
-											{device.lastOnline ? device.lastOnline : "Never"}
+											{device?.lastOnline ? device.lastOnline:"never"}
 										</TableCell>
 										<TableCell>
 											{/* <NextLink

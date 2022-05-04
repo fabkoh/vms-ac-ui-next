@@ -4,7 +4,7 @@ import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 
-export const ControllerBasicDetails = ({}) => {
+export const ControllerBasicDetails = ({controller,E1Status,E2Status}) => {
     // const { 
     //     controllerName, 
     //     controllerIP, 
@@ -16,23 +16,26 @@ export const ControllerBasicDetails = ({}) => {
     // } = controller;
     // const {controller:{controllerName}} = props
     // console.log("controllerName",controller.controllerName)
-    const controller = {
-        "controllerId":1,
-        "controllerName":"Controller_DefaultMAC1",
-        "controllerIpStatic":false,
-        "controllerIP":"192.168.1.1",
-        "controllerMAC":"495162159654",
-        "controllerSerialNo":"5e86805e2bafd54f66cc95c3",
-        "firstOnline":"2022-18-04    09:52:23",
-        "pinAssignmentConfig":"",
-        "settingsConfig":"",
-        "lastOnline":"2022-18-04    09:52:23",
-    }
+    // const controller = {
+    //     "controllerId":1,
+    //     "controllerName":"Controller_DefaultMAC1",
+    //     "controllerIpStatic":false,
+    //     "controllerIP":"192.168.1.1",
+    //     "controllerMAC":"495162159654",
+    //     "controllerSerialNo":"5e86805e2bafd54f66cc95c3",
+    //     "firstOnline":"2022-18-04    09:52:23",
+    //     "pinAssignmentConfig":"",
+    //     "settingsConfig":"",
+    //     "lastOnline":"2022-18-04    09:52:23",
+    // }
     // console.log("controller",controller)
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
 
+    if(controller==null){
+        return null
+    }
     return(
         <Card>
             <CardHeader title="Basic Details" />
@@ -77,12 +80,13 @@ export const ControllerBasicDetails = ({}) => {
                     align={align}
                     divider
                     label="Status"
-                    value={"test"} //needs another api to check status
+                    // value={<SeverityPill color="success"> test</SeverityPill>} //needs another api to check status
                 >
-                {<SeverityPill color="error">
+                {(E1Status.length==0&&E2Status.length==0)?(
+                    <SeverityPill color="error">
                     <Warning fontSize="small" sx={{mr:1}}/>
-                    test disconnected 
-                    </SeverityPill>}
+                    disconnected 
+                    </SeverityPill>):(<SeverityPill color="success"> connected</SeverityPill>)}
                 </PropertyListItem>
                 {/* <PropertyListItem
                     align={align}

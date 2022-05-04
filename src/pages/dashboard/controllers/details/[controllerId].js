@@ -44,15 +44,18 @@ const ControllerDetails = () => {
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    const { entranceId }  = router.query; //change to controller Id
-
+    const { controllerId }  = router.query; //change to controller Id
+    // console.log("controllerId",controllerId)
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
 
     const [controllerInfo, setControllerInfo] = useState(null)
     const [E1, setE1] = useState()
+    const [E1Status, setE1Status] = useState([])
     const [E2, setE2] = useState()
+    const [E2Status, setE2Status] = useState([])
+
     const getController = async(controllerId) => {
         try{
             Promise.resolve(controllerApi.getController(controllerId)) 
@@ -60,11 +63,12 @@ const ControllerDetails = () => {
                 if(res.status==200){
                     const data = await res.json()
                     setControllerInfo(data)
-                    // console.log(data)
+                    console.log("getController",data)
                     getPairs(data)
                 }
                 else{
                     toast.error("Controller info not found")
+                    router.replace(getControllerListLink())
                 }
             })
         }catch(err){console.log(err)}
@@ -72,7 +76,7 @@ const ControllerDetails = () => {
     const getPairs = (controllerInfo) => {
         const E1=[]
         const E2=[]
-        controllerInfo.authDevice.forEach(dev=>{
+        controllerInfo.authDevices.forEach(dev=>{
             if(dev.authDeviceDirection.includes('E1')){
                 E1.push(dev)
             }
@@ -82,12 +86,28 @@ const ControllerDetails = () => {
         setE2(E2)
     }
 
-    const controllerEditLink = `/dashboard/controllers/edit?controllerId=` +  encodeURIComponent(JSON.stringify(entranceId)) //change to controllerId
-    const link = getEntranceScheduleEditLink(entranceId);
+    const getStatus = async() => {
+        const E1 = []
+        const E2 = []
+        try{
+            const res = await controllerApi.getAuthStatus(controllerId);
+            const data = await res.json();
+            data.forEach(status =>{
+                if(status.includes("E1")){
+                    E1.push(status)
+                }
+                else{E2.push(status)}
+            })
+        }catch(err){console.log(err)}
+        setE1Status(E1)
+        setE2Status(E2)
+        console.log("E1,E2",E1,E2)
+    }
 
 
     const getInfo = useCallback(async() => {
-        getController(1)
+        getController(controllerId)
+        getStatus()
     }, [isMounted])
 
     useEffect(() => {
@@ -129,7 +149,7 @@ const ControllerDetails = () => {
 	}
 	const deleteEntrance = async() => {
         Promise.resolve(
-            entranceApi.deleteEntrance(entranceId)
+            entranceApi.deleteEntrance(controllerId)
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
@@ -147,9 +167,9 @@ const ControllerDetails = () => {
 
 
     // render view
-    // if (!entrance) {
-    //     return null;
-    // }
+    if (!controllerInfo) {
+        return null;
+    }
     return (
         <>
             <Head>
@@ -274,6 +294,8 @@ const ControllerDetails = () => {
                             >
                                 <ControllerBasicDetails
                                 controller={controllerInfo}
+                                E1Status={E1Status}
+                                E2Status={E2Status}
                                 />
                             </Grid>                         
                             <Grid
@@ -282,6 +304,8 @@ const ControllerDetails = () => {
                             >
                                 <AuthDevicePair
                                 authPair={E1}
+                                controllerId={controllerId}
+                                status={E1Status}
                                 />
                             </Grid>                         
                             <Grid
@@ -290,6 +314,8 @@ const ControllerDetails = () => {
                             >
                                 <AuthDevicePair
                                 authPair={E2}
+                                controllerId={controllerId}
+                                status={E2Status}
                                 />
                             </Grid>                         
                         </Grid>

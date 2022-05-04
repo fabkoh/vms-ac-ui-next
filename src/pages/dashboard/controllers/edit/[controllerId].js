@@ -17,48 +17,50 @@ import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n
 import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
 import { getControllerListLink } from "../../../../utils/controller";
+import { controllerApi } from "../../../../api/controllers";
+import { authDeviceApi } from "../../../../api/auth-devices";
 
 const EditController = () => {
 
-    // edited access groups logic
-    const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
-    const [accessGroupValidationsArr, 
-        setAccessGroupValidationsArr] = useState([]);
-    
-        //         await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
-
-
-    useEffect( async () => {
-        // try {
-        //     getGroupEntrances(
-        //         await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
-        //     );
-        // } catch(e){
-        //     router.replace('/dashboard/access-groups')
-        // }
-    }, [])
+    const [controllerInfo, setControllerInfo] = useState()
 
     // persons logic (displaying in dropdown box)
-    const isPersonMounted = useMounted();
-    const [allPersons, setAllPersons] = useState([]);
+    const isMounted = useMounted();
+    // const [allPersons, setAllPersons] = useState([]);
 
-    const getPersons = useCallback( async() => {
+    const getController = async() => {
         try {
-            const res = await personApi.getPersons();
+            const res = await controllerApi.getController(router.query.controllerId);
             if (res.status == 200) {
                 const body = await res.json();
-                setAllPersons(body);
+                setControllerInfo(body);
+                console.log("getcontroller",body)
             } else {
-                throw new Error("persons not loaded");
+                throw new Error("Controller info not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Persons not loaded");
+            toast.error("Controller info not loaded");
         }
-    }, [isPersonMounted]);
+    }
+    // const getController = useCallback( async() => {
+    //     try {
+    //         const res = await controllerApi.getController(router.query.controllerId);
+    //         if (res.status == 200) {
+    //             const body = await res.json();
+    //             setControllerInfo(body);
+    //             console.log("getcontroller",body)
+    //         } else {
+    //             throw new Error("Controller info not loaded");
+    //         }
+    //     } catch(e) {
+    //         console.error(e);
+    //         toast.error("Controller info not loaded");
+    //     }
+    // }, [isMounted]);
 
     useEffect(() => {
-        getPersons();
+        getController();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
@@ -68,12 +70,13 @@ const EditController = () => {
     const [allEntrances, setAllEntrances] = useState([]);
     const getEntrances = useCallback( async() => {
         try {
-            const res = await entranceApi.getEntrances();
+            const res = await authDeviceApi.getAvailableEntrances();
             if (res.status == 200) {
                 const body = await res.json();
                 setAllEntrances(body);
+                console.log("avail ent",body)
             } else {
-                throw new Error("entrances not loaded");
+                throw new Error("Entrances not loaded");
             }
         } catch(e) {
             console.error(e);
@@ -91,18 +94,18 @@ const EditController = () => {
     const [duplicatedPerson, setDuplicatedPerson] = useState({});
 
     // store previous access group names
-    const [accessGroupNames, setAccessGroupNames] = useState({});
-    useEffect(() => {
-        accessGroupApi.getAccessGroups()
-            .then(async res => {
-                const newAccessGroupNames = {}
-                if (res.status == 200) {
-                    const body = await res.json();
-                    body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
-                    setAccessGroupNames(newAccessGroupNames);
-                }
-            })
-    }, []);
+    // const [accessGroupNames, setAccessGroupNames] = useState({});
+    // useEffect(() => {
+    //     accessGroupApi.getAccessGroups()
+    //         .then(async res => {
+    //             const newAccessGroupNames = {}
+    //             if (res.status == 200) {
+    //                 const body = await res.json();
+    //                 body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
+    //                 setAccessGroupNames(newAccessGroupNames);
+    //             }
+    //         })
+    // }, []);
     
 
     // helper for remove card and changeNameCheck
@@ -172,11 +175,6 @@ const EditController = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
-    const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
-    const onPersonChangeFactory = (id) => (newValue) => {
-        changePerson(newValue, id);
-        changePersonCheck(newValue, id);
-    }
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -229,6 +227,23 @@ const EditController = () => {
         setSubmitted(false);
     }
 
+    //change controllerInfo
+    const changeText = (e) => {
+        // console.log(controllerInfo)
+        setControllerInfo(prevState=>({...prevState,controllerName:e.target.value}) )
+    }
+    const changeIPStatic = (e) => {
+        if(controllerInfo.controllerIPStatic==true){
+        setControllerInfo(prevState=>({...prevState,controllerIP:"",controllerIPStatic:false}))
+        }
+        if(controllerInfo.controllerIPStatic==false){
+        setControllerInfo(prevState=>({...prevState ,controllerIPStatic:true}))
+        }
+        console.log(controllerInfo)
+    }
+    const changeIP = (e) => {
+        setControllerInfo(prevState=>({...prevState,controllerIP:e.target.value}))
+    }
     return(
         <>
             <Head>
@@ -274,7 +289,12 @@ const EditController = () => {
                     </Box>
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
-                                <ControllerEditForm/>
+                                <ControllerEditForm
+                                controllerInfo={controllerInfo}
+                                changeText={changeText}
+                                changeIPStatic={changeIPStatic}
+                                changeIP={changeIP}
+                                />
                                 <AssignAuthDevice       //split 2 components E1 and E2? 
                                 />
                                 <AssignAuthDevice       //split 2 components E1 and E2? 

@@ -142,7 +142,7 @@ const fakeAuthDevices = [
     {
             "authDeviceId":"1",
             "authDeviceName":"authDevice1",
-            "authDeviceDirection":"E1 IN",
+            "authDeviceDirection":"E1_IN",
             "lastOnline":"2022-08-14 08:59:52",
             "masterpin":true,
             "defaultAuthMethod":"",
@@ -157,7 +157,7 @@ const fakeAuthDevices = [
     {
             "authDeviceId":"2",
             "authDeviceName":"authDevice2",
-            "authDeviceDirection":"E1 OUT",
+            "authDeviceDirection":"E1_OUT",
             "lastOnline":"",
             "masterpin":false,
             "defaultAuthMethod":"",
@@ -172,7 +172,7 @@ const fakeAuthDevices = [
     {
             "authDeviceId":"3",
             "authDeviceName":"authDevice3",
-            "authDeviceDirection":"E2 IN",
+            "authDeviceDirection":"E2_IN",
             "lastOnline":"",
             "masterpin":true,
             "defaultAuthMethod":"",
@@ -182,7 +182,7 @@ const fakeAuthDevices = [
     {
             "authDeviceId":"4",
             "authDeviceName":"authDevice4",
-            "authDeviceDirection":"E2 OUT",
+            "authDeviceDirection":"E2_OUT",
             "lastOnline":"",
             "masterpin":true,
             "defaultAuthMethod":"",
