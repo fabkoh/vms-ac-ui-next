@@ -124,7 +124,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                         <Circle
                             key={device?.authDeviceId}
                             color={
-                                device?.lastOnline ?
+                                (device?.lastOnline && connected)?
                                     (deviceStatus[authDeviceKeys[i]] ?
                                         "success" :
                                         "error") :
