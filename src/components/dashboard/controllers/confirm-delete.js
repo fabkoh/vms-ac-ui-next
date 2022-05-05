@@ -7,8 +7,7 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogContentText,
-	TextField,
-	Typography,
+	TextField
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
@@ -16,26 +15,6 @@ import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
 	const { open, handleDialogClose, deleteControllers } = props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
-
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
-
-	//move text state here
 
 	//text field
 	const [value, setValue] = useState("");
@@ -81,7 +60,7 @@ export const Confirmdelete = (props) => {
 						<TextField
 							variant="filled"
 							fullWidth
-							helperText="Please type in DELETE to proceed"
+							helperText="Please type in DELETE to continue"
 							onChange={handleTextChange}
 							autoFocus
 						/>

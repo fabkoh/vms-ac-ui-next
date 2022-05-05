@@ -148,7 +148,24 @@ const ControllerDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteController = async() => {
+
+    const deleteController = async() => {
+        Promise.resolve(
+            controllerApi.deleteController(controllerId)
+        ).then((res)=>{
+            if (res.status == 204){
+                toast.success('Delete success');
+                router.replace(getControllerListLink());
+            }
+            else{
+                toast.error('Delete unsuccessful')
+            }
+        })
+        setDeleteOpen(false);
+    };
+
+    //dk if needed - leave it here first
+	/*const deleteEntrance = async() => {
         Promise.resolve(
             entranceApi.deleteEntrance(controllerId)
         ).then((res)=>{
@@ -161,7 +178,8 @@ const ControllerDetails = () => {
             }
         })
         setDeleteOpen(false);
-    }; 
+    }; */
+
 
     //Reset controller
     const [resetOpen, setResetOpen] = useState(false);
@@ -178,7 +196,7 @@ const ControllerDetails = () => {
         ).then((res)=>{
             if (res.status == 204){
                 toast.success('Reset controller success');
-               // router.replace(controllerListLink);
+                router.replace(getControllerListLink());
             }
             else{
                 toast.error('Reset unsuccessful')
@@ -296,7 +314,7 @@ const ControllerDetails = () => {
                                         &#8288;Delete
                                     </MenuItem>
                                     <Confirmdelete 
-                                    setAnchorEl={setActionAnchor} 
+                                    setActionAnchor={setActionAnchor} 
                                     open={deleteOpen}
                                     handleDialogClose={handleDeleteClose}
                                     deleteControllers={deleteController} />
@@ -309,7 +327,7 @@ const ControllerDetails = () => {
                                         &#8288;Reset
                                     </MenuItem>
                                     <ConfirmReset 
-                                    setAnchorEl={setActionAnchor} 
+                                    setActionAnchor={setActionAnchor} 
                                     open={resetOpen}
                                     handleDialogClose={handleResetClose}
                                     resetControllers={resetController} />
