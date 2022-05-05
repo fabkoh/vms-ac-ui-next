@@ -268,6 +268,7 @@ const EditController = () => {
         setSubmitted(true)
         Promise.resolve(controllerApi.updateController(controllerInfo),toast.loading("Attempting to update controller"))
         .then(res=>{
+            toast.dismiss()
             if(res.status!=200){
                 toast.error("Error updating controller")
             setSubmitted(false)
