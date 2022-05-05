@@ -17,48 +17,54 @@ import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n
 import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
 import { getControllerListLink } from "../../../../utils/controller";
+import { controllerApi } from "../../../../api/controllers";
+import { authDeviceApi } from "../../../../api/auth-devices";
 
 const EditController = () => {
 
-    // edited access groups logic
-    const [accessGroupInfoArr, setAccessGroupInfoArr] = useState([]);
-    const [accessGroupValidationsArr, 
-        setAccessGroupValidationsArr] = useState([]);
-    
-        //         await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
+    const [controllerInfo, setControllerInfo] = useState()
+    const [controllerValidations, setControllerValidations] = useState({
+        invalidIP:false,
+        invalidEntrance:false,
+    })
 
-
-    useEffect( async () => {
-        // try {
-        //     getGroupEntrances(
-        //         await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
-        //     );
-        // } catch(e){
-        //     router.replace('/dashboard/access-groups')
-        // }
-    }, [])
-
-    // persons logic (displaying in dropdown box)
-    const isPersonMounted = useMounted();
-    const [allPersons, setAllPersons] = useState([]);
-
-    const getPersons = useCallback( async() => {
+    const getController = async() => {
         try {
-            const res = await personApi.getPersons();
+            const res = await controllerApi.getController(router.query.controllerId);
             if (res.status == 200) {
                 const body = await res.json();
-                setAllPersons(body);
+                setControllerInfo(body);
+                // console.log("getcontroller",body)
             } else {
-                throw new Error("persons not loaded");
+                throw new Error("Controller info not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Persons not loaded");
+            toast.error("Controller info not loaded");
         }
-    }, [isPersonMounted]);
+    }
+    useEffect(() => {
+        console.log("controllerValidations",controllerValidations)
+    }, [controllerValidations])
+    
+    // const getController = useCallback( async() => {
+    //     try {
+    //         const res = await controllerApi.getController(router.query.controllerId);
+    //         if (res.status == 200) {
+    //             const body = await res.json();
+    //             setControllerInfo(body);
+    //             console.log("getcontroller",body)
+    //         } else {
+    //             throw new Error("Controller info not loaded");
+    //         }
+    //     } catch(e) {
+    //         console.error(e);
+    //         toast.error("Controller info not loaded");
+    //     }
+    // }, [isMounted]);
 
     useEffect(() => {
-        getPersons();
+        getController();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
@@ -68,12 +74,13 @@ const EditController = () => {
     const [allEntrances, setAllEntrances] = useState([]);
     const getEntrances = useCallback( async() => {
         try {
-            const res = await entranceApi.getEntrances();
+            const res = await authDeviceApi.getAvailableEntrances();
             if (res.status == 200) {
                 const body = await res.json();
                 setAllEntrances(body);
+                console.log("avail ent",body)
             } else {
-                throw new Error("entrances not loaded");
+                throw new Error("Entrances not loaded");
             }
         } catch(e) {
             console.error(e);
@@ -91,18 +98,18 @@ const EditController = () => {
     const [duplicatedPerson, setDuplicatedPerson] = useState({});
 
     // store previous access group names
-    const [accessGroupNames, setAccessGroupNames] = useState({});
-    useEffect(() => {
-        accessGroupApi.getAccessGroups()
-            .then(async res => {
-                const newAccessGroupNames = {}
-                if (res.status == 200) {
-                    const body = await res.json();
-                    body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
-                    setAccessGroupNames(newAccessGroupNames);
-                }
-            })
-    }, []);
+    // const [accessGroupNames, setAccessGroupNames] = useState({});
+    // useEffect(() => {
+    //     accessGroupApi.getAccessGroups()
+    //         .then(async res => {
+    //             const newAccessGroupNames = {}
+    //             if (res.status == 200) {
+    //                 const body = await res.json();
+    //                 body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
+    //                 setAccessGroupNames(newAccessGroupNames);
+    //             }
+    //         })
+    // }, []);
     
 
     // helper for remove card and changeNameCheck
@@ -172,63 +179,121 @@ const EditController = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
-    const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
-    const onPersonChangeFactory = (id) => (newValue) => {
-        changePerson(newValue, id);
-        changePersonCheck(newValue, id);
-    }
 
     const [submitted, setSubmitted] = useState(false);
 
-    const submitForm = async e => {
-        e.preventDefault(); 
+    // const submitForm = async e => {
+    //     e.preventDefault(); 
 
-        setSubmitted(true);
+    //     setSubmitted(true);
 
-        const resArr = await Promise.all(accessGroupInfoArr.map(group => accessGroupApi.updateAccessGroup(group)));
+    //     const resArr = await Promise.all(accessGroupInfoArr.map(group => accessGroupApi.updateAccessGroup(group)));
         
-        const successStatus = [];
-        const successfulResIndex = [];
+    //     const successStatus = [];
+    //     const successfulResIndex = [];
 
-        resArr.forEach((res, i) => {
-            if(res.status == 200) {
-                successStatus.push(true);
-                successfulResIndex.push(i);
-            } else {
-                successStatus.push(false);
+    //     resArr.forEach((res, i) => {
+    //         if(res.status == 200) {
+    //             successStatus.push(true);
+    //             successfulResIndex.push(i);
+    //         } else {
+    //             successStatus.push(false);
+    //         }
+    //     });
+
+    //     const entranceResArr = await Promise.all(
+    //         successfulResIndex.map(i => {
+    //             const accessGroup = accessGroupInfoArr[i];
+    //             return accessGroupEntranceApi.assignEntrancesToAccessGroup(
+    //                 accessGroup.entrances.map(e => e.entranceId),
+    //                 accessGroup.accessGroupId
+    //             );
+    //         })
+    //     )
+    //     entranceResArr.forEach((res, i) => {
+    //         if (res.status != 204) {
+    //             successStatus[successfulResIndex[i]] = false;
+    //         }
+    //     })
+
+    //     const numEdited = successStatus.filter(status => status).length;
+    //     if (numEdited) {
+    //         toast.success(`${numEdited} access groups edited`);
+    //         if (numEdited == resArr.length) { // all success
+    //             router.replace('/dashboard/access-groups');
+    //             return;
+    //         }
+    //     }
+
+    //     toast.error('Error updating the below access groups');
+    //     setAccessGroupInfoArr(accessGroupInfoArr.filter((e, i) => !(successStatus[i])));
+    //     setAccessGroupValidationsArr(accessGroupValidationsArr.filter((e, i) => !(successStatus[i])));
+    //     setSubmitted(false);
+    // }
+
+    //change controllerInfo
+    const changeText = (e) => {
+        // console.log(controllerInfo)
+        setControllerInfo(prevState=>({...prevState,controllerName:e.target.value}) )
+    }
+    const changeIPStatic = (e) => {
+        if(controllerInfo.controllerIPStatic==true){
+        setControllerInfo(prevState=>({...prevState,controllerIP:"",controllerIPStatic:false}))
+        setControllerValidations(prevState=>({...prevState,invalidIP:false}))
+        }
+        if(controllerInfo.controllerIPStatic==false){
+            setControllerInfo(prevState=>({...prevState ,controllerIPStatic:true}))
+            setControllerValidations(prevState=>({...prevState,invalidIP:true}))
+        }
+        console.log(controllerInfo)
+    }
+    const changeIP = (e) => {
+        setControllerInfo(prevState=>({...prevState,controllerIP:e.target.value}))
+    }
+    const checkIP = (e) => {
+        if(controllerInfo.controllerIPStatic){
+            // console.log("controllerInfo.controllerIPStatic",controllerInfo.controllerIPStatic)
+            const invalid = !/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(e.target.value)
+            setControllerValidations(prevState=>({...prevState,invalidIP:invalid}))
+        }
+        else{setControllerValidations(prevState=>({...prevState,invalidIP:false}))}
+    }
+    const changeIPHandler = (e) => {
+        changeIP(e);
+        checkIP(e);
+    }
+    const [loading, setLoading] = useState(true)
+    const submitForm = (e) => {
+        e.preventDefault();
+        setSubmitted(true)
+        Promise.resolve(controllerApi.updateController(controllerInfo),toast.loading("Attempting to update controller"))
+        .then(res=>{
+            toast.dismiss()
+            if(res.status!=200){
+                toast.error("Error updating controller")
+            setSubmitted(false)
             }
-        });
-
-        const entranceResArr = await Promise.all(
-            successfulResIndex.map(i => {
-                const accessGroup = accessGroupInfoArr[i];
-                return accessGroupEntranceApi.assignEntrancesToAccessGroup(
-                    accessGroup.entrances.map(e => e.entranceId),
-                    accessGroup.accessGroupId
-                );
-            })
-        )
-        entranceResArr.forEach((res, i) => {
-            if (res.status != 204) {
-                successStatus[successfulResIndex[i]] = false;
+            else{
+                toast.success("Controller info updated")
+                router.replace('/dashboard/controllers')
             }
         })
-
-        const numEdited = successStatus.filter(status => status).length;
-        if (numEdited) {
-            toast.success(`${numEdited} access groups edited`);
-            if (numEdited == resArr.length) { // all success
-                router.replace('/dashboard/access-groups');
-                return;
-            }
-        }
-
-        toast.error('Error updating the below access groups');
-        setAccessGroupInfoArr(accessGroupInfoArr.filter((e, i) => !(successStatus[i])));
-        setAccessGroupValidationsArr(accessGroupValidationsArr.filter((e, i) => !(successStatus[i])));
-        setSubmitted(false);
+        // toast.promise(Promise.resolve(controllerApi.updateController(controllerInfo))
+        // ,{
+        //     loading:'Attempting to update controller',
+        //     success:'Controller info updated',
+        //     error:'Error updating controller',
+        // },{
+        //     style:{
+        //         minWidth:'250px'
+        //     }
+        // }
+        // ).then(res=>{
+        //     if(res.status==200){
+        //         router.replace('/dashboard/controllers')
+        //     }
+        // })
     }
-
     return(
         <>
             <Head>
@@ -274,10 +339,16 @@ const EditController = () => {
                     </Box>
                     <form onSubmit={submitForm}>
                         <Stack spacing={3}>
-                                <ControllerEditForm/>
-                                <AssignAuthDevice
+                                <ControllerEditForm
+                                controllerInfo={controllerInfo}
+                                changeText={changeText}
+                                changeIPStatic={changeIPStatic}
+                                changeIPHandler={changeIPHandler}
+                                controllerValidations={controllerValidations}
                                 />
-                                <AssignAuthDevice
+                                <AssignAuthDevice       //split 2 components E1 and E2? 
+                                />
+                                <AssignAuthDevice       //split 2 components E1 and E2? 
                                 />
                             <Grid container>
                                 <Grid item marginRight={3}>
@@ -286,7 +357,9 @@ const EditController = () => {
                                         size="large"
                                         variant="contained"
                                         disabled={
-                                            true
+                                            submitted||
+                                            controllerValidations.invalidIP||
+                                            controllerValidations.invalidEntrance
                                         }
                                         // disabled={
                                         //     submitted                      ||

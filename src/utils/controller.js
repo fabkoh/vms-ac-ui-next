@@ -15,8 +15,14 @@ const getControllerEditLink = (controller) => {
 }
 const getControllerListLink = () => {
         return `/dashboard/controllers/`;
-    
 }
+const getAuthdeviceDetailsLink = (controllerId,authDeviceId) => {
+        return `/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`;
+}
+const getAuthdeviceEditLink = (controllerId,authDeviceId) => {
+        return `/dashboard/controllers/auth-device/edit/${controllerId}/${authDeviceId}`;
+}
+
 
 const stringFilterHelper = (controller, query) => query === "" || stringIn(query, controller.controllerName) || stringIn(query, controller.controllerIP) || stringIn(query, controller.authDevices[0].entrance?.entranceName) || stringIn(query, controller.authDevices[2].entrance?.entranceName);
 
@@ -24,4 +30,4 @@ const filterControllerByString = (controller, queryString) => stringFilterHelper
 
 const filterControllerByStringPlaceholder = "Search for controller name, ip address or entrance name";
 
-export { getControllerDetailsLink, filterControllerByString, filterControllerByStringPlaceholder, getControllerEditLink, getControllerListLink };
+export { getControllerDetailsLink, filterControllerByString, filterControllerByStringPlaceholder, getControllerEditLink, getControllerListLink,getAuthdeviceDetailsLink,getAuthdeviceEditLink };

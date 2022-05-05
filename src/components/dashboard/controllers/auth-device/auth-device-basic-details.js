@@ -29,7 +29,11 @@ export const AuthDeviceBasicDetails = (props) => {
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
     
-    return(
+    if(deviceInfo == null){
+        return null
+    }
+    else{
+    return( 
         <Card>
             <CardHeader title="Basic Details" />
             <Divider />
@@ -38,42 +42,39 @@ export const AuthDeviceBasicDetails = (props) => {
                     align={align}
                     divider
                     label="Name"
-                    // value={deviceInfo.authDeviceName}
-                    // value={controller.controllerName}
+                    value={deviceInfo.authDeviceName}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Direction"
-                    // value={deviceInfo.authDeviceDirection}
-                    // value={controller.controllerIP}
+                    value={deviceInfo.authDeviceDirection}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Status"
-                    // value={controller.controllerMAC}
-                    value={<Chip color="success" label="connected" />}
+                    value={<Chip color="success" label="fix this eventually" />} // need to pass status here.
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Last Online"
-                    // value={deviceInfo.lastOnline}
+                    value={deviceInfo?.lastOnline?deviceInfo.lastOnline:"never"}
                     // value={controllerMAC}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Masterpin"
-                    // value={<Switch checked={deviceInfo.masterpin} size="small" ></Switch>}
+                    value={<Switch checked={deviceInfo.masterpin} size="small" ></Switch>}
                     // value={controllerSerialNo}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Entrance"
-                    // value={<Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName}></Chip>}
+                    value={deviceInfo.entrance? <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName}></Chip>:<Chip color="warning" label="No entrance assigned"/>}
                     // value={lastOnline}
                 />
                 {/* <PropertyListItem
@@ -127,4 +128,5 @@ export const AuthDeviceBasicDetails = (props) => {
             </PropertyList>
         </Card>
     )
+            }
 }

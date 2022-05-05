@@ -5,7 +5,7 @@ class AuthDeviceApi {
     
     getAuthDevice(authDeviceId) {
         if (useApi) { 
-            return sendApi(`/api/controller/${controllerId}`); //change to auth device api
+            return sendApi(`/api/authdevice/${authDeviceId}`); //change to auth device api
         }
         const authDevice = fakeAuthDevices.find(dev => dev.authDeviceId==authDeviceId)
 

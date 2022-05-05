@@ -30,7 +30,7 @@ import { Scrollbar } from "../../scrollbar";
 import { Circle } from "@mui/icons-material";
 import NextLink from "next/link";
 
-
+//this is the authdevice list for edit page. can only assign entrance. other details for viewing only.
 
 const AssignAuthDevice = ({ }) => {
 
@@ -147,16 +147,16 @@ const AssignAuthDevice = ({ }) => {
 											/>{" "}
 										</TableCell> */}
 										<TableCell>
-											<NextLink href={"/dashboard"} passHref>
-												<Link color="inherit">
+											{/* <NextLink href={"/dashboard"} passHref> */}
+												{/* <Link color="inherit"> */}
 													{device.authDeviceName}
-												</Link>
-											</NextLink>
+												{/* </Link> */}
+											{/* </NextLink> */}
 										</TableCell>
 										<TableCell>{device.authDeviceDirection}</TableCell>
 										<TableCell>{1}</TableCell>
 										<TableCell>
-											{<Switch checked={device.masterpin} />}
+											{<Switch disabled checked={device.masterpin} />}
 										</TableCell>
 										<TableCell>
 											<Circle color={device.lastOnline ? "success" : "error"} />
