@@ -39,7 +39,7 @@ import WarningChip from "../../shared/warning-chip";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
-import { getAuthdeviceDetailsLink } from "../../../../utils/controller";
+import { getAuthdeviceDetailsLink, getControllerEditLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 
 export default function AuthDevicePair({ authPair,controllerId,status }) {
@@ -134,6 +134,10 @@ export default function AuthDevicePair({ authPair,controllerId,status }) {
 					/>
 				</Box>
 				<Box>
+				<NextLink 
+                                                href={`/dashboard/controllers/edit/${controllerId}`}
+                                                passHref
+                                            >
 					<Button
 						sx={{ m: 2 }}
 						variant="contained"
@@ -141,6 +145,7 @@ export default function AuthDevicePair({ authPair,controllerId,status }) {
 					>
 						Assign Entrance
 					</Button>
+					</NextLink>
 					<Button
 						endIcon={<ChevronDown fontSize="small" />}
 						sx={{ m: 2 }}
@@ -245,15 +250,15 @@ export default function AuthDevicePair({ authPair,controllerId,status }) {
 											<IconButton component="a">
 												<PencilAlt fontSize="small" />
 											</IconButton>
-											{/* </NextLink>
+											{/* </NextLink> */}
                                             <NextLink 
-                                                href={ detailsLink }
+                                                href={ getAuthdeviceDetailsLink(controllerId,authDeviceId) }
                                                 passHref
-                                            > */}
+                                            >
 											<IconButton component="a">
 												<ArrowRight fontSize="small" />
 											</IconButton>
-											{/* </NextLink> */}
+											</NextLink>
 										</TableCell>
 									</TableRow>
 								);

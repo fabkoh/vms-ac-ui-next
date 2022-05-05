@@ -43,21 +43,18 @@ export const AuthDeviceBasicDetails = (props) => {
                     divider
                     label="Name"
                     value={deviceInfo.authDeviceName}
-                    // value={controller.controllerName}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Direction"
                     value={deviceInfo.authDeviceDirection}
-                    // value={controller.controllerIP}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Status"
-                    // value={controller.controllerMAC}
-                    value={<Chip color="success" label="connected" />}
+                    value={<Chip color="success" label="fix this eventually" />} // need to pass status here.
                 />
                 <PropertyListItem
                     align={align}
