@@ -15,6 +15,8 @@ import { gtm } from "../../../lib/gtm";
 import { useMounted } from "../../../hooks/use-mounted";
 import { controllerApi } from "../../../api/controllers";
 import toast from "react-hot-toast";
+import { Confirmdelete } from "../../../components/dashboard/controllers/confirm-delete";
+import { ConfirmReset } from "../../../components/dashboard/controllers/confirm-reset";
 
 const applyFilter = createFilter({
     query: filterControllerByString
@@ -79,6 +81,9 @@ const ControllerList = () => {
         }
     }
 
+    //disable action button if no controller is being selected
+    const actionDisabled = selectedControllers.length == 0;
+
     // for filtering
     const [filters, setFilters] = useState({
         query: ""
@@ -100,6 +105,78 @@ const ControllerList = () => {
     const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
     const paginatedControllers = applyPagination(filteredControllers, page, rowsPerPage);
     const controllerCount = filteredControllers.length;
+
+    //for delete action button
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [selectedState, setSelectedState] = useState(false);
+    const checkSelected = () => {
+        if(selectedControllers.length>=1){
+           setSelectedState(true)
+        }
+    };
+    useEffect(() => {
+        checkSelected()
+    }, [selectedControllers]);
+
+    const handleDeleteOpen = () => {        
+		setDeleteOpen(true);           
+	};
+	const handleDeleteClose = () => {
+		setDeleteOpen(false);
+	}
+	const deleteControllers = async() => {
+		Promise.all(selectedControllers.map(id=>{
+			return controllerApi.deleteController(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 204){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful')
+				}
+			})
+			getInfo();
+		})
+		setDeleteOpen(false);
+	};
+
+    // Reset selectedControllers when controllers change
+	useEffect(
+		() => {
+			if (selectedControllers.length) {
+				setSelectedControllers([]);
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[controllers]
+	);
+
+    //for reset controllers
+    const [resetOpen, setResetOpen] = useState(false);
+
+    const handleResetOpen = () => {        
+		setResetOpen(true);           
+	};
+	const handleResetClose = () => {
+		setResetOpen(false);
+	}
+	const resetControllers = async() => {
+		Promise.all(selectedControllers.map(id=>{
+			return controllerApi.resetController(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 204){
+					toast.success('Reset success',{duration:2000},);
+				}
+				else{
+					toast.error('Reset unsuccessful' )
+				}
+			})
+			getInfo();
+		})
+		setResetOpen(false);
+	};
 
     return (
         <>
@@ -145,20 +222,35 @@ const ControllerList = () => {
                                 >
                                     <MenuItem
                                         disableRipple
-                                        // disabled
-                                        // onClick
+                                        disabled={actionDisabled}
+                                        onClick={handleDeleteOpen}
                                     >
                                         <Delete />
                                         &#8288;Delete
                                     </MenuItem>
+                                    <Confirmdelete
+                                        setActionAnchor={setActionAnchor}
+                                        open={deleteOpen} 
+                                        handleDialogClose={handleDeleteClose}
+                                        selectedControllers={selectedControllers}
+                                        deleteControllers={deleteControllers}
+                                    /> 
+
                                     <MenuItem
                                         disableRipple
-                                        // disabled
-                                        // onClick
+                                        disabled={actionDisabled}
+                                        onClick={handleResetOpen}
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
+                                    <ConfirmReset
+                                        setActionAnchor={setActionAnchor}
+                                        open={resetOpen} 
+                                        handleDialogClose={handleResetClose}
+                                        selectedControllers={selectedControllers}
+                                        resetControllers={resetControllers}
+                                    />
                                 </StyledMenu>
                             </Grid>
                         </Grid>

@@ -35,7 +35,7 @@ export const AccessGroupBasicDetails = (props) => {
                                     fontSize="small" 
                                     sx={{ mr: 1 }}
                                 />
-                                No description
+                                No descriptions
                             </SeverityPill>
                         )
                     }
