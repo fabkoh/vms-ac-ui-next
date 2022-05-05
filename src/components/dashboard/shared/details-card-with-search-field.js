@@ -112,6 +112,7 @@ export default function DetailsCardWithSearchField({
             <Collapse in={expanded}>
                 <Divider />
                 <Box
+                    component="form"
                     sx = {{
                         flexGrow: 1,
                         m: 1.5

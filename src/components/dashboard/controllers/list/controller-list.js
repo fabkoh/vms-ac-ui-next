@@ -32,7 +32,7 @@ const authDeviceKeys = ["E1_IN", "E1_OUT", "E2_IN", "E2_OUT"];
 
 const ControllerListTable = ({ controllers, selectedAllControllers, selectedSomeControllers, handleSelectAllControllers, handleSelectFactory, selectedControllers, page, rowsPerPage, onPageChange, onRowsPerPageChange, controllerCount, controllersStatus }) => {
     
-    const statusLoaded = controllersStatus !== null;
+const statusLoaded = controllersStatus !== null;
 
     return (
         <div>

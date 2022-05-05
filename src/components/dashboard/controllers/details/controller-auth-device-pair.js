@@ -42,6 +42,8 @@ import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
 import { getAuthdeviceDetailsLink, getControllerEditLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
+import AuthDeviceDelete from "../auth-device/auth-device-delete";
+import AuthDeviceReset from "../auth-device/auth-device-reset";
 
 export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
 	// const status = {
@@ -82,32 +84,67 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		getDeviceEntrance(authPair);
 	}, [authPair]);
 
-	// schedule actions
+	// auth device actions
 	const [actionAnchor, setActionAnchor] = useState(null);
 	const actionOpen = Boolean(actionAnchor);
 	const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
 	const handleActionMenuClose = () => setActionAnchor(null);
-	// const actionDisabled = schedules.length == 0;
+	
+	const actionDisabled = selectedDevices.length == 0;
 
-	// delete schedules
+	// delete auth devices
 	const [openDelete, setOpenDelete] = useState(false);
 	const openDeleteDialog = () => setOpenDelete(true);
 	const closeDeleteDialog = () => {
 		setOpenDelete(false);
 		handleActionMenuClose();
 	};
+
+	const handleDeleteAuthDevices = (ids, allSelected) => {
+		if(allSelected) {
+			setSelectedDevices("");
+		}
+		deleteAuthDevices(ids);
+	}
+
+	// reset auth devices
+	const [openReset, setOpenReset] = useState(false);
+	const openResetDialog = () => setOpenReset(true);
+	const closeResetDialog = () => {
+		setOpenReset(false);
+		handleActionMenuClose();
+	};
+
+	const handleResetAuthDevices = (ids, allSelected) => {
+		if(allSelected) {
+			setSelectedDevices("");
+		}
+		resetAuthDevices(ids);
+	}
+
+
 	// useEffect(() => {
 	// 	console.log("selectedDevices", selectedDevices);
 	// }, [selectedDevices]);
 
 	return (
 		<Card>
-			{/* <EntranceScheduleDelete
-				open={openDelete}
-				schedules={schedules}
+			<AuthDeviceReset
+				setActionAnchor={setActionAnchor}
+				open={openReset}
+				handleDialogClose={closeResetDialog}
+				selectedAuthDevices={selectedDevices}
+				resetAuthDevices={handleResetAuthDevices}
+			/> 
+			
+			<AuthDeviceDelete
+				setActionAnchor={setActionAnchor}
+				open={openDelete} 
 				handleDialogClose={closeDeleteDialog}
-				deleteSchedules={handleDeleteSchedules}
-			/> */}
+				selectedAuthDevices={selectedDevices}
+				deleteAuthDevices={handleDeleteAuthDevices}
+			/>
+
 			<Box
 				display="flex"
 				justifyContent="space-between"
@@ -174,7 +211,8 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 				> */}
 				<MenuItem
 					disableRipple
-					// disabled={actionDisabled}
+					disabled={actionDisabled}
+					onClick={openResetDialog}
 				>
 					<BuildCircle />
 					&#8288;Reset
@@ -182,7 +220,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 				{/* </NextLink> */}
 				<MenuItem
 					disableRipple
-					// disabled={actionDisabled}
+					disabled={actionDisabled}
 					onClick={openDeleteDialog}
 				>
 					<Delete />

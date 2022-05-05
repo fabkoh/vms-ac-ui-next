@@ -268,6 +268,7 @@ const OrderList = () => {
             }}
           >
             <Box
+              component="form"
               onSubmit={handleQueryChange}
               sx={{
                 flexGrow: 1,
