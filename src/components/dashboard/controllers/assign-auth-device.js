@@ -29,6 +29,7 @@ import SingleSelect from "../shared/single-select-input";
 import { Scrollbar } from "../../scrollbar";
 import { Circle } from "@mui/icons-material";
 import NextLink from "next/link";
+import WarningChip from "../shared/warning-chip";
 
 //this is the authdevice list for edit page. can only assign entrance. other details for viewing only.
 

@@ -44,7 +44,7 @@ import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 
-export default function AuthDevicePair({ authPair,controllerId,status }) {
+export default function AuthDevicePair({ authPair,controllerId,status, deleteAuthDevices, resetAuthDevices }) {
 	// console.log("controllerId",controllerId);
 
 	// for selection of checkboxes

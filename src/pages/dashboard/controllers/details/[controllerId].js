@@ -39,6 +39,7 @@ import { controllerApi } from "../../../../api/controllers";
 import { ControllerBasicDetails } from "../../../../components/dashboard/controllers/details/controller-basic-details";
 import AuthDevicePair from "../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { getControllerEditLink, getControllerListLink } from "../../../../utils/controller";
+import { authDeviceApi } from "../../../../api/auth-devices";
 
 const ControllerDetails = () => {
 
@@ -149,20 +150,82 @@ const ControllerDetails = () => {
 		setDeleteOpen(false);
 	}
 
+    //refactored according to persons
     const deleteController = async() => {
-        Promise.resolve(
-            controllerApi.deleteController(controllerId)
-        ).then((res)=>{
-            if (res.status == 204){
+        try {
+           const res = await controllerApi.deleteController(controllerId);
+           const status = await res.status();
+
+            if (status == 204) {
                 toast.success('Delete success');
                 router.replace(getControllerListLink());
             }
             else{
                 toast.error('Delete unsuccessful')
             }
-        })
+        } catch (err) {
+            console.error(err);
+        }
+        
         setDeleteOpen(false);
     };
+
+    //Reset controller
+    const [resetOpen, setResetOpen] = useState(false);
+
+    const handleResetOpen = () => {        
+		setResetOpen(true);                        
+	};
+	const handleResetClose = () => {
+		setResetOpen(false);
+	}
+
+    //refactored according to persons
+	const resetController = async() => {
+        const resArr = await controllerApi.resetController(controllerId);
+
+        if (resArr.status == 204){
+            toast.success('Reset controller success');
+            router.replace(getControllerListLink());
+        }
+        else{
+            toast.error('Reset unsuccessful')
+        }
+
+        setResetOpen(false);
+    }; 
+
+    //delete auth devices
+    const deleteAuthDevices = async() => {
+        const resArr = await authDeviceApi.deleteAuthdevice();
+
+        if (resArr.status != 204) {
+            toast.error('Failed to remove some authentication devices');
+        }
+
+        const numSuccess = (resArr.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} authentication devices`)
+        }
+
+        getInfo();
+    }
+
+    //reset auth devices
+    const resetAuthDevices = async() => {
+        const resArr = await authDeviceApi.deleteAuthdevice();
+
+        if (resArr.status != 204) {
+            toast.error('Failed to reset some authentication devices');
+        }
+
+        const numSuccess = (resArr.status == 204).length
+        if (numSuccess) {
+            toast.success(`Successfully reset ${numSuccess} authentication devices`)
+        }
+
+        getInfo();
+    }
 
     //dk if needed - leave it here first
 	/*const deleteEntrance = async() => {
@@ -179,34 +242,6 @@ const ControllerDetails = () => {
         })
         setDeleteOpen(false);
     }; */
-
-
-    //Reset controller
-    const [resetOpen, setResetOpen] = useState(false);
-
-    const handleResetOpen = () => {        
-		setResetOpen(true);                        
-	};
-	const handleResetClose = () => {
-		setResetOpen(false);
-	}
-	const resetController = async() => {
-        Promise.resolve(
-            controllerApi.resetController(controllerId)
-        ).then((res)=>{
-            if (res.status == 204){
-                toast.success('Reset controller success');
-                router.replace(getControllerListLink());
-            }
-            else{
-                toast.error('Reset unsuccessful')
-            }
-        })
-        setResetOpen(false);
-    }; 
-
-
-
 
     // render view
     if (!controllerInfo) {
@@ -359,6 +394,8 @@ const ControllerDetails = () => {
                                 authPair={E1}
                                 controllerId={controllerId}
                                 status={E1Status}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                             <Grid
@@ -369,6 +406,8 @@ const ControllerDetails = () => {
                                 authPair={E2}
                                 controllerId={controllerId}
                                 status={E2Status}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                         </Grid>
