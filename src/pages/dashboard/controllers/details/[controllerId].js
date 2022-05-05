@@ -85,20 +85,42 @@ const ControllerDetails = () => {
         setE1(E1)
         setE2(E2)
     }
-
+    const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
         const E1 = []
         const E2 = []
+        // try{
+        //     const res = await controllerApi.getAuthStatus(controllerId);
+        //     const data = await res.json();
+        //     data.forEach(status =>{
+        //         if(status.includes("E1")){
+        //             E1.push(status)
+        //         }
+        //         else{E2.push(status)}
+        //     })
+        // }catch(err){console.log(err)}
         try{
-            const res = await controllerApi.getAuthStatus(controllerId);
-            const data = await res.json();
-            data.forEach(status =>{
-                if(status.includes("E1")){
-                    E1.push(status)
+            Promise.resolve(controllerApi.getAuthStatus(controllerId))
+            .then(async res=>{
+                toast.dismiss()
+                if(res.status!=200){
+                    setStatusLoaded(true)
+                    // toast.error("Failed to fetch status")
                 }
-                else{E2.push(status)}
+                else{
+                    setStatusLoaded(true)
+                    // toast.success("Status successfully fetched")
+                    const data = await res.json();
+                    data.forEach(status=>{
+                        if(status.includes("E1")){
+                            E1.push(status)
+                        }
+                        else{E2.push(status)}
+                    })
+            }
             })
         }catch(err){console.log(err)}
+        // setStatusLoaded(true)
         setE1Status(E1)
         setE2Status(E2)
         console.log("E1,E2",E1,E2)
@@ -235,6 +257,7 @@ const ControllerDetails = () => {
                                 <Button 
                                 variant="contained" // add refresh fn here. refetch or refresh entire page?
                                 sx={{m:1}}
+                                onClick={getInfo}
                                 endIcon={(
                                     <Refresh fontSize="small"/>
                                 )}
@@ -293,6 +316,7 @@ const ControllerDetails = () => {
                                 xs={12}
                             >
                                 <ControllerBasicDetails
+                                statusLoaded={statusLoaded}
                                 controller={controllerInfo}
                                 E1Status={E1Status}
                                 E2Status={E2Status}
@@ -306,6 +330,7 @@ const ControllerDetails = () => {
                                 authPair={E1}
                                 controllerId={controllerId}
                                 status={E1Status}
+                                statusLoaded={statusLoaded}
                                 />
                             </Grid>                         
                             <Grid
@@ -316,6 +341,7 @@ const ControllerDetails = () => {
                                 authPair={E2}
                                 controllerId={controllerId}
                                 status={E2Status}
+                                statusLoaded={statusLoaded}
                                 />
                             </Grid>                         
                         </Grid>

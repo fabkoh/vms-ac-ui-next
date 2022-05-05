@@ -1,10 +1,10 @@
 import Warning from "@mui/icons-material/Warning";
-import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
+import { Card, useMediaQuery, CardHeader, Divider, CircularProgress } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 
-export const ControllerBasicDetails = ({controller,E1Status,E2Status}) => {
+export const ControllerBasicDetails = ({controller,E1Status,E2Status,statusLoaded}) => {
     // const { 
     //     controllerName, 
     //     controllerIP, 
@@ -32,6 +32,7 @@ export const ControllerBasicDetails = ({controller,E1Status,E2Status}) => {
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
+    const statusArr=[...E1Status,...E2Status]
 
     if(controller==null){
         return null
@@ -80,13 +81,17 @@ export const ControllerBasicDetails = ({controller,E1Status,E2Status}) => {
                     align={align}
                     divider
                     label="Status"
+                    value={statusLoaded?
+                        (statusArr.length==0?(<SeverityPill color="error">Disconnected</SeverityPill>):(<SeverityPill color="success">Connected</SeverityPill>)):
+                        (<CircularProgress size='1rem'/>)
+                    } //needs another api to check status
                     // value={<SeverityPill color="success"> test</SeverityPill>} //needs another api to check status
                 >
-                {(E1Status.length==0&&E2Status.length==0)?(
+                {/* {(E1Status.length==0&&E2Status.length==0)?(
                     <SeverityPill color="error">
                     <Warning fontSize="small" sx={{mr:1}}/>
                     disconnected 
-                    </SeverityPill>):(<SeverityPill color="success"> connected</SeverityPill>)}
+                    </SeverityPill>):(<SeverityPill color="success"> connected</SeverityPill>)} */}
                 </PropertyListItem>
                 {/* <PropertyListItem
                     align={align}

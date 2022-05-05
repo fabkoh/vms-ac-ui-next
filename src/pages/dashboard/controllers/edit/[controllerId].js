@@ -239,11 +239,11 @@ const EditController = () => {
     const changeIPStatic = (e) => {
         if(controllerInfo.controllerIPStatic==true){
         setControllerInfo(prevState=>({...prevState,controllerIP:"",controllerIPStatic:false}))
-        setControllerValidations(prevState=>({...prevState,invalidIP:false}))
+        // setControllerValidations(prevState=>({...prevState,invalidIP:false}))
         }
         if(controllerInfo.controllerIPStatic==false){
             setControllerInfo(prevState=>({...prevState ,controllerIPStatic:true}))
-            setControllerValidations(prevState=>({...prevState,invalidIP:true}))
+            // setControllerValidations(prevState=>({...prevState,invalidIP:true}))
         }
         console.log(controllerInfo)
     }
