@@ -17,7 +17,8 @@ import {
 	TableHead,
 	TableRow,
 	Typography,
-	Link
+	Link,
+	CircularProgress
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "../../shared/expand-more";
@@ -44,9 +45,13 @@ import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 
-export default function AuthDevicePair({ authPair,controllerId,status, deleteAuthDevices, resetAuthDevices }) {
-	// console.log("controllerId",controllerId);
-
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
+	// const status = {
+	// 	"E1_IN": true,
+	// 	"E1_OUT": true,
+	// 	"E2_IN": false,
+	// 	"E2_OUT": false
+	// }
 	// for selection of checkboxes
 	const [selectedDevices, setSelectedDevices] = useState([]);
 	const selectedAllDevices = selectedDevices.length == 2;
@@ -273,11 +278,14 @@ export default function AuthDevicePair({ authPair,controllerId,status, deleteAut
 											{<Switch checked={device.masterpin} />}
 										</TableCell>
 										<TableCell>
-											{/* <Circle color="disabled" /> */}
-											<Circle color={device?.lastOnline ? (status[device?.authDeviceDirection]? "success":"error") : "disabled"} />
+											{statusLoaded?
+											(<Circle color={device?.lastOnline ? (status[device.authDeviceDirection]? "success":"error") : "disabled"} />):
+											(<CircularProgress size='1rem'/>)
+											}
 										</TableCell>
 										<TableCell>
-											{device?.lastOnline ? device.lastOnline:"never"}
+											{status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")}
+											{/* {device?.lastOnline ? device.lastOnline:"never"} */}
 										</TableCell>
 										<TableCell>
 											{/* <NextLink
