@@ -21,7 +21,7 @@ import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../../../components/dashboard/shared/edit_form_tooltip";
 import { useMounted } from "../../../hooks/use-mounted";
 
-const ControllerEditForm = ({controllerInfo,changeText,changeIPStatic,changeIP}) => {
+const ControllerEditForm = ({controllerInfo,changeText,changeIPStatic,changeIPHandler,controllerValidations}) => {
 	
 	// const controllerName = useRef(controllerInfo['controllerName'])
 	
@@ -119,9 +119,11 @@ const ControllerEditForm = ({controllerInfo,changeText,changeIPStatic,changeIP})
                                         required={controllerInfo.controllerIPStatic?false:true}
 										// disabled={controller.controllerIpStatic}
 										value={controllerInfo.controllerIP}
-										// helperText={storedInfo? storedInfo.controllerIP:""}
-										onChange={changeIP}
-										error={!/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(controllerInfo.controllerIP)}
+										helperText={controllerValidations.invalidIP? "Invalid IP address":""}
+										onChange={changeIPHandler}
+										error={controllerValidations.invalidIP}
+										// error={controllerInfo.controllerIPStatic?
+										// 	!/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(controllerInfo.controllerIP):false}
 									/>
 								</Grid>
 								<Grid item ml={1}>
