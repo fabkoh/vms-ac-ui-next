@@ -22,13 +22,6 @@ const applyFilter = createFilter({
     query: filterControllerByString
 })
 
-const resToJsonHelper = res => {
-    if (res?.status == 200) {
-        return res.json();
-    }
-    return Promise.resolve({});
-}
-
 const ControllerList = () => {
 
     // copied
@@ -44,7 +37,6 @@ const ControllerList = () => {
 
     // data
     const [controllers, setControllers] = useState([]);              
-    const [controllersStatus, setControllersStatus] = useState(null);
     const isMounted = useMounted();
 
     const getInfo = useCallback(async() => {
@@ -56,12 +48,6 @@ const ControllerList = () => {
         const controllersJson = await controllersRes.json();
         if (isMounted()){
             setControllers(controllersJson);
-        }
-
-        const statusResArr = await Promise.all(controllersJson.map(c => controllerApi.getAuthStatus(c.controllerId)));
-        const statusJsonArr = await Promise.all(statusResArr.map(res => resToJsonHelper(res)));
-        if (isMounted()) {
-            setControllersStatus(statusJsonArr);
         }
     }, [isMounted]);
 
@@ -204,7 +190,7 @@ const ControllerList = () => {
                                 <Typography variant="h4">Controllers</Typography>
                             </Grid>
                             <Grid item>
-                                <IconButton>
+                                <IconButton onClick={getInfo}>
                                     <Refresh />
                                 </IconButton>
                                 <Button
@@ -333,7 +319,6 @@ const ControllerList = () => {
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             controllerCount={controllerCount}
-                            controllersStatus={controllersStatus}
                         />
                     </Card>
                 </Container>

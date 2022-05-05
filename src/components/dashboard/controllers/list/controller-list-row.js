@@ -58,6 +58,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
     const [connected,    setConnected]    = useState(false);
 
     useEffect(async() => {
+        console.log("INITIATING CHANGE")
         setStatusLoaded(false);
         const res = await controllerApi.getAuthStatus(controllerId);
         if(res.status == 200) {
@@ -97,8 +98,8 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                 {
                     statusLoaded ? 
                     (connected ? 
-                    <CloudOff color="success" /> :
-                    <CloudQueue color="error" />) :
+                    <CloudQueue color="success" /> :
+                    <CloudOff color="error" />) :
                     <CircularProgress size='1rem' />
                 }
             </TableCell>
