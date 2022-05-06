@@ -65,7 +65,7 @@ const ControllerDetails = () => {
                 if(res.status==200){
                     const data = await res.json()
                     setControllerInfo(data)
-                    console.log("getController",data)
+                    // console.log("getController",data)
                     getPairs(data)
                 }
                 else{
@@ -102,16 +102,16 @@ const ControllerDetails = () => {
         //     })
         // }catch(err){console.log(err)}
         try{
-            Promise.resolve(controllerApi.getAuthStatus(controllerId))
+            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
             .then(async res=>{
                 //toast.dismiss()
                 if(res.status!=200){
                     setStatusLoaded(true)
-                    // toast.error("Failed to fetch status")
+                    toast.error("Failed to fetch status")
                 }
                 else{
                     setStatusLoaded(true)
-                    // toast.success("Status successfully fetched")
+                    toast.success("Status successfully fetched")
                     const data = await res.json();
                     data.forEach(status=>{
                         if(status.includes("E1")){
@@ -130,6 +130,7 @@ const ControllerDetails = () => {
 
 
     const getInfo = useCallback(async() => {
+        setStatusLoaded(false)
         getController(controllerId)
         getStatus()
     }, [isMounted])
