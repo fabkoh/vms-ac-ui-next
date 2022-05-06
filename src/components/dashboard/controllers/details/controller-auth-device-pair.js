@@ -284,7 +284,8 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											}
 										</TableCell>
 										<TableCell>
-											{status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")}
+											{statusLoaded?(status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")) :(<CircularProgress size='1rem'/>)}
+											{/* {status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")} */}
 											{/* {device?.lastOnline ? device.lastOnline:"never"} */}
 										</TableCell>
 										<TableCell>
