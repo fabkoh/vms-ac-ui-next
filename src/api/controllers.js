@@ -64,13 +64,16 @@ class ControllerApi {
         }
     }
 
-    getAuthStatus(controllerId){
-        if(useApi){return sendApi(`/api/controllerConnection/${controllerId}`)}
-    }
+    
 
     deleteController(controllerId) {
         if (useApi) { return sendApi(`/api/controller/delete/${controllerId}`, { method: 'DELETE' }); }
     }
+    
+    getAuthStatus(controllerId){
+        if(useApi){return sendApi(`/api/controllerConnection/${controllerId}`)}
+    }
+    
     resetController(controllerId) {
         if (useApi) { return sendApi(`/api/controller/reset/${controllerId}`, { method: 'DELETE' }); }
     }

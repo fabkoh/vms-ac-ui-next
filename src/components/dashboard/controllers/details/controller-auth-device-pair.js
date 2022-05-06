@@ -45,7 +45,7 @@ import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 
-export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices }) {
 	// const status = {
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
@@ -100,11 +100,10 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		handleActionMenuClose();
 	};
 
-	const handleDeleteAuthDevices = (ids, allSelected) => {
-		if(allSelected) {
-			setSelectedDevices("");
-		}
-		deleteAuthDevices(ids);
+	const handleDeleteAuthDevices = () => {
+		deleteAuthDevices(selectedDevices);
+		closeDeleteDialog();
+		setSelectedDevices("");
 	}
 
 	// reset auth devices
@@ -115,11 +114,10 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		handleActionMenuClose();
 	};
 
-	const handleResetAuthDevices = (ids, allSelected) => {
-		if(allSelected) {
-			setSelectedDevices("");
-		}
-		resetAuthDevices(ids);
+	const handleResetAuthDevices = () => {
+		resetAuthDevices(selectedDevices);
+		closeResetDialog();
+		setSelectedDevices("");
 	}
 
 
