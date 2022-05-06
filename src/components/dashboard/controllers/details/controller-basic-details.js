@@ -4,7 +4,7 @@ import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 
-export const ControllerBasicDetails = ({controller,E1Status,E2Status,statusLoaded}) => {
+export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => {
     // const { 
     //     controllerName, 
     //     controllerIP, 
@@ -32,11 +32,12 @@ export const ControllerBasicDetails = ({controller,E1Status,E2Status,statusLoade
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
-    const statusArr=[...E1Status,...E2Status]
-
-    if(controller==null){
-        return null
-    }
+    // const statusArr= true //returns true if status is successfully fetched. null if disconnected
+    // const statusArr= authStatus==null//returns true if status is successfully fetched. null if disconnected
+    // const statusArr= Array.isArray(E1Status)&&Array.isArray(E2Status) //returns true if status is successfully fetched. null if disconnected
+    // console.log("statusArr",statusArr)
+    
+    
     return(
         <Card>
             <CardHeader title="Basic Details" />
@@ -82,7 +83,7 @@ export const ControllerBasicDetails = ({controller,E1Status,E2Status,statusLoade
                     divider
                     label="Status"
                     value={statusLoaded?
-                        (statusArr.length==0?(<SeverityPill color="error">Disconnected</SeverityPill>):(<SeverityPill color="success">Connected</SeverityPill>)):
+                        (authStatus?(<SeverityPill color="success">Connected</SeverityPill>):(<SeverityPill color="error">Disconnected</SeverityPill>)):
                         (<CircularProgress size='1rem'/>)
                     } //needs another api to check status
                     // value={<SeverityPill color="success"> test</SeverityPill>} //needs another api to check status

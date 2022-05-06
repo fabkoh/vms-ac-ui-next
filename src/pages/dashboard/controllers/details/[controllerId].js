@@ -53,9 +53,8 @@ const ControllerDetails = () => {
 
     const [controllerInfo, setControllerInfo] = useState(null)
     const [E1, setE1] = useState()
-    const [E1Status, setE1Status] = useState([])
     const [E2, setE2] = useState()
-    const [E2Status, setE2Status] = useState([])
+    const [authStatus, setAuthStatus] = useState(null)
 
     const getController = async(controllerId) => {
         try{
@@ -88,19 +87,6 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-        const E1 = []
-        const E2 = []
-        // try{
-        //     const res = await controllerApi.getAuthStatus(controllerId);
-        //     const data = await res.json();
-        //     data.forEach(status =>{
-        //         if(status.includes("E1")){
-        //             E1.push(status)
-        //         }
-        //         else{E2.push(status)}
-        //     })
-        // }catch(err){console.log(err)}
-        try{
             Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
             .then(async res=>{
                 toast.dismiss()
@@ -112,21 +98,19 @@ const ControllerDetails = () => {
                     setStatusLoaded(true)
                     toast.success("Status successfully fetched")
                     const data = await res.json();
-                    data.forEach(status=>{
-                        if(status.includes("E1")){
-                            E1.push(status)
-                        }
-                        else{E2.push(status)}
-                    })
-            }
+                    console.log(data)
+                    setAuthStatus(data)
+                }
+                // setAuthStatus(E1)
+                // setE2Status(E2)
             })
-        }catch(err){console.log(err)}
+        // }catch(err){console.log(err)}
         // setStatusLoaded(true)
-        setE1Status(E1)
-        setE2Status(E2)
-        console.log("E1,E2",E1,E2)
     }
-
+    useEffect(() => {
+        console.log("authsayts",authStatus)
+    }, [authStatus])
+    
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
@@ -372,8 +356,7 @@ const ControllerDetails = () => {
                                 <ControllerBasicDetails
                                 statusLoaded={statusLoaded}
                                 controller={controllerInfo}
-                                E1Status={E1Status}
-                                E2Status={E2Status}
+                                authStatus={authStatus}
                                 />
                             </Grid>                         
                             <Grid
@@ -383,7 +366,7 @@ const ControllerDetails = () => {
                                 <AuthDevicePair
                                 authPair={E1}
                                 controllerId={controllerId}
-                                status={E1Status}
+                                authStatus={authStatus}
                                 statusLoaded={statusLoaded}
                                 />
                             </Grid>                         
@@ -394,7 +377,7 @@ const ControllerDetails = () => {
                                 <AuthDevicePair
                                 authPair={E2}
                                 controllerId={controllerId}
-                                status={E2Status}
+                                authStatus={authStatus}
                                 statusLoaded={statusLoaded}
                                 />
                             </Grid>                         

@@ -45,13 +45,15 @@ import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 
+// export default function AuthDevicePair({ authPair,controllerId, statusLoaded }) {
 export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
-	// const status = {
+	// const status = [{
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
 	// 	"E2_IN": false,
 	// 	"E2_OUT": false
-	// }
+	// }]
+	const statusError = status==null
 	// for selection of checkboxes
 	const [selectedDevices, setSelectedDevices] = useState([]);
 	const selectedAllDevices = selectedDevices.length == 2;
@@ -279,12 +281,26 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-											(<Circle color={device?.lastOnline ? (status[device.authDeviceDirection]? "success":"error") : "disabled"} />):
+											(<Circle color={device.lastOnline?(statusError?"error":(status[device.authDeviceDirection]?"success":console.log(status[device.authDeviceDirection]))):"disabled"} />):
 											(<CircularProgress size='1rem'/>)
 											}
+											{/* {statusLoaded?
+											(<Circle color={device?.lastOnline ? ((Array.isArray(status)&&status[device.authDeviceDirection])? "success":"error") : "disabled"} />):
+											(<CircularProgress size='1rem'/>)
+											} */}
+											{/* {statusLoaded?
+											(<Circle color={device?.lastOnline ? (status[device.authDeviceDirection]? "success":"error") : "disabled"} />):
+											(<CircularProgress size='1rem'/>)
+											} */}
 										</TableCell>
 										<TableCell>
-											{statusLoaded?(status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")) :(<CircularProgress size='1rem'/>)}
+											{statusLoaded?
+												(status?(status[device.authDeviceDirection]?"N.A.":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+											(<CircularProgress size='1rem'/>)}
+											{/* {statusLoaded?
+												(status[device.authDeviceDirection]?"N.A.":
+												(device.lastOnline?device.lastOnline:"Never")) :
+											(<CircularProgress size='1rem'/>)} */}
 											{/* {status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")} */}
 											{/* {device?.lastOnline ? device.lastOnline:"never"} */}
 										</TableCell>
