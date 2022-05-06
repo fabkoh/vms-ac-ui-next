@@ -41,6 +41,8 @@ import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
 // import { AuthDeviceBasicDetails } from "../../../../../components/dashboard/controllers/auth-devices/auth-device-basic-details";
 import { getControllerListLink } from "../../../../../../utils/controller";
+import { AuthDeviceDelete } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
+import { AuthDeviceReset } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
 
 const AuthDeviceDetails = () => {
 
@@ -157,9 +159,11 @@ const AuthDeviceDetails = () => {
 	const deleteAuthDevice = async() => {
         Promise.resolve(
             authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
-        ).then((res)=>{
-            console.log(res);
-            if (res.status == 204){
+        ),  toast.loading("Removing Authentication Device...")
+        .then((res)=>{
+           toast.dismiss()
+
+            if (res.status == 200){
                 toast.success('Delete Authentication Device success');
                 router.replace(getControllerListLink());
             }
@@ -182,14 +186,17 @@ const AuthDeviceDetails = () => {
 	const resetAuthDevice = async() => {
         Promise.resolve(
             authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
-        ).then((res)=>{
-        if (res.status == 204){
-            toast.success('Reset Authentication Device success');
-            router.replace(getControllerListLink());
-        }
-        else{
-            toast.error('Reset unsuccessful')
-        }
+        ), toast.loading("Resetting Authentication Device...")
+        .then((res)=>{
+            toast.dismiss()
+
+            if (res.status == 200){
+                toast.success('Reset Authentication Device success');
+                router.replace(getControllerListLink());
+            }
+            else{
+                toast.error('Reset unsuccessful')
+            }
         })
         setResetOpen(false);
     }; 
@@ -302,6 +309,13 @@ const AuthDeviceDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
+                                   {/* <AuthDeviceDelete
+                                        setActionAnchor={setActionAnchor}
+                                        open={deleteOpen}
+                                        handleDialogClose={handleDeleteClose}
+                                        deleteAuthDevices={deleteAuthDevice}
+                                />*/}
+
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleResetOpen}
@@ -310,6 +324,12 @@ const AuthDeviceDetails = () => {
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
+                                    {/*<AuthDeviceReset
+                                        setActionAnchor={setActionAnchor}
+                                        open={resetOpen}
+                                        handleDialogClose={handleResetClose}
+                                        resetAuthDevices={resetAuthDevice}
+                            />*/}
                                 </StyledMenu>
                             </Grid>
                         </Grid>

@@ -239,7 +239,7 @@ const ControllerDetails = () => {
             toast.dismiss()
 
             resArr.filter(res=>{
-                if(res.status != 204) {
+                if(res.status != 200) {
                     toast.error('Remove unsuccessful')
                 }
                 else {
@@ -272,7 +272,7 @@ const ControllerDetails = () => {
             toast.dismiss()
 
             resArr.filter(res=>{
-                if(res.status != 204) {
+                if(res.status != 200) {
                     toast.error('Reset unsuccessful')
                 }
                 else {
