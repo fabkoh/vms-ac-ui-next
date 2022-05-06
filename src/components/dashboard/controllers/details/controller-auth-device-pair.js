@@ -53,7 +53,6 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 	// 	"E2_IN": false,
 	// 	"E2_OUT": false
 	// }]
-	const statusError = status==null
 	// for selection of checkboxes
 	const [selectedDevices, setSelectedDevices] = useState([]);
 	const selectedAllDevices = selectedDevices.length == 2;
@@ -281,7 +280,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-											(<Circle color={device.lastOnline?(statusError?"error":(status[device.authDeviceDirection]?"success":console.log(status[device.authDeviceDirection]))):"disabled"} />):
+											(<Circle color={device.lastOnline?(status?(status[device.authDeviceDirection]?"success":"error"):"warning"):"disabled"} />):
 											(<CircularProgress size='1rem'/>)
 											}
 											{/* {statusLoaded?
