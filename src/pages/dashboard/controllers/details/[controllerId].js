@@ -455,6 +455,9 @@ const ControllerDetails = () => {
                                 status={E1Status}
                                 resetAuthDevices={resetAuthDevices}
                                 deleteAuthDevices={deleteAuthDevices}
+<<<<<<< HEAD
+>>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
+=======
 >>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
                                 statusLoaded={statusLoaded}
                                 />
@@ -472,6 +475,9 @@ const ControllerDetails = () => {
                                 status={E2Status}
                                 resetAuthDevices={resetAuthDevices}
                                 deleteAuthDevices={deleteAuthDevices}
+<<<<<<< HEAD
+>>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
+=======
 >>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
                                 statusLoaded={statusLoaded}
                                 />

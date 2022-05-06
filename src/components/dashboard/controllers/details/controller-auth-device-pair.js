@@ -46,9 +46,14 @@ import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 import { toDisplayDateString } from "../../../../utils/utils";
 
+<<<<<<< HEAD
 // export default function AuthDevicePair({ authPair,controllerId, statusLoaded }) {
 export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
 	// const status = [{
+=======
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices }) {
+	// const status = {
+>>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
 	// 	"E2_IN": false,
@@ -102,11 +107,10 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		handleActionMenuClose();
 	};
 
-	const handleDeleteAuthDevices = (ids, allSelected) => {
-		if(allSelected) {
-			setSelectedDevices("");
-		}
-		deleteAuthDevices(ids);
+	const handleDeleteAuthDevices = () => {
+		deleteAuthDevices(selectedDevices);
+		closeDeleteDialog();
+		setSelectedDevices("");
 	}
 
 	// reset auth devices
@@ -117,11 +121,10 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		handleActionMenuClose();
 	};
 
-	const handleResetAuthDevices = (ids, allSelected) => {
-		if(allSelected) {
-			setSelectedDevices("");
-		}
-		resetAuthDevices(ids);
+	const handleResetAuthDevices = () => {
+		resetAuthDevices(selectedDevices);
+		closeResetDialog();
+		setSelectedDevices("");
 	}
 
 
