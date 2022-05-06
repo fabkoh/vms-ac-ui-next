@@ -190,9 +190,14 @@ const ControllerList = () => {
                                 <Typography variant="h4">Controllers</Typography>
                             </Grid>
                             <Grid item>
-                                <IconButton onClick={getInfo}>
-                                    <Refresh />
-                                </IconButton>
+                                <Button
+                                    variant="contained"
+                                    sx={{ m: 1 }}
+                                    endIcon={<Refresh fontSize="small"/>}
+                                    onClick={getInfo}
+                                >
+                                    Refresh
+                                </Button>
                                 <Button
                                     endIcon={<ChevronDown fontSize="small" />}
                                     sx={{ m: 2 }}
