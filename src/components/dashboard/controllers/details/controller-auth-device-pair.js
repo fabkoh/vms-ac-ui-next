@@ -44,6 +44,7 @@ import { getAuthdeviceDetailsLink, getControllerEditLink } from "../../../../uti
 import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
+import { toDisplayDateString } from "../../../../utils/utils";
 
 // export default function AuthDevicePair({ authPair,controllerId, statusLoaded }) {
 export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
@@ -280,7 +281,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-											(<Circle color={device.lastOnline?(status?(status[device.authDeviceDirection]?"success":"error"):"warning"):"disabled"} />):
+											(<Circle color={device.lastOnline?(status?(status[device.authDeviceDirection]?"success":"error"):"error"):"disabled"} />):
 											(<CircularProgress size='1rem'/>)
 											}
 											{/* {statusLoaded?
@@ -294,7 +295,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-												(status?(status[device.authDeviceDirection]?"N.A.":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+												(status?(status[device.authDeviceDirection]?"N.A.":toDisplayDateString(device.lastOnline)):(device.lastOnline?toDisplayDateString(device.lastOnline):"Never")):
 											(<CircularProgress size='1rem'/>)}
 											{/* {statusLoaded?
 												(status[device.authDeviceDirection]?"N.A.":

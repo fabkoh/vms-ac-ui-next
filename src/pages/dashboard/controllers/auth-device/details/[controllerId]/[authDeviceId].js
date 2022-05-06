@@ -36,10 +36,13 @@ import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../..
 import { getEntranceScheduleEditLink } from "../../../../../../utils/entrance-schedule";
 // import { controllerApi } from "../../../../../../api/controllers";
 // import { ControllerBasicDetails } from "../../../../../../components/dashboard/controllers/details/controller-basic-details";
-// import AuthDevicePair from "../../../../../../components/dashboard/controllers/details/controller-auth-device-pair";
+import AuthDevicePair from "../../../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
 // import { AuthDeviceBasicDetails } from "../../../../../components/dashboard/controllers/auth-devices/auth-device-basic-details";
+import { getControllerListLink } from "../../../../../../utils/controller";
+import { AuthDeviceDelete } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
+import { AuthDeviceReset } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
 
 const AuthDeviceDetails = () => {
 
@@ -153,19 +156,49 @@ const AuthDeviceDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrance = async() => {
+	const deleteAuthDevice = async() => {
         Promise.resolve(
-            entranceApi.deleteEntrance(entranceId)
-        ).then((res)=>{
-        if (res.status == 204){
-            toast.success('Delete success');
-            router.replace(entranceListLink);
-        }
-        else{
-            toast.error('Delete unsuccessful')
-        }
+            authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
+        ),  toast.loading("Removing Authentication Device...")
+        .then((res)=>{
+           toast.dismiss()
+
+            if (res.status == 200){
+                toast.success('Delete Authentication Device success');
+                router.replace(getControllerListLink());
+            }
+            else{
+                toast.error('Delete unsuccessful')
+            }
         })
         setDeleteOpen(false);
+    }; 
+
+    //for reset auth devices
+    const [resetOpen, setResetOpen] = useState(false);
+
+    const handleResetOpen = () => {        
+		setResetOpen(true);                        
+	};
+	const handleResetClose = () => {
+		setResetOpen(false);
+	}
+	const resetAuthDevice = async() => {
+        Promise.resolve(
+            authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
+        ), toast.loading("Resetting Authentication Device...")
+        .then((res)=>{
+            toast.dismiss()
+
+            if (res.status == 200){
+                toast.success('Reset Authentication Device success');
+                router.replace(getControllerListLink());
+            }
+            else{
+                toast.error('Reset unsuccessful')
+            }
+        })
+        setResetOpen(false);
     }; 
 
 
@@ -276,14 +309,27 @@ const AuthDeviceDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
+                                   {/* <AuthDeviceDelete
+                                        setActionAnchor={setActionAnchor}
+                                        open={deleteOpen}
+                                        handleDialogClose={handleDeleteClose}
+                                        deleteAuthDevices={deleteAuthDevice}
+                                />*/}
+
                                     <MenuItem 
                                         disableRipple
-                                        // onClick={handleMultiUnlock}
+                                        onClick={handleResetOpen}
                                         // disabled={!entranceActive}
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
+                                    {/*<AuthDeviceReset
+                                        setActionAnchor={setActionAnchor}
+                                        open={resetOpen}
+                                        handleDialogClose={handleResetClose}
+                                        resetAuthDevices={resetAuthDevice}
+                            />*/}
                                 </StyledMenu>
                             </Grid>
                         </Grid>

@@ -113,13 +113,16 @@ const ControllerList = () => {
 	const deleteControllers = async() => {
 		Promise.all(selectedControllers.map(id=>{
 			return controllerApi.deleteController(id)
-		})).then( resArr => {
+		}), toast.loading("Deleting Selected Controller(s)..."))
+        .then( resArr => {
+            toast.dismiss()
+
 			resArr.filter(res=>{
-				if(res.status == 204){
-					toast.success('Delete success',{duration:2000},);
+				if(res.status != 204){
+                    toast.error('Delete unsuccessful', {duration:3000})
 				}
 				else{
-					toast.error('Delete unsuccessful')
+					toast.success('Delete success',{duration:2000});
 				}
 			})
 			getInfo();
@@ -150,13 +153,16 @@ const ControllerList = () => {
 	const resetControllers = async() => {
 		Promise.all(selectedControllers.map(id=>{
 			return controllerApi.resetController(id)
-		})).then( resArr => {
+		}), toast.loading("Resetting Selected Controller(s)..."))
+        .then( resArr => {
+            toast.dismiss()
+
 			resArr.filter(res=>{
-				if(res.status == 204){
-					toast.success('Reset success',{duration:2000},);
+				if(res.status != 204){
+                    toast.error('Reset unsuccessful', {duration:5000})
 				}
 				else{
-					toast.error('Reset unsuccessful' )
+					toast.success('Reset success',{duration:2000});
 				}
 			})
 			getInfo();
