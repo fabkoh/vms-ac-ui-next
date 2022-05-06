@@ -6,7 +6,7 @@ import { ArrowRight } from "../../../../icons/arrow-right";
 import { getEntranceDetailsLink } from "../../../../utils/entrance"
 import { getControllerDetailsLink, getControllerEditLink } from "../../../../utils/controller";
 import { Circle, CloudOff, CloudQueue } from "@mui/icons-material";
-import { isObject } from "../../../../utils/utils";
+import { isObject, toDisplayDateString } from "../../../../utils/utils";
 import { Box, Checkbox, CircularProgress, IconButton, Link, TableCell, TableRow, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 
@@ -58,14 +58,17 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
     const [connected,    setConnected]    = useState(false);
 
     useEffect(async() => {
-        console.log("INITIATING CHANGE")
         setStatusLoaded(false);
-        const res = await controllerApi.getAuthStatus(controllerId);
-        if(res.status == 200) {
-            const body = await res.json();
-            setDeviceStatus(body);
-            setConnected(true);
-        } else {
+        try {
+            const res = await controllerApi.getAuthStatus(controllerId);
+            if(res.status == 200) {
+                const body = await res.json();
+                setDeviceStatus(body);
+                setConnected(true);
+            } else {
+                throw new Error("controller not connected");
+            }
+        } catch(e) {
             setConnected(false);
         }
         setStatusLoaded(true);
@@ -124,11 +127,11 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                         <Circle
                             key={device?.authDeviceId}
                             color={
-                                (device?.lastOnline && connected)?
-                                    (deviceStatus[authDeviceKeys[i]] ?
-                                        "success" :
-                                        "error") :
-                                    "disabled"
+                                (deviceStatus[authDeviceKeys[i]]) ? 
+                                    "success" :
+                                    ((device?.lastOnline && connected) ?
+                                        "error":
+                                        "disabled")
                             }
                         />
                     ))) :
@@ -136,7 +139,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                 }
             </TableCell>
             <TableCell>
-                    { created }
+                    { toDisplayDateString(created) }
             </TableCell>
             <TableCell>
                 <NextLink
