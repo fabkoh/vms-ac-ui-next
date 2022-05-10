@@ -29,8 +29,8 @@ import AuthDevicePair from "../../../../../../components/dashboard/controllers/d
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
 import { getAuthdeviceEditLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
-import { AuthDeviceDelete } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
-import { AuthDeviceReset } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
+import AuthDeviceDelete from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
+import AuthDeviceReset from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
 import { controllerApi } from "../../../../../../api/controllers";
 
 const AuthDeviceDetails = () => {
@@ -122,7 +122,7 @@ const AuthDeviceDetails = () => {
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
-	};
+	}
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
@@ -142,14 +142,14 @@ const AuthDeviceDetails = () => {
             }
         })
         setDeleteOpen(false);
-    }; 
+    }
 
     //for reset auth devices
     const [resetOpen, setResetOpen] = useState(false);
 
     const handleResetOpen = () => {        
 		setResetOpen(true);                        
-	};
+	}
 	const handleResetClose = () => {
 		setResetOpen(false);
 	}
@@ -161,7 +161,7 @@ const AuthDeviceDetails = () => {
             toast.dismiss()
 
             if (res.status == 200){
-                toast.success('Reset Authentication Device success');
+                toast.success("Reset Authentication Device success");
                 router.replace(getControllerListLink());
             }
             else{
@@ -169,7 +169,7 @@ const AuthDeviceDetails = () => {
             }
         })
         setResetOpen(false);
-    }; 
+    }
 
     const handleToggleMasterpin = async (e) => {
         const bool = e.target.checked;
@@ -295,27 +295,26 @@ const AuthDeviceDetails = () => {
                                         <DeleteIcon />
                                         &#8288;Delete
                                     </MenuItem>
-                                   {/* <AuthDeviceDelete
+                                   <AuthDeviceDelete
                                         setActionAnchor={setActionAnchor}
                                         open={deleteOpen}
                                         handleDialogClose={handleDeleteClose}
                                         deleteAuthDevices={deleteAuthDevice}
-                                />*/}
+                                    />
 
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleResetOpen}
-                                        // disabled={!entranceActive}
                                     >
                                         <BuildCircle />
                                         &#8288;Reset
                                     </MenuItem>
-                                    {/*<AuthDeviceReset
+                                    <AuthDeviceReset
                                         setActionAnchor={setActionAnchor}
                                         open={resetOpen}
                                         handleDialogClose={handleResetClose}
                                         resetAuthDevices={resetAuthDevice}
-                            />*/}
+                                    />
                                 </StyledMenu>
                             </Grid>
                         </Grid>

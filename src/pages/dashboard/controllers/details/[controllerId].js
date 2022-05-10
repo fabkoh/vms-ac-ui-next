@@ -155,17 +155,20 @@ const ControllerDetails = () => {
 	}
 
     const deleteController = async() => {
-        Promise.resolve(
-            controllerApi.deleteController(controllerId)
-        ).then((res)=>{
-            if (res.status == 204){
+        Promise.resolve(controllerApi.deleteController(controllerId), toast.loading("Deleting Controller..."))
+        .then(async res =>{
+            toast.dismiss()
+
+            if (res.status != 204) {
+                toast.error('Delete unsuccessful', {duration:3000})
+            }
+            else{                                           
                 toast.success('Delete success');
                 router.replace(getControllerListLink());
             }
-            else{
-                toast.error('Delete unsuccessful')
-            }
         })
+            //const res = controllerApi.deleteController(controllerId);
+        
         setDeleteOpen(false);
     };
 
@@ -196,19 +199,63 @@ const ControllerDetails = () => {
 		setResetOpen(false);
 	}
 	const resetController = async() => {
-        Promise.resolve(
-            controllerApi.resetController(controllerId)
-        ).then((res)=>{
-            if (res.status == 204){
-                toast.success('Reset controller success');
-                router.replace(getControllerListLink());
+        Promise.resolve(controllerApi.resetController(controllerId), toast.loading("Resetting Controller..."))
+        .then(async res =>{
+            toast.dismiss()
+
+            if (res.status != 204) {
+                toast.error('Reset unsuccessful', {duration: 3000})
             }
             else{
-                toast.error('Reset unsuccessful')
+                toast.success('Reset success');
+                router.replace(getControllerListLink());
             }
         })
+
         setResetOpen(false);
     }; 
+
+    //delete auth devices
+    const deleteAuthDevices = async(selectedAuthDevices) => {
+        //console.log(selectedAuthDevices);
+
+        Promise.all(selectedAuthDevices.map(id=>{
+            return authDeviceApi.deleteAuthdevice(id)
+        }), toast.loading("Removing Selected Authentication Device(s)..."))
+        .then(resArr => {
+            toast.dismiss()
+
+            resArr.filter(res=>{
+                if(res.status != 200) {
+                    toast.error('Remove unsuccessful')
+                }
+                else {
+                    toast.success('Remove success', {duration:2000})
+                }
+            })
+            getInfo();
+        })
+    }
+
+    //reset auth devices
+    const resetAuthDevices = async(selectedAuthDevices) => {
+        Promise.all(selectedAuthDevices.map(id=>{
+            return authDeviceApi.deleteAuthdevice(id)
+        }), toast.loading("Resetting Selected Authentication Device(s)..."))
+        .then(resArr => {
+            toast.dismiss()
+
+            resArr.filter(res=>{
+                if(res.status != 200) {
+                    toast.error('Reset unsuccessful')
+                }
+                else {
+                    toast.success('Reset success', {duration:2000})
+                }
+            })
+            getInfo();
+        })
+    }
 
     const handleToggleMasterpinE1 = async (id,e) => {
         const bool = e.target.checked;
@@ -404,6 +451,8 @@ const ControllerDetails = () => {
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                             <Grid
@@ -416,6 +465,8 @@ const ControllerDetails = () => {
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
                                 handleToggleMasterpin={handleToggleMasterpinE2}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                         </Grid>
