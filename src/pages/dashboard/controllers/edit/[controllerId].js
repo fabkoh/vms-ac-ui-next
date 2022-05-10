@@ -21,31 +21,79 @@ import { controllerApi } from "../../../../api/controllers";
 import { authDeviceApi } from "../../../../api/auth-devices";
 
 const EditController = () => {
+    const isMounted = useMounted();
+    const { controllerId }  = router.query; 
 
     const [controllerInfo, setControllerInfo] = useState()
     const [controllerValidations, setControllerValidations] = useState({
         invalidIP:false,
         invalidEntrance:false,
     })
+    const [E1, setE1] = useState()
+    const [E2, setE2] = useState()
+    const [authStatus, setAuthStatus] = useState(null)
 
-    const getController = async() => {
-        try {
-            const res = await controllerApi.getController(router.query.controllerId);
-            if (res.status == 200) {
-                const body = await res.json();
-                setControllerInfo(body);
-                // console.log("getcontroller",body)
-            } else {
-                throw new Error("Controller info not loaded");
-            }
-        } catch(e) {
-            console.error(e);
-            toast.error("Controller info not loaded");
-        }
+    const getController = async(controllerId) => {
+        try{
+            Promise.resolve(controllerApi.getController(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    setControllerInfo(data)
+                    // console.log("getController",data)
+                    getPairs(data)
+                }
+                else{
+                    toast.error("Controller info not found")
+                    router.replace(getControllerListLink)
+                }
+            })
+        }catch(err){console.log(err)}
     }
-    useEffect(() => {
-        console.log("controllerValidations",controllerValidations)
-    }, [controllerValidations])
+    const getPairs = (controllerInfo) => {
+        const E1=[]
+        const E2=[]
+        controllerInfo.authDevices.forEach(dev=>{
+            if(dev.authDeviceDirection.includes('E1')){
+                E1.push(dev)
+            }
+            else{E2.push(dev)}
+        })
+        getEntrances(E1,E2)
+        setE1(E1)
+        setE2(E2)
+    }
+    // const initialEntrance = (E1,E2) => {
+    //     const toUpdate = [...allEntrances]
+    //     E1[0]?.entrance? toUpdate.push(E1[0].entrance):false
+    //     E2[0]?.entrance? toUpdate.push(E2[0].entrance):false
+    //     setAllEntrances(toUpdate)
+    // }
+    const [statusLoaded, setStatusLoaded] = useState(false)
+    const getStatus = async() => {
+            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            .then(async res=>{
+                toast.dismiss()
+                if(res.status!=200){
+                    setStatusLoaded(true)
+                    toast.error("Failed to fetch status")
+                }
+                else{
+                    setStatusLoaded(true)
+                    toast.success("Status successfully fetched")
+                    const data = await res.json();
+                    console.log(data)
+                    setAuthStatus(data)
+                }
+                // setAuthStatus(E1)
+                // setE2Status(E2)
+            })
+        // }catch(err){console.log(err)}
+        // setStatusLoaded(true)
+    }
+    // useEffect(() => {
+    //     console.log("controllerValidations",controllerValidations)
+    // }, [controllerValidations])
     
     // const getController = useCallback( async() => {
     //     try {
@@ -63,40 +111,80 @@ const EditController = () => {
     //     }
     // }, [isMounted]);
 
+    const getInfo = useCallback(async() => {
+        setStatusLoaded(false)
+        getController(controllerId)
+        getStatus()
+    }, [isMounted])
+
     useEffect(() => {
-        getController();
+        getInfo();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+    [])
 
     // fetch all entrance info
     const isEntranceMounted = useMounted();
     const [allEntrances, setAllEntrances] = useState([]);
-    const getEntrances = useCallback( async() => {
-        try {
-            const res = await authDeviceApi.getAvailableEntrances();
-            if (res.status == 200) {
-                const body = await res.json();
-                setAllEntrances(body);
-                console.log("avail ent",body)
-            } else {
-                throw new Error("Entrances not loaded");
+    const getEntrances = async(E1,E2) => {
+        const toUpdate =[...allEntrances]
+        Promise.resolve(authDeviceApi.getAvailableEntrances())
+        .then(async res=>{
+            if(res.status==200){
+                // toast.success("Successfully fetched entrance info")
+                const data = await res.json()
+                data.forEach(data=>toUpdate.push(data))
+                E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false
+                E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false
             }
-        } catch(e) {
-            console.error(e);
-            toast.error("Entrances info not loaded")
-        }
-    }, [isEntranceMounted]);
-    
+            else{toast.error("Failed to fetch entrance data")}
+        })        
+       
+        setAllEntrances(toUpdate)
+        
+    }
+    // const getEntrances = useCallback( async() => {
+    //     const toUpdate =[...allEntrances]
+    //     Promise.resolve(authDeviceApi.getAvailableEntrances())
+    //     .then(async res=>{
+    //         if(res.status==200){
+    //             const data = await res.json()
+    //             toUpdate.push(data)
+    //         }
+    //     })
+    //     .then(
+    //         E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false,
+    //         E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false,
+    //     )
+    //     .then(setAllEntrances(toUpdate))
+    // }, [isEntranceMounted]);
+    // const getEntrances = useCallback( async() => {
+    //     try {
+    //         const res = await authDeviceApi.getAvailableEntrances();
+    //         if (res.status == 200) {
+    //             const body = await res.json();
+    //             setAllEntrances(body)
+    //             // console.log("avail ent",body)
+    //         } else {
+    //             throw new Error("Entrances not loaded");
+    //         }
+    //     } catch(e) {
+    //         console.error(e);
+    //         toast.error("Entrances info not loaded")
+    //     }
+    // }, [isEntranceMounted]);
+
+
+    // useEffect(() => {
+    //     getEntrances();    
+    // },
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // [])
+
     useEffect(() => {
-        getEntrances();    
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [])
-
-    // stores the duplicated person ids
-    const [duplicatedPerson, setDuplicatedPerson] = useState({});
-
+        console.log('allEntrances',allEntrances)
+    }, [allEntrances])
+    
     // store previous access group names
     // const [accessGroupNames, setAccessGroupNames] = useState({});
     // useEffect(() => {
@@ -114,42 +202,6 @@ const EditController = () => {
 
     // helper for remove card and changeNameCheck
     // directly modifies validationArr
-    const checkDuplicateName = (groupArr, validationArr) => {
-        const duplicatedNames = formUtils.getDuplicates(
-            groupArr
-                // get access group names
-                .map(group => group.accessGroupName)
-                // keep the ones that are not blank strings
-                .filter(name => !(/^\s*$/.test(name)))
-        );
-        for(let i=0; i<groupArr.length; i++) {
-            validationArr[i].accessGroupNameDuplicated = groupArr[i].accessGroupName in duplicatedNames;
-        }
-    }
-
-    // helper for removeCard and changePersonCheck
-    // directly modifies validationArr, return newDuplicatedPerson
-    const checkDuplicatePerson = (groupArr, validationArr) => {
-        // stores id of duplicated persons
-        const newDuplicatedPerson = formUtils.getDuplicates(
-            groupArr.map(
-                // get access group person
-                group => group.persons.map(
-                    // get person id
-                    person => person.personId
-                )
-            ).flat()
-        );
-        for(let i=0; i<groupArr.length; i++) {
-            // equals true if 
-            validationArr[i].accessGroupPersonDuplicated =
-                // returns true if some person in access group is in duplicaed person
-                groupArr[i].persons.some(
-                    person => person.personId in newDuplicatedPerson
-                );           
-        }
-        return newDuplicatedPerson
-    }
 
     
     // update methods for form inputs
@@ -167,11 +219,11 @@ const EditController = () => {
     }
 
     // entrance logic
-    const changeEntrance = (newValue, id) => {
-        const updatedInfo = [ ...accessGroupInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
-        setAccessGroupInfoArr(updatedInfo);
-    }
+    // const changeEntrance = (newValue, id) => {
+    //     const updatedInfo = [ ...accessGroupInfoArr ];
+    //     updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
+    //     setAccessGroupInfoArr(updatedInfo);
+    // }
 
     // currying for cleaner code
     const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
@@ -252,17 +304,66 @@ const EditController = () => {
     }
     const checkIP = (e) => {
         if(controllerInfo.controllerIPStatic){
-            // console.log("controllerInfo.controllerIPStatic",controllerInfo.controllerIPStatic)
             const invalid = !/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(e.target.value)
             setControllerValidations(prevState=>({...prevState,invalidIP:invalid}))
         }
         else{setControllerValidations(prevState=>({...prevState,invalidIP:false}))}
     }
+
+    const e1Handler = (e) => {
+        console.log("e.target.value",e.target.value)
+        const newArr=[...E1]
+        newArr.forEach(dev=> dev.entrance=e.target.value)
+        setE1(newArr)
+        entranceChecker(E1,E2)
+    }
+    const e2Handler = (e) => {
+        const newArr=[...E2]
+        newArr.forEach(dev=> dev.entrance=e.target.value)
+        setE2(newArr)
+        entranceChecker(E1,E2)
+    }
+    const entranceChecker = (e1,e2) => {
+        if(e1[0].entrance&&e2[0].entrance){ //only check when got entrance. else both null is fine.
+            if(e1[0].entrance==e2[0].entrance){
+                setControllerValidations(prevState=>({...prevState,invalidEntrance:true}))
+            }
+            else{setControllerValidations(prevState=>({...prevState,invalidEntrance:false}))}
+        }
+        else{setControllerValidations(prevState=>({...prevState,invalidEntrance:false}))} 
+    }
+    useEffect(() => {
+        console.log(E1,E2)
+    }, [E1,E2])
+    useEffect(() => {
+        console.log(controllerValidations)
+    }, [controllerValidations])
+    
+    
     const changeIPHandler = (e) => {
         changeIP(e);
         checkIP(e);
     }
     const [loading, setLoading] = useState(true)
+    // const submitForm = (e) => {
+    //     e.preventDefault();
+       
+    //     Promise.resolve(authDeviceApi.assignEntrance(E1))
+    //     .then(res=>{
+    //         if(res.status==200){
+    //             toast.success("Entrance E1 updated")
+    //         }
+    //         else(toast.error("Failed to update entrance E1"))
+    //     }),
+    //     Promise.resolve(authDeviceApi.assignEntrance(E2))
+    //     .then(res=>{
+    //         if(res.status==200){
+    //             toast.success("Entrance E2 updated")
+    //         }
+    //         else(toast.error("Failed to update entrance E2"))
+    //     })
+        
+    // }
     const submitForm = (e) => {
         e.preventDefault();
         setSubmitted(true)
@@ -277,22 +378,22 @@ const EditController = () => {
                 toast.success("Controller info updated")
                 router.replace('/dashboard/controllers')
             }
+        }).then(
+        Promise.resolve(authDeviceApi.assignEntrance(E1))
+        .then(res=>{
+            if(res.status==200){
+                toast.success("Entrance E1 updated")
+            }
+            else(toast.error("Failed to update entrance E1"))
+        }),
+        Promise.resolve(authDeviceApi.assignEntrance(E2))
+        .then(res=>{
+            if(res.status==200){
+                toast.success("Entrance E2 updated")
+            }
+            else(toast.error("Failed to update entrance E2"))
         })
-        // toast.promise(Promise.resolve(controllerApi.updateController(controllerInfo))
-        // ,{
-        //     loading:'Attempting to update controller',
-        //     success:'Controller info updated',
-        //     error:'Error updating controller',
-        // },{
-        //     style:{
-        //         minWidth:'250px'
-        //     }
-        // }
-        // ).then(res=>{
-        //     if(res.status==200){
-        //         router.replace('/dashboard/controllers')
-        //     }
-        // })
+        )
     }
     return(
         <>
@@ -346,9 +447,21 @@ const EditController = () => {
                                 changeIPHandler={changeIPHandler}
                                 controllerValidations={controllerValidations}
                                 />
-                                <AssignAuthDevice       //split 2 components E1 and E2? 
+                                <AssignAuthDevice
+                                authPair={E1}      
+                                statusLoaded={statusLoaded}
+                                status={authStatus}
+                                allEntrances={allEntrances}
+                                changeEntrance={e1Handler}
+                                controllerValidations={controllerValidations}
                                 />
-                                <AssignAuthDevice       //split 2 components E1 and E2? 
+                                <AssignAuthDevice  
+                                authPair={E2}    
+                                statusLoaded={statusLoaded}
+                                status={authStatus}
+                                allEntrances={allEntrances}
+                                changeEntrance={e2Handler}
+                                controllerValidations={controllerValidations}
                                 />
                             <Grid container>
                                 <Grid item marginRight={3}>

@@ -39,19 +39,40 @@ class AuthDeviceApi {
         }
     }
 
-    assignEntrance(authdevices, entranceId) {   //to remove entrance, set entranceId = null
+    assignEntrance(authDeviceList) {   //to remove entrance, set entranceId = null
+        const toUpdate = authDeviceList.map(dev=>{
+            if(dev.entrance){
+                return ({authDeviceId:dev.authDeviceId,entranceId:dev.entrance.entranceId})
+            }
+            else{
+                return ({authDeviceId:dev.authDeviceId,entranceId:null})
+            }
+        })
         if (useApi) {
-            return sendApi(`/api/authdevice/entrance?entranceid=${entranceId}`, 
+            if(toUpdate[0].entranceId){
+            return sendApi(`/api/authdevice/entrance?entranceid=${toUpdate[0].entranceId}`, 
                 {
                     method: 'PUT',
                     headers: {
                         'Content-type': 'application/json'
                     },
-                    body: JSON.stringify(authdevices)
+                    body: JSON.stringify(toUpdate)
                 }
-            );
+            )}
+            else{
+                return sendApi(`/api/authdevice/entrance`, 
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(toUpdate)
+                }
+            )
+            }
         }
     }
+
     enableMasterpin(authdeviceId) {
         if (useApi) { return sendApi(`/api/authdevice/masterpinToTrue/${authdeviceId}`, { method: 'PUT' }); }
     }

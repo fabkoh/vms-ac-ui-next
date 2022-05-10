@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../../lib/gtm";
-// import accessGroupEntranceApi from "../../../../../../api/access-group-entrance-n-to-n";
 import entranceApi from "../../../../../../api/entrance";
 import NextLink from 'next/link';
 import Head from 'next/head';
@@ -20,29 +19,19 @@ import { ChevronDown } from "../../../../../../icons/chevron-down";
 import StyledMenu from "../../../../../../components/dashboard/styled-menu";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-// import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../../../components/dashboard/dashboard-layout";
-// import { EntranceBasicDetails } from "../../../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
-// import { Confirmdelete } from '../../../../../../components/dashboard/entrances/confirm-delete';
-// import { set } from "date-fns";
-// import AccessGroupDetails from "../../../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
-// import ConfirmStatusUpdate from "../../../../../../components/dashboard/entrances/list/confirm-status-update";
 import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../../../utils/entrance";
-// import EntranceSchedules from "../../../../../../components/dashboard/entrances/details/entrance-schedules";
-// import { entranceScheduleApi } from "../../../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../../../utils/entrance-schedule";
-// import { controllerApi } from "../../../../../../api/controllers";
-// import { ControllerBasicDetails } from "../../../../../../components/dashboard/controllers/details/controller-basic-details";
 import AuthDevicePair from "../../../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
-// import { AuthDeviceBasicDetails } from "../../../../../components/dashboard/controllers/auth-devices/auth-device-basic-details";
-import { getControllerListLink } from "../../../../../../utils/controller";
+import { getAuthdeviceEditLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
 import { AuthDeviceDelete } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
 import { AuthDeviceReset } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
+import { controllerApi } from "../../../../../../api/controllers";
 
 const AuthDeviceDetails = () => {
 
@@ -50,8 +39,8 @@ const AuthDeviceDetails = () => {
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    // const { entranceId }  = router.query; //change to auth device id
-    // console.log(router.query)
+    const { authDeviceId }  = router.query; //change to auth device id
+    const { controllerId }  = router.query; //change to auth device id
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -61,68 +50,49 @@ const AuthDeviceDetails = () => {
 
     const getAuthDevice = async() => {
         try{
-            const res = await authDeviceApi.getAuthDevice(router.query.authDeviceId)
+            const res = await authDeviceApi.getAuthDevice(authDeviceId)
             if(res.status!=200){
                 toast.error("Device not found")
+                router.replace(getControllerListLink())
             }
             const data = await res.json()
             if(isMounted()){
                 setDeviceInfo(data)
                 console.log("getauth device",data)
             }
-        }catch(err){console.log(err)}
+        }catch(err){console.log(err),router.replace(getControllerListLink())}
     }
-    // const getAuthDevice = async(authDeviceId) => {
-    //     try{
-    //         Promise.resolve(authDeviceApi.getAuthDevice(authDeviceId)) 
-    //         .then( async res=>{
-    //             if(res.status==200){
-    //                 const data = await res.json()
-    //                 setDeviceInfo(data)
-    //                 console.log("auth device data",data)
-    //                 // getPairs(data)
-    //             }
-    //             else{
-    //                 toast.error("authentication device info not found")
-    //             }
-    //         })
-    //     }catch(err){console.log(err)}
-    // }
-    // const getPairs = (deviceInfo) => {
-    //     const E1=[]
-    //     const E2=[]
-    //     deviceInfo.authDevice.forEach(dev=>{
-    //         if(dev.authDeviceDirection.includes('E1')){
-    //             E1.push(dev)
-    //         }
-    //         else{E2.push(dev)}
-    //     })
-    //     setE1(E1)
-    //     setE2(E2)
-    // }
 
-
-    // const link = getEntranceScheduleEditLink(entranceId);
-
-    const [entranceSchedules, setEntranceSchedules] = useState([]);
-
-    const [accessGroup, setAccessGroup] = useState([]);
-    const [entranceIsActive, setEntranceIsActive] = useState();
+    const [authStatus, setAuthStatus] = useState(null)
+    const [statusLoaded, setStatusLoaded] = useState(false)
+    const getStatus = async() => {
+        setStatusLoaded(false)
+            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            .then(async res=>{
+                toast.dismiss()
+                if(res.status!=200){
+                    setStatusLoaded(true)
+                    toast.error("Failed to fetch status")
+                }
+                else{
+                    setStatusLoaded(true)
+                    toast.success("Status successfully fetched")
+                    const data = await res.json();
+                    console.log(data)
+                    setAuthStatus(data)
+                }
+            })
+    }
 
 
     const getInfo = useCallback(async() => {
-        //get entrance and access group entrance
-        // getEntrance();
-        // getAccessGroups();
-        // getEntranceSchedules();
-        // getAuthDevice(1)
+        //get authDevice info and controller status
+        getStatus()
+        getAuthDevice()
     }, [isMounted])
 
     useEffect(() => {
-        // getController(1)
-        // getPairs(deviceInfo)
-        getAuthDevice()
-        // getInfo();
+        getInfo();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
@@ -201,13 +171,28 @@ const AuthDeviceDetails = () => {
         setResetOpen(false);
     }; 
 
-
+    const handleToggleMasterpin = async (e) => {
+        const bool = e.target.checked;
+        const verb = bool ? 'activated' : 'deactivated';
+        try {
+            const res = await (bool ? authDeviceApi.enableMasterpin(authDeviceId) : authDeviceApi.disableMasterpin(authDeviceId));
+            if (res.status != 200) throw new Error("Failed to send req");
+            toast.success(`Successfully ${verb} masterpin`);
+            setDeviceInfo(prevState=>({...prevState,masterpin:bool}))
+            return true
+        } catch(e) {
+            console.error(e);
+            const errorVerb = bool ? 'activate' : 'deactivate';
+            toast.error(`Failed to ${errorVerb} masterpin`);
+            return false
+        }
+    }
 
 
 
     // render view
-    // if (!entrance) {
-    //     return null;
+    // if (!deviceInfo) {
+    //     return router.replace(getControllerListLink());
     // }
     return (
         <>
@@ -227,7 +212,7 @@ const AuthDeviceDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                             <NextLink
-                                href={`/dashboard/controllers/details/${router.query.controllerId}`} //change to controller details view
+                                href={getControllerDetailsLinkWithId(controllerId)} //change to controller details view
                                 passHref
                             >
                                 <Link
@@ -276,6 +261,7 @@ const AuthDeviceDetails = () => {
                                 endIcon={(
                                     <Refresh fontSize="small"/>
                                 )}
+                                onClick={getInfo}
                                 >Refresh        
                                 </Button>
                                 <Button
@@ -293,15 +279,15 @@ const AuthDeviceDetails = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    {/* <NextLink
-                                        href={getEntranceEditLink([entrance])}
+                                    <NextLink
+                                        href={getAuthdeviceEditLink(controllerId,authDeviceId)}
                                         passHref
-                                    > */}
+                                    >
                                         <MenuItem disableRipple>
                                             <EditIcon />
                                             &#8288;Edit
                                         </MenuItem>
-                                    {/* </NextLink> */}
+                                    </NextLink>
                                     <MenuItem
                                         disableRipple
                                         onClick={handleDeleteOpen}
@@ -345,6 +331,9 @@ const AuthDeviceDetails = () => {
                             >
                                 <AuthDeviceBasicDetails
                                 deviceInfo={deviceInfo}
+                                statusLoaded={statusLoaded}
+                                authStatus={authStatus}
+                                handleToggleMasterpin={handleToggleMasterpin}
                                 />
                             </Grid>                         
                         </Grid>

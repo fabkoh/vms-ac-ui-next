@@ -48,34 +48,34 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
                     divider
                     label="Name"
                     // value={controllerName}
-                    value={controller.controllerName}
+                    value={controller?.controllerName}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Controller IP"
                     // value={controllerIP}
-                    value={controller.controllerIP}
+                    value={controller?.controllerIP}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Controller MAC"
-                    value={controller.controllerMAC}
+                    value={controller?.controllerMAC}
                     // value={controllerMAC}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Controller Serial"
-                    value={controller.controllerSerialNo}
+                    value={controller?.controllerSerialNo}
                     // value={controllerSerialNo}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Last Online"
-                    value={controller.lastOnline}
+                    value={controller?.lastOnline}
                     // value={lastOnline}
                 />
                 <PropertyListItem

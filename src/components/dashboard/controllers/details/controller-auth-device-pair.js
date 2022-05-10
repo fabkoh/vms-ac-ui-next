@@ -40,20 +40,16 @@ import WarningChip from "../../shared/warning-chip";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
-import { getAuthdeviceDetailsLink, getControllerEditLink } from "../../../../utils/controller";
+import { getAuthdeviceDetailsLink, getAuthdeviceEditLink, getControllerEditLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 import { toDisplayDateString } from "../../../../utils/utils";
+import { authDeviceApi } from "../../../../api/auth-devices";
+import toast from "react-hot-toast";
 
-<<<<<<< HEAD
-// export default function AuthDevicePair({ authPair,controllerId, statusLoaded }) {
-export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded }) {
-	// const status = [{
-=======
-export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices }) {
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices,handleToggleMasterpin }) {
 	// const status = {
->>>>>>> ee12515b76c8ab285702ef57e8fad0bd57319bc2
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
 	// 	"E2_IN": false,
@@ -271,7 +267,6 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>							
 											<NextLink href={getAuthdeviceDetailsLink(controllerId,authDeviceId)} passHref> 
-											{/* <NextLink href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`} passHref>  */}
 												<Link color="inherit">
 													{device.authDeviceName} 
 												</Link>
@@ -280,7 +275,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										<TableCell>{device.authDeviceDirection}</TableCell>
 										<TableCell>{1}</TableCell>
 										<TableCell>
-											{<Switch checked={device.masterpin} />}
+											{<Switch onClick={(e)=>handleToggleMasterpin(authDeviceId,e)} checked={device.masterpin} />}
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
@@ -298,7 +293,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-												(status?(status[device.authDeviceDirection]?"N.A.":toDisplayDateString(device.lastOnline)):(device.lastOnline?toDisplayDateString(device.lastOnline):"Never")):
+												(status?(status[device.authDeviceDirection]?"N.A.":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
 											(<CircularProgress size='1rem'/>)}
 											{/* {statusLoaded?
 												(status[device.authDeviceDirection]?"N.A.":
@@ -308,14 +303,14 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											{/* {device?.lastOnline ? device.lastOnline:"never"} */}
 										</TableCell>
 										<TableCell>
-											{/* <NextLink
-                                                href={ editLink }
+											<NextLink
+                                                href={ getAuthdeviceEditLink(controllerId,authDeviceId) }
                                                 passHref
-                                            > */}
+                                            >
 											<IconButton component="a">
 												<PencilAlt fontSize="small" />
 											</IconButton>
-											{/* </NextLink> */}
+											</NextLink>
                                             <NextLink 
                                                 href={ getAuthdeviceDetailsLink(controllerId,authDeviceId) }
                                                 passHref
