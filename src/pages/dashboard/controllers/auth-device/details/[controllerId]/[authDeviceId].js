@@ -128,17 +128,17 @@ const AuthDeviceDetails = () => {
 	}
 	const deleteAuthDevice = async() => {
         Promise.resolve(
-            authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
-        ),  toast.loading("Removing Authentication Device...")
+            authDeviceApi.deleteAuthdevice(authDeviceId), toast.loading("Removing Authentication Device...")
+        )
         .then((res)=>{
            toast.dismiss()
 
-            if (res.status == 200){
-                toast.success('Delete Authentication Device success');
-                router.replace(getControllerListLink());
+            if (res.status != 200){
+                toast.error('Remove unsuccessful')
             }
             else{
-                toast.error('Delete unsuccessful')
+                toast.success('Successfully Remove Authentication Device', {duration: 5000});
+                router.replace(getControllerDetailsLinkWithId(controllerId)); //go back to the controller details view
             }
         })
         setDeleteOpen(false);
@@ -155,17 +155,19 @@ const AuthDeviceDetails = () => {
 	}
 	const resetAuthDevice = async() => {
         Promise.resolve(
-            authDeviceApi.deleteAuthdevice(router.query.authDeviceId)
-        ), toast.loading("Resetting Authentication Device...")
+            authDeviceApi.deleteAuthdevice(authDeviceId), toast.loading("Resetting Authentication Device...")
+        )
         .then((res)=>{
+            console.log(res);
+
             toast.dismiss()
 
-            if (res.status == 200){
-                toast.success("Reset Authentication Device success");
-                router.replace(getControllerListLink());
+            if (res.status != 200){
+               toast.error('Reset unsuccessful')
             }
             else{
-                toast.error('Reset unsuccessful')
+                toast.success("Reset Authentication Device success");
+                //router.replace(getControllerListLink());
             }
         })
         setResetOpen(false);
