@@ -63,7 +63,7 @@ const AuthDeviceDetails = () => {
         }catch(err){console.log(err),router.replace(getControllerListLink())}
     }
 
-    const [authStatus, setAuthStatus] = useState(null)
+    const [authStatus, setAuthStatus] = useState({})
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
         setStatusLoaded(false)

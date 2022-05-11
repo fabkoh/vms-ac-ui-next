@@ -33,6 +33,7 @@ import WarningChip from "../shared/warning-chip";
 import { getEntranceLabel } from "../../../utils/entrance";
 import entranceApi from "../../../api/entrance";
 import SingleSelect from "./single-select-input";
+import { toDisplayDateString } from "../../../utils/utils";
 
 //this is the authdevice list for edit page. can only assign entrance. other details for viewing only.
 
@@ -180,8 +181,11 @@ const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntra
 										</TableCell>
 										<TableCell>
                                         {statusLoaded?
-												(status?(status[device.authDeviceDirection]?"N.A.":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+												(status[device.authDeviceDirection]?"Online":(device.lastOnline?toDisplayDateString(device.lastOnline):"Never")):
 											(<CircularProgress size='1rem'/>)}
+                                        {/* {statusLoaded?
+												(status?(status[device.authDeviceDirection]?"Online":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+											(<CircularProgress size='1rem'/>)} */}
 										</TableCell>
 									</TableRow>
 								);

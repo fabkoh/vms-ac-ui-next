@@ -55,7 +55,7 @@ const ControllerDetails = () => {
     const [controllerInfo, setControllerInfo] = useState(null)
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
-    const [authStatus, setAuthStatus] = useState(null)
+    const [authStatus, setAuthStatus] = useState({})
 
     const getController = async(controllerId) => {
         try{
@@ -298,7 +298,18 @@ const ControllerDetails = () => {
         }
     }
 
-
+	const removeEntranceButton = (authPair) => async() => {
+		Promise.resolve(authDeviceApi.removeEntrance(authPair))
+		.then(res=>{
+			if(res.status!=200){
+				toast.error("Error removing entrance")
+			}
+			else{toast.success("Successfully removed entrance"),getInfo()}
+            
+        })
+        
+        
+	}
 
     // render view
     return (
@@ -453,6 +464,7 @@ const ControllerDetails = () => {
                                 handleToggleMasterpin={handleToggleMasterpinE1}
                                 resetAuthDevices={resetAuthDevices}
                                 deleteAuthDevices={deleteAuthDevices}
+                                removeEntrance={removeEntranceButton}
                                 />
                             </Grid>                         
                             <Grid
@@ -460,6 +472,7 @@ const ControllerDetails = () => {
                                 xs={12}
                             >
                                 <AuthDevicePair
+                                removeEntrance={removeEntranceButton}
                                 authPair={E2}
                                 controllerId={controllerId}
                                 status={authStatus}

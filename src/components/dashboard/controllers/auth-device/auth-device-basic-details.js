@@ -8,6 +8,9 @@ import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import NextLink from 'next/link';
 import Link from "next/link";
+import { toDisplayDateString } from "../../../../utils/utils";
+import WarningChip from "../../shared/warning-chip";
+
 
 export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus}) => {
     // copied from template
@@ -50,8 +53,11 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     divider
                     label="Last Online"
                     value={	statusLoaded?
-                        (authStatus?(authStatus[deviceInfo.authDeviceDirection]?"N.A.":deviceInfo.lastOnline):(deviceInfo.lastOnline?deviceInfo.lastOnline:"Never")):
+                        (authStatus[deviceInfo.authDeviceDirection]?"Online":(deviceInfo.lastOnline?toDisplayDateString(deviceInfo.lastOnline):"Never")):
                     (<CircularProgress size='1rem'/>)}
+                    // value={	statusLoaded?
+                    //     (authStatus?(authStatus[deviceInfo.authDeviceDirection]?"Online":deviceInfo.lastOnline):(deviceInfo.lastOnline?deviceInfo.lastOnline:"Never")):
+                    // (<CircularProgress size='1rem'/>)}
                     // value={deviceInfo?.lastOnline?deviceInfo.lastOnline:"never"}
                     // value={controllerMAC}
                 />
@@ -74,7 +80,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                         <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
                         </Link>
                     </NextLink> :
-                    <Chip color="warning" label="No entrance assigned"/>}
+                    <WarningChip text="No entrance assigned"/>}
                     // value={lastOnline}
                 />
                 {/* <PropertyListItem

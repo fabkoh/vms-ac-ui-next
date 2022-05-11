@@ -19,6 +19,12 @@ const getControllerDetailsLinkWithId = (controllerId) => {
     }
     return DEFAULT_URL
 };
+const getControllerEditLinkWithId = (controllerId) => {
+    if(controllerId){
+        return `/dashboard/controllers/edit/${controllerId}`;
+    }
+    return DEFAULT_URL
+};
 const getControllerListLink = () => {
         return `/dashboard/controllers/`;
 }
@@ -36,4 +42,4 @@ const filterControllerByString = (controller, queryString) => stringFilterHelper
 
 const filterControllerByStringPlaceholder = "Search for controller name, ip address or entrance name";
 
-export { getControllerDetailsLink, filterControllerByString, filterControllerByStringPlaceholder, getControllerEditLink, getControllerListLink,getAuthdeviceDetailsLink,getAuthdeviceEditLink,getControllerDetailsLinkWithId };
+export { getControllerDetailsLink, filterControllerByString, filterControllerByStringPlaceholder, getControllerEditLink, getControllerListLink,getAuthdeviceDetailsLink,getAuthdeviceEditLink,getControllerDetailsLinkWithId, getControllerEditLinkWithId };

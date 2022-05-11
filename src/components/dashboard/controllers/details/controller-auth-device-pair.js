@@ -40,60 +40,44 @@ import WarningChip from "../../shared/warning-chip";
 import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import entranceApi from "../../../../api/entrance";
-import { getAuthdeviceDetailsLink, getAuthdeviceEditLink, getControllerEditLink } from "../../../../utils/controller";
+import { getAuthdeviceDetailsLink, getAuthdeviceEditLink, getControllerEditLink, getControllerEditLinkWithId } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 import AuthDeviceDelete from "../auth-device/auth-device-delete";
 import AuthDeviceReset from "../auth-device/auth-device-reset";
 import { toDisplayDateString } from "../../../../utils/utils";
 import { authDeviceApi } from "../../../../api/auth-devices";
 import toast from "react-hot-toast";
+import RemoveEntrance from "./remove-entrance";
 
-export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices,handleToggleMasterpin }) {
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices,handleToggleMasterpin,removeEntrance }) {
 	// const status = {
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
 	// 	"E2_IN": false,
 	// 	"E2_OUT": false
 	// }]
-	// for selection of checkboxes
-	const [selectedDevices, setSelectedDevices] = useState([]);
-	const selectedAllDevices = selectedDevices.length == 2;
-	const selectedSomeDevices = selectedDevices.length > 0 && !selectedAllDevices;
-	const handleSelectAllDevices = (e) =>
-		setSelectedDevices(
-			e.target.checked ? authPair.map((e) => e.authDeviceId) : []
-		);
-	const handleSelect = (authDeviceId) => {
-		if (selectedDevices.includes(authDeviceId)) {
-			setSelectedDevices(selectedDevices.filter((id) => id !== authDeviceId));
-		} else {
-			setSelectedDevices([...selectedDevices, authDeviceId]);
-		}
-	};
 
 	//get entrance
-	const [deviceEntrance, setDeviceEntrance] = useState(null);
-	const getDeviceEntrance = (authPair) => {
-		try {
-			if (authPair[0].entrance) {
-				setDeviceEntrance(authPair[0].entrance);
-			}
-		} catch (err) {
-			console.log(err);
-		}
-	};
+	// const [deviceEntrance, setDeviceEntrance] = useState(null);
+	// const getDeviceEntrance = (authPair) => {
+	// 	try {
+	// 		if (authPair[0].entrance) {
+	// 			setDeviceEntrance(authPair[0].entrance);
+	// 		}
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// };
 
-	useEffect(() => {
-		getDeviceEntrance(authPair);
-	}, [authPair]);
+	// useEffect(() => {
+	// 	getDeviceEntrance(authPair);
+	// }, [authPair]);
 
 	// auth device actions
 	const [actionAnchor, setActionAnchor] = useState(null);
 	const actionOpen = Boolean(actionAnchor);
 	const handleActionMenuOpen = (e) => setActionAnchor(e.currentTarget);
 	const handleActionMenuClose = () => setActionAnchor(null);
-	
-	const actionDisabled = selectedDevices.length == 0;
 
 	// delete auth devices
 	const [openDelete, setOpenDelete] = useState(false);
@@ -123,10 +107,14 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 		setSelectedDevices("");
 	}
 
-
-	// useEffect(() => {
-	// 	console.log("selectedDevices", selectedDevices);
-	// }, [selectedDevices]);
+	//remove entrance
+	const [removeOpen, setRemoveOpen] = useState(false)
+	const handleRemoveClose = () => {
+		setRemoveOpen(false)
+	}
+	const handleRemoveOpen = () => {
+		setRemoveOpen(true)
+	}
 
 	return (
 		<Card>
@@ -134,7 +122,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 				setActionAnchor={setActionAnchor}
 				open={openReset}
 				handleDialogClose={closeResetDialog}
-				selectedAuthDevices={selectedDevices}
+				// selectedAuthDevices={selectedDevices}
 				resetAuthDevices={handleResetAuthDevices}
 			/> 
 			
@@ -142,8 +130,13 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 				setActionAnchor={setActionAnchor}
 				open={openDelete} 
 				handleDialogClose={closeDeleteDialog}
-				selectedAuthDevices={selectedDevices}
+				// selectedAuthDevices={selectedDevices}
 				deleteAuthDevices={handleDeleteAuthDevices}
+			/>
+			<RemoveEntrance
+				open={removeOpen}
+				handleDialogClose={handleRemoveClose}
+				removeEntrance={removeEntrance(authPair)}
 			/>
 
 			<Box
@@ -157,59 +150,61 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 						title={
 							"Authentication devices for: " +
 							`${
-								deviceEntrance
-									? deviceEntrance.entranceName
+								authPair
+									? (authPair[0].entrance?authPair[0].entrance.entranceName:"No entrance assigned")
 									: "No entrance assigned"
 							}`
 						}
 						// title={deviceEntrance?deviceEntrance.entranceName:"No Entrance Assigned"}
 						subheader="Click on the authentication device below to go to the device details page"
 						avatar={
-							// <ExpandMore expand={expanded} onClick={handleExpandClick}>
-							// 	<ExpandMoreIcon />
-							// </ExpandMore>
-							deviceEntrance ? (
-								true
-							) : (
-								<WarningAmber color="warning"></WarningAmber>
-							)
+							authPair?
+							(authPair[0].entrance?true:<WarningAmber color="warning"></WarningAmber>):
+							<WarningAmber color="warning"></WarningAmber>
+							// deviceEntrance ? (
+							// 	true
+							// ) : (
+							// 	<WarningAmber color="warning"></WarningAmber>
+							// )
 						}
 					/>
 				</Box>
 				<Box>
 				<NextLink 
-                                                href={`/dashboard/controllers/edit/${controllerId}`}
+                                                href={getControllerEditLinkWithId(controllerId)}
                                                 passHref
                                             >
 					<Button
 						sx={{ m: 2 }}
 						variant="contained"
-						// onClick={handleActionMenuOpen}
+						onClick={getControllerEditLinkWithId(controllerId)}
 					>
 						Assign Entrance
 					</Button>
 					</NextLink>
 					<Button
-						endIcon={<ChevronDown fontSize="small" />}
 						sx={{ m: 2 }}
 						variant="contained"
-						onClick={handleActionMenuOpen}
+						onClick={handleRemoveOpen}
+						// disabled={true}
+						disabled={authPair?(authPair[0].entrance==null?true:false):true}
 					>
-						Actions
+						Remove Entrance
 					</Button>
+
 				</Box>
 			</Box>
-			<StyledMenu
+			{/* <StyledMenu
 				anchorEl={actionAnchor}
 				open={actionOpen}
 				onClose={handleActionMenuClose}
 			>
-				{/* <NextLink
+				<NextLink
 					href={
                         link
 					}
 					passHref
-				> */}
+				>
 				<MenuItem
 					disableRipple
 					disabled={actionDisabled}
@@ -218,7 +213,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					<BuildCircle />
 					&#8288;Reset
 				</MenuItem>
-				{/* </NextLink> */}
+				</NextLink>
 				<MenuItem
 					disableRipple
 					disabled={actionDisabled}
@@ -227,7 +222,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					<Delete />
 					&#8288;Remove
 				</MenuItem>
-			</StyledMenu>
+			</StyledMenu> */}
 			{/* <Collapse in={expanded}> */}
 			{/*<Divider /> */}
 			<Divider />
@@ -236,13 +231,13 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					<Table>
 						<TableHead sx={{ backgroundColor: "neutral.200" }}>
 							<TableRow>
-								<TableCell padding="checkbox">
+								{/* <TableCell padding="checkbox">
 									<Checkbox
 										checked={selectedAllDevices}
 										indeterminate={selectedSomeDevices}
 										onChange={handleSelectAllDevices}
 									/>{" "}
-								</TableCell>
+								</TableCell> */}
 								<TableCell>Name</TableCell>
 								<TableCell>Direction</TableCell>
 								<TableCell>No. of auth methods</TableCell>
@@ -258,13 +253,13 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 								// const controllerId = device.controllerId
 								return (
 									<TableRow hover key={i}>
-										<TableCell padding="checkbox">
+										{/* <TableCell padding="checkbox">
 											<Checkbox
 												checked={selectedDevices.includes(authDeviceId)}
 												onChange={(e) => handleSelect(authDeviceId)}
 												// value={selectedDevices.includes(id)}
 											/>{" "}
-										</TableCell>
+										</TableCell> */}
 										<TableCell>							
 											<NextLink href={getAuthdeviceDetailsLink(controllerId,authDeviceId)} passHref> 
 												<Link color="inherit">
@@ -283,24 +278,21 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											(<CircularProgress size='1rem'/>)
 											}
 											{/* {statusLoaded?
-											(<Circle color={device?.lastOnline ? ((Array.isArray(status)&&status[device.authDeviceDirection])? "success":"error") : "disabled"} />):
-											(<CircularProgress size='1rem'/>)
-											} */}
-											{/* {statusLoaded?
 											(<Circle color={device?.lastOnline ? (status[device.authDeviceDirection]? "success":"error") : "disabled"} />):
 											(<CircularProgress size='1rem'/>)
 											} */}
 										</TableCell>
 										<TableCell>
 											{statusLoaded?
-												(status?(status[device.authDeviceDirection]?"N.A.":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+												(status[device.authDeviceDirection]?"Online":(device.lastOnline?toDisplayDateString(device.lastOnline):"Never")):
 											(<CircularProgress size='1rem'/>)}
+											{/* {statusLoaded?
+												(status?(status[device.authDeviceDirection]?"Online":device.lastOnline):(device.lastOnline?device.lastOnline:"Never")):
+											(<CircularProgress size='1rem'/>)} */}
 											{/* {statusLoaded?
 												(status[device.authDeviceDirection]?"N.A.":
 												(device.lastOnline?device.lastOnline:"Never")) :
 											(<CircularProgress size='1rem'/>)} */}
-											{/* {status[device.authDeviceDirection]?"N.A.":(device.lastOnline?device.lastOnline:"Never")} */}
-											{/* {device?.lastOnline ? device.lastOnline:"never"} */}
 										</TableCell>
 										<TableCell>
 											<NextLink
