@@ -45,7 +45,7 @@ const RemoveEntrance = (props) => {
 					<WarningAmberOutlinedIcon
 						sx={{ color: "#F44336", m: -0.5, width: 50 }}
 					/>{" "}
-					&#8288;Confirm Reset?
+					&#8288;Confirm Remove?
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>

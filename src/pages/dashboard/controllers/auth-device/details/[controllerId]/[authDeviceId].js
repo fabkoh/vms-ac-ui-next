@@ -166,7 +166,7 @@ const AuthDeviceDetails = () => {
                toast.error('Reset unsuccessful')
             }
             else{
-                toast.success("Reset Authentication Device success");
+                toast.success("Reset Authentication Device success"),getInfo()
                 //router.replace(getControllerListLink());
             }
         })
