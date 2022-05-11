@@ -58,7 +58,7 @@ const AuthDeviceDetails = () => {
             const data = await res.json()
             if(isMounted()){
                 setDeviceInfo(data)
-                console.log("getauth device",data)
+                // console.log("getauth device",data)
             }
         }catch(err){console.log(err),router.replace(getControllerListLink())}
     }

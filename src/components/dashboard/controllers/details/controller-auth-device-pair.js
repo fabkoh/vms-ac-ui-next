@@ -175,7 +175,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
                                                 passHref
                                             >
 					<Button
-						sx={{ m: 2 }}
+						sx={{ ml:2, mb: 2 }}
 						variant="contained"
 						onClick={getControllerEditLinkWithId(controllerId)}
 					>
@@ -183,7 +183,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					</Button>
 					</NextLink>
 					<Button
-						sx={{ m: 2 }}
+						sx={{ ml: 2 , mb:2}}
 						variant="contained"
 						onClick={handleRemoveOpen}
 						// disabled={true}

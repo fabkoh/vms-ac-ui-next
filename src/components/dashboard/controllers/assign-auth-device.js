@@ -88,8 +88,8 @@ const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntra
                 // title="Entrance E1 :"
                 title={
                     <Grid container alignItems="center" >
-                        <Grid item md={2} xs={2}>
-                            <Typography variant="h6">{authPair? (authPair[0]?.authDeviceDirection.includes("E1")? "E1 entrance :": "E2 entrance :"): "Device not found"} </Typography>
+                        <Grid item md={2} xs={2} mb={1} minWidth="200px" >
+                            <Typography variant="h6" fullWidth>{authPair? (authPair[0]?.authDeviceDirection.includes("E1")? "E1 entrance :": "E2 entrance :"): "Device not found"} </Typography>
                         </Grid>
                         <Grid item md={6} xs={8}>
                             <SingleSelect 
