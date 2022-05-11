@@ -304,10 +304,10 @@ const ControllerDetails = () => {
 			if(res.status!=200){
 				toast.error("Error removing entrance")
 			}
-			else{toast.success("Successfully removed entrance")}
+			else{toast.success("Successfully removed entrance"),getInfo()}
             
         })
-        .then(getInfo())
+        
         
 	}
 
