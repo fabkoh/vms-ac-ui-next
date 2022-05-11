@@ -155,10 +155,10 @@ const AuthDeviceDetails = () => {
 	}
 	const resetAuthDevice = async() => {
         Promise.resolve(
-            authDeviceApi.deleteAuthdevice(authDeviceId), toast.loading("Resetting Authentication Device...")
+            authDeviceApi.resetAuthDevice(authDeviceId), toast.loading("Resetting Authentication Device...")
         )
         .then((res)=>{
-            console.log(res);
+            //console.log(res);
 
             toast.dismiss()
 

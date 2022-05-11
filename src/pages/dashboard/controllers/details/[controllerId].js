@@ -216,7 +216,7 @@ const ControllerDetails = () => {
     }; 
 
     //delete auth devices
-    const deleteAuthDevices = async(selectedAuthDevices) => {
+   /* const deleteAuthDevices = async(selectedAuthDevices) => {
         //console.log(selectedAuthDevices);
 
         Promise.all(selectedAuthDevices.map(id=>{
@@ -255,7 +255,7 @@ const ControllerDetails = () => {
             })
             getInfo();
         })
-    }
+    } */
 
     const handleToggleMasterpinE1 = async (id,e) => {
         const bool = e.target.checked;
@@ -462,8 +462,6 @@ const ControllerDetails = () => {
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
-                                resetAuthDevices={resetAuthDevices}
-                                deleteAuthDevices={deleteAuthDevices}
                                 removeEntrance={removeEntranceButton}
                                 />
                             </Grid>                         
@@ -478,8 +476,6 @@ const ControllerDetails = () => {
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
                                 handleToggleMasterpin={handleToggleMasterpinE2}
-                                resetAuthDevices={resetAuthDevices}
-                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                         </Grid>

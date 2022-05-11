@@ -102,6 +102,10 @@ class AuthDeviceApi {
     deleteAuthdevice(authdeviceId) {
         if (useApi) { return sendApi(`/api/authdevice/delete/${authdeviceId}`, { method: 'DELETE' }); }
     }
+
+    resetAuthDevice(authdeviceId) {
+        if (useApi) { return sendApi(`/api/authdevice/reset/${authdeviceId}`, { method: 'DELETE' }); }
+    }
 }
 
 export const authDeviceApi = new AuthDeviceApi();
