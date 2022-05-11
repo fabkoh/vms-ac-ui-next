@@ -1,5 +1,6 @@
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider, CircularProgress } from "@mui/material";
+import { isObject, toDisplayDateString } from "../../../../utils/utils";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
@@ -75,7 +76,7 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
                     align={align}
                     divider
                     label="Last Online"
-                    value={controller?.lastOnline}
+                    value={controller?.lastOnline&&toDisplayDateString(controller.lastOnline)}
                     // value={lastOnline}
                 />
                 <PropertyListItem
@@ -83,54 +84,15 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
                     divider
                     label="Status"
                     value={statusLoaded?
-                        (authStatus?(<SeverityPill color="success">Connected</SeverityPill>):(<SeverityPill color="error">Disconnected</SeverityPill>)):
+                        (Object.keys(authStatus).length>0?(<SeverityPill color="success">Connected</SeverityPill>):(<SeverityPill color="error">Disconnected</SeverityPill>)):
                         (<CircularProgress size='1rem'/>)
-                    } //needs another api to check status
-                    // value={<SeverityPill color="success"> test</SeverityPill>} //needs another api to check status
+                    } 
+                    // value={statusLoaded?
+                    //     (authStatus?(<SeverityPill color="success">Connected</SeverityPill>):(<SeverityPill color="error">Disconnected</SeverityPill>)):
+                    //     (<CircularProgress size='1rem'/>)
+                    // } 
                 >
-                {/* {(E1Status.length==0&&E2Status.length==0)?(
-                    <SeverityPill color="error">
-                    <Warning fontSize="small" sx={{mr:1}}/>
-                    disconnected 
-                    </SeverityPill>):(<SeverityPill color="success"> connected</SeverityPill>)} */}
                 </PropertyListItem>
-                {/* <PropertyListItem
-                    align={align}
-                    divider
-                    label="Description"
-                    value={entranceDesc}
-                >
-                    {
-                        // if no entranceDesc, render warning
-                        !entranceDesc && (
-                            <SeverityPill color="warning">
-                                <Warning 
-                                    fontSize="small" 
-                                    sx={{ mr: 1 }}
-                                />
-                                No description
-                            </SeverityPill>
-                        )
-                    }
-                </PropertyListItem>
-                <PropertyListItem
-                    align={align}
-                    divider
-                    label="Status"
-                    value={isActive}
-                >
-                    {
-                        !isActive && (
-                            <SeverityPill color="error">
-                                UNLOCKED
-                            </SeverityPill>
-                        ) || (
-                            <SeverityPill color="success">
-                                ACTIVE
-                            </SeverityPill>
-                        )
-                    }
-                </PropertyListItem> */}
             </PropertyList>
         </Card>
     )

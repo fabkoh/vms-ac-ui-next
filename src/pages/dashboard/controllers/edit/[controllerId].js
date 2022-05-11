@@ -31,7 +31,7 @@ const EditController = () => {
     })
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
-    const [authStatus, setAuthStatus] = useState(null)
+    const [authStatus, setAuthStatus] = useState({})
 
     const getController = async(controllerId) => {
         try{
@@ -63,12 +63,7 @@ const EditController = () => {
         setE1(E1)
         setE2(E2)
     }
-    // const initialEntrance = (E1,E2) => {
-    //     const toUpdate = [...allEntrances]
-    //     E1[0]?.entrance? toUpdate.push(E1[0].entrance):false
-    //     E2[0]?.entrance? toUpdate.push(E2[0].entrance):false
-    //     setAllEntrances(toUpdate)
-    // }
+
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
             Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
@@ -91,25 +86,7 @@ const EditController = () => {
         // }catch(err){console.log(err)}
         // setStatusLoaded(true)
     }
-    // useEffect(() => {
-    //     console.log("controllerValidations",controllerValidations)
-    // }, [controllerValidations])
-    
-    // const getController = useCallback( async() => {
-    //     try {
-    //         const res = await controllerApi.getController(router.query.controllerId);
-    //         if (res.status == 200) {
-    //             const body = await res.json();
-    //             setControllerInfo(body);
-    //             console.log("getcontroller",body)
-    //         } else {
-    //             throw new Error("Controller info not loaded");
-    //         }
-    //     } catch(e) {
-    //         console.error(e);
-    //         toast.error("Controller info not loaded");
-    //     }
-    // }, [isMounted]);
+
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
@@ -124,7 +101,6 @@ const EditController = () => {
     [])
 
     // fetch all entrance info
-    const isEntranceMounted = useMounted();
     const [allEntrances, setAllEntrances] = useState([]);
     const getEntrances = async(E1,E2) => {
         const toUpdate =[...allEntrances]
@@ -143,145 +119,11 @@ const EditController = () => {
         setAllEntrances(toUpdate)
         
     }
-    // const getEntrances = useCallback( async() => {
-    //     const toUpdate =[...allEntrances]
-    //     Promise.resolve(authDeviceApi.getAvailableEntrances())
-    //     .then(async res=>{
-    //         if(res.status==200){
-    //             const data = await res.json()
-    //             toUpdate.push(data)
-    //         }
-    //     })
-    //     .then(
-    //         E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false,
-    //         E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false,
-    //     )
-    //     .then(setAllEntrances(toUpdate))
-    // }, [isEntranceMounted]);
-    // const getEntrances = useCallback( async() => {
-    //     try {
-    //         const res = await authDeviceApi.getAvailableEntrances();
-    //         if (res.status == 200) {
-    //             const body = await res.json();
-    //             setAllEntrances(body)
-    //             // console.log("avail ent",body)
-    //         } else {
-    //             throw new Error("Entrances not loaded");
-    //         }
-    //     } catch(e) {
-    //         console.error(e);
-    //         toast.error("Entrances info not loaded")
-    //     }
-    // }, [isEntranceMounted]);
-
-
-    // useEffect(() => {
-    //     getEntrances();    
-    // },
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // [])
-
-    useEffect(() => {
-        console.log('allEntrances',allEntrances)
-    }, [allEntrances])
     
-    // store previous access group names
-    // const [accessGroupNames, setAccessGroupNames] = useState({});
-    // useEffect(() => {
-    //     accessGroupApi.getAccessGroups()
-    //         .then(async res => {
-    //             const newAccessGroupNames = {}
-    //             if (res.status == 200) {
-    //                 const body = await res.json();
-    //                 body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
-    //                 setAccessGroupNames(newAccessGroupNames);
-    //             }
-    //         })
-    // }, []);
     
-
-    // helper for remove card and changeNameCheck
-    // directly modifies validationArr
-
-    
-    // update methods for form inputs
-    const changeTextField = (e, id) => {
-        const updatedInfo = [ ...accessGroupInfoArr ];
-        // this method is reliant on text field having a name field == key in info object ie accessGroupName, accessGroupDesc
-        updatedInfo.find(info => info.accessGroupId == id)[e.target.name] = e.target.value;
-        setAccessGroupInfoArr(updatedInfo);
-    }
-
-    const changePerson = (newValue, id) => {
-        const updatedInfo = [ ...accessGroupInfoArr ];
-        updatedInfo.find(info => info.accessGroupId == id).persons = newValue;
-        setAccessGroupInfoArr(updatedInfo);
-    }
-
-    // entrance logic
-    // const changeEntrance = (newValue, id) => {
-    //     const updatedInfo = [ ...accessGroupInfoArr ];
-    //     updatedInfo.find(info => info.accessGroupId == id).entrances = newValue;
-    //     setAccessGroupInfoArr(updatedInfo);
-    // }
-
-    // currying for cleaner code
-    const onEntranceChangeFactory = (id) => (newValue) => changeEntrance(newValue, id);
-    const onNameChangeFactory = (id) => (e) => {
-        changeTextField(e, id);
-        changeNameCheck(e, id);
-    }
 
     const [submitted, setSubmitted] = useState(false);
 
-    // const submitForm = async e => {
-    //     e.preventDefault(); 
-
-    //     setSubmitted(true);
-
-    //     const resArr = await Promise.all(accessGroupInfoArr.map(group => accessGroupApi.updateAccessGroup(group)));
-        
-    //     const successStatus = [];
-    //     const successfulResIndex = [];
-
-    //     resArr.forEach((res, i) => {
-    //         if(res.status == 200) {
-    //             successStatus.push(true);
-    //             successfulResIndex.push(i);
-    //         } else {
-    //             successStatus.push(false);
-    //         }
-    //     });
-
-    //     const entranceResArr = await Promise.all(
-    //         successfulResIndex.map(i => {
-    //             const accessGroup = accessGroupInfoArr[i];
-    //             return accessGroupEntranceApi.assignEntrancesToAccessGroup(
-    //                 accessGroup.entrances.map(e => e.entranceId),
-    //                 accessGroup.accessGroupId
-    //             );
-    //         })
-    //     )
-    //     entranceResArr.forEach((res, i) => {
-    //         if (res.status != 204) {
-    //             successStatus[successfulResIndex[i]] = false;
-    //         }
-    //     })
-
-    //     const numEdited = successStatus.filter(status => status).length;
-    //     if (numEdited) {
-    //         toast.success(`${numEdited} access groups edited`);
-    //         if (numEdited == resArr.length) { // all success
-    //             router.replace('/dashboard/access-groups');
-    //             return;
-    //         }
-    //     }
-
-    //     toast.error('Error updating the below access groups');
-    //     setAccessGroupInfoArr(accessGroupInfoArr.filter((e, i) => !(successStatus[i])));
-    //     setAccessGroupValidationsArr(accessGroupValidationsArr.filter((e, i) => !(successStatus[i])));
-    //     setSubmitted(false);
-    // }
 
     //change controllerInfo
     const changeText = (e) => {
@@ -376,7 +218,7 @@ const EditController = () => {
             }
             else{
                 toast.success("Controller info updated")
-                router.replace('/dashboard/controllers')
+                router.replace(getControllerListLink())
             }
         }).then(
         Promise.resolve(authDeviceApi.assignEntrance(E1))
