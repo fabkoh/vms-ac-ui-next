@@ -73,11 +73,13 @@ const Rrule = (props) => {
 
 
 	const setrrule = () => {
-		try{const {timeStart,timeEnd,...newrule1} =nonChangingRule
-		const newrule2 = {...rule,...newrule1}
-		const rule2 = new RRule(newrule2);}catch(e){console.log(e)}
-		try{console.log(rule2.toText()),handleRrule(rule2)}catch(e){console.log(e)}
-		// console.log(rule2.toString());
+		try {
+			const { timeStart, timeEnd, ...newrule1} = nonChangingRule;
+			const newRule2 = { ...rule, ...newrule1 };
+			const rule2 = new RRule(newrule2);
+			console.log(rule2.toText()); // DELETE THIS
+			handleRrule(rule2);
+		} catch(e) { console.log(e); };
 	}
 
 	
