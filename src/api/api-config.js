@@ -110,5 +110,86 @@ const fakeAccessGroupSchedule = [
         "groupToEntranceId": 1,
     }
 ]
+const fakeControllers = [
+    {
+        "controllerId":1,
+        "controllerName":"Controller_DefaultMAC1",
+        "controllerIpStatic":false,
+        "controllerIP":"192.168.1.1",
+        "controllerMAC":"495162159654",
+        "controllerSerialNo":"5e86805e2bafd54f66cc95c3",
+        "created":"2022-18-04    09:52:23",
+        "masterController":true,
+        "pinAssignmentConfig":"",
+        "settingsConfig":"",
+        "lastOnline":"2022-18-04    09:52:23",
+    },
+    {
+        "controllerId":2,
+        "controllerName":"Controller_DefaultMAC2",
+        "controllerIpStatic":"",
+        "controllerIP":"",
+        "controllerMAC":"",
+        "controllerSerialNo":"",
+        "created":"",
+        "pinAssignmentConfig":"",
+        "settingsConfig":"",
+        "lastOnline":"",
+    },
 
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule};
+]
+const fakeAuthDevices = [
+    {
+            "authDeviceId":"1",
+            "authDeviceName":"authDevice1",
+            "authDeviceDirection":"E1_IN",
+            "lastOnline":"2022-08-14 08:59:52",
+            "masterpin":true,
+            "defaultAuthMethod":"",
+            "controllerId":"1",
+            "entrance":{
+                "entranceId": 1,
+                "entranceName": "Main Entrance",
+                "entranceDesc": "the main entrance",
+                "isActive": true
+            },
+    },
+    {
+            "authDeviceId":"2",
+            "authDeviceName":"authDevice2",
+            "authDeviceDirection":"E1_OUT",
+            "lastOnline":"",
+            "masterpin":false,
+            "defaultAuthMethod":"",
+            "controllerId":"1",
+            "entrance":{
+                "entranceId": 1,
+                "entranceName": "Main Entrance",
+                "entranceDesc": "the main entrance",
+                "isActive": true
+            },
+    },
+    {
+            "authDeviceId":"3",
+            "authDeviceName":"authDevice3",
+            "authDeviceDirection":"E2_IN",
+            "lastOnline":"",
+            "masterpin":true,
+            "defaultAuthMethod":"",
+            "controllerId":"1",
+            "entrance":null,
+    },
+    {
+            "authDeviceId":"4",
+            "authDeviceName":"authDevice4",
+            "authDeviceDirection":"E2_OUT",
+            "lastOnline":"",
+            "masterpin":true,
+            "defaultAuthMethod":"",
+            "controllerId":"1",
+            "entrance":null,
+    },
+
+]
+
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers,fakeAuthDevices};

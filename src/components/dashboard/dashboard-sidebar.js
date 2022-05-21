@@ -33,7 +33,7 @@ import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
-import { DoorFront } from '@mui/icons-material';
+import { DoorFront, SelectAll } from '@mui/icons-material';
 
 const getSections = (t) => [
   {
@@ -57,6 +57,22 @@ const getSections = (t) => [
           {
             title: 'Add',
             path: '/dashboard/credentials/create'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: t('Devices'),
+    items: [
+      {
+        title: t('Controllers'),
+        path: '/dashboard/controllers/',
+        icon: <SelectAll fontSize="small" />,
+        children: [
+          {
+            title: 'List',
+            path: '/dashboard/controllers/'
           }
         ]
       }

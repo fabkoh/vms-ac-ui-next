@@ -18,4 +18,18 @@ const arraySameContents = (arr1, arr2) => {
     return arr2.every(i => arr1Obj[i]);
 }
 
-export { isObject, filterByState, stringIn, arraySameContents }
+// default URL (see getControllerDetailsLink in ./controller)
+const DEFAULT_URL = '/dashboard';
+
+const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov' , 'Dec'];
+// takes in a raw date string eg 2022-05-06T13:09:14.372126 and converts to display date string eg 6 May 2022 13:09
+const toDisplayDateString = (str) => {
+    return (
+        str.slice(8, 10) + ' ' +
+        months[Number(str.slice(5, 7))] + ' ' +
+        str.slice(0, 4) + ' ' +
+        str.slice(11, 16)
+    );
+};
+
+export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString }
