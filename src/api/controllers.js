@@ -77,6 +77,9 @@ class ControllerApi {
     resetController(controllerId) {
         if (useApi) { return sendApi(`/api/controller/reset/${controllerId}`, { method: 'DELETE' }); }
     }
+
+    
+
 }
 
 export const controllerApi = new ControllerApi();

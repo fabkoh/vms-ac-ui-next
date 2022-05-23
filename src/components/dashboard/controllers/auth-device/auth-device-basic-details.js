@@ -1,6 +1,6 @@
 import { Circle, MeetingRoom } from "@mui/icons-material";
 import Warning from "@mui/icons-material/Warning";
-import { Card, useMediaQuery, CardHeader, Divider, Switch, Chip, CircularProgress } from "@mui/material";
+import { Card, useMediaQuery, CardHeader, Divider, Switch, Chip, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getEntranceDetailsLink } from "../../../../utils/entrance";
 import { PropertyList } from "../../../property-list";
@@ -10,6 +10,7 @@ import NextLink from 'next/link';
 import Link from "next/link";
 import { toDisplayDateString } from "../../../../utils/utils";
 import WarningChip from "../../shared/warning-chip";
+import BasicDetailsCard from "../../shared/basic-details-card";
 
 
 export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus}) => {
@@ -22,9 +23,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
     }
     else{
     return( 
-        <Card>
-            <CardHeader title="Basic Details" />
-            <Divider />
+        <BasicDetailsCard>
             <PropertyList>
                 <PropertyListItem
                     align={align}
@@ -83,6 +82,31 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     <WarningChip text="No entrance assigned"/>}
                     // value={lastOnline}
                 />
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Default Auth Method"
+                    children={
+                        <div>
+                            <Typography
+                                color="textSecondary"
+                                variant="body2"
+                            >
+                                {deviceInfo.defaultAuthMethod.authMethodDesc}
+                            </Typography>
+                            <divider/>
+                                <Typography
+                                style={{color:'rgb(101, 116, 139)' ,fontSize:'12px'}}
+                            >
+                                {"Default Auth Method will be used when no auth schedule is detected"}
+                            </Typography>
+                        </div>
+                    }
+                      
+
+                    
+                    // value={lastOnline}
+                />
                 {/* <PropertyListItem
                     align={align}
                     divider
@@ -132,7 +156,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     }
                 </PropertyListItem> */}
             </PropertyList>
-        </Card>
+        </BasicDetailsCard>
     )
             }
 }

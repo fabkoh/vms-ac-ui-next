@@ -18,11 +18,14 @@ import { useEffect, useRef, useState } from "react";
 import ExpandMore from "../../shared/expand-more";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../../../components/dashboard/shared/edit_form_tooltip";
+import SingleSelect from "../single-select-input";
 
 const AuthdeviceEditForm = ({
 	deviceInfo,
 	changeText,
 	masterpinHandler,
+	defaultAuthMethodHandler,
+	authMethodList,
 }) => {
 	// const controllerName = useRef(controllerInfo['controllerName'])
 
@@ -123,36 +126,18 @@ const AuthdeviceEditForm = ({
 					</Grid>
 					<Collapse in={expanded}>
 						<Stack spacing={3}>
-							<Grid container alignItems="center">
-								{/* <Grid item md={6} xs={6}>
-									<TextField
-										fullWidth
-										label="IP Address"
-										name="controllerIP"
-										// disabled={controllerInfo.controllerIPStatic?false:true}
-                                        // required={controllerInfo.controllerIPStatic}
-										// disabled={controller.controllerIpStatic}
-										// value={controllerInfo.controllerIP}
-										// helperText={controllerValidations.invalidIP? "Invalid IP address":""}
-										// onChange={changeIPHandler}
-										// error={controllerValidations.invalidIP}
-										// error={controllerInfo.controllerIPStatic?
-										// 	!/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(controllerInfo.controllerIP):false}
-									/>
-								</Grid> */}
-								{/* <Grid item ml={1}>
-									<FormGroup>
-										<FormControlLabel
-											control={<Switch 
-                                                // checked="true" 
-                                                // checked={controllerInfo.controllerIPStatic}
-                                                // onChange={changeIPStatic}
-                                                />}
-                                            labelPlacement="start"
-											label={<Typography fontWeight="bold">Masterpin</Typography>}
-										/>
-									</FormGroup>
-								</Grid> */}
+							<Grid container alignItems="center" xs={12} md={6}>
+							<SingleSelect
+								label="Default Auth Method"
+								value={deviceInfo.defaultAuthMethod.authMethodId}
+								getLabel={(authMethod)=>authMethod.authMethodDesc}
+								getValue={(authMethod)=>authMethod.authMethodId}
+								onChange={defaultAuthMethodHandler}
+								options={authMethodList}
+								noclear
+								required
+								fullWidth
+							/>
 							</Grid>
 						</Stack>
 					</Collapse>

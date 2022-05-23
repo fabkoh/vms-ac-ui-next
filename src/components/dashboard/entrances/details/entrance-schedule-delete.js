@@ -7,7 +7,11 @@ import { Scrollbar } from "../../../scrollbar";
 
 const steps = ['Select schedules to delete', 'Confirm delete'];
 
-const EntranceScheduleDelete = ({ open, schedules, handleDialogClose, deleteSchedules }) => {
+const EntranceScheduleDelete = ({ 
+    open, 
+    schedules, 
+    handleDialogClose, 
+    deleteSchedules, }) => {
 
     // stepper
     const [activeStep, setActiveStep] = useState(0)

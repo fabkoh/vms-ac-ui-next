@@ -15,29 +15,37 @@ import EditAccGrpSchedForm from "../../../../components/dashboard/access-group-s
 import MultipleSelectInput from "../../../../components/dashboard/shared/multi-select-input"
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
-import entranceApi from "../../../../api/entrance";
-import { entranceScheduleApi } from "../../../../api/entrance-schedule";
-import EditEntSchedForm from "../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form";
+import { authMethodScheduleApi } from "../../../../api/authentication-schedule";
+import EditAuthSchedForm from "../../../../components/dashboard/authentication-schedule/authentication-schedule-edit-form";
+import { controllerApi } from "../../../../api/controllers";
 
-const ModifyEntranceSchedule = () => {
+const ModifyauthMethodSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
     const router = useRouter();
     const temp = router.query;
-    const entranceId = temp.entranceId;
+    const controllerId = temp.controllerId;
+    const authDeviceId = temp.authDeviceId;
 
     // const [accGrp, setAccGrp] = useState()
     const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
-    const [allEntrances, setAllEntrances] = useState([])
+    const [allAuthenticationDevices, setAllAuthenticationDevices] = useState([])
 
-    const getEntrance = async () => {
-        const res = await entranceApi.getEntrances();
+    const getControllerAuthDevices = async () => {
+        const res = await controllerApi.getControllers();
           if(res.status != 200) { // entrance not found
-            toast.error("Entrance not found");
+            toast.error("Authentication Devices not found");
             // router.replace("/dashboard");
         }
-        const data = await res.json();
-        setAllEntrances(data)
-        console.log(JSON.stringify(data))
+        const data = await res.json()
+        const authdevices = [];
+        data.forEach(c => {
+            const authDeviceArr = c.authDevices;
+            authDeviceArr.forEach(a => a.controllerName = c.controllerName);
+            authdevices.push( ...authDeviceArr );
+        })
+
+        setAllAuthenticationDevices(authdevices)
+
     }
     // const getAccGrp = async() => {
     //     const res = await accessGroupApi.getAccessGroup(entranceId);
@@ -51,7 +59,7 @@ const ModifyEntranceSchedule = () => {
     // }
     useEffect(() => {
         try {
-            getEntrance()
+            getControllerAuthDevices()
             // getAccGrp()
         } catch (error) {
             console.log(error)
@@ -61,194 +69,214 @@ const ModifyEntranceSchedule = () => {
     //
 
     // empty objects for initialisation of new card
-    const getEmptyEntranceScheduleInfo = (entranceScheduleId) => ({
-        entranceScheduleId,
-        entranceScheduleName:"",
+    
+    const getEmptyauthMethodScheduleInfo = (authMethodScheduleId) => ({
+        authMethodScheduleId,
+        authMethodScheduleName:"",
         rrule:"",
+        authMethod:"",
         timeStart:"",
         timeEnd:"",
-        
     });
-    const getEmptyEntranceScheduleValidations = (entranceScheduleId) => ({
-        entranceScheduleId,
-        entranceScheduleNameBlank: false,
+    const getEmptyauthMethodScheduleValidations = (authMethodScheduleId) => ({
+        authMethodScheduleId,
+        authMethodScheduleNameBlank: false,
 
         timeEndInvalid:false,
         timeStartInvalid:false,
         //Entrance valid(might not need as field is select. cannot custom add)
         untilInvalid:false,
         // submit failed
-        submitFailed: false
+        submitFailed: false,
+        overlappedSchedule : false
     });
 
-    const [entranceScheduleInfoArr, 
-        setEntranceScheduleInfoArr] = useState([getEmptyEntranceScheduleInfo(0)]);
-    const [entranceScheduleValidationsArr, 
-        setEntranceScheduleValidationsArr] = useState([getEmptyEntranceScheduleValidations(0)]);
+    const [authMethodScheduleInfoArr, 
+        setauthMethodScheduleInfoArr] = useState([getEmptyauthMethodScheduleInfo(0)]);
+    const [authMethodScheduleValidationsArr, 
+        setauthMethodScheduleValidationsArr] = useState([getEmptyauthMethodScheduleValidations(0)]);
 
+    
 
     // add card logic
     //returns largest entranceId + 1
-    const getNewId = () => entranceScheduleInfoArr.map(info => info.entranceScheduleId)
+    const getNewId = () => authMethodScheduleInfoArr.map(info => info.authMethodScheduleId)
                                              .reduce((a, b) => Math.max(a, b), -1) + 1
 
     const addCard = () => {
         const newId = getNewId();
-        setEntranceScheduleInfoArr([ ...entranceScheduleInfoArr, getEmptyEntranceScheduleInfo(newId) ]);
-        setEntranceScheduleValidationsArr([ ...entranceScheduleValidationsArr, getEmptyEntranceScheduleValidations(newId) ]);
+        setauthMethodScheduleInfoArr([ ...authMethodScheduleInfoArr, getEmptyauthMethodScheduleInfo(newId) ]);
+        setauthMethodScheduleValidationsArr([ ...authMethodScheduleValidationsArr, getEmptyauthMethodScheduleValidations(newId) ]);
     }
 
 
     // remove card logic
     const removeCard = (id) => {
-        const newAccessGroupScheduleInfoArr = entranceScheduleInfoArr.filter(info => info.entranceScheduleId != id);
-        const newValidations = entranceScheduleValidationsArr.filter(validation => validation.entranceScheduleId != id);
+        const newAuthMethodScheduleInfoArr = authMethodScheduleInfoArr.filter(info => info.authMethodScheduleId != id);
+        const newValidations = authMethodScheduleValidationsArr.filter(validation => validation.authMethodScheduleId != id);
 
-        setEntranceScheduleInfoArr(newAccessGroupScheduleInfoArr);
-        setEntranceScheduleValidationsArr(newValidations);       
+        setauthMethodScheduleInfoArr(newAuthMethodScheduleInfoArr);
+        setauthMethodScheduleValidationsArr(newValidations);       
     }
     
     // update methods for form inputs
     const changeTextField = (e, id) => {
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
+        const updatedInfo = [ ...authMethodScheduleInfoArr ];
         // this method is reliant on text field having a name field == key in info object ie accessGroupName, accessGroupDesc
-        updatedInfo.find(info => info.entranceScheduleId == id)[e.target.name] = e.target.value;
-        setEntranceScheduleInfoArr(updatedInfo);
+        updatedInfo.find(info => info.authMethodScheduleId == id)[e.target.name] = e.target.value;
+        setauthMethodScheduleInfoArr(updatedInfo);
+    }
+
+    const changeAuthMethod = (e,id) => {
+
+        const updatedInfo = [ ...authMethodScheduleInfoArr ];
+        updatedInfo.find(info => info.authMethodScheduleId == id)['authMethod']= e.target.value;
+        setauthMethodScheduleInfoArr(updatedInfo);
+        console.log(authMethodScheduleInfoArr)
+
     }
 
     //set rrule string
     const changeRrule = (string,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['rrule']=string;
-        setEntranceScheduleInfoArr(updatedInfo);
-        console.log(entranceScheduleInfoArr)
+        const updatedInfo = [ ...authMethodScheduleInfoArr ];
+        updatedInfo.find(info => info.authMethodScheduleId == id)['rrule']=string;
+        setauthMethodScheduleInfoArr(updatedInfo);
+        console.log(authMethodScheduleInfoArr)
     }
     //set timestartend
     const changeTimeStart = (start,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['timeStart']=start;
-        setEntranceScheduleInfoArr(updatedInfo);
+        const updatedInfo = [ ...authMethodScheduleInfoArr ];
+        updatedInfo.find(info => info.authMethodScheduleId == id)['timeStart']=start;
+        setauthMethodScheduleInfoArr(updatedInfo);
         checkTimeStart(start,id)
     }
     const changeTimeEnd = (end,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['timeEnd']=end;
-        setEntranceScheduleInfoArr(updatedInfo);
+        const updatedInfo = [ ...authMethodScheduleInfoArr ];
+        updatedInfo.find(info => info.authMethodScheduleId == id)['timeEnd']=end;
+        setauthMethodScheduleInfoArr(updatedInfo);
         checkTimeEnd(end,id)
     }
     const checkTimeEnd = (end,id) => {
         const endTime = end;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
+        const newValidations = [ ...authMethodScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.authMethodScheduleId == id);
         // store a temp updated access group info
-        const newAccessGroupScheduleInfoArr = [ ...entranceScheduleInfoArr ]
-        const tempStartTime = newAccessGroupScheduleInfoArr.find(group => group.entranceScheduleId == id)['timeStart'];
+        const newAccessGroupScheduleInfoArr = [ ...authMethodScheduleInfoArr ]
+        const tempStartTime = newAccessGroupScheduleInfoArr.find(group => group.authMethodScheduleId == id)['timeStart'];
 
         if(tempStartTime=="00:00"){
             validation.timeEndInvalid = false;
-            setEntranceScheduleValidationsArr(newValidations)
+            setauthMethodScheduleValidationsArr(newValidations)
             // console.log(newValidations)
         }
         
         validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<tempStartTime);
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
-        setEntranceScheduleValidationsArr(newValidations)
+        setauthMethodScheduleValidationsArr(newValidations)
     }
     const checkTimeStart = (start,id) => {
         const starttime = start;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
+        const newValidations = [ ...authMethodScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.authMethodScheduleId == id);
 
         validation.timeStartInvalid = (formUtils.checkBlank(starttime));
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
-        setEntranceScheduleValidationsArr(newValidations)
+        setauthMethodScheduleValidationsArr(newValidations)
     }
+
+    
 
     // error checking methods
     const changeNameCheck = async (e, id) => {
-        const entranceScheduleName = e.target.value;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
+        const authMethodScheduleName = e.target.value;
+        const newValidations = [ ...authMethodScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.authMethodScheduleId == id);
 
         // store a temp updated access group info
-        const newAccessGroupScheduleInfoArr = [ ...entranceScheduleInfoArr ]
-        newAccessGroupScheduleInfoArr.find(group => group.entranceScheduleId == id).entranceScheduleName = entranceScheduleName;
+        const tempAuthMethodScheduleInfoArr = [ ...authMethodScheduleInfoArr ]
+        tempAuthMethodScheduleInfoArr.find(group => group.authMethodScheduleId == id).authMethodScheduleName = authMethodScheduleName;
 
         // remove submit failed
         // validation.submitFailed = false;
 
         // check name is blank?
-        validation.entranceScheduleNameBlank = formUtils.checkBlank(entranceScheduleName);
+        validation.authMethodScheduleNameBlank = formUtils.checkBlank(authMethodScheduleName);
 
-        setEntranceScheduleValidationsArr(newValidations);
+        setauthMethodScheduleValidationsArr(newValidations);
     }
     //currying for cleaner code
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
+
+
     const checkUntil = (id) =>(e) => {
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
+        const newValidations = [ ...authMethodScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.authMethodScheduleId == id);
         validation.untilInvalid = e
         // console.log("newValidations",newValidations)
-        setEntranceScheduleValidationsArr(newValidations);
+        setauthMethodScheduleValidationsArr(newValidations);
 
     }
-    const [submitted, setSubmitted] = useState(false);
-
 
     const replaceAll = (e) => {
         e.preventDefault();
 
-        const entIdArr = []
-        entrances.forEach(ent=>entIdArr.push(ent.entranceId))
+        const authDeviceIdArr = []
+        authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
 
-        Promise.resolve(entranceScheduleApi.replaceEntranceSchedules(entranceScheduleInfoArr,entIdArr))
+        Promise.resolve(authMethodScheduleApi.replaceAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
         .then(res =>{
             if (res.status!=200){
                 return toast.error("Error replacing all schedules")
             }
             else{
                 toast.success("Successfully replaced all schedules")
-                router.replace(`/dashboard/entrances/details/${entranceId}`)
+                router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })
         
     }
     const addOn = (e) => {
         e.preventDefault();
-        const entIdArr = []
-        entrances.forEach(ent=>entIdArr.push(ent.entranceId))
-        Promise.resolve(entranceScheduleApi.addEntranceSchedules(entranceScheduleInfoArr,entIdArr))
+        const authDeviceIdArr = []
+        authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
+        Promise.resolve(authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
         .then(res =>{
             if (res.status!=200){
                 return toast.error("Error adding schedules")
             }
             else{
                 toast.success("Schedules successfully added")
-                router.replace(`/dashboard/entrances/details/${entranceId}`)
+                router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })
 
     }
 
     //for MultiSelectInput
-    const entranceEqual = (option, value) => option.entranceId == value.entranceId;
-    const getEntranceName = (e) => e.entranceName;
-    const entranceFilter = (entrances, state) => {
+    const authdeviceEqual = (option, value) => option.authDeviceId == value.authDeviceId;
+    const getAuthDeviceName = (e) => {
+        
+        return `${e.controllerName}  \u00a0\u00a0 \u00a0\u00a0  ${e.authDeviceName} \u00a0\u00a0  \u00a0\u00a0  (${e.authDeviceDirection})`;
+    }
+    // + " "+ e.authDevices ;
+    const authDeviceFilter = (authdevice, state) => {
         // console.log(entrances)
         const text = state.inputValue.toLowerCase(); // case insensitive search
-        return entrances.filter(e => (
-            e.entranceName.toLowerCase().includes(text)
+        return authdevice.filter(e => (
+            e.controllerName?.toLowerCase().includes(text) 
+            || e.authDeviceName?.toLowerCase().includes(text) 
+            || e.authDeviceDirection?.toLowerCase().includes(text) 
         ))
     }
-    const [entrances, setEntrances] = useState([])
-    const changeEntrance = (newValue) => {
+    const [authDevices, setAuthDevices] = useState([])
+    const changeAuthDevice = (newValue) => {
         console.log(newValue,"SSSSSSSS")
-        setEntrances(newValue)
+        setAuthDevices(newValue)
     }
     // const [grpToEntIdArr, setGrpToEntIdArr] = useState([])
     // const getGrpToEntId = (grpToEntIdArr) => {
@@ -266,7 +294,7 @@ const ModifyEntranceSchedule = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Modify Entrance Schedule
+                    Etlas: Modify Authentication Device Schedules
                 </title>
             </Head>
             <Box
@@ -279,7 +307,7 @@ const ModifyEntranceSchedule = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href={`/dashboard/entrances/details/${entranceId}`}
+                            href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`}
                             passHref
                         >
                             <Link
@@ -295,14 +323,14 @@ const ModifyEntranceSchedule = () => {
                                     sx={{ mr: 1 }}
                                 />
                                 <Typography variant="subtitle2">
-                                    Entrance Details
+                                    Authentication Device
                                 </Typography>
                             </Link>
                         </NextLink>
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Modify Entrance Schedule
+                            Modify Authentication Schedule
                         </Typography>
                         {/* <Grid container>
                             <Grid item mr={1}>
@@ -319,28 +347,29 @@ const ModifyEntranceSchedule = () => {
                         {/* <Typography variant="body2" color="neutral.500">
                         {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
                         </Typography> */}
-                        <Alert severity="info"variant="outlined">Quick tip : You may apply these schedules to multiple entrances by selecting more than one entrance</Alert>
+                        <Alert severity="info"variant="outlined">Quick tip : You may apply these schedules to multiple authentication devices by selecting more than one authentication device </Alert>
                     </Box>
                     <Grid container alignItems="center" mb={3}>
                         <Grid item mr={2}>
-                            <Typography fontWeight="bold">Entrance(s) :</Typography>
+                            <Typography fontWeight="bold">Authentication Device(s) :</Typography>
                         </Grid>
                         <Grid item xs={11} md={7}>
                             <MultipleSelectInput
-                                options={allEntrances}
-                                setSelected={changeEntrance}
-                                getOptionLabel={getEntranceName}
-                                label="Entrances"
-                                noOptionsText="No entrance found"
-                                placeholder="Enter entrance details (name, description) to search"
-                                filterOptions={entranceFilter}
-                                value={entrances}
-                                isOptionEqualToValue={entranceEqual}
+                                authschedule={true}
+                                options={allAuthenticationDevices}
+                                setSelected={changeAuthDevice}
+                                getOptionLabel={getAuthDeviceName}
+                                label="Authentication Devices"
+                                noOptionsText="No authentication device found"
+                                placeholder="Enter controller or auth device (name, direction) to search"
+                                filterOptions={authDeviceFilter}
+                                value={authDevices}
+                                isOptionEqualToValue={authdeviceEqual}
                                 error={
-                                    Boolean(entrances.length==0)
+                                    Boolean(authDevices.length==0)
                                 }
                                 helperText={
-                                    Boolean(entrances.length==0)&&"Error : no entrance selected"
+                                    Boolean(authDevices.length==0)&&"Error : no authentication device selected"
                                 }
                             />
                         </Grid>
@@ -348,18 +377,19 @@ const ModifyEntranceSchedule = () => {
                     <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
                     {/* <form onSubmit={(e) => { console.log(e.nativeEvent.submitter.name); e.preventDefault(); }}> */}
                         <Stack spacing={3}>
-                            { entranceScheduleInfoArr.map((accessGroupScheduleInfo, i) => (
-                                <EditEntSchedForm
-                                    key={accessGroupScheduleInfo.entranceScheduleId}
-                                    accessGroupScheduleInfo={accessGroupScheduleInfo}
+                            { authMethodScheduleInfoArr.map((authMethodScheduleInfo, i) => (
+                                <EditAuthSchedForm
+                                    key={authMethodScheduleInfo.authMethodScheduleId}
+                                    changeAuthMethod={changeAuthMethod}
+                                    authMethodScheduleInfo={authMethodScheduleInfo}
                                     removeCard={removeCard}
                                     changeTimeStart={changeTimeStart}
                                     changeTimeEnd={changeTimeEnd}
-                                    accessGroupScheduleValidations={entranceScheduleValidationsArr[i]}
-                                    changeTextField={onNameChangeFactory(accessGroupScheduleInfo.entranceScheduleId)}
+                                    authMethodScheduleValidations={authMethodScheduleValidationsArr[i]}
+                                    changeTextField={onNameChangeFactory(authMethodScheduleInfo.authMethodScheduleId)}
                                     changeNameCheck={changeNameCheck}
                                     changeRrule={changeRrule}
-                                    checkUntil={checkUntil(accessGroupScheduleInfo.entranceScheduleId)}
+                                    checkUntil={checkUntil(authMethodScheduleInfo.authMethodScheduleId)}
                                 />
                             ))}
                             <div>
@@ -384,9 +414,9 @@ const ModifyEntranceSchedule = () => {
                                         disabled={
                                         //     submitted                      ||
                                         //     entranceScheduleInfoArr.length == 0 || // no access groups to submit
-                                        entrances.length ==0 ||
-                                            entranceScheduleValidationsArr.some( // check if validations fail
-                                                validation => validation.entranceScheduleNameBlank        ||
+                                        authDevices.length ==0 ||
+                                            authMethodScheduleValidationsArr.some( // check if validations fail
+                                                validation => validation.authMethodScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid
@@ -410,12 +440,13 @@ const ModifyEntranceSchedule = () => {
                                         disabled={
                                         //     submitted                      ||
                                         //     entranceScheduleInfoArr.length == 0 || // no access groups to submit
-                                            entrances.length==0||
-                                            entranceScheduleValidationsArr.some( // check if validations fail
-                                                validation => validation.entranceScheduleNameBlank        ||
+                                        authDevices.length==0||
+                                            authMethodScheduleValidationsArr.some( // check if validations fail
+                                                validation => validation.authMethodScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.overlappedSchedule
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
@@ -427,7 +458,7 @@ const ModifyEntranceSchedule = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={`/dashboard/entrances/details/${entranceId}`}
+                                        href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`}
                                         passHref
                                     >
                                         <Button
@@ -448,7 +479,7 @@ const ModifyEntranceSchedule = () => {
     )
 }
 
-ModifyEntranceSchedule
+ModifyauthMethodSchedule
 .getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
@@ -457,5 +488,5 @@ ModifyEntranceSchedule
     </AuthGuard>
 )
 
-export default ModifyEntranceSchedule
+export default ModifyauthMethodSchedule
 ;

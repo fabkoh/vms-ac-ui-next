@@ -3,6 +3,7 @@ import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
+import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const EntranceBasicDetails = (props) => {
     const { entranceName, entranceDesc, isActive } = props.entrance;
@@ -12,9 +13,7 @@ export const EntranceBasicDetails = (props) => {
     const align = mdUp ? 'horizontal' : 'vertical';
 
     return(
-        <Card>
-            <CardHeader title="Basic Details" />
-            <Divider />
+        <BasicDetailsCard>
             <PropertyList>
                 <PropertyListItem
                     align={align}
@@ -60,6 +59,6 @@ export const EntranceBasicDetails = (props) => {
                     }
                 </PropertyListItem>
             </PropertyList>
-        </Card>
+        </BasicDetailsCard>
     )
 }

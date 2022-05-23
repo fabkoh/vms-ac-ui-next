@@ -16,7 +16,7 @@ import formUtils from "../../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
 import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
-import { getControllerListLink } from "../../../../utils/controller";
+import { getControllerDetailsLink, getControllerListLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 import { authDeviceApi } from "../../../../api/auth-devices";
 
@@ -332,7 +332,7 @@ const EditController = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={getControllerListLink()} 
+                                        href={getControllerDetailsLink(controllerId)} 
                                         passHref
                                     >
                                         <Button

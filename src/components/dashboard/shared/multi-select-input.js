@@ -33,6 +33,7 @@ see mui docs https://mui.com/api/autocomplete/
 export default function CheckboxesTags({  
     label = "Select",
     placeholder = "Enter text to search",
+    authschedule = false,
     getOptionLabel,
     setSelected,
     filterOptions,
@@ -42,6 +43,7 @@ export default function CheckboxesTags({
     error,
     value,
     isOptionEqualToValue,
+    options,
     ...other
 }) {
 
@@ -62,6 +64,8 @@ export default function CheckboxesTags({
                     />
                     { getOptionLabel(option) }
                 </li>
+
+
             )}
             fullWidth
             renderInput={(params) => (
@@ -96,6 +100,7 @@ export default function CheckboxesTags({
             getOptionLabel={getOptionLabel}
             value={value}
             isOptionEqualToValue={isOptionEqualToValue}
+            options={options}
         />
     );
 }

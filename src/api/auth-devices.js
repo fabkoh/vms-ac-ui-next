@@ -106,6 +106,50 @@ class AuthDeviceApi {
     resetAuthDevice(authdeviceId) {
         if (useApi) { return sendApi(`/api/authdevice/reset/${authdeviceId}`, { method: 'DELETE' }); }
     }
+
+    getAllAuthMethods() {
+        if (useApi) { return sendApi(`/api/allAuthMethods`, { method: 'GET' }); }
+        
+
+        const allAuthMethods = [
+            {"authMethodId":1, "authMethodDesc":"CardAndPin"},
+            {"authMethodId":2, "authMethodDesc":"CardOrPin"},
+            {"authMethodId":3, "authMethodDesc":"Card"},
+            {"authMethodId":4, "authMethodDesc":"CardAndFingerPrint"}
+        ]
+
+        return Promise.resolve(new Response(JSON.stringify(allAuthMethods), { status: 200 }));
+    }
+
+    getAuthenticationSchedules() {
+        const allAuthenticationSchedules = [
+            {
+                "authenticationScheduleId": 1,
+                "authenticationScheduleName": "Default Schedule",
+                "rrule": "DTSTART:20220517T000000Z;RRULE:FREQ=DAILY;INTERVAL=1;WKST=MO	",
+                "timeStart": "00:00",
+                "timeEnd": "23:59",
+                "authMethod": {"authMethodId":1, "authMethodDesc":"CardAndPin"},
+            },
+            {
+                "authenticationScheduleId": 2,
+                "authenticationScheduleName": "Weekdays 9 to 5",
+                "rrule": "DTSTART:20220517T000000Z;RRULE:FREQ=WEEKLY;INTERVAL=1;WKST=MO;BYDAY=MO,TU,WE,TH,FR",
+                "timeStart": "09:00",
+                "timeEnd": "17:00",
+                "authMethod": {"authMethodId":2, "authMethodDesc":"CardOrPin"},
+            },
+            {
+                "authenticationScheduleId": 3,
+                "authenticationScheduleName": "Weekends 12 to 2",
+                "rrule": "DTSTART:20220517T000000Z;RRULE:FREQ=WEEKLY;INTERVAL=1;WKST=MO;BYDAY=SA,SU",
+                "timeStart": "12:00",
+                "timeEnd": "17:00",
+                "authMethod": {"authMethodId":3, "authMethodDesc":"Card"},
+            }
+        ]
+        return Promise.resolve(new Response(JSON.stringify(allAuthenticationSchedules), { status: 200 }));
+    }
 }
 
 export const authDeviceApi = new AuthDeviceApi();

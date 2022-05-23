@@ -4,6 +4,7 @@ import { isObject, toDisplayDateString } from "../../../../utils/utils";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
+import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => {
     // const { 
@@ -40,9 +41,7 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
     
     
     return(
-        <Card>
-            <CardHeader title="Basic Details" />
-            <Divider />
+        <BasicDetailsCard>
             <PropertyList>
                 <PropertyListItem
                     align={align}
@@ -94,6 +93,6 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
                 >
                 </PropertyListItem>
             </PropertyList>
-        </Card>
+        </BasicDetailsCard>
     )
 }

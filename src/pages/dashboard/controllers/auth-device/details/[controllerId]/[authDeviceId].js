@@ -23,24 +23,25 @@ import { AuthGuard } from "../../../../../../components/authentication/auth-guar
 import { DashboardLayout } from "../../../../../../components/dashboard/dashboard-layout";
 import toast from "react-hot-toast";
 import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
-import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../../../utils/entrance";
-import { getEntranceScheduleEditLink } from "../../../../../../utils/entrance-schedule";
-import AuthDevicePair from "../../../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
 import { getAuthdeviceEditLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
 import AuthDeviceDelete from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
 import AuthDeviceReset from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
 import { controllerApi } from "../../../../../../api/controllers";
+import  AuthenticationSchedules  from "../../../../../../components/dashboard/controllers/auth-device/auth-device-authentication-schedule"
+import { getAuthenticationScheduleEditLink } from "../../../../../../utils/authentication-schedule";
 
 const AuthDeviceDetails = () => {
 
     const router = useRouter();
     // load entrance details
     const isMounted = useMounted();
-    const [entrance, setEntrance] = useState(null);
     const { authDeviceId }  = router.query; //change to auth device id
     const { controllerId }  = router.query; //change to auth device id
+
+    const link = getAuthenticationScheduleEditLink(authDeviceId);
+    const [authenticationSchedules, setauthenticationSchedules] = useState([]);
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -63,6 +64,15 @@ const AuthDeviceDetails = () => {
         }catch(err){console.log(err),router.replace(getControllerListLink())}
     }
 
+    const getAuthenticationSchedules = async () => {
+        authDeviceApi.getAuthenticationSchedules().then(async(res)=>{
+            setauthenticationSchedules(await res.json())
+            // console.log('a',authMethodList)
+        }
+        )
+    }
+    
+
     const [authStatus, setAuthStatus] = useState({})
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
@@ -84,11 +94,27 @@ const AuthDeviceDetails = () => {
             })
     }
 
+    //delete entrance schedules
+    const deleteSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some entrance schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    }
 
     const getInfo = useCallback(async() => {
         //get authDevice info and controller status
         getStatus()
         getAuthDevice()
+        getAuthenticationSchedules()
     }, [isMounted])
 
     useEffect(() => {
@@ -336,7 +362,18 @@ const AuthDeviceDetails = () => {
                                 authStatus={authStatus}
                                 handleToggleMasterpin={handleToggleMasterpin}
                                 />
-                            </Grid>                         
+                            </Grid>   
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <AuthenticationSchedules 
+                                    deviceInfo={deviceInfo}
+                                    authenticationSchedules={authenticationSchedules}
+                                    deleteSchedules={deleteSchedules}
+                                    link={link} 
+                                />
+                            </Grid>                       
                         </Grid>
                     </Box>
                 </Container>
