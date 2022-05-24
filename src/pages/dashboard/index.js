@@ -57,7 +57,7 @@ const Overview = () => {
     <>
       <Head>
         <title>
-          Dashboard: Overview | Material Kit Pro
+          Dashboard: Overview | ETLAS
         </title>
       </Head>
       <Box
@@ -87,14 +87,14 @@ const Overview = () => {
                   m: -1
                 }}
               >
-                <Button
+                {/* <Button
                   startIcon={<ReportsIcon fontSize="small" />}
                   sx={{ m: 1 }}
                   variant="outlined"
                 >
                   Reports
-                </Button>
-                <TextField
+                </Button> */}
+                {/* <TextField
                   defaultValue="week"
                   label="Period"
                   select
@@ -110,7 +110,7 @@ const Overview = () => {
                   <MenuItem value="year">
                     Last year
                   </MenuItem>
-                </TextField>
+                </TextField> */}
               </Grid>
             </Grid>
           </Box>
@@ -131,7 +131,7 @@ const Overview = () => {
               md={6}
               xs={12}
             >
-              <OverviewCryptoWallet />
+              {/* <OverviewCryptoWallet />
             </Grid>
             <Grid
               item
@@ -360,9 +360,9 @@ const Overview = () => {
                     My Contacts
                   </Button>
                 </CardActions>
-              </Card>
+              </Card>*/}
             </Grid>
-          </Grid>
+          </Grid> 
         </Container>
       </Box>
     </>
