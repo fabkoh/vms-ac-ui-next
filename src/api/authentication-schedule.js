@@ -56,7 +56,7 @@ class AuthMethodScheduleApi {
     }
 
     deleteAuthDeviceSchedule(authMethodScheduleId) {
-        if (useApi) { return sendApi(`/api/entrance-schedule/delete/${authMethodScheduleId}`, { method: 'DELETE' }); }
+        if (useApi) { return sendApi(`/api/authentication-schedule/${authMethodScheduleId}`, { method: 'DELETE' }); }
     }
 }
 
