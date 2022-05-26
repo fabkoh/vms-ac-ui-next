@@ -11,4 +11,5 @@
  sudo cp -r /var/lib/jenkins/workspace/vms-ac-ui-next/next.config.js /home/koh_fabian/runNextTmp
  sudo cp -r /var/lib/jenkins/workspace/vms-ac-ui-next/package.json /home/koh_fabian/runNextTmp
  cd /home/koh_fabian/runNextTmp
- sudo pm2 restart @devias/material-kit-pro-react
+ sudo pm2 stop all
+ sudo pm2 start npm --name @devias/material-kit-pro-react -- start

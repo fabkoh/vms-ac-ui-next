@@ -22,11 +22,12 @@ import StyledMenu from "../../styled-menu";
 import { Delete, Edit } from "@mui/icons-material";
 import { Scrollbar } from "../../../scrollbar";
 import { rrulestr } from "rrule";
-// import AuthenticationScheduleDelete from "./entrance-schedule-delete";
+
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
-import EntranceScheduleDelete from "../../entrances/details/entrance-schedule-delete"
+//import EntranceScheduleDelete from "../../entrances/details/entrance-schedule-delete";
+import AuthenticationScheduleDelete from "../../authentication-schedule/authentication-schedule-delete";
 
 
 export default function AuthenticationSchedules({
@@ -40,7 +41,7 @@ export default function AuthenticationSchedules({
 	const handleExpandClick = () => setExpanded(!expanded);
 
 	// schedules
-	const [authdeviceId, setauthdeviceId] = useState("");
+	const [authdeviceId, setAuthDeviceId] = useState("");
 
 	const schedules = authenticationSchedules
 
@@ -61,14 +62,14 @@ export default function AuthenticationSchedules({
 
 	const handleDeleteSchedules = (ids, allSelected) => {
 		if (allSelected) {
-			setauthdeviceId("");
+			setAuthDeviceId("");
 		}
 		deleteSchedules(ids);
 	};
 
 	return (
 		<Card>
-			<EntranceScheduleDelete
+			<AuthenticationScheduleDelete
 				open={openDelete}
 				schedules={schedules}
 				handleDialogClose={closeDeleteDialog}

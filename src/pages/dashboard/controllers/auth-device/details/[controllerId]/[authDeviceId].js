@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../../lib/gtm";
-import entranceApi from "../../../../../../api/entrance";
 import NextLink from 'next/link';
 import Head from 'next/head';
 import router, { Router, useRouter } from 'next/router';
@@ -31,6 +30,7 @@ import AuthDeviceReset from "../../../../../../components/dashboard/controllers/
 import { controllerApi } from "../../../../../../api/controllers";
 import  AuthenticationSchedules  from "../../../../../../components/dashboard/controllers/auth-device/auth-device-authentication-schedule"
 import { getAuthenticationScheduleEditLink } from "../../../../../../utils/authentication-schedule";
+import { authMethodScheduleApi } from "../../../../../../api/authentication-schedule";
 
 const AuthDeviceDetails = () => {
 
@@ -95,7 +95,7 @@ const AuthDeviceDetails = () => {
     }
 
     //delete entrance schedules
-    const deleteSchedules = async(ids) => {
+   /* const deleteSchedules = async(ids) => {
         const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
     
         if (resArr.some(res => res.status != 204)) {
@@ -105,6 +105,22 @@ const AuthDeviceDetails = () => {
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
             toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    } */
+
+    //delete authDevice Schedules
+    const deleteAuthDeviceSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(authMethodScheduleApi.deleteAuthDeviceSchedule));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some authentication schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} authentication schedules`)
         }
 
         getInfo();
@@ -370,7 +386,7 @@ const AuthDeviceDetails = () => {
                                 <AuthenticationSchedules 
                                     deviceInfo={deviceInfo}
                                     authenticationSchedules={authenticationSchedules}
-                                    deleteSchedules={deleteSchedules}
+                                    deleteSchedules={deleteAuthDeviceSchedules}
                                     link={link} 
                                 />
                             </Grid>                       
