@@ -114,16 +114,14 @@ export default function AuthenticationSchedules({
 					}
 					passHref
 				>
-					<MenuItem disableRipple 
-					// disabled={actionDisabled}
-					>
+					<MenuItem disableRipple>
 						<Edit />
 						&#8288;Modify
 					</MenuItem>
 				</NextLink>
 				<MenuItem
 					disableRipple
-					// disabled={actionDisabled}
+					disabled={actionDisabled}
 					onClick={openDeleteDialog}
 				>
 					<Delete />
