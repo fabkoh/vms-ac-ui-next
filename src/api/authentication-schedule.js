@@ -3,11 +3,11 @@ import { encodeArrayForSpring, sendApi } from './api-helpers';
 
 class AuthMethodScheduleApi {
 
-    getEntranceSchedulesWhereEntranceIdsIn( authDeviceIds) {
-        if (useApi) { 
-            return sendApi(`/api/authentication-schedule?authDeviceids=${encodeArrayForSpring(authDeviceIds)}`);
-        }
-    }
+    // getEntranceSchedulesWhereEntranceIdsIn( authDeviceIds) {
+    //     if (useApi) { 
+    //         return sendApi(`/api/authentication-schedule?authDeviceids=${encodeArrayForSpring(authDeviceIds)}`);
+    //     }
+    // }
 
     replaceAuthDeviceSchedules(authMethodScheduleList, authDeviceIds) {
         const cleanedauthMethodScheduleList = authMethodScheduleList.map(
@@ -16,11 +16,11 @@ class AuthMethodScheduleApi {
                 rrule: schedule.rrule,
                 timeStart: schedule.timeStart,
                 timeEnd: schedule.timeEnd,
-                authMehod: schedule.authMethod,
+                authMethod: {authMethodId:schedule.authMethod},
             })
         );
         if (useApi) {
-            return sendApi(`/api/authentication-schedule/replace?authDeviceids=${encodeArrayForSpring(authDeviceIds)}`, 
+            return sendApi(`/api/authentication-schedule/replace?authDeviceIds=${encodeArrayForSpring(authDeviceIds)}`, 
                 {
                     method: 'PUT',
                     headers: {
@@ -39,11 +39,11 @@ class AuthMethodScheduleApi {
                 rrule: schedule.rrule,
                 timeStart: schedule.timeStart,
                 timeEnd: schedule.timeEnd,
-                authMehod: schedule.authMethod,
+                authMethod: {authMethodId:schedule.authMethod},
             })
         );
         if (useApi) {
-            return sendApi(`/api/authentication-schedule/add?authDeviceids=${encodeArrayForSpring(authDeviceIds)}`, 
+            return sendApi(`/api/authentication-schedule/add?authDeviceIds=${encodeArrayForSpring(authDeviceIds)}`, 
                 {
                     method: 'PUT',
                     headers: {

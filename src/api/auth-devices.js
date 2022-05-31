@@ -109,19 +109,18 @@ class AuthDeviceApi {
 
     getAllAuthMethods() {
         if (useApi) { return sendApi(`/api/allAuthMethods`, { method: 'GET' }); }
-        
 
-        const allAuthMethods = [
-            {"authMethodId":1, "authMethodDesc":"CardAndPin"},
-            {"authMethodId":2, "authMethodDesc":"CardOrPin"},
-            {"authMethodId":3, "authMethodDesc":"Card"},
-            {"authMethodId":4, "authMethodDesc":"CardAndFingerPrint"}
-        ]
-
-        return Promise.resolve(new Response(JSON.stringify(allAuthMethods), { status: 200 }));
     }
 
-    getAuthenticationSchedules() {
+    updateUnicon() {
+        if (useApi) { return sendApi(`/api/uniconUpdater`, { method: 'POST' }); }
+
+    }
+
+    getAuthenticationSchedules(authDeviceId) {
+        
+        if (useApi) { return sendApi(`/api/authentication-schedule/${authDeviceId}`, { method: 'GET' }); }
+
         const allAuthenticationSchedules = [
             {
                 "authenticationScheduleId": 1,
@@ -129,7 +128,7 @@ class AuthDeviceApi {
                 "rrule": "DTSTART:20220517T000000Z;RRULE:FREQ=DAILY;INTERVAL=1;WKST=MO	",
                 "timeStart": "00:00",
                 "timeEnd": "23:59",
-                "authMethod": {"authMethodId":1, "authMethodDesc":"CardAndPin"},
+                "authMethod": 4,
             },
             {
                 "authenticationScheduleId": 2,

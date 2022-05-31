@@ -235,7 +235,14 @@ const EditController = () => {
             }
             else(toast.error("Failed to update entrance E2"))
         })
-        )
+        ).then(
+            Promise.resolve(authDeviceApi.updateUnicon())
+            .then(res=>{
+                if(res.status==200){
+                    toast.success("Updated Controllers")
+                }
+                else(toast.error("Failed to update controllers"))
+            }))
     }
     return(
         <>

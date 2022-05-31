@@ -65,7 +65,7 @@ const AuthDeviceDetails = () => {
     }
 
     const getAuthenticationSchedules = async () => {
-        authDeviceApi.getAuthenticationSchedules().then(async(res)=>{
+        authDeviceApi.getAuthenticationSchedules(authDeviceId).then(async(res)=>{
             setauthenticationSchedules(await res.json())
             // console.log('a',authMethodList)
         }

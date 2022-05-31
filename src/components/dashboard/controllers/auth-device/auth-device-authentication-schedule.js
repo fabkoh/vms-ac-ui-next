@@ -146,7 +146,7 @@ export default function AuthenticationSchedules({
 							<TableBody>
 								{schedules.map((schedule, i) => (
 									<TableRow hover key={i}>
-										<TableCell>{schedule.authenticationScheduleName}</TableCell>
+										<TableCell>{schedule.authMethodScheduleName}</TableCell>
 										<TableCell>{ rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd) }</TableCell>
 										<TableCell>
 											<Chip label= { schedule.authMethod.authMethodDesc } />																

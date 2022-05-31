@@ -86,7 +86,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     align={align}
                     divider
                     label="Default Auth Method"
-                    children={
+                    >
                         <div>
                             <Typography
                                 color="textSecondary"
@@ -101,12 +101,11 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                                 {"Default Auth Method will be used when no auth schedule is detected"}
                             </Typography>
                         </div>
-                    }
+                    </PropertyListItem>
                       
 
                     
-                    // value={lastOnline}
-                />
+        
                 {/* <PropertyListItem
                     align={align}
                     divider
