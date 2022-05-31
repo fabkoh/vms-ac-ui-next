@@ -340,22 +340,30 @@ const ModifyauthMethodSchedule = () => {
         e.preventDefault();
         const authDeviceIdArr = []
         authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
-        Promise.resolve(authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
-        .then(res => res.json()).then(datas => datas.forEach(data => console.log(data[0])))
+        authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr)
+        .then(res => 
             
             
-        //     {
-        //     if (res.status!=200){
-        //         res.json().then(data => console.log(data))
-                
-        //         // return toast.error(res.json);
-        //         return toast.error("Error adding schedules")
-        //     }
-        //     else{
-        //         toast.success("Schedules successfully added")
-        //         router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
-        //     }
-        // })
+            {
+            if (res.status!=200){
+                (res.json()).then(data => Object.entries(data[0]).map( 
+                    ([key, value]) => {
+                        console.log(key,value)
+                        
+                        value.map(
+                            clashes => toast.error(`Error : "${key}"  
+                                                    clashes with existing schedule(s) in 
+                                                    ${clashes.controller}
+                                                    (${clashes.authDevice.authDeviceDirection})`)
+                        )
+                    }))
+       
+            }
+            else{
+                toast.success("Schedules successfully added")
+                router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
+            }
+        })
 
     }
 
