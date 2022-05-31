@@ -117,7 +117,7 @@ export default function AccessGroupSchedules({
 					}
 					passHref
 				>
-					<MenuItem disableRipple disabled={actionDisabled}>
+					<MenuItem disableRipple>
 						<Edit />
 						&#8288;Modify
 					</MenuItem>
