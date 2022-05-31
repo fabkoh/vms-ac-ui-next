@@ -18,6 +18,7 @@ import { Info } from "@mui/icons-material";
 import entranceApi from "../../../../api/entrance";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import EditEntSchedForm from "../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form";
+import { controllerApi } from "../../../../api/controllers";
 
 const ModifyEntranceSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -213,6 +214,7 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })
@@ -229,6 +231,7 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })

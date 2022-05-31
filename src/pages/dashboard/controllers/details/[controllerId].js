@@ -88,7 +88,7 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status...")
             .then(async res=>{
                 toast.dismiss()
                 if(res.status!=200){
@@ -155,7 +155,8 @@ const ControllerDetails = () => {
 	}
 
     const deleteController = async() => {
-        Promise.resolve(controllerApi.deleteController(controllerId), toast.loading("Deleting Controller..."))
+        toast.loading("Deleting Controller...");
+        controllerApi.deleteController(controllerId)
         .then(async res =>{
             toast.dismiss()
 
@@ -164,6 +165,7 @@ const ControllerDetails = () => {
             }
             else{                                           
                 toast.success('Delete success');
+                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -199,7 +201,7 @@ const ControllerDetails = () => {
 		setResetOpen(false);
 	}
 	const resetController = async() => {
-        Promise.resolve(controllerApi.resetController(controllerId), toast.loading("Resetting Controller..."))
+        controllerApi.resetController(controllerId), toast.loading("Resetting Controller...")
         .then(async res =>{
             toast.dismiss()
 
@@ -208,6 +210,7 @@ const ControllerDetails = () => {
             }
             else{
                 toast.success('Reset success');
+                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -268,6 +271,7 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE1(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
+            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -289,6 +293,7 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE2(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
+            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -304,7 +309,11 @@ const ControllerDetails = () => {
 			if(res.status!=200){
 				toast.error("Error removing entrance")
 			}
-			else{toast.success("Successfully removed entrance"),getInfo()}
+			else {
+                toast.success("Successfully removed entrance"); 
+                getInfo();
+                controllerApi.uniconUpdater();
+            }
             
         })
         

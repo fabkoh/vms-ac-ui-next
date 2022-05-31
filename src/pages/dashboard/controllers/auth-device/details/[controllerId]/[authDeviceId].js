@@ -120,7 +120,8 @@ const AuthDeviceDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            toast.success(`Deleted ${numSuccess} authentication schedules`)
+            controllerApi.uniconUpdater();
+            toast.success(`Deleted ${numSuccess} authentication schedules`);
         }
 
         getInfo();
@@ -169,20 +170,18 @@ const AuthDeviceDetails = () => {
 		setDeleteOpen(false);
 	}
 	const deleteAuthDevice = async() => {
-        Promise.resolve(
-            authDeviceApi.deleteAuthdevice(authDeviceId), toast.loading("Removing Authentication Device...")
-        )
-        .then((res)=>{
-           toast.dismiss()
-
-            if (res.status != 200){
-                toast.error('Remove unsuccessful')
+        toast.loading("Removing Authentication Device...");
+        authDeviceApi.deleteAuthdevice(authDeviceId)
+        .then(res => {
+            toast.dismiss();
+            if(res.status != 200) {
+                toast.error("Remove unsuccessful");
+            } else {
+                controllerApi.uniconUpdater();
+                toast.success("Successfully removed Authentication Device");
+                router.replace(getControllerDetailsLinkWithId(controllerId));
             }
-            else{
-                toast.success('Successfully Remove Authentication Device', {duration: 5000});
-                router.replace(getControllerDetailsLinkWithId(controllerId)); //go back to the controller details view
-            }
-        })
+        });
         setDeleteOpen(false);
     }
 
@@ -196,22 +195,18 @@ const AuthDeviceDetails = () => {
 		setResetOpen(false);
 	}
 	const resetAuthDevice = async() => {
-        Promise.resolve(
-            authDeviceApi.resetAuthDevice(authDeviceId), toast.loading("Resetting Authentication Device...")
-        )
-        .then((res)=>{
-            //console.log(res);
-
-            toast.dismiss()
-
-            if (res.status != 200){
-               toast.error('Reset unsuccessful')
+        toast.loading("Resetting Authentication Device...");
+        authDeviceApi.resetAuthDevice(authDeviceId)
+        .then(res => {
+            toast.dismiss();
+            if(res.status != 200) {
+                toast.error('Reset unsuccessful');
+            } else {
+                toast.success("Reset Authentication Device success");
+                controllerApi.uniconUpdater();
+                getInfo();
             }
-            else{
-                toast.success("Reset Authentication Device success"),getInfo()
-                //router.replace(getControllerListLink());
-            }
-        })
+        });
         setResetOpen(false);
     }
 
@@ -222,7 +217,8 @@ const AuthDeviceDetails = () => {
             const res = await (bool ? authDeviceApi.enableMasterpin(authDeviceId) : authDeviceApi.disableMasterpin(authDeviceId));
             if (res.status != 200) throw new Error("Failed to send req");
             toast.success(`Successfully ${verb} masterpin`);
-            setDeviceInfo(prevState=>({...prevState,masterpin:bool}))
+            setDeviceInfo(prevState=>({...prevState,masterpin:bool}));
+            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);

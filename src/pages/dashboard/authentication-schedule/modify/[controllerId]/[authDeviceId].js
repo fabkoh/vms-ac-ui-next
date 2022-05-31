@@ -324,13 +324,14 @@ const ModifyauthMethodSchedule = () => {
         const authDeviceIdArr = []
         authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
 
-        Promise.resolve(authMethodScheduleApi.replaceAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
+        authMethodScheduleApi.replaceAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr)
         .then(res =>{
             if (res.status!=200){
                 return toast.error("Error replacing all schedules")
             }
             else{
                 toast.success("Successfully replaced all schedules")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })
@@ -340,8 +341,16 @@ const ModifyauthMethodSchedule = () => {
         e.preventDefault();
         const authDeviceIdArr = []
         authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
-        Promise.resolve(authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
-        .then(res => res.json()).then(datas => datas.forEach(data => console.log(data[0])))
+        authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr)
+        .then(async(res) => {
+            if (res.status != 200) {
+                toast.error('Error adding schedules');
+                return
+            }
+            toast.success('Schedules added successfully');
+            controllerApi.uniconUpdater();
+            router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`);
+        })
             
             
         //     {

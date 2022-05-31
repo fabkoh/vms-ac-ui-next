@@ -39,6 +39,7 @@ import { Confirmdelete } from "../../../components/dashboard/persons/confirm-del
 import toast from "react-hot-toast";
 import { createFilter } from "../../../utils/list-utils";
 import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink } from "../../../utils/persons";
+import { controllerApi } from "../../../api/controllers";
 
 const tabs = [
 	{
@@ -295,6 +296,7 @@ const PersonList = () => {
 			resArr.filter(res=>{
 				if(res.status == 204){
 					toast.success('Delete success',{duration:2000},);
+					controllerApi.uniconUpdater();
 				}
 				else{
 					toast.error('Delete unsuccessful' )
