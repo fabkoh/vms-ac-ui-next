@@ -20,6 +20,7 @@ import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
 import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
+import { controllerApi } from "../../../api/controllers";
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
@@ -190,6 +191,7 @@ const EntranceList = () => {
 		})).then( resArr => {
 			resArr.filter(res=>{
 				if(res.status == 204){
+                    controllerApi.uniconUpdater();
 					toast.success('Delete success',{duration:2000},);
 				}
 				else{

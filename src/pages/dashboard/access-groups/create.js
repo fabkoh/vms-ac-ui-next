@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { accessGroupListLink } from "../../../utils/access-group";
+import { controllerApi } from "../../../api/controllers";
 
 const CreateAccessGroups = () => {
 
@@ -316,6 +317,7 @@ const CreateAccessGroups = () => {
 
                     const numCreated = accessGroupInfoArr.length - failedResIndex.length
                     if (numCreated) {
+                        controllerApi.uniconUpdater();
                         toast.success(`${numCreated} access groups created`); 
                     }
 

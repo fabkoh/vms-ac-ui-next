@@ -40,6 +40,7 @@ import toast from "react-hot-toast";
 import { Confirmdelete } from "../../../components/dashboard/access-groups/confirm-delete";
 import { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, accessGroupCreateLink, getAccessGroupEditLink } from "../../../utils/access-group";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
+import { controllerApi } from "../../../api/controllers";
 
 const tabs = [
 	{
@@ -332,7 +333,8 @@ const AccessGroupList = () => {
 				else{
 					toast.error('Delete unsuccessful' )
 				}
-			})
+			});
+			controllerApi.uniconUpdater();
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);

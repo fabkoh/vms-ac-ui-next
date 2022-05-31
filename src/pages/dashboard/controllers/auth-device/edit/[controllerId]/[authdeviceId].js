@@ -93,16 +93,18 @@ const EditAuthDevice = () => {
     const [submitted, setSubmitted] = useState(false);
     const submitForm = (e) => {
         e.preventDefault();
-        setSubmitted(true)
-        Promise.resolve(authDeviceApi.updateAuthdevice(deviceInfo,deviceInfo.authDeviceId))
-        .then(res=>{
-            if(res.status==200){
-                toast.success("Update success")
-                router.replace(getControllerDetailsLinkWithId(controllerId))
+        setSubmitted(true);
+        authDeviceApi.updateAuthdevice(deviceInfo, deviceInfo.authDeviceId)
+        .then(res => {
+            if(res.status == 200) {
+                toast.success("Update success");
+                controllerApi.uniconUpdater();
+                router.replace(getControllerDetailsLinkWithId(controllerId));   
+            } else {
+                toast.error("Failed to update authentication device");
+                setSubmitted(false);
             }
-            else{toast.error("Failed to update authentication device"),setSubmitted(false)}
-        })
-        
+        });
     }
 
     return(

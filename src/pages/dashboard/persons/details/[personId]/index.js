@@ -28,6 +28,7 @@ import toast from 'react-hot-toast';
 import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
 import PersonCredentials from '../../../../../components/dashboard/persons/person-credentials';
 import { getCredentialWherePersonIdApi } from '../../../../../api/credentials';
+import { controllerApi } from '../../../../../api/controllers';
 
 const PersonDetails = () => {
 
@@ -109,6 +110,7 @@ const PersonDetails = () => {
     ).then((res)=>{
       if (res.status == 204){
         toast.success('Delete success');
+        controllerApi.uniconUpdater();
         router.replace(personListLink);
       }
       else{
