@@ -36,7 +36,7 @@ const EditAuthSchedForm = ({
     const {
         authMethodScheduleBlank,
         timeEndInvalid,
-        submitFailed
+        overlapped,
     } = authMethodScheduleValidations;
    
     // expanding form
@@ -116,7 +116,7 @@ const EditAuthSchedForm = ({
             // accessGroupNameExists       ||
             // accessGroupNameDuplicated   ||
             // accessGroupPersonDuplicated ||
-            submitFailed
+            overlapped
         }>
             <CardHeader
                 avatar={
@@ -129,6 +129,10 @@ const EditAuthSchedForm = ({
                     </ExpandMore>
                 }
                 title="Authentication Schedule"
+                subheader = {overlapped?"Error: Clashes detected in highlighted schedules":""}
+                subheaderTypographyProps = {{
+                                            color: "error",
+                                            margin:0,}}
                 action={
                     // action are children flushed to the right
                     (

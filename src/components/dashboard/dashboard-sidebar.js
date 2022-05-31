@@ -34,8 +34,10 @@ import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
 import { DoorFront, SelectAll } from '@mui/icons-material';
+import { controllerApi } from '../../api/controllers';
 
 const getSections = (t) => [
+  
   {
     title: t('General'),
     items: [
@@ -469,6 +471,24 @@ export const DashboardSidebar = (props) => {
               </Box>
             </Box> */}
           </div>
+            
+          <Box sx={{ p: 2 }}>
+              <Button
+                onClick={
+                  controllerApi.uniconUpdater
+                }
+                color="info"
+                component="a"
+                fullWidth
+                sx={{ mt: 2 }}
+                variant="contained"
+              >
+                {t('Sync Unicons')}
+              </Button>
+
+          </Box>
+
+
           <Divider
             sx={{
               borderColor: '#2D3748',
@@ -522,6 +542,7 @@ export const DashboardSidebar = (props) => {
               </Button>
             </NextLink>
           </Box>
+          
         </Box>
       </Scrollbar>
       <OrganizationPopover

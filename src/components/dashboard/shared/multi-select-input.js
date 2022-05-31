@@ -33,7 +33,6 @@ see mui docs https://mui.com/api/autocomplete/
 export default function CheckboxesTags({  
     label = "Select",
     placeholder = "Enter text to search",
-    authschedule = false,
     getOptionLabel,
     setSelected,
     filterOptions,

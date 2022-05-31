@@ -3,21 +3,21 @@ import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid, TextField, Alert, Tooltip } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import { AuthGuard } from '../../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
+import { AuthGuard } from '../../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../../components/dashboard/dashboard-layout';
 import Add from "@mui/icons-material/Add";
-import { accessGroupApi } from "../../../../api/access-groups";
+import { accessGroupApi } from "../../../../../api/access-groups";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
-import formUtils from "../../../../utils/form-utils";
-import accessGroupEntranceNtoNApi from "../../../../api/access-group-entrance-n-to-n";
-import EditAccGrpSchedForm from "../../../../components/dashboard/access-group-schedule/access-group-schedule-edit-form";
-import MultipleSelectInput from "../../../../components/dashboard/shared/multi-select-input"
-import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import formUtils from "../../../../../utils/form-utils";
+import accessGroupEntranceNtoNApi from "../../../../../api/access-group-entrance-n-to-n";
+import EditAccGrpSchedForm from "../../../../../components/dashboard/access-group-schedule/access-group-schedule-edit-form";
+import MultipleSelectInput from "../../../../../components/dashboard/shared/multi-select-input"
+import { accessGroupScheduleApi } from "../../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
-import { authMethodScheduleApi } from "../../../../api/authentication-schedule";
-import EditAuthSchedForm from "../../../../components/dashboard/authentication-schedule/authentication-schedule-edit-form";
-import { controllerApi } from "../../../../api/controllers";
+import { authMethodScheduleApi } from "../../../../../api/authentication-schedule";
+import EditAuthSchedForm from "../../../../../components/dashboard/authentication-schedule/authentication-schedule-edit-form";
+import { controllerApi } from "../../../../../api/controllers";
 
 const ModifyauthMethodSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -38,6 +38,7 @@ const ModifyauthMethodSchedule = () => {
         }
         const data = await res.json()
         const authdevices = [];
+        // for each controller, 
         data.forEach(c => {
             const authDeviceArr = c.authDevices;
             authDeviceArr.forEach(a => a.controllerName = c.controllerName);
@@ -88,7 +89,7 @@ const ModifyauthMethodSchedule = () => {
         untilInvalid:false,
         // submit failed
         submitFailed: false,
-        overlappedSchedule : false
+        overlapped : false
     });
 
     const [authMethodScheduleInfoArr, 
@@ -132,8 +133,6 @@ const ModifyauthMethodSchedule = () => {
         const updatedInfo = [ ...authMethodScheduleInfoArr ];
         updatedInfo.find(info => info.authMethodScheduleId == id)['authMethod']= e.target.value;
         setauthMethodScheduleInfoArr(updatedInfo);
-        console.log(authMethodScheduleInfoArr)
-
     }
 
     //set rrule string
@@ -141,7 +140,6 @@ const ModifyauthMethodSchedule = () => {
         const updatedInfo = [ ...authMethodScheduleInfoArr ];
         updatedInfo.find(info => info.authMethodScheduleId == id)['rrule']=string;
         setauthMethodScheduleInfoArr(updatedInfo);
-        console.log(authMethodScheduleInfoArr)
     }
     //set timestartend
     const changeTimeStart = (start,id) =>{
@@ -155,7 +153,105 @@ const ModifyauthMethodSchedule = () => {
         updatedInfo.find(info => info.authMethodScheduleId == id)['timeEnd']=end;
         setauthMethodScheduleInfoArr(updatedInfo);
         checkTimeEnd(end,id)
+        checkClashingWeekdays()
     }
+
+    // check for rrule 
+    // if days clash, check for time
+
+    // if clahses, return true 
+    const checkRruleAndTimeClahses = (rrule1,timeStart1,timeEnd1,rrule2,timeStart2, timeEnd2) => {
+        const returnStatement = false;
+
+        if (rrule1 != undefined && rrule2 != undefined){
+            console.log("rrule1: ",typeof(rrule1),rrule1,rrule1.indexOf("BYDAY="))
+            console.log("rrule2: ",typeof(rrule2),rrule2,rrule2.indexOf("BYDAY="))
+    
+            const Weekday1 = (rrule1.slice(rrule1.lastIndexOf("BYDAY=")+6)).split(",");
+            const Weekday2 = (rrule2.slice(rrule2.lastIndexOf("BYDAY=")+6)).split(",");
+            
+            
+            Weekday2.forEach(day2 => {
+                const dayExist = day1 => {
+                    return day2 === day1
+                    // console.log(day1,day2,)
+                    
+                }
+                // console.log(Weekday1.some(dayExist))
+                if(Weekday1.some(dayExist)){
+                    // check for time 
+                    // both start1 and end 1 > end 2 or both less than start 2
+                    console.log(timeStart1,timeEnd1,timeStart2,timeEnd2)
+                    if (!((timeStart1 > timeEnd2 && timeEnd1 > timeEnd2 ) || (timeStart1 < timeStart2 && timeEnd1 < timeStart2 ))){
+                        // console.log("OVERLAPPED");
+                        returnStatement = true;
+                    }
+                    
+                }
+            })
+            
+            console.log("rrule check for clashes : ",Weekday1,Weekday2)
+        }
+        
+        return returnStatement;
+    }
+
+    const checkClashingWeekdays = () => {
+        
+        authMethodScheduleInfoArr.map(sch => { 
+            
+        const id = sch.authMethodScheduleId
+
+        const newValidations = [ ...authMethodScheduleValidationsArr ];
+        const newAuthMethodScheduleInfoArr = [...authMethodScheduleInfoArr]
+        
+
+        const newRrule = newAuthMethodScheduleInfoArr.find(v => v.authMethodScheduleId == id)["rrule"]
+        const NewTimeStart = newAuthMethodScheduleInfoArr.find(v => v.authMethodScheduleId == id)["timeStart"];
+        const NewTimeEnd = newAuthMethodScheduleInfoArr.find(v => v.authMethodScheduleId == id)["timeEnd"];
+
+        console.log(NewTimeStart,NewTimeEnd)
+
+        const listOfClashes = newAuthMethodScheduleInfoArr.filter(singleAuthMethodSchedule => singleAuthMethodSchedule.authMethodScheduleId != id)
+        // return id of clahses 
+        // check for rrule fisrt, of true, check for time 
+            .filter(singleAuthMethodSchedule => checkRruleAndTimeClahses(
+                newRrule,
+                NewTimeStart,
+                NewTimeEnd,
+                singleAuthMethodSchedule.rrule,
+                singleAuthMethodSchedule.timeStart,
+                singleAuthMethodSchedule.timeEnd))
+        
+
+        const listOfIds = listOfClashes.map(v => v.authMethodScheduleId);
+        listOfIds.forEach(Id => {
+            const validation = newValidations.find(v => v.authMethodScheduleId == Id);
+            validation.overlapped = true;
+            setauthMethodScheduleValidationsArr(newValidations)
+        })
+        
+        if (listOfIds.length > 0){
+            const validation = newValidations.find(v => v.authMethodScheduleId == id);
+            validation.overlapped = true;
+            setauthMethodScheduleValidationsArr(newValidations)
+        }
+        
+        if (listOfIds.length === 0){
+            const validation = newValidations.find(v => v.authMethodScheduleId == id);
+            validation.overlapped = false;
+            setauthMethodScheduleValidationsArr(newValidations)
+        }})
+
+
+
+
+        // validation.overlappedSchedule = (formUtils.checkBlank(starttime));
+        // validation.timeEndInvalid = formUtils.checkBlank(endTime);
+        // console.log(validation)
+        //setauthMethodScheduleValidationsArr(newValidations)
+    }
+
     const checkTimeEnd = (end,id) => {
         const endTime = end;
         const newValidations = [ ...authMethodScheduleValidationsArr ];
@@ -245,23 +341,41 @@ const ModifyauthMethodSchedule = () => {
         const authDeviceIdArr = []
         authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
         Promise.resolve(authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr))
-        .then(res =>{
-            if (res.status!=200){
-                return toast.error("Error adding schedules")
-            }
-            else{
-                toast.success("Schedules successfully added")
-                router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
-            }
-        })
+        .then(res => res.json()).then(datas => datas.forEach(data => console.log(data[0])))
+            
+            
+        //     {
+        //     if (res.status!=200){
+        //         res.json().then(data => console.log(data))
+                
+        //         // return toast.error(res.json);
+        //         return toast.error("Error adding schedules")
+        //     }
+        //     else{
+        //         toast.success("Schedules successfully added")
+        //         router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
+        //     }
+        // })
 
     }
 
     //for MultiSelectInput
     const authdeviceEqual = (option, value) => option.authDeviceId == value.authDeviceId;
     const getAuthDeviceName = (e) => {
-        
-        return `${e.controllerName}  \u00a0\u00a0 \u00a0\u00a0  ${e.authDeviceName} \u00a0\u00a0  \u00a0\u00a0  (${e.authDeviceDirection})`;
+
+        if (e.entrance === null){
+            return `${e.controllerName}   
+            \u00a0\u00a0 \u00a0\u00a0  ( No Entrance ) 
+            \u00a0\u00a0 \u00a0\u00a0  ${e.authDeviceName} 
+            \u00a0\u00a0  \u00a0\u00a0  (${e.authDeviceDirection})`;
+        }
+
+
+        return `${e.controllerName}   
+            \u00a0\u00a0 \u00a0\u00a0  ${e.entrance.entranceName} 
+            \u00a0\u00a0 \u00a0\u00a0  ${e.authDeviceName} 
+            \u00a0\u00a0  \u00a0\u00a0  (${e.authDeviceDirection})`;
+
     }
     // + " "+ e.authDevices ;
     const authDeviceFilter = (authdevice, state) => {
@@ -355,7 +469,6 @@ const ModifyauthMethodSchedule = () => {
                         </Grid>
                         <Grid item xs={11} md={7}>
                             <MultipleSelectInput
-                                authschedule={true}
                                 options={allAuthenticationDevices}
                                 setSelected={changeAuthDevice}
                                 getOptionLabel={getAuthDeviceName}
@@ -419,7 +532,8 @@ const ModifyauthMethodSchedule = () => {
                                                 validation => validation.authMethodScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.overlapped
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
@@ -446,7 +560,7 @@ const ModifyauthMethodSchedule = () => {
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
-                                                validation.overlappedSchedule
+                                                validation.overlapped
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
                                         //                       validation.accessGroupPersonDuplicated
@@ -481,6 +595,7 @@ const ModifyauthMethodSchedule = () => {
 
 ModifyauthMethodSchedule
 .getLayout = (page) => (
+    
     <AuthGuard>
         <DashboardLayout>
             { page }

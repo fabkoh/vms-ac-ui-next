@@ -40,7 +40,7 @@ const AuthDeviceDetails = () => {
     const { authDeviceId }  = router.query; //change to auth device id
     const { controllerId }  = router.query; //change to auth device id
 
-    const link = getAuthenticationScheduleEditLink(authDeviceId);
+    const link = getAuthenticationScheduleEditLink(controllerId,authDeviceId);
     const [authenticationSchedules, setauthenticationSchedules] = useState([]);
 
     useEffect(() => { // copied from original template
@@ -112,7 +112,7 @@ const AuthDeviceDetails = () => {
 
     //delete authDevice Schedules
     const deleteAuthDeviceSchedules = async(ids) => {
-        const resArr = await Promise.all(ids.map(authMethodScheduleApi.deleteAuthDeviceSchedule));
+        const resArr = await Promise.all(ids.map(id => authMethodScheduleApi.deleteAuthDeviceSchedule(id)));
     
         if (resArr.some(res => res.status != 204)) {
             toast.error('Failed to delete some authentication schedules')

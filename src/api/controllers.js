@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useApi, fakeAccessGroups, fakePersons , fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices } from './api-config';
 import { encodeArrayForSpring, sendApi } from './api-helpers';
 
@@ -78,7 +79,20 @@ class ControllerApi {
         if (useApi) { return sendApi(`/api/controller/reset/${controllerId}`, { method: 'DELETE' }); }
     }
 
+    uniconUpdater() {
+        if (useApi) { return sendApi(`/api/uniconUpdater`, { method: 'POST' })
+        .then( res => {
+				if(res.status == 200){
+					toast.success('Synced successfully',{duration:2000},);
+				}
+				else{
+					toast.error('Synced unsuccessfully' )
+				}
+			})
+		}}
     
+
+
 
 }
 
