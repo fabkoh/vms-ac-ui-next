@@ -16,6 +16,7 @@ import router, { useRouter } from "next/router";
 import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
 import { deleteCredential, deleteCredentialApi, getCredentialsApi, getCredentialWherePersonIdApi, saveCredentialApi } from "../../../../api/credentials";
 import { getCredTypesApi } from "../../../../api/credential-types";
+import { controllerApi } from "../../../../api/controllers";
 
 // const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
@@ -536,7 +537,10 @@ const EditPersonsTwo = () => {
             console.log("boolArr",boolArr)
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
-            if (numSuccess) { toast.success(`Successfully edited ${numSuccess} persons`); }
+            if (numSuccess) { 
+                controllerApi.uniconUpdater();
+                toast.success(`Successfully edited ${numSuccess} persons`);
+            }
 
             // if some failed
             if (boolArr.some(b => !b)) {

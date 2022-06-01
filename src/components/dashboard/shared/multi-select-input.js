@@ -42,6 +42,7 @@ export default function CheckboxesTags({
     error,
     value,
     isOptionEqualToValue,
+    options,
     ...other
 }) {
 
@@ -62,6 +63,8 @@ export default function CheckboxesTags({
                     />
                     { getOptionLabel(option) }
                 </li>
+
+
             )}
             fullWidth
             renderInput={(params) => (
@@ -96,6 +99,7 @@ export default function CheckboxesTags({
             getOptionLabel={getOptionLabel}
             value={value}
             isOptionEqualToValue={isOptionEqualToValue}
+            options={options}
         />
     );
 }

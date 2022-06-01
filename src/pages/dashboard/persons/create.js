@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import { getCredentialsApi, saveCredentialApi } from "../../../api/credentials";
 import { getPersonName } from "../../../utils/persons";
+import { controllerApi } from "../../../api/controllers";
 
 const getNextId = createCounterObject(1);
 
@@ -433,7 +434,10 @@ const CreatePersonsTwo = () => {
 
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
-            if (numSuccess) { toast.success(`Successfully created ${numSuccess} persons`); }
+            if (numSuccess) {
+                controllerApi.uniconUpdater();
+                toast.success(`Successfully created ${numSuccess} persons`); 
+            }
 
             // if some failed
             if (boolArr.some(b => !b)) {

@@ -122,6 +122,7 @@ const ControllerList = () => {
                     toast.error('Delete unsuccessful', {duration:3000})
 				}
 				else{
+                    controllerApi.uniconUpdater();
 					toast.success('Delete success',{duration:2000});
 				}
 			})
@@ -162,6 +163,7 @@ const ControllerList = () => {
                     toast.error('Reset unsuccessful', {duration:5000})
 				}
 				else{
+                    controllerApi.uniconUpdater();
 					toast.success('Reset success',{duration:2000});
 				}
 			})

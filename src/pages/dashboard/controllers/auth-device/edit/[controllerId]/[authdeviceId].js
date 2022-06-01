@@ -12,7 +12,7 @@ import formUtils from "../../../../../../hooks/use-mounted";
 import accessGroupEntranceApi from "../../../../../../api/access-group-entrance-n-to-n";
 import ControllerEditForm from "../../../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../../../components/dashboard/controllers/assign-auth-device";
-import { getControllerDetailsLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
+import { getAuthdeviceDetailsLink, getControllerDetailsLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
 import { controllerApi } from "../../../../../../api/controllers";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import AuthdeviceEditForm from "../../../../../../components/dashboard/controllers/auth-device/auth-device-edit-form";
@@ -41,8 +41,18 @@ const EditAuthDevice = () => {
         }catch(err){console.log(err)}
     }
 
+    const [authMethodList, setAuthMethodList ] = useState([])
+    const getAuthMethodList = async () => {
+        authDeviceApi.getAllAuthMethods().then(async(res)=>{
+            setAuthMethodList(await res.json())
+            // console.log('a',authMethodList)
+        }
+        )
+    }
+
     const getInfo = useCallback(async() => {
         getDevice(authdeviceId)
+        getAuthMethodList()
     }, [isMounted])
 
     useEffect(() => {
@@ -50,6 +60,8 @@ const EditAuthDevice = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
+
+
 
     
 
@@ -68,20 +80,31 @@ const EditAuthDevice = () => {
             setDeviceInfo(prevState=>({...prevState,masterpin:true}))
         }
     }
+
+    const defaultAuthMethodHandler = (e) => {
+        // console.log(controllerInfo)
+        const newAuthMethod = {
+            authMethodId:e.target.value,
+        }
+        setDeviceInfo(prevState=>({...prevState,defaultAuthMethod:newAuthMethod}) )
+    }
+
         
     const [submitted, setSubmitted] = useState(false);
     const submitForm = (e) => {
         e.preventDefault();
-        setSubmitted(true)
-        Promise.resolve(authDeviceApi.updateAuthdevice(deviceInfo,deviceInfo.authDeviceId))
-        .then(res=>{
-            if(res.status==200){
-                toast.success("Update success")
-                router.replace(getControllerDetailsLinkWithId(controllerId))
+        setSubmitted(true);
+        authDeviceApi.updateAuthdevice(deviceInfo, deviceInfo.authDeviceId)
+        .then(res => {
+            if(res.status == 200) {
+                toast.success("Update success");
+                controllerApi.uniconUpdater();
+                router.replace(getControllerDetailsLinkWithId(controllerId));   
+            } else {
+                toast.error("Failed to update authentication device");
+                setSubmitted(false);
             }
-            else{toast.error("Failed to update authentication device"),setSubmitted(false)}
-        })
-        
+        });
     }
 
     return(
@@ -133,6 +156,8 @@ const EditAuthDevice = () => {
                             deviceInfo={deviceInfo}
                             changeText={changeText}
                             masterpinHandler={masterpinHandler}
+                            defaultAuthMethodHandler={defaultAuthMethodHandler}
+                            authMethodList={authMethodList}
                             />
                             <Grid container>
                                 <Grid item marginRight={3}>
@@ -159,7 +184,7 @@ const EditAuthDevice = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={getControllerDetailsLinkWithId(controllerId)} 
+                                        href={getAuthdeviceDetailsLink(authdeviceId)} 
                                         passHref
                                     >
                                         <Button

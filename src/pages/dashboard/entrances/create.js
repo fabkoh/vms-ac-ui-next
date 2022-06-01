@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { entranceListLink } from "../../../utils/entrance";
+import { controllerApi } from "../../../api/controllers";
 
 const CreateEntrances = () => {
 
@@ -286,6 +287,7 @@ const CreateEntrances = () => {
 
                     const numCreated = entranceInfoArr.length - failedResIndex.length
                     if (numCreated) {
+                        controllerApi.uniconUpdater();
                         toast.success(`${numCreated} entrances created`); 
                     }
 

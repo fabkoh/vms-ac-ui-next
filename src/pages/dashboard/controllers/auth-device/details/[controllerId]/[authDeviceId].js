@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../../lib/gtm";
-import entranceApi from "../../../../../../api/entrance";
 import NextLink from 'next/link';
 import Head from 'next/head';
 import router, { Router, useRouter } from 'next/router';
@@ -23,24 +22,26 @@ import { AuthGuard } from "../../../../../../components/authentication/auth-guar
 import { DashboardLayout } from "../../../../../../components/dashboard/dashboard-layout";
 import toast from "react-hot-toast";
 import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
-import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../../../utils/entrance";
-import { getEntranceScheduleEditLink } from "../../../../../../utils/entrance-schedule";
-import AuthDevicePair from "../../../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import { AuthDeviceBasicDetails } from "../../../../../../components/dashboard/controllers/auth-device/auth-device-basic-details";
 import { getAuthdeviceEditLink, getControllerDetailsLinkWithId, getControllerListLink } from "../../../../../../utils/controller";
 import AuthDeviceDelete from "../../../../../../components/dashboard/controllers/auth-device/auth-device-delete";
 import AuthDeviceReset from "../../../../../../components/dashboard/controllers/auth-device/auth-device-reset";
 import { controllerApi } from "../../../../../../api/controllers";
+import  AuthenticationSchedules  from "../../../../../../components/dashboard/controllers/auth-device/auth-device-authentication-schedule"
+import { getAuthenticationScheduleEditLink } from "../../../../../../utils/authentication-schedule";
+import { authMethodScheduleApi } from "../../../../../../api/authentication-schedule";
 
 const AuthDeviceDetails = () => {
 
     const router = useRouter();
     // load entrance details
     const isMounted = useMounted();
-    const [entrance, setEntrance] = useState(null);
     const { authDeviceId }  = router.query; //change to auth device id
     const { controllerId }  = router.query; //change to auth device id
+
+    const link = getAuthenticationScheduleEditLink(controllerId,authDeviceId);
+    const [authenticationSchedules, setauthenticationSchedules] = useState([]);
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -63,6 +64,15 @@ const AuthDeviceDetails = () => {
         }catch(err){console.log(err),router.replace(getControllerListLink())}
     }
 
+    const getAuthenticationSchedules = async () => {
+        authDeviceApi.getAuthenticationSchedules(authDeviceId).then(async(res)=>{
+            setauthenticationSchedules(await res.json())
+            // console.log('a',authMethodList)
+        }
+        )
+    }
+    
+
     const [authStatus, setAuthStatus] = useState({})
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
@@ -84,11 +94,44 @@ const AuthDeviceDetails = () => {
             })
     }
 
+    //delete entrance schedules
+   /* const deleteSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some entrance schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    } */
+
+    //delete authDevice Schedules
+    const deleteAuthDeviceSchedules = async(ids) => {
+        const resArr = await Promise.all(ids.map(id => authMethodScheduleApi.deleteAuthDeviceSchedule(id)));
+    
+        if (resArr.some(res => res.status != 204)) {
+            toast.error('Failed to delete some authentication schedules')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 204).length
+        if (numSuccess) {
+            controllerApi.uniconUpdater();
+            toast.success(`Deleted ${numSuccess} authentication schedules`);
+        }
+
+        getInfo();
+    }
 
     const getInfo = useCallback(async() => {
         //get authDevice info and controller status
         getStatus()
         getAuthDevice()
+        getAuthenticationSchedules()
     }, [isMounted])
 
     useEffect(() => {
@@ -127,20 +170,18 @@ const AuthDeviceDetails = () => {
 		setDeleteOpen(false);
 	}
 	const deleteAuthDevice = async() => {
-        Promise.resolve(
-            authDeviceApi.deleteAuthdevice(authDeviceId), toast.loading("Removing Authentication Device...")
-        )
-        .then((res)=>{
-           toast.dismiss()
-
-            if (res.status != 200){
-                toast.error('Remove unsuccessful')
+        toast.loading("Removing Authentication Device...");
+        authDeviceApi.deleteAuthdevice(authDeviceId)
+        .then(res => {
+            toast.dismiss();
+            if(res.status != 200) {
+                toast.error("Remove unsuccessful");
+            } else {
+                controllerApi.uniconUpdater();
+                toast.success("Successfully removed Authentication Device");
+                router.replace(getControllerDetailsLinkWithId(controllerId));
             }
-            else{
-                toast.success('Successfully Remove Authentication Device', {duration: 5000});
-                router.replace(getControllerDetailsLinkWithId(controllerId)); //go back to the controller details view
-            }
-        })
+        });
         setDeleteOpen(false);
     }
 
@@ -154,22 +195,18 @@ const AuthDeviceDetails = () => {
 		setResetOpen(false);
 	}
 	const resetAuthDevice = async() => {
-        Promise.resolve(
-            authDeviceApi.resetAuthDevice(authDeviceId), toast.loading("Resetting Authentication Device...")
-        )
-        .then((res)=>{
-            //console.log(res);
-
-            toast.dismiss()
-
-            if (res.status != 200){
-               toast.error('Reset unsuccessful')
+        toast.loading("Resetting Authentication Device...");
+        authDeviceApi.resetAuthDevice(authDeviceId)
+        .then(res => {
+            toast.dismiss();
+            if(res.status != 200) {
+                toast.error('Reset unsuccessful');
+            } else {
+                toast.success("Reset Authentication Device success");
+                controllerApi.uniconUpdater();
+                getInfo();
             }
-            else{
-                toast.success("Reset Authentication Device success"),getInfo()
-                //router.replace(getControllerListLink());
-            }
-        })
+        });
         setResetOpen(false);
     }
 
@@ -180,7 +217,8 @@ const AuthDeviceDetails = () => {
             const res = await (bool ? authDeviceApi.enableMasterpin(authDeviceId) : authDeviceApi.disableMasterpin(authDeviceId));
             if (res.status != 200) throw new Error("Failed to send req");
             toast.success(`Successfully ${verb} masterpin`);
-            setDeviceInfo(prevState=>({...prevState,masterpin:bool}))
+            setDeviceInfo(prevState=>({...prevState,masterpin:bool}));
+            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -336,7 +374,18 @@ const AuthDeviceDetails = () => {
                                 authStatus={authStatus}
                                 handleToggleMasterpin={handleToggleMasterpin}
                                 />
-                            </Grid>                         
+                            </Grid>   
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <AuthenticationSchedules 
+                                    deviceInfo={deviceInfo}
+                                    authenticationSchedules={authenticationSchedules}
+                                    deleteSchedules={deleteAuthDeviceSchedules}
+                                    link={link} 
+                                />
+                            </Grid>                       
                         </Grid>
                     </Box>
                 </Container>

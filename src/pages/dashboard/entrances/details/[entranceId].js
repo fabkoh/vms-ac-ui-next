@@ -34,6 +34,7 @@ import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../..
 import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
+import { controllerApi } from "../../../../api/controllers";
 
 const EntranceDetails = () => {
 
@@ -158,6 +159,7 @@ const EntranceDetails = () => {
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
+            controllerApi.uniconUpdater();
             router.replace(entranceListLink);
         }
         else{
@@ -177,6 +179,7 @@ const EntranceDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
+            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} entrance schedules`)
         }
 
@@ -209,6 +212,7 @@ const EntranceDetails = () => {
             entranceApi.updateEntranceStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
+                controllerApi.uniconUpdater();
                 toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
             } else {
                 toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");

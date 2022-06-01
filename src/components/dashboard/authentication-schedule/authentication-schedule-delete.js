@@ -2,16 +2,12 @@ import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";
 import { rrulestr } from "rrule";
-import rruleDescription from "../../../../utils/rrule-desc";
-import { Scrollbar } from "../../../scrollbar";
+import rruleDescription from "../../../utils/rrule-desc";
+import { Scrollbar } from "../../scrollbar";
 
-const steps = ['Select schedules to delete', 'Confirm delete'];
+const steps = ['Select Schedules to Delete', 'Confirm Delete'];
 
-const EntranceScheduleDelete = ({ 
-    open, 
-    schedules, 
-    handleDialogClose, 
-    deleteSchedules, }) => {
+const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, deleteSchedules }) => {
 
     // stepper
     const [activeStep, setActiveStep] = useState(0)
@@ -28,7 +24,7 @@ const EntranceScheduleDelete = ({
     const [selected, setSelected] = useState([])
     const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
     const selectedSome = selected.length > 0 && !selectedAll;
-    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.accessGroupScheduleId) : []);
+    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authenticationScheduleId) : []);
     const handleSelectFactory = (id) => () => {
         if (selected.includes(id)) {
             setSelected(selected.filter(i => i != id));
@@ -52,6 +48,7 @@ const EntranceScheduleDelete = ({
 
     // delete action
     const handleDeleteSchedules = () => {
+        console.log(selected, selectedAll);
         deleteSchedules(selected, selectedAll);
         handleClose();
     }
@@ -96,6 +93,7 @@ const EntranceScheduleDelete = ({
                                             </TableCell>
                                             <TableCell>Name</TableCell>
                                             <TableCell>Description</TableCell>
+                                            <TableCell>Authentication Method</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -103,15 +101,17 @@ const EntranceScheduleDelete = ({
                                             Array.isArray(schedules) && (
                                                 schedules.map((schedule, i) => {
                                                     const {
-                                                        entranceScheduleId,
-                                                        entranceScheduleName,
+                                                        authMethodScheduleId,
+                                                        authMethodScheduleName,
                                                         rrule,
                                                         timeStart,
-                                                        timeEnd
+                                                        timeEnd,
+                                                        authMethod
                                                     } = schedule;
-                                                    const isScheduleSelected = selected.includes(entranceScheduleId);
-                                                    const handleSelect = handleSelectFactory(entranceScheduleId);
-                                                        
+                                                    console.log("authMethodScheduleId:",authMethodScheduleId)
+                                                    const isScheduleSelected = selected.includes(authMethodScheduleId);
+                                                    const handleSelect = handleSelectFactory(authMethodScheduleId);
+            
                                                     return (
                                                         <TableRow hover key={i}>
                                                             <TableCell padding="checkbox">
@@ -122,10 +122,13 @@ const EntranceScheduleDelete = ({
                                                                 />
                                                             </TableCell>
                                                             <TableCell>
-                                                                { entranceScheduleName }
+                                                                { authMethodScheduleName }
                                                             </TableCell>
                                                             <TableCell>
                                                                 { rruleDescription(rrulestr(rrule), timeStart, timeEnd) }
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                { authMethod.authMethodDesc }
                                                             </TableCell>
                                                         </TableRow>
                                                     )
@@ -174,10 +177,6 @@ const EntranceScheduleDelete = ({
                         <DialogContent>
                             <DialogContentText sx={{ whiteSpace: "pre-line", mb: 1}}>
                                 Are you sure you want to delete schedule(s)? This action cannot be undone.
-                                {/*
-                                    selectedAll && 
-                                    <strong>{"\nDeleting all schedules would remove this entrance from the access group"}</strong>
-                                */}
                             </DialogContentText>
                             <form onSubmit={handleDeleteSchedules}>
                                 <TextField
@@ -215,4 +214,4 @@ const EntranceScheduleDelete = ({
     )
 }
 
-export default EntranceScheduleDelete;
+export default AuthenticationScheduleDelete;

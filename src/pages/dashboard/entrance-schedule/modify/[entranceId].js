@@ -18,6 +18,7 @@ import { Info } from "@mui/icons-material";
 import entranceApi from "../../../../api/entrance";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import EditEntSchedForm from "../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form";
+import { controllerApi } from "../../../../api/controllers";
 
 const ModifyEntranceSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -213,6 +214,7 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })
@@ -229,6 +231,7 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })
@@ -319,7 +322,7 @@ const ModifyEntranceSchedule = () => {
                         {/* <Typography variant="body2" color="neutral.500">
                         {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
                         </Typography> */}
-                        <Alert severity="info"variant="outlined">Quick tip : You may select more than one entrance to apply these schedules to multiple entrances </Alert>
+                        <Alert severity="info"variant="outlined">Quick tip : You may apply these schedules to multiple entrances by selecting more than one entrance</Alert>
                     </Box>
                     <Grid container alignItems="center" mb={3}>
                         <Grid item mr={2}>
@@ -427,7 +430,7 @@ const ModifyEntranceSchedule = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href="/dashboard/entrances/"
+                                        href={`/dashboard/entrances/details/${entranceId}`}
                                         passHref
                                     >
                                         <Button

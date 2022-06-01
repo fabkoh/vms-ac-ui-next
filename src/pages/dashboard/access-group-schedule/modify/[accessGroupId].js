@@ -15,6 +15,7 @@ import EditAccGrpSchedForm from "../../../../components/dashboard/access-group-s
 import MultipleSelectInput from "../../../../components/dashboard/shared/multi-select-input"
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
+import { controllerApi } from "../../../../api/controllers";
 
 const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -213,6 +214,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
             }
         })
@@ -230,6 +232,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
             }
         })

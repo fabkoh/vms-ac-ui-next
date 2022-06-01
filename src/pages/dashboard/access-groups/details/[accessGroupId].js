@@ -32,6 +32,7 @@ import EntranceDetails from "../../../../components/dashboard/access-groups/deta
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { getAccessGroupScheduleEditLink } from "../../../../utils/access-group-schedule";
 import { accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink } from "../../../../utils/access-group";
+import { controllerApi } from "../../../../api/controllers";
 
 const AccessGroupDetails = () => {
 
@@ -136,17 +137,16 @@ const AccessGroupDetails = () => {
 		setDeleteOpen(false);
 	}
 	const deleteAccessGroup = async() => {
-        Promise.resolve(
-            accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
-        ).then((res)=>{
-        if (res.status == 204){
-            toast.success('Delete success');
-            router.replace(accessGroupListLink);
-        }
-        else{
-            toast.error('Delete unsuccessful')
-        }
-        })
+        accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
+        .then(res => {
+            if (res.status == 204) {
+                toast.success('Delete success');
+                controllerApi.uniconUpdater();
+                router.replace(accessGroupListLink);
+            } else {
+                toast.error('Delete unsuccessful')
+            }
+        }).catch(() => toast.error('Delete unsuccessful'));
         setDeleteOpen(false);
     };
 
@@ -160,6 +160,7 @@ const AccessGroupDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
+            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} access group schedules`)
         }
 

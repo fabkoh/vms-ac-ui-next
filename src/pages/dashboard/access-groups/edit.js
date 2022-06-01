@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
+import { controllerApi } from "../../../api/controllers";
 
 const EditAccessGroups = () => {
 
@@ -362,6 +363,7 @@ const EditAccessGroups = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
+            controllerApi.uniconUpdater();
             toast.success(`${numEdited} access groups edited`);
             if (numEdited == resArr.length) { // all success
                 router.replace('/dashboard/access-groups');

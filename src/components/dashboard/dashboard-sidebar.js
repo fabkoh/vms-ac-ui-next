@@ -34,8 +34,10 @@ import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
 import { DoorFront, SelectAll } from '@mui/icons-material';
+import { controllerApi } from '../../api/controllers';
 
 const getSections = (t) => [
+  
   {
     title: t('General'),
     items: [
@@ -153,212 +155,212 @@ const getSections = (t) => [
       }
     ]
   },
-  {
-    title: t('Management'),
-    items: [
-      {
-        title: t('Customers'),
-        path: '/dashboard/customers',
-        icon: <UsersIcon fontSize="small" />,
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/customers'
-          },
-          {
-            title: t('Details'),
-            path: '/dashboard/customers/1'
-          },
-          {
-            title: t('Edit'),
-            path: '/dashboard/customers/1/edit'
-          }
-        ]
-      },
-      {
-        title: t('Products'),
-        path: '/dashboard/products',
-        icon: <ShoppingBagIcon fontSize="small" />,
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/products'
-          },
-          {
-            title: t('Create'),
-            path: '/dashboard/products/new'
-          }
-        ]
-      },
-      {
-        title: t('Orders'),
-        icon: <ShoppingCartIcon fontSize="small" />,
-        path: '/dashboard/orders',
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/orders'
-          },
-          {
-            title: t('Details'),
-            path: '/dashboard/orders/1'
-          }
-        ]
-      },
-      {
-        title: t('Invoices'),
-        path: '/dashboard/invoices',
-        icon: <ReceiptTaxIcon fontSize="small" />,
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/invoices'
-          },
-          {
-            title: t('Details'),
-            path: '/dashboard/invoices/1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    title: t('Platforms'),
-    items: [
-      {
-        title: t('Job Listings'),
-        path: '/dashboard/jobs',
-        icon: <OfficeBuildingIcon fontSize="small" />,
-        children: [
-          {
-            title: t('Browse'),
-            path: '/dashboard/jobs'
-          },
-          {
-            title: t('Details'),
-            path: '/dashboard/jobs/companies/1'
-          },
-          {
-            title: t('Create'),
-            path: '/dashboard/jobs/new'
-          }
-        ]
-      },
-      {
-        title: t('Social Media'),
-        path: '/dashboard/social',
-        icon: <ShareIcon fontSize="small" />,
-        children: [
-          {
-            title: t('Profile'),
-            path: '/dashboard/social/profile'
-          },
-          {
-            title: t('Feed'),
-            path: '/dashboard/social/feed'
-          }
-        ]
-      },
-      {
-        title: t('Blog'),
-        path: '/blog',
-        icon: <NewspaperIcon fontSize="small" />,
-        children: [
-          {
-            title: t('Post List'),
-            path: '/blog'
-          },
-          {
-            title: t('Post Details'),
-            path: '/blog/1'
-          },
-          {
-            title: t('Post Create'),
-            path: '/blog/new'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    title: t('Apps'),
-    items: [
-      {
-        title: t('Kanban'),
-        path: '/dashboard/kanban',
-        icon: <ClipboardListIcon fontSize="small" />
-      },
-      {
-        title: t('Mail'),
-        path: '/dashboard/mail',
-        icon: <MailIcon fontSize="small" />
-      },
-      {
-        title: t('Chat'),
-        path: '/dashboard/chat',
-        icon: <ChatAlt2Icon fontSize="small" />
-      },
-      {
-        title: t('Calendar'),
-        path: '/dashboard/calendar',
-        icon: <CalendarIcon fontSize="small" />
-      }
-    ]
-  },
-  {
-    title: t('Pages'),
-    items: [
-      {
-        title: t('Auth'),
-        path: '/authentication',
-        icon: <LockClosedIcon fontSize="small" />,
-        children: [
-          {
-            title: t('Register'),
-            path: '/authentication/register?disableGuard=true'
-          },
-          {
-            title: t('Login'),
-            path: '/authentication/login?disableGuard=true'
-          }
-        ]
-      },
-      {
-        title: t('Pricing'),
-        path: '/dashboard/pricing',
-        icon: <CreditCardIcon fontSize="small" />
-      },
-      {
-        title: t('Checkout'),
-        path: '/checkout',
-        icon: <CashIcon fontSize="small" />
-      },
-      {
-        title: t('Contact'),
-        path: '/contact',
-        icon: <MailOpenIcon fontSize="small" />
-      },
-      {
-        title: t('Error'),
-        path: '/error',
-        icon: <XCircleIcon fontSize="small" />,
-        children: [
-          {
-            title: '401',
-            path: '/401'
-          },
-          {
-            title: '404',
-            path: '/404'
-          },
-          {
-            title: '500',
-            path: '/500'
-          }
-        ]
-      }
-    ]
-  }
+  // {
+  //   title: t('Management'),
+  //   items: [
+  //     {
+  //       title: t('Customers'),
+  //       path: '/dashboard/customers',
+  //       icon: <UsersIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/customers'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/customers/1'
+  //         },
+  //         {
+  //           title: t('Edit'),
+  //           path: '/dashboard/customers/1/edit'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Products'),
+  //       path: '/dashboard/products',
+  //       icon: <ShoppingBagIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/products'
+  //         },
+  //         {
+  //           title: t('Create'),
+  //           path: '/dashboard/products/new'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Orders'),
+  //       icon: <ShoppingCartIcon fontSize="small" />,
+  //       path: '/dashboard/orders',
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/orders'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/orders/1'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Invoices'),
+  //       path: '/dashboard/invoices',
+  //       icon: <ReceiptTaxIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/invoices'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/invoices/1'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Platforms'),
+  //   items: [
+  //     {
+  //       title: t('Job Listings'),
+  //       path: '/dashboard/jobs',
+  //       icon: <OfficeBuildingIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Browse'),
+  //           path: '/dashboard/jobs'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/jobs/companies/1'
+  //         },
+  //         {
+  //           title: t('Create'),
+  //           path: '/dashboard/jobs/new'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Social Media'),
+  //       path: '/dashboard/social',
+  //       icon: <ShareIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Profile'),
+  //           path: '/dashboard/social/profile'
+  //         },
+  //         {
+  //           title: t('Feed'),
+  //           path: '/dashboard/social/feed'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Blog'),
+  //       path: '/blog',
+  //       icon: <NewspaperIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Post List'),
+  //           path: '/blog'
+  //         },
+  //         {
+  //           title: t('Post Details'),
+  //           path: '/blog/1'
+  //         },
+  //         {
+  //           title: t('Post Create'),
+  //           path: '/blog/new'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Apps'),
+  //   items: [
+  //     {
+  //       title: t('Kanban'),
+  //       path: '/dashboard/kanban',
+  //       icon: <ClipboardListIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Mail'),
+  //       path: '/dashboard/mail',
+  //       icon: <MailIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Chat'),
+  //       path: '/dashboard/chat',
+  //       icon: <ChatAlt2Icon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Calendar'),
+  //       path: '/dashboard/calendar',
+  //       icon: <CalendarIcon fontSize="small" />
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Pages'),
+  //   items: [
+  //     {
+  //       title: t('Auth'),
+  //       path: '/authentication',
+  //       icon: <LockClosedIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Register'),
+  //           path: '/authentication/register?disableGuard=true'
+  //         },
+  //         {
+  //           title: t('Login'),
+  //           path: '/authentication/login?disableGuard=true'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Pricing'),
+  //       path: '/dashboard/pricing',
+  //       icon: <CreditCardIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Checkout'),
+  //       path: '/checkout',
+  //       icon: <CashIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Contact'),
+  //       path: '/contact',
+  //       icon: <MailOpenIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Error'),
+  //       path: '/error',
+  //       icon: <XCircleIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: '401',
+  //           path: '/401'
+  //         },
+  //         {
+  //           title: '404',
+  //           path: '/404'
+  //         },
+  //         {
+  //           title: '500',
+  //           path: '/500'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // }
 ];
 
 export const DashboardSidebar = (props) => {
@@ -469,6 +471,24 @@ export const DashboardSidebar = (props) => {
               </Box>
             </Box> */}
           </div>
+            
+          <Box sx={{ p: 2 }}>
+              <Button
+                onClick={
+                  controllerApi.uniconUpdater
+                }
+                color="info"
+                component="a"
+                fullWidth
+                sx={{ mt: 2 }}
+                variant="contained"
+              >
+                {t('Sync Unicons')}
+              </Button>
+
+          </Box>
+
+
           <Divider
             sx={{
               borderColor: '#2D3748',
@@ -522,6 +542,7 @@ export const DashboardSidebar = (props) => {
               </Button>
             </NextLink>
           </Box>
+          
         </Box>
       </Scrollbar>
       <OrganizationPopover
