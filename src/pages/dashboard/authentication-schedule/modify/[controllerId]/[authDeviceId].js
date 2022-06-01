@@ -342,17 +342,7 @@ const ModifyauthMethodSchedule = () => {
         const authDeviceIdArr = []
         authDevices.forEach(a=>authDeviceIdArr.push(a.authDeviceId))
         authMethodScheduleApi.addAuthDeviceSchedules(authMethodScheduleInfoArr,authDeviceIdArr)
-
-        .then(async(res) => {
-            if (res.status != 200) {
-                toast.error('Error adding schedules');
-                return
-            }
-            toast.success('Schedules added successfully');
-            controllerApi.uniconUpdater();
-            router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`);
-        })
-
+        .then(res => 
             
             
             {
@@ -374,7 +364,7 @@ const ModifyauthMethodSchedule = () => {
                 toast.success("Schedules successfully added")
                 router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
-        }
+        })
 
     }
 
