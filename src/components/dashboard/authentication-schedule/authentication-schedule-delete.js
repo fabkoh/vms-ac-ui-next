@@ -108,7 +108,6 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                                         timeEnd,
                                                         authMethod
                                                     } = schedule;
-                                                    console.log("authMethodScheduleId:",authMethodScheduleId)
                                                     const isScheduleSelected = selected.includes(authMethodScheduleId);
                                                     const handleSelect = handleSelectFactory(authMethodScheduleId);
             

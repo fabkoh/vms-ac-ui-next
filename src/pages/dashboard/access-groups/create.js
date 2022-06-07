@@ -315,7 +315,7 @@ const CreateAccessGroups = () => {
                             )
                         })
 
-                    const numCreated = accessGroupInfoArr.length - failedResIndex.length
+                    const numCreated = accessGroupInfoArr.length - failedResIndex.length;
                     if (numCreated) {
                         controllerApi.uniconUpdater();
                         toast.success(`${numCreated} access groups created`); 

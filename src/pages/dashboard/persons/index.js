@@ -293,15 +293,19 @@ const PersonList = () => {
 		Promise.all(selectedPersons.map(id=>{
 			return personApi.deletePerson(id)
 		})).then( resArr => {
+			let success = false;
 			resArr.filter(res=>{
 				if(res.status == 204){
 					toast.success('Delete success',{duration:2000},);
-					controllerApi.uniconUpdater();
+					success = true;
 				}
 				else{
 					toast.error('Delete unsuccessful' )
 				}
 			})
+			if(success) {
+				controllerApi.uniconUpdater();
+			}
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);
