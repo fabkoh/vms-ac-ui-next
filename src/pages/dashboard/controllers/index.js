@@ -122,10 +122,10 @@ const ControllerList = () => {
                     toast.error('Delete unsuccessful', {duration:3000})
 				}
 				else{
-                    controllerApi.uniconUpdater();
 					toast.success('Delete success',{duration:2000});
 				}
 			})
+            controllerApi.uniconUpdater();
 			getInfo();
 		})
 		setDeleteOpen(false);

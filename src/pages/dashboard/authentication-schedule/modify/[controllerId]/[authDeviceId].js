@@ -396,7 +396,8 @@ const ModifyauthMethodSchedule = () => {
        
             }
             else{
-                toast.success("Schedules successfully added")
+                toast.success("Schedules successfully added");
+                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })
