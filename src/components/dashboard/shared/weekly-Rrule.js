@@ -111,7 +111,7 @@ const WeeklyRrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
 
 	// const AllDayRenderer = (allDay) => {

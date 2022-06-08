@@ -48,7 +48,6 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
 
     // delete action
     const handleDeleteSchedules = () => {
-        console.log(selected, selectedAll);
         deleteSchedules(selected, selectedAll);
         handleClose();
     }
@@ -101,17 +100,16 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                             Array.isArray(schedules) && (
                                                 schedules.map((schedule, i) => {
                                                     const {
-                                                        authMethodScheduleId,
-                                                        authMethodScheduleName,
+                                                        authenticationScheduleId,
+                                                        authenticationScheduleName,
                                                         rrule,
                                                         timeStart,
                                                         timeEnd,
                                                         authMethod
                                                     } = schedule;
-                                                    console.log("authMethodScheduleId:",authMethodScheduleId)
-                                                    const isScheduleSelected = selected.includes(authMethodScheduleId);
-                                                    const handleSelect = handleSelectFactory(authMethodScheduleId);
-            
+                                                    const isScheduleSelected = selected.includes(authenticationScheduleId);
+                                                    const handleSelect = handleSelectFactory(authenticationScheduleId);
+                                                        
                                                     return (
                                                         <TableRow hover key={i}>
                                                             <TableCell padding="checkbox">
@@ -122,7 +120,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                                                 />
                                                             </TableCell>
                                                             <TableCell>
-                                                                { authMethodScheduleName }
+                                                                { authenticationScheduleName }
                                                             </TableCell>
                                                             <TableCell>
                                                                 { rruleDescription(rrulestr(rrule), timeStart, timeEnd) }

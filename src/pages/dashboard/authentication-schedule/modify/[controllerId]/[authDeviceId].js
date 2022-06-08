@@ -18,6 +18,7 @@ import { Info } from "@mui/icons-material";
 import { authMethodScheduleApi } from "../../../../../api/authentication-schedule";
 import EditAuthSchedForm from "../../../../../components/dashboard/authentication-schedule/authentication-schedule-edit-form";
 import { controllerApi } from "../../../../../api/controllers";
+import AuthenticationAddOnError from "../../../../../components/dashboard/authentication-schedule/authentication-add-on-error";
 
 const ModifyauthMethodSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -25,6 +26,11 @@ const ModifyauthMethodSchedule = () => {
     const temp = router.query;
     const controllerId = temp.controllerId;
     const authDeviceId = temp.authDeviceId;
+
+    const [open, setOpen] = useState(false);
+    
+
+    
 
     // const [accGrp, setAccGrp] = useState()
     const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
@@ -79,6 +85,9 @@ const ModifyauthMethodSchedule = () => {
         timeStart:"",
         timeEnd:"",
     });
+
+
+
     const getEmptyauthMethodScheduleValidations = (authMethodScheduleId) => ({
         authMethodScheduleId,
         authMethodScheduleNameBlank: false,
@@ -96,8 +105,20 @@ const ModifyauthMethodSchedule = () => {
         setauthMethodScheduleInfoArr] = useState([getEmptyauthMethodScheduleInfo(0)]);
     const [authMethodScheduleValidationsArr, 
         setauthMethodScheduleValidationsArr] = useState([getEmptyauthMethodScheduleValidations(0)]);
-
     
+    const [errorMessages, setErrorMessages] = useState([]);
+    
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessages([]);
+    };
+
+    const handleErrorMessages = (res) => {
+        setErrorMessages(res);
+    }
 
     // add card logic
     //returns largest entranceId + 1
@@ -266,7 +287,7 @@ const ModifyauthMethodSchedule = () => {
             // console.log(newValidations)
         }
         
-        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<tempStartTime);
+        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<=tempStartTime);
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
         setauthMethodScheduleValidationsArr(newValidations)
@@ -347,17 +368,31 @@ const ModifyauthMethodSchedule = () => {
             
             {
             if (res.status!=200){
-                (res.json()).then(data => Object.entries(data[0]).map( 
-                    ([key, value]) => {
-                        console.log(key,value)
-                        
-                        value.map(
-                            clashes => toast.error(`Error : "${key}"  
-                                                    clashes with existing schedule(s) in 
-                                                    ${clashes.controller}
-                                                    (${clashes.authDevice.authDeviceDirection})`)
-                        )
-                    }))
+
+                
+
+                
+                (res.json()).then(data => {
+                    // console.log(data);
+                    // console.log(data[0])
+                    
+                    const array = [];
+                    Object.entries(data[0]).map(([key,value]) => {
+                        value.map( singleData => 
+                            // console.log(key, singleData))
+                            array.push([key,singleData]))
+
+
+                    })
+
+                    handleErrorMessages(array)
+                    // getClashingAuthDeviceSchedule
+
+                })
+                handleClickOpen();
+                    // handleErrorMessages(data))
+                
+
        
             }
             else{
@@ -427,6 +462,12 @@ const ModifyauthMethodSchedule = () => {
                     py: 8
                 }}
             >
+                <AuthenticationAddOnError
+                    errorMessages={errorMessages}
+                    handleClose={handleClose}
+                    open={open}
+                />
+
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
