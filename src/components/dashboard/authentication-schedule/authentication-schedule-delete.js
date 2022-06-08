@@ -24,7 +24,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
     const [selected, setSelected] = useState([])
     const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
     const selectedSome = selected.length > 0 && !selectedAll;
-    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authenticationScheduleId) : []);
+    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authMethodScheduleId) : []);
     const handleSelectFactory = (id) => () => {
         if (selected.includes(id)) {
             setSelected(selected.filter(i => i != id));
@@ -100,15 +100,15 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                             Array.isArray(schedules) && (
                                                 schedules.map((schedule, i) => {
                                                     const {
-                                                        authenticationScheduleId,
-                                                        authenticationScheduleName,
+                                                        authMethodScheduleId,
+                                                        authMethodScheduleName,
                                                         rrule,
                                                         timeStart,
                                                         timeEnd,
                                                         authMethod
                                                     } = schedule;
-                                                    const isScheduleSelected = selected.includes(authenticationScheduleId);
-                                                    const handleSelect = handleSelectFactory(authenticationScheduleId);
+                                                    const isScheduleSelected = selected.includes(authMethodScheduleId);
+                                                    const handleSelect = handleSelectFactory(authMethodScheduleId);
                                                         
                                                     return (
                                                         <TableRow hover key={i}>
@@ -120,7 +120,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                                                 />
                                                             </TableCell>
                                                             <TableCell>
-                                                                { authenticationScheduleName }
+                                                                { authMethodScheduleName }
                                                             </TableCell>
                                                             <TableCell>
                                                                 { rruleDescription(rrulestr(rrule), timeStart, timeEnd) }
