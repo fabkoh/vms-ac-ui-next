@@ -55,6 +55,9 @@ const getTime = (timeStart, timeEnd) => {
     if (timeStart == undefined || timeEnd == undefined) {
         return ""
     }
+    if ( timeStart == "00:00" && timeEnd == "24:00"){
+        return ` ( All Day ) `
+    }
 
     return ` from ${time(timeStart)} to ${time(timeEnd)}`
 };
