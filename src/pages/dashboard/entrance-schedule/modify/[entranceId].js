@@ -151,7 +151,7 @@ const ModifyEntranceSchedule = () => {
             // console.log(newValidations)
         }
         
-        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<tempStartTime);
+        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<=tempStartTime);
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
         setEntranceScheduleValidationsArr(newValidations)

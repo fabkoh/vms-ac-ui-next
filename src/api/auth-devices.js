@@ -127,7 +127,7 @@ class AuthDeviceApi {
                 "authenticationScheduleName": "Default Schedule",
                 "rrule": "DTSTART:20220517T000000Z;RRULE:FREQ=DAILY;INTERVAL=1;WKST=MO	",
                 "timeStart": "00:00",
-                "timeEnd": "23:59",
+                "timeEnd": "24:00",
                 "authMethod": 4,
             },
             {
