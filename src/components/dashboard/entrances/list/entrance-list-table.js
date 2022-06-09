@@ -10,7 +10,7 @@ import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../util
 // for status options
 const statusOptions = ['Unlocked', 'Active'];
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, ...other }) {   
+export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, entranceSchedules, ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
@@ -45,7 +45,6 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                     entranceId,
                                     entranceName,
                                     accessGroups,
-                                    entranceSchedules,
                                     controller,
                                     isActive
                                 } = entrance
@@ -54,6 +53,7 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                 const detailsLink = getEntranceDetailsLink(entrance);
                                 const editLink = getEntranceIdsEditLink([entranceId]);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
+                                const numberOfSchedules = entranceSchedules[entranceId];
                                 return(
                                     <TableRow
                                         hover
@@ -88,8 +88,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                         </TableCell>
                                         <TableCell>
                                             {
-                                                (Array.isArray(entranceSchedules) && entranceSchedules.length > 0) ? (
-                                                    <Typography noWrap>{entranceSchedules.length}</Typography>
+                                                numberOfSchedules ? (
+                                                    <Typography noWrap>{numberOfSchedules}</Typography>
                                                 ) : (
                                                     <WarningChip text="No schedules" />
                                                 )
