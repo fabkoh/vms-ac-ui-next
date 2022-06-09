@@ -352,7 +352,7 @@ const EntranceDetails = () => {
                                         disabled={entranceActive}
                                     >
                                         <DoorFront />
-                                        &#8288;Enable
+                                        &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
