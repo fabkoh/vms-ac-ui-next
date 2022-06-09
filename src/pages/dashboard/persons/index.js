@@ -289,7 +289,8 @@ const PersonList = () => {
 		console.log(selectedPersons)
 	}, [selectedPersons])
 	
-	const deletePersons = async() => {
+	const deletePersons = async(e) => {
+		e.preventDefault();
 		Promise.all(selectedPersons.map(id=>{
 			return personApi.deletePerson(id)
 		})).then( resArr => {
