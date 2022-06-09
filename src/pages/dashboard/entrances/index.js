@@ -21,6 +21,7 @@ import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/co
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
 import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
+import { entranceScheduleApi } from "../../../api/entrance-schedule";
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
@@ -65,8 +66,28 @@ const EntranceList = () => {
         }
         return data;
     }, [isMounted]);
+    const [entranceSchedules, setEntranceSchedules] = useState({}); // map entranceId to number of schedules
+    const getEntranceSchedules = async() => {
+        try {
+            const res = await entranceScheduleApi.getEntranceSchedules();
+            if(res.status != 200) throw 'cannot load entrance schedules';
+            const body = await res.json();
+            const temp = {};
+            body.forEach(sch => {
+                temp[sch.entranceId] = (temp[sch.entranceId] || 0) + 1;
+            })
+            setEntranceSchedules(temp);
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrance schedules failed to load");
+        }
+    }
+    const getInfo = async() => {
+        getEntranceSchedules();
+        getAccessGroupsLocal(await getEntrancesLocal());
+    }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(async () => getAccessGroupsLocal(await getEntrancesLocal()), [])  
+    useEffect(getInfo, [])  
 
     // for selection of checkboxes
     const [selectedEntrances, setSelectedEntrances] = useState([]);
@@ -370,6 +391,7 @@ const EntranceList = () => {
                             rowsPerPage={rowsPerPage}
                             handleStatusSelect={handleStatusSelect}
                             openStatusUpdateDialog={openStatusUpdateDialog}
+                            entranceSchedules={entranceSchedules}
                         />
                     </Card>
                 </Container>    
