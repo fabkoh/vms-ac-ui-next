@@ -7,6 +7,7 @@ import { SeverityPill } from '../../severity-pill';
 import WarningIcon from '@mui/icons-material/Warning';
 import BasicDetailsCard from '../shared/basic-details-card';
 import { getAccessGroupDetailsLink, getAccessGroupLabel } from "../../../utils/access-group";
+import { LockClosed } from '../../../icons/lock-closed';
 
 export const PersonBasicDetails = (props) => {
   const { 
@@ -82,7 +83,7 @@ export const PersonBasicDetails = (props) => {
             accessGroup ? (
               <Link component="a">
                 <NextLink href={getAccessGroupDetailsLink(accessGroup)} passHref>                
-                  <Chip label={getAccessGroupLabel(accessGroup)} />
+                  <Chip label={getAccessGroupLabel(accessGroup)} icon={<LockClosed />}/>
                 </NextLink>
               </Link>
             ) : (
