@@ -82,7 +82,30 @@ const EntranceList = () => {
             toast.error("Entrance schedules failed to load");
         }
     }
+    const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
+    const getControllers = async() => {
+        try {
+            const res = await controllerApi.getControllers();
+            if(res.status != 200) throw 'cannot load controllers';
+            const body = await res.json();
+            const temp = {};
+            body.forEach(con => {
+                const authArr = con.authDevices;
+                if (Array.isArray(authArr)) {
+                    authArr.forEach(auth => {
+                        const entranceId = auth.entrance?.entranceId;
+                        if (entranceId) temp[entranceId] = con;
+                    });
+                }
+            });
+            setEntranceController(temp);
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrance controllers failed to load");
+        }
+    };
     const getInfo = async() => {
+        getControllers();
         getEntranceSchedules();
         getAccessGroupsLocal(await getEntrancesLocal());
     }
@@ -392,6 +415,7 @@ const EntranceList = () => {
                             handleStatusSelect={handleStatusSelect}
                             openStatusUpdateDialog={openStatusUpdateDialog}
                             entranceSchedules={entranceSchedules}
+                            entranceController={entranceController}
                         />
                     </Card>
                 </Container>    
