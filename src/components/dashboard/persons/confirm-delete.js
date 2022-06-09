@@ -36,8 +36,8 @@ export const Confirmdelete = (props) => {
     }
 
     // delete action
-    const handleDeletePersons = () => {
-        deletePersons();
+    const handleDeletePersons = (e) => {
+        deletePersons(e);
         handleClose();
     }
 
