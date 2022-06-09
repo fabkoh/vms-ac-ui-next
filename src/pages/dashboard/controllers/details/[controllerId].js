@@ -88,7 +88,8 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            toast.loading("Fetching status...")
+            controllerApi.getAuthStatus(controllerId)
             .then(async res=>{
                 toast.dismiss()
                 if(res.status!=200){
