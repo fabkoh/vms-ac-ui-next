@@ -322,7 +322,8 @@ const AccessGroupList = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteAccessGroups = async() => { 
+	const deleteAccessGroups = async(e) => {
+		e.preventDefault();
 		Promise.all(selectedAccessGroup.map(id=>{
 			return accessGroupApi.deleteAccessGroup(id)
 		})).then( resArr => {

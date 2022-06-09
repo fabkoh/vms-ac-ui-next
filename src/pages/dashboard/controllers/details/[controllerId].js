@@ -88,23 +88,24 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status...")
-            .then(async res=>{
-                toast.dismiss()
-                if(res.status!=200){
-                    setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
-                }
-                else{
-                    setStatusLoaded(true)
-                    toast.success("Status successfully fetched")
-                    const data = await res.json();
-                    console.log(data)
-                    setAuthStatus(data)
-                }
-                // setAuthStatus(E1)
-                // setE2Status(E2)
-            })
+        toast.loading("Fetching status...")
+        controllerApi.getAuthStatus(controllerId)
+        .then(async res=>{
+            toast.dismiss()
+            if(res.status!=200){
+                setStatusLoaded(true)
+                toast.error("Failed to fetch status")
+            }
+            else{
+                setStatusLoaded(true)
+                toast.success("Status successfully fetched")
+                const data = await res.json();
+                console.log(data)
+                setAuthStatus(data)
+            }
+            // setAuthStatus(E1)
+            // setE2Status(E2)
+        })
         // }catch(err){console.log(err)}
         // setStatusLoaded(true)
     }
