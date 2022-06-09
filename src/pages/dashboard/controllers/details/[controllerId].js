@@ -303,21 +303,17 @@ const ControllerDetails = () => {
         }
     }
 
-	const removeEntranceButton = (authPair) => async() => {
-		Promise.resolve(authDeviceApi.removeEntrance(authPair))
-		.then(res=>{
-			if(res.status!=200){
-				toast.error("Error removing entrance")
-			}
-			else {
-                toast.success("Successfully removed entrance"); 
-                getInfo();
-                controllerApi.uniconUpdater();
-            }
-            
-        })
-        
-        
+	const removeEntranceButton = (authPair) => async(e) => {
+        e.preventDefault();
+        authDeviceApi.removeEntrance(authPair)
+                     .then(res => {
+                         if(res.status!=200) { toast.success("Error removing entrance"); }
+                         else {
+                            toast.success("Successfully removed entrance");
+                            getInfo();
+                            controllerApi.uniconUpdater;
+                         }
+                     });
 	}
 
     // render view
