@@ -5,7 +5,7 @@ import NextLink from "next/link";
 import { getPersonDetailsLink, getPersonName } from "../../../../utils/persons";
 import WarningChip from "../../shared/warning-chip";
 
-const PersonsListTable = ({ persons, credentialNumbers, selectedAllPersons, selectedSomePersons, handleSelectAllPersons, handleSelectFactory, selectedPersons, page, handlePageChange, rowsPerPage, handleRowsPerPageChange, count, ...other }) => {
+const PersonsListTable = ({ persons, selectedAllPersons, selectedSomePersons, handleSelectAllPersons, handleSelectFactory, selectedPersons, page, handlePageChange, rowsPerPage, handleRowsPerPageChange, count, ...other }) => {
     return (
         <div {...other}>
             <Scrollbar>
@@ -34,10 +34,11 @@ const PersonsListTable = ({ persons, credentialNumbers, selectedAllPersons, sele
                                     personLastName,
                                     personUid,
                                     personMobileNumber,
-                                    personEmail
+                                    personEmail,
+                                    numCredentials
                                 } = person;
                                 const isPersonSelected = selectedPersons.includes(personId);
-                                const numCred = credentialNumbers[personId] || 0;
+                                const numCred = numCredentials || 0;
                                 const handleSelect = handleSelectFactory(personId);
 
                                 return (
