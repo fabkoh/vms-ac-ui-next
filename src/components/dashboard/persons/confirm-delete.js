@@ -37,6 +37,7 @@ export const Confirmdelete = (props) => {
 
     // delete action
     const handleDeletePersons = (e) => {
+		console.log(e);
         deletePersons(e);
         handleClose();
     }
@@ -70,14 +71,11 @@ export const Confirmdelete = (props) => {
 						/> }
 						<Box display="flex" justifyContent="flex-end" mt={1}>
 							<Button
+								type="submit"
 								color="error" 
 								disabled={selectedState? deleteBlock:false}
 								variant="contained"
 								sx={{ borderRadius: 8, marginRight: 1}}
-								onClick={() => {
-									deletePersons();
-									props.setAnchorEl(null);
-								}}
 							>
 								Delete
 							</Button>
