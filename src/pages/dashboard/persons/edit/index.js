@@ -316,7 +316,7 @@ const EditPersonsTwo = () => {
             const newCredentialsInUse = [] //stores cred Ids currently used. 
             person.credentials.forEach(cred => { // populate the above array
                 if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
-                    const inUseValues = credentials[cred.credTypeId]; //credentials is from db. stores credUid for the credIds of form person. doesnt add when new cred added?
+                    const inUseValues = credentials[cred.credTypeId] ?? []; //credentials is from db. stores credUid for the credIds of form person. doesnt add when new cred added?
                     // console.log("inusevalues",inUseValues)
                     // console.log("cred",cred) created creds are in person.credentials array. correct behaviour.
                     // person.originalCreds.forEach(oCred=>{
