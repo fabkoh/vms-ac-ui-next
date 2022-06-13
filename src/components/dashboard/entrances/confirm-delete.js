@@ -49,8 +49,8 @@ export const Confirmdelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteEntrances = () => {
-		deleteEntrances();
+	const handleDeleteEntrances = (e) => {
+		deleteEntrances(e);
 		handleClose();
 	}
 
@@ -85,14 +85,11 @@ export const Confirmdelete = (props) => {
 
 						<Box display="flex" justifyContent="flex-end" mt={1}>
 							<Button
+								type="submit"
 								color="error"
 								disabled={deleteDisabled}
 								variant="contained"
 								sx={{ borderRadius: 8, marginRight: 1}}
-								onClick={() => {
-									deleteEntrances();
-									props.setActionAnchor(null);
-								}}
 							>
 							Delete	
 							</Button>
