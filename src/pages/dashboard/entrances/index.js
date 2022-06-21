@@ -229,7 +229,8 @@ const EntranceList = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrances = async() => {
+	const deleteEntrances = async(e) => {
+        e.preventDefault();
 		Promise.all(selectedEntrances.map(id=>{
 			return entranceApi.deleteEntrance(id)
 		})).then( resArr => {
