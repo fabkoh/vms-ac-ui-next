@@ -6,11 +6,12 @@ import { PencilAlt } from "../../../../icons/pencil-alt";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import { ListFilter } from "../../shared/list-filter";
 import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
+import { getControllerDetailsLink } from "../../../../utils/controller";
 
 // for status options
 const statusOptions = ['Unlocked', 'Active'];
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, ...other }) {   
+export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, entranceSchedules, entranceController, ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
@@ -45,8 +46,6 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                     entranceId,
                                     entranceName,
                                     accessGroups,
-                                    entranceSchedules,
-                                    controller,
                                     isActive
                                 } = entrance
                                 const isEntranceSelected = selectedEntrances.includes(entranceId);
@@ -54,6 +53,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                 const detailsLink = getEntranceDetailsLink(entrance);
                                 const editLink = getEntranceIdsEditLink([entranceId]);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
+                                const numberOfSchedules = entranceSchedules[entranceId];
+                                const controller = entranceController[entranceId];
                                 return(
                                     <TableRow
                                         hover
@@ -88,8 +89,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                         </TableCell>
                                         <TableCell>
                                             {
-                                                (Array.isArray(entranceSchedules) && entranceSchedules.length > 0) ? (
-                                                    <Typography noWrap>{entranceSchedules.length}</Typography>
+                                                numberOfSchedules ? (
+                                                    <Typography noWrap>{numberOfSchedules}</Typography>
                                                 ) : (
                                                     <WarningChip text="No schedules" />
                                                 )
@@ -98,7 +99,11 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                         <TableCell>
                                             {
                                                 controller ? ( // TODO make this into link
-                                                    <Typography noWrap>{ controller.controllerName }</Typography>
+                                                    <NextLink href={getControllerDetailsLink(controller)} passHref>
+                                                        <Link color="inherit">
+                                                            <Typography noWrap>{ controller.controllerName }</Typography>
+                                                        </Link>
+                                                    </NextLink>
                                                 ) : (
                                                     <WarningChip text="No controller" />
                                                 )

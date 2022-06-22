@@ -28,8 +28,8 @@ const RemoveEntrance = (props) => {
 	}
 
 	// delete action
-	const handleRemoveEntrance = () => {
-		removeEntrance();
+	const handleRemoveEntrance = (e) => {
+		removeEntrance(e);
 		handleClose();
 	}
 

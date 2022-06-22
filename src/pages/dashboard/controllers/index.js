@@ -110,7 +110,8 @@ const ControllerList = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteControllers = async() => {
+	const deleteControllers = async(e) => {
+        e.preventDefault();
 		Promise.all(selectedControllers.map(id=>{
 			return controllerApi.deleteController(id)
 		}), toast.loading("Deleting Selected Controller(s)..."))
@@ -122,10 +123,10 @@ const ControllerList = () => {
                     toast.error('Delete unsuccessful', {duration:3000})
 				}
 				else{
-                    controllerApi.uniconUpdater();
 					toast.success('Delete success',{duration:2000});
 				}
 			})
+            controllerApi.uniconUpdater();
 			getInfo();
 		})
 		setDeleteOpen(false);

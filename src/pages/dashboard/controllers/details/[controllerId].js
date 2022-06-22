@@ -88,24 +88,25 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
-            .then(async res=>{
-                toast.dismiss()
-                if(res.status!=200){
-                    setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
-                }
-                else{
-                    setStatusLoaded(true)
-                    toast.success("Status successfully fetched")
-                    const data = await res.json();
-                    console.log(data)
-                    setAuthStatus(data)
-                }
-                // setAuthStatus(E1)
-                // setE2Status(E2)
-            })
-        // }catch(err){console.log(err)}
+
+        toast.loading("Fetching status...")
+        controllerApi.getAuthStatus(controllerId)
+        .then(async res=>{
+            toast.dismiss()
+            if(res.status!=200){
+                setStatusLoaded(true)
+                toast.error("Failed to fetch status")
+            }
+            else{
+                setStatusLoaded(true)
+                toast.success("Status successfully fetched")
+                const data = await res.json();
+                console.log(data)
+                setAuthStatus(data)
+            }
+            // setAuthStatus(E1)
+            // setE2Status(E2)
+        })
         // setStatusLoaded(true)
     }
     
@@ -303,21 +304,17 @@ const ControllerDetails = () => {
         }
     }
 
-	const removeEntranceButton = (authPair) => async() => {
-		Promise.resolve(authDeviceApi.removeEntrance(authPair))
-		.then(res=>{
-			if(res.status!=200){
-				toast.error("Error removing entrance")
-			}
-			else {
-                toast.success("Successfully removed entrance"); 
-                getInfo();
-                controllerApi.uniconUpdater();
-            }
-            
-        })
-        
-        
+	const removeEntranceButton = (authPair) => async(e) => {
+        e.preventDefault();
+        authDeviceApi.removeEntrance(authPair)
+                     .then(res => {
+                         if(res.status!=200) { toast.success("Error removing entrance"); }
+                         else {
+                            toast.success("Successfully removed entrance");
+                            getInfo();
+                            controllerApi.uniconUpdater;
+                         }
+                     });
 	}
 
     // render view
