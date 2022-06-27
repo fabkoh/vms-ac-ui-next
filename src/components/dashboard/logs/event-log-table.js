@@ -1,6 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { Scrollbar } from "../../scrollbar";
 import { toDisplayDateString } from "../../../utils/utils";
+import NextLink from "next/link";
+import { Card, CardHeader, Grid, Link, Divider, Chip, TextField, Box, InputAdornment, Typography, Collapse, IconButton } from "@mui/material";
+import MeetingRoom from "@mui/icons-material/MeetingRoom";
+import WarningChip from "../shared/warning-chip";
+import RenderTableCell from "../shared/renderTableCell";
+import { Person, SelectAll } from "@mui/icons-material";
+import { LockClosed } from '../../../icons/lock-closed';
 
 const EventLogTable = ({logs}) => (
     <div>
@@ -10,10 +17,10 @@ const EventLogTable = ({logs}) => (
                     <TableRow>
                         <TableCell>Event Type</TableCell>
                         <TableCell>Entrance</TableCell>
+                        <TableCell>Controller</TableCell>
                         <TableCell>Person</TableCell>
                         <TableCell>Access Group</TableCell>
                         <TableCell>Timestamp</TableCell>
-                        <TableCell>Auth Method</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -23,38 +30,72 @@ const EventLogTable = ({logs}) => (
                                 hover
                                 key={`logtablerow${i}`}
                             >
-                                <TableCell>{ log.eventType }</TableCell>
-                                <TableCell>
-                                    {
-                                        log.entrance ?
-                                        log.entrance :
-                                        'N.A.'
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    {
-                                        log.person ?
-                                        log.person : 
-                                        'N.A.'
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    {
-                                        log.accessGroup ?
-                                        log.accessGroup :
-                                        'N.A.'
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    { toDisplayDateString(log.timestamp) }
-                                </TableCell>
                                 <TableCell>
                                     { 
-                                        log.authMethod ?
-                                        log.authMethod :
-                                        'N.A.'
+                                        log.direction ? 
+                                        log.eventActionType.eventActionTypeName + " ( " + log.direction +" ) ":
+                                        log.eventActionType.eventActionTypeName
                                     }
                                 </TableCell>
+                                
+                                <TableCell>
+
+                                {log.entrance ?
+                                <RenderTableCell
+                                    exist={log.entrance ? true : false}
+                                    deleted={log.entrance.deleted}
+                                    id={log.entrance.entranceId}
+                                    name={log.entrance.entranceName}
+                                    link={ `/dashboard/entrances/details/${log.entrance.entranceId}` }
+                                    chip={<MeetingRoom fontSize="small" />} //Centered vertically}} />}
+                                />: 'N.A.'
+                                }
+                                </TableCell>
+
+                                
+                                <TableCell>
+                                <RenderTableCell
+                                    exist={log.controller ? true : false}
+                                    deleted={log.controller.deleted}
+                                    id={log.controller.controllerId}
+                                    name={log.controller.controllerName}
+                                    link={ `/dashboard/controllers/details/${log.controller.controllerId}` }
+                                    chip={<SelectAll fontSize="small" sx={{mr: 1}} />}
+                                />
+                                </TableCell>
+
+                                <TableCell>
+                                {log.person ?
+                                <RenderTableCell
+                                    exist={log.person ? true : false}
+                                    deleted={log.person.deleted}
+                                    id={log.person.personId}
+                                    name={log.person.personFirstName +" "+ log.person.personLastName}
+                                    link={ `/dashboard/persons/details/${log.person.personId}` }
+                                    chip={<Person fontSize="small" sx={{mr: 1}} />}
+                                />: 'N.A.'
+                                }
+                                </TableCell>
+
+
+                                <TableCell>
+                                {log.accessGroup ?
+                                <RenderTableCell
+                                    exist={log.accessGroup ? true : false}
+                                    deleted={log.accessGroup.deleted}
+                                    id={log.accessGroup.accessGroupId}
+                                    name={log.accessGroup.accessGroupName }
+                                    link={ `/dashboard/access-groups/details/${log.accessGroup.accessGroupId}` }
+                                    chip={<LockClosed fontSize="small" sx={{mr: 1}} />}
+                                />: 'N.A.'
+                                }
+                                </TableCell>
+
+                                <TableCell>
+                                    {/* { toDisplayDateString(log.eventTime) } */}
+                                    { log.eventTime }
+                                </TableCell>
+                                
                             </TableRow>
                         ))
                     }
