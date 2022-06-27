@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.13.6",
+    "@date-io/dayjs": "^2.14.0",
     "@emotion/cache": "^11.4.0",
     "@emotion/react": "^11.4.1",
     "@emotion/server": "^11.4.0",
@@ -38,6 +39,7 @@
     "@fullcalendar/react": "^5.9.0",
     "@fullcalendar/timegrid": "^5.9.0",
     "@fullcalendar/timeline": "^5.9.0",
+    "@mui/base": "^5.0.0-alpha.86",
     "@mui/icons-material": "^5.0.0-rc.1",
     "@mui/lab": "^5.0.0-alpha.53",
     "@mui/material": "^5.0.4",
