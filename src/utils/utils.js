@@ -27,6 +27,7 @@ const toDisplayDateString = (str) => {
     return (
         str.slice(8, 10) + ' ' +
         months[Number(str.slice(5, 7))] + ' ' +
+
         str.slice(0, 4) + ' ' +
         str.slice(11, 19)
     );
@@ -42,3 +43,31 @@ const toDisplayEventsDateString = (str) => {
 };
 
 export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString,toDisplayEventsDateString }
+
+{
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/persons',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('Add'),
+            path: '/dashboard/persons/create'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/logs'
+          }
+        ]
+      },
+    ]
+  },
