@@ -79,18 +79,19 @@ const getSections = (t) => [
             path: '/dashboard/controllers/'
           }
         ]
-      },
+      }
+      ,
       {
         title: t('Video Recorders'),
         path: '/dashboard/video-recorders/',
         icon: <Videocam fontSize="small" />,
         children: [
           {
-            title: 'List',
+            title: t('List'),
             path: '/dashboard/video-recorders/'
           },
           {
-            title: 'Add',
+            title: t('Add'),
             path: '/dashboard/video-recorders/create'
           }
         ]
@@ -117,33 +118,6 @@ const getSections = (t) => [
         ]
       },
       {
-        title: t('Events'),
-        items: [
-          {
-            title: t('Management'),
-            path: '/dashboard/persons',
-            icon: <NotificationImportantIcon fontSize="small" />,
-            children: [
-              {
-                title: t('Add'),
-                path: '/dashboard/persons/create'
-              }
-            ]
-          },
-          {
-            title: t('Logs'),
-            path: '/dashboard/logs',
-            icon: <DescriptionIcon fontSize="small" />,
-            children: [
-              {
-                title: t('List'),
-                path: '/dashboard/logs'
-              }
-            ]
-          },
-        ]
-      },
-      {
         title: t('Organizations'),
         path: '/dashboard/jobs',
         icon: <OfficeBuildingIcon fontSize="small" />,
@@ -155,6 +129,33 @@ const getSections = (t) => [
           {
             title: t('Add'),
             path: '/dashboard/jobs/companies/1'
+          }
+        ]
+      },
+    ]
+  },
+  {
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/persons',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('Add'),
+            path: '/dashboard/persons/create'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/logs'
           }
         ]
       },
