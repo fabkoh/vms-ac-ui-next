@@ -27,11 +27,14 @@ const toDisplayDateString = (str) => {
     return (
         str.slice(8, 10) + ' ' +
         months[Number(str.slice(5, 7))] + ' ' +
+<<<<<<< .merge_file_a06868
 <<<<<<< .merge_file_a03064
 
         str.slice(0, 4) + ' ' +
         str.slice(11, 19)
 =======
+=======
+>>>>>>> .merge_file_a16456
         str.slice(0, 4) + ', ' +
         str.slice(11, 16)
 >>>>>>> .merge_file_a08372
