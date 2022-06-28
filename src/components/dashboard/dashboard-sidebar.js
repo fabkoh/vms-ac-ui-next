@@ -94,7 +94,6 @@ const getSections = (t) => [
             path: '/dashboard/video-recorders/create'
           }
         ]
-<<<<<<< .merge_file_a14668
       }
       ,
       {
@@ -111,8 +110,6 @@ const getSections = (t) => [
             path: '/dashboard/video-recorders/create'
           }
         ]
-=======
->>>>>>> .merge_file_a07820
       }
     ]
   },
