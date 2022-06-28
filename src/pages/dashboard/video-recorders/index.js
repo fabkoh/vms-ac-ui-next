@@ -303,7 +303,8 @@ EntranceList.getLayout = (page) => (
             <script src="/static/sdk/codebase/encryption/AES.js"></script>
                 <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
                 <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-                <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+                <script id="videonode"
+src="/static/sdk/codebase/webVideoCtrl.js"></script>
         </Head>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
