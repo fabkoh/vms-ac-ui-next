@@ -35,6 +35,8 @@ import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
 import { DoorFront, SelectAll, Videocam } from '@mui/icons-material';
 import { controllerApi } from '../../api/controllers';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant'
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const getSections = (t) => [
   
@@ -77,7 +79,9 @@ const getSections = (t) => [
             path: '/dashboard/controllers/'
           }
         ]
-      },
+      }
+    ]
+  },
       {
         title: t('Video Recorders'),
         path: '/dashboard/video-recorders/',
@@ -92,9 +96,7 @@ const getSections = (t) => [
             path: '/dashboard/video-recorders/create'
           }
         ]
-      }
-    ]
-  },
+      },
   {
     title: t('People'),
     items: [
@@ -111,6 +113,33 @@ const getSections = (t) => [
             title: t('Add'),
             path: '/dashboard/persons/create'
           }
+        ]
+      },
+      {
+        title: t('Events'),
+        items: [
+          {
+            title: t('Management'),
+            path: '/dashboard/persons',
+            icon: <NotificationImportantIcon fontSize="small" />,
+            children: [
+              {
+                title: t('Add'),
+                path: '/dashboard/persons/create'
+              }
+            ]
+          },
+          {
+            title: t('Logs'),
+            path: '/dashboard/logs',
+            icon: <DescriptionIcon fontSize="small" />,
+            children: [
+              {
+                title: t('List'),
+                path: '/dashboard/logs'
+              }
+            ]
+          },
         ]
       },
       {
