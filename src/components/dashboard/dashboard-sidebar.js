@@ -79,9 +79,7 @@ const getSections = (t) => [
             path: '/dashboard/controllers/'
           }
         ]
-      }
-    ]
-  },
+      },
       {
         title: t('Video Recorders'),
         path: '/dashboard/video-recorders/',
@@ -96,7 +94,10 @@ const getSections = (t) => [
             path: '/dashboard/video-recorders/create'
           }
         ]
-      },
+      }
+    ]
+  },
+      
   {
     title: t('People'),
     items: [
