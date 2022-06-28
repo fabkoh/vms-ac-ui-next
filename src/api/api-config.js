@@ -192,4 +192,27 @@ const fakeAuthDevices = [
 
 ]
 
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers,fakeAuthDevices};
+const fakeVideoRecorders = [
+    {
+        "recorderId": 1,
+        "recorderName": "Video Recorder 1",
+        "recorderSerialNumber": "123ABC",
+        "recorderIpAddress": "192.168.34.23",
+        "recorderPortNumber": 81,
+        "recorderUsername": "demo",
+        "recorderPassword": "password",
+        "created": "2022-06-24T10:31:35.126183"
+    }, 
+    {
+        "recorderId": 2,
+        "recorderName": "Video Recorder 2",
+        "recorderSerialNumber": "123ABCD",
+        "recorderIpAddress": "192.168.34.22",
+        "recorderPortNumber": 80,
+        "recorderUsername": "demo",
+        "recorderPassword": "password",
+        "created": "2022-06-24T10:31:35.126183"
+    }
+]
+
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders};

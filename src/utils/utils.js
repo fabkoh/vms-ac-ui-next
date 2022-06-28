@@ -37,8 +37,8 @@ const toDisplayEventsDateString = (str) => {
         str.slice(3, 5) + ' ' +
         months[Number(str.slice(0, 2))] + ' ' +
         str.slice(6, 10) + ' ' +
-        str.slice(11, 19)
-    );
+        str.slice(11, 19))
+
 };
 
 export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString,toDisplayEventsDateString }
