@@ -27,7 +27,7 @@ const toDisplayDateString = (str) => {
     return (
         str.slice(8, 10) + ' ' +
         months[Number(str.slice(5, 7))] + ' ' +
-        str.slice(0, 4) + ' ' +
+        str.slice(0, 4) + ', ' +
         str.slice(11, 16)
     );
 };

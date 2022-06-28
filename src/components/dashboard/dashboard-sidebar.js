@@ -33,7 +33,7 @@ import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
-import { DoorFront, SelectAll } from '@mui/icons-material';
+import { DoorFront, SelectAll, Videocam } from '@mui/icons-material';
 import { controllerApi } from '../../api/controllers';
 
 const getSections = (t) => [
@@ -75,6 +75,21 @@ const getSections = (t) => [
           {
             title: 'List',
             path: '/dashboard/controllers/'
+          }
+        ]
+      },
+      {
+        title: t('Video Recorders'),
+        path: '/dashboard/video-recorders/',
+        icon: <Videocam fontSize="small" />,
+        children: [
+          {
+            title: 'List',
+            path: '/dashboard/video-recorders/'
+          },
+          {
+            title: 'Add',
+            path: '/dashboard/video-recorders/create'
           }
         ]
       }
