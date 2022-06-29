@@ -206,7 +206,7 @@ const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
 const eventsCount = filteredEvents.length;
 
 // for polling 
-const [pollingTime, setPollingTime] = useState(30000);
+const [pollingTime, setPollingTime] = useState(10000);
 const pollingOptions = [
     { "pollingDisplay" : 1, "pollingTime" : 1000},
     { "pollingDisplay" : 2, "pollingTime" : 2000},

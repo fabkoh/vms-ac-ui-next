@@ -1,5 +1,3 @@
-<<<<<<< .merge_file_a00376
-=======
 import { useEffect, useMemo, useRef, useState } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -37,6 +35,8 @@ import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
 import { DoorFront, SelectAll, Videocam } from '@mui/icons-material';
 import { controllerApi } from '../../api/controllers';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant'
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const getSections = (t) => [
   
@@ -86,17 +86,18 @@ const getSections = (t) => [
         icon: <Videocam fontSize="small" />,
         children: [
           {
-            title: 'List',
+            title: t('List'),
             path: '/dashboard/video-recorders/'
           },
           {
-            title: 'Add',
+            title: t('Add'),
             path: '/dashboard/video-recorders/create'
           }
         ]
       }
     ]
   },
+      
   {
     title: t('People'),
     items: [
@@ -127,6 +128,33 @@ const getSections = (t) => [
           {
             title: t('Add'),
             path: '/dashboard/jobs/companies/1'
+          }
+        ]
+      },
+    ]
+  },
+  {
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/persons',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('Add'),
+            path: '/dashboard/persons/create'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/logs'
           }
         ]
       },
@@ -616,4 +644,4 @@ DashboardSidebar.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool
 };
->>>>>>> .merge_file_a19472
+
