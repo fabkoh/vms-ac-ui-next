@@ -90,3 +90,38 @@ const capitalize = (s) => {
     if (s.length == 0) return "";
     return s.charAt(0).toUpperCase() + s.substring(1);
 }
+
+export function rruleDescriptionWithBr(rruleObj, timeStart, timeEnd) {
+    // returns '1 time on {Date} from {timeStart} to {timeEnd}' when count == 1
+    // returns 'Every month on the {num} {day} from {timeStart} to {timeEnd}, starting {startDate}' when setPos is set
+    // appends ' from {timeStart} to {timeEnd}, starting {startDate}' for all other rules
+
+    if (rruleObj == undefined) {
+        return "Please select start date below";
+    }
+
+    const rruleOptions = rruleObj.origOptions;
+    
+    // return 'Please select start date' if start date not in object
+    if (rruleOptions.dtstart == null) {
+        return 'Please select start date below';
+    }
+
+    const dateString = rruleOptions.dtstart.toLocaleDateString("en-US", {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // return '1 time on {Date} from {timeStart} to {timeEnd} when count == 1
+    if (rruleOptions.count == 1) {
+        return `1 time on ${dateString}` + getTime(timeStart, timeEnd);
+    }
+
+    return (
+    
+    <div>
+        <div>{capitalize(getDescription(rruleObj) + getTime(timeStart, timeEnd)) }</div>
+        <div>{`starting ${dateString}` }</div>
+    </div>)
+}
