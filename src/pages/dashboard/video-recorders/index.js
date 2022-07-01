@@ -24,7 +24,7 @@ const applyFilter = createFilter({
     status: filterRecorderByStatus
 })
 
-const EntranceList = () => {
+const RecorderList = () => {
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
@@ -297,7 +297,7 @@ const EntranceList = () => {
     )
 }
 
-EntranceList.getLayout = (page) => (
+RecorderList.getLayout = (page) => (
     <AuthGuard>
         <Head>
             <script src="/static/sdk/codebase/encryption/AES.js"></script>
@@ -310,4 +310,4 @@ src="/static/sdk/codebase/webVideoCtrl.js"></script>
     </AuthGuard>
 );
 
-export default EntranceList;
+export default RecorderList;
