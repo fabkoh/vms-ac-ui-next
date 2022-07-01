@@ -206,7 +206,7 @@ const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
 const eventsCount = filteredEvents.length;
 
 // for polling 
-const [pollingTime, setPollingTime] = useState(10000);
+const [pollingTime, setPollingTime] = useState(1000);
 const pollingOptions = [
     { "pollingDisplay" : 1, "pollingTime" : 1000},
     { "pollingDisplay" : 2, "pollingTime" : 2000},
@@ -218,14 +218,11 @@ const pollingOptions = [
 ]
 const getPollingDisplay = (e) => e.pollingDisplay
 const getPollingValue = (e) => e.pollingTime
-const onPollingTimeChange = (e) => setPollingTime(e.target.value)
-
-
-
+const onPollingTimeChange = (e) => {
+        setPollingTime(e.target.value)}
 
 
 const getEvents = useCallback(async () => {
-
     try {
   //const data = await personApi.getFakePersons() 
     const res = await eventslogsApi.getEvents()
@@ -239,15 +236,23 @@ const getEvents = useCallback(async () => {
     }
 }, [isMounted]);
 
+
 useEffect(
     () => {
         getEvents()
-        const timer = setInterval(getEvents, pollingTime);
-        return () => clearInterval(timer)
-        
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+);
+
+useEffect(
+    () => {
+        console.log(pollingTime)
+        const timer = setInterval(getEvents, pollingTime);
+        return () => clearInterval(timer)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pollingTime]
 );
 
 const getInfo = useCallback(async() => {
@@ -282,27 +287,7 @@ const getInfo = useCallback(async() => {
                             <Grid item sx={{m:2.5}}>
                                 <Typography variant="h4">Event Logs</Typography>
                             </Grid>
-
-                            <Grid
-                                item
-                                md={3}
-                            >
-                                <SingleSelect
-                                    fullWidth
-                                    sx={{ minWidth: '90px' }}
-                                    label="seconds"
-                                    getLabel={getPollingDisplay}
-                                    onChange={onPollingTimeChange}
-                                    value={pollingTime}
-                                    options={pollingOptions}
-                                    getValue={getPollingValue}
-                                    noclear
-                                    required
-                                    helperText='Auto Refresh '
-                                />
-                            </Grid>
-
-                            <Grid item>
+                            <Grid item sx={{m:2.5}}>
                                 <Button
                                     variant="contained"
                                     sx={{ m: 1 , mr : 5 }}
@@ -313,9 +298,11 @@ const getInfo = useCallback(async() => {
                                 </Button>
                             </Grid>
                             </Grid>
+                        
+                        <Grid container justifyContent="space-between" spacing={3}>
                         <Box
                             sx={{
-                                m: -1,
+                                m: 2.5,
                                 mt: 3
                             }}
                         >
@@ -332,7 +319,28 @@ const getInfo = useCallback(async() => {
                             >
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                            </Box>
+                            
+                            <Box
+                            sx={{
+                                m: 2.5,
+                                mt: 3,
+                                mr:7.5
+                            }}>
+                                <SingleSelect
+                                    label="seconds"
+                                    getLabel={getPollingDisplay}
+                                    onChange={onPollingTimeChange}
+                                    value={pollingTime}
+                                    options={pollingOptions}
+                                    getValue={getPollingValue}
+                                    noclear
+                                    required
+                                    helperText='Auto Refresh '
+                                />
+                            </Box>
+                        
+                        </Grid>
                     </Box>
                     <Card>
                         <Divider />
@@ -378,9 +386,26 @@ const getInfo = useCallback(async() => {
                                 flexGrow: 1,
                             }}
                         >
-                            <StartDateTimePicker /> 
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DateTimePicker
+                                    renderInput={(props) => <TextField {...props} />}
+                                    label="Start Date Time"
+                                    value={filterStart}
+                                    onChange={(e)=> {}}
+                                    onAccept={handleStartDate}
+                                />
+                            </LocalizationProvider>
+
                             <span> &nbsp; &nbsp;</span>
-                            <EndDateTimePicker/> 
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DateTimePicker
+                                renderInput={(props) => <TextField {...props} />}
+                                label="End Date Time"
+                                value={filterEnd}
+                                onChange={(e)=> {}}
+                                    onAccept={handleEndDate}
+                                />
+                            </LocalizationProvider>
                             <span> &nbsp; &nbsp;</span>
 
                             <Button

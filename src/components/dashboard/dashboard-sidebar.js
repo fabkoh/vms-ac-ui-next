@@ -138,9 +138,13 @@ const getSections = (t) => [
     items: [
       {
         title: t('Management'),
-        path: '/dashboard/persons',
+        path: '/dashboard/events-management',
         icon: <NotificationImportantIcon fontSize="small" />,
         children: [
+          {
+            title: t('List'),
+            path: '/dashboard/events-management'
+          },
           {
             title: t('Add'),
             path: '/dashboard/persons/create'
