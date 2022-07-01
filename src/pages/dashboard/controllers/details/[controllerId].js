@@ -40,6 +40,156 @@ import { ControllerBasicDetails } from "../../../../components/dashboard/control
 import AuthDevicePair from "../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { getControllerEditLink, getControllerListLink } from "../../../../utils/controller";
 import { authDeviceApi } from "../../../../api/auth-devices";
+import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
+
+const controllerEventManagements = [
+    // for entrance 
+    {
+        "eventsManagementId":1,
+        "eventsManagementName":"Events 1",
+        "inputEvents":[
+            // input w/o timer 
+            {
+                "inputEventId":1,
+                "timerDuration":null,
+                "eventActionInputType":{
+                    "eventActionInputId":1,
+                    "eventActionInputTypeName":"Authenticated Scan",
+                    "timerEnabled":false
+                }
+            },
+            // input with timer ( 30 secs )
+            {
+                "inputEventId":2,
+                "timerDuration":30,
+                "eventActionInputType":{
+                    "eventActionInputId":2,
+                    "eventActionInputTypeName":"Door Opened",
+                    "timerEnabled":true
+                }
+            }
+            
+        ],
+        "outputActions":[
+            // output w/o timer 
+            {
+                "outputEventId":1,
+                "timerDuration":null,
+                "eventActionOutputType":{
+                    "eventActionOutputId":1,
+                    "eventActionOutputTypeName":"Authenticated Scan",
+                    "timerEnabled":false
+                }
+            },
+            // output with timer ( 30 secs )
+            {
+                "outputEventId":2,
+                "timerDuration":30,
+                "eventActionOutputType":{
+                    "eventActionOutputId":2,
+                    "eventActionOutputTypeName":"Buzzer buzzing",
+                    "timerEnabled":true
+                }
+            },
+            // output with timer ( but choose to let it go on indefinitely )
+            {
+                "outputEventId":3,
+                "timerDuration":null,
+                "eventActionOutputType":{
+                    "eventActionOutputId":3,
+                    "eventActionOutputTypeName":"LED light",
+                    "timerEnabled":true
+                }
+            }
+            
+        ],
+        "triggerSchedule":{
+            "triggerScheduleId":1,
+            "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
+            "timeStart":"00:00",
+            "timeEnd":"12:00",
+        },
+        "entrance":{
+            "entranceId": 3,
+            "entranceName": "Abandoned Entrance",
+            "deleted": false
+        },
+        "controller":null},
+    
+        // for controller 
+        {
+            "eventsManagementId":2,
+            "eventsManagementName":"Events 2",
+            "inputEvents":[
+                // input w/o timer 
+                {
+                    "inputEventId":4,
+                    "timerDuration":null,
+                    "eventActionInputType":{
+                        "eventActionInputId":4,
+                        "eventActionInputTypeName":"Authenticated Scan controller",
+                        "timerEnabled":false
+                    }
+                },
+                // input with timer ( 30 secs )
+                {
+                    "inputEventId":5,
+                    "timerDuration":30,
+                    "eventActionInputType":{
+                        "eventActionInputId":5,
+                        "eventActionInputTypeName":"Door Opened",
+                        "timerEnabled":true
+                    }
+                }
+                
+            ],
+            "outputActions":[
+                // output w/o timer 
+                {
+                    "outputEventId":4,
+                    "timerDuration":null,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":4,
+                        "eventActionOutputTypeName":"Authenticated Scan controller",
+                        "timerEnabled":false
+                    }
+                },
+                // output with timer ( 30 secs )
+                {
+                    "outputEventId":5,
+                    "timerDuration":30,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":5,
+                        "eventActionOutputTypeName":"Buzzer buzzing controller",
+                        "timerEnabled":true
+                    }
+                },
+                // output with timer ( but choose to let it go on indefinitely )
+                {
+                    "outputEventId":6,
+                    "timerDuration":null,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":6,
+                        "eventActionOutputTypeName":"LED light for controller",
+                        "timerEnabled":true
+                    }
+                }
+                
+            ],
+            "triggerSchedule":{
+                "triggerScheduleId":2,
+                "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
+                "timeStart":"00:00",
+                "timeEnd":"12:00",
+            },
+            "entrance":null,
+            "controller":{
+                "controllerId": 2,
+                "controllerName": "100000005a46e105",
+                "deleted": false,
+                "controllerSerialNo": "100000005a46e105"
+            }}
+]
 
 const ControllerDetails = () => {
 
@@ -485,6 +635,17 @@ const ControllerDetails = () => {
                                 />
                             </Grid>                         
                         </Grid>
+                        <Grid
+                                item
+                                xs={12}
+                            >
+                                <ControllerEventsManagement  
+                                    entrance={entrance}
+                                    controllerEventManagements={controllerEventManagements}
+                                    // deleteSchedules={deleteSchedules}
+                                    // eventsManagementCreatelink={eventsManagementCreatelink} 
+                                />
+                            </Grid>
                     </Box>
                 </Container>
             </Box>

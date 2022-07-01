@@ -20,12 +20,12 @@ const EventLogTable = ({
             <Table sx={{minWidth: 700}}>
                 <TableHead sx={{backgroundColor:"neutral.200"}}>
                     <TableRow>
+                        <TableCell>Timestamp</TableCell>
                         <TableCell>Event Type</TableCell>
                         <TableCell>Entrance</TableCell>
                         <TableCell>Controller</TableCell>
                         <TableCell>Person</TableCell>
                         <TableCell>Access Group</TableCell>
-                        <TableCell>Timestamp</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -37,6 +37,11 @@ const EventLogTable = ({
                                 hover
                                 key={`logtablerow${i}`}
                             >
+
+                                <TableCell>
+                                    {/* { toDisplayDateString(log.eventTime) } */}
+                                    { toDisplayEventsDateString(log.eventTime) }
+                                </TableCell>
 
                             {/* // insert icon for different types of eventtype  */}
                                 <TableCell>
@@ -103,10 +108,7 @@ const EventLogTable = ({
                                 }
                                 </TableCell>
 
-                                <TableCell>
-                                    {/* { toDisplayDateString(log.eventTime) } */}
-                                    { toDisplayEventsDateString(log.eventTime) }
-                                </TableCell>
+                                
                                 
                             </TableRow>
                         ))
