@@ -23,7 +23,7 @@ const applyFilter = createFilter({
     status: filterRecorderByStatus
 })
 
-const EntranceList = () => {
+const RecorderList = () => {
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
@@ -296,10 +296,10 @@ const EntranceList = () => {
     )
 }
 
-EntranceList.getLayout = (page) => (
+RecorderList.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );
 
-export default EntranceList;
+export default RecorderList;
