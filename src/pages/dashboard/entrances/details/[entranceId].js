@@ -222,6 +222,7 @@ const EntranceDetails = () => {
         }
     }
 
+
     const getEntrance = useCallback(async() => {
         try {
             const res = await entranceApi.getEntrance(entranceId);
