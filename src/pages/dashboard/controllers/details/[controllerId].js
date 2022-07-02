@@ -642,7 +642,7 @@ const ControllerDetails = () => {
                                 <ControllerEventsManagement  
                                     entrance={entrance}
                                     controllerEventManagements={controllerEventManagements}
-                                    // deleteSchedules={deleteSchedules}
+                                    // deleteSchedules={deleteController}
                                     // eventsManagementCreatelink={eventsManagementCreatelink} 
                                 />
                             </Grid>

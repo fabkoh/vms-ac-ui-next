@@ -210,7 +210,7 @@ export default function ControllerEventsManagement({
 									<TableRow hover key={i}>
                                         <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
                                         <TableCell sx={{minWidth: 150}}>{eventManagement.eventsManagementName}</TableCell>
-                                        <TableCell sx={{minWidth: 200}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
+                                        <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
                                         <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
                                         <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
 									</TableRow>

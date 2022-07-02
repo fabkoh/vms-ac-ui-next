@@ -124,7 +124,6 @@ const EntranceList = () => {
             setSelectedEntrances([ ...selectedEntrances, entranceId ]);
         }
     }
-
      // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
     const open = Boolean(actionAnchor);

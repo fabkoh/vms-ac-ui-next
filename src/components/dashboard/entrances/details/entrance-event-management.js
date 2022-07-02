@@ -3,6 +3,7 @@ import {
 	Button,
 	Card,
 	CardHeader,
+	Checkbox,
 	Collapse,
 	Divider,
 	Grid,
@@ -172,6 +173,7 @@ export default function EntranceEventsManagement({
 						<Table>
 							<TableHead sx={{ backgroundColor: "neutral.200" }}>
 								<TableRow>
+                                    
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>
                                     <TableCell>Input(s)</TableCell>
@@ -179,15 +181,19 @@ export default function EntranceEventsManagement({
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{entranceEventManagements.map((eventManagement, i) => (
-									<TableRow hover key={i}>
+								{entranceEventManagements.map((eventManagement, i) => {
+
+                                return(
+									
+                          
+                                    <TableRow hover key={i}>
                                         <TableCell sx={{minWidth: 150}}>{eventManagement.eventsManagementName}</TableCell>
-                                        <TableCell sx={{minWidth: 200}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
+                                        <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
                                         <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
                                         <TableCell sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
 									</TableRow>
                                     
-								))}
+								);})}
 							</TableBody>
 						</Table>
 					</Scrollbar> 
