@@ -8,48 +8,57 @@ import { ListFilter } from "../../shared/list-filter";
 import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
 import { getControllerDetailsLink } from "../../../../utils/controller";
 
-// for status options
-const statusOptions = ['Unlocked', 'Active'];
+function EventsManagementTable({ 
+    selectedEventsManagement, 
+    selectedSomeEventsManagement, 
+    selectedAllEventsManagement,
+    handleSelectAllEventsManagement, 
+    eventsManagements, 
+    selectedEventsManagement, 
+    handleSelectFactory, 
+    eventsManagementCount, 
+    onPageChange, 
+    onRowsPerPageChange, 
+    page,
+    rowsPerPage, 
+    handleStatusSelect, 
+    openStatusUpdateDialog,
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, entranceSchedules, entranceController, ...other }) {   
+    entranceSchedules,
+    entranceController,
+     ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
                 <Table sx={{ minWidth: 700 }}>
                     <TableHead sx={{ backgroundColor: "neutral.200" }}>
                         <TableRow>
-                            <TableCell padding="checkbox">
+                                <TableCell padding="checkbox">
                                 <Checkbox
-                                    checked={selectedAllEntrances}
-                                    indeterminate={selectedSomeEntrances}
-                                    onChange={handleSelectAllEntrances}
+                                    checked={selectedAllEventsManagement}
+                                    indeterminate={selectedSomeEventsManagement}
+                                    onChange={handleSelectAllsEventsManagement}
                                 />  
-                            </TableCell>
+                                </TableCell>
                             <TableCell>Name</TableCell>    
                             <TableCell>No. of Access Groups</TableCell>
                             <TableCell>No. of Schedules</TableCell>
                             <TableCell>Controller</TableCell>
-                            <TableCell>
-                                <ListFilter
-                                    array={statusOptions}
-                                    onSelect={handleStatusSelect}
-                                    defaultLabel="Status"
-                                />
-                            </TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>    
                     </TableHead>   
                     <TableBody>
                         {
-                            entrances.map(entrance => {
+                            eventsManagements.map(eventsManagement => {
                                 const {
                                     entranceId,
                                     entranceName,
                                     accessGroups,
                                     isActive
-                                } = entrance
-                                const isEntranceSelected = selectedEntrances.includes(entranceId);
-                                const handleSelect = handleSelectFactory(entranceId);
+                                } = eventsManagement
+                                
+                                const IsEventsManagementSelected = selectedEventsManagement.includes(eventManagement.eventsManagementId);
+                                const handleSelect = handleSelectFactory(eventManagement.eventsManagementId);
                                 const detailsLink = getEntranceDetailsLink(entrance);
                                 const editLink = getEntranceIdsEditLink([entranceId]);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
@@ -63,9 +72,9 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
-                                                checked={isEntranceSelected}
+                                                checked={IsEventsManagementSelected}
                                                 onChange={handleSelect}
-                                                value={isEntranceSelected}
+                                                value={IsEventsManagementSelected}
                                             /> 
                                         </TableCell>    
                                         <TableCell>
@@ -158,3 +167,5 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
         </div>
     )
 }
+
+export default EventsManagementTable

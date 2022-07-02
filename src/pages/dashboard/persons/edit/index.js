@@ -342,7 +342,7 @@ const EditPersonsTwo = () => {
                     // if (inUseValues.includes(cred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
                     //     newCredentialsInUse.push(cred.credId);
                     // }
-                    if (inUseValues.includes(cred.credUid)&& !origIds.includes(cred.credId)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
+                    if (inUseValues && inUseValues.includes(cred.credUid)&& !origIds.includes(cred.credId)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
                         newCredentialsInUse.push(cred.credId);
                     }
                 }

@@ -15,20 +15,169 @@ import { gtm } from "../../../lib/gtm";
 import { Upload } from "../../../icons/upload"; 
 import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
-import EntranceListTable from "../../../components/dashboard/entrances/list/entrance-list-table";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
 import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
+import { EventsManagementTable } from "../../../components/dashboard/events-management/list/events-management-table";
+
+const EventManagements = [
+    // for entrance 
+    {
+        "eventsManagementId":1,
+        "eventsManagementName":"Events 1",
+        "inputEvents":[
+            // input w/o timer 
+            {
+                "inputEventId":1,
+                "timerDuration":null,
+                "eventActionInputType":{
+                    "eventActionInputId":1,
+                    "eventActionInputTypeName":"Authenticated Scan",
+                    "timerEnabled":false
+                }
+            },
+            // input with timer ( 30 secs )
+            {
+                "inputEventId":2,
+                "timerDuration":30,
+                "eventActionInputType":{
+                    "eventActionInputId":2,
+                    "eventActionInputTypeName":"Door Opened",
+                    "timerEnabled":true
+                }
+            }
+            
+        ],
+        "outputActions":[
+            // output w/o timer 
+            {
+                "outputEventId":1,
+                "timerDuration":null,
+                "eventActionOutputType":{
+                    "eventActionOutputId":1,
+                    "eventActionOutputTypeName":"Authenticated Scan",
+                    "timerEnabled":false
+                }
+            },
+            // output with timer ( 30 secs )
+            {
+                "outputEventId":2,
+                "timerDuration":30,
+                "eventActionOutputType":{
+                    "eventActionOutputId":2,
+                    "eventActionOutputTypeName":"Buzzer buzzing",
+                    "timerEnabled":true
+                }
+            },
+            // output with timer ( but choose to let it go on indefinitely )
+            {
+                "outputEventId":3,
+                "timerDuration":null,
+                "eventActionOutputType":{
+                    "eventActionOutputId":3,
+                    "eventActionOutputTypeName":"LED light",
+                    "timerEnabled":true
+                }
+            }
+            
+        ],
+        "triggerSchedule":{
+            "triggerScheduleId":1,
+            "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
+            "timeStart":"00:00",
+            "timeEnd":"12:00",
+        },
+        "entrance":{
+            "entranceId": 3,
+            "entranceName": "Abandoned Entrance",
+            "deleted": false
+        },
+        "controller":null},
+    
+        // for controller 
+        {
+            "eventsManagementId":2,
+            "eventsManagementName":"Events 2",
+            "inputEvents":[
+                // input w/o timer 
+                {
+                    "inputEventId":4,
+                    "timerDuration":null,
+                    "eventActionInputType":{
+                        "eventActionInputId":4,
+                        "eventActionInputTypeName":"Authenticated Scan controller",
+                        "timerEnabled":false
+                    }
+                },
+                // input with timer ( 30 secs )
+                {
+                    "inputEventId":5,
+                    "timerDuration":30,
+                    "eventActionInputType":{
+                        "eventActionInputId":5,
+                        "eventActionInputTypeName":"Door Opened",
+                        "timerEnabled":true
+                    }
+                }
+                
+            ],
+            "outputActions":[
+                // output w/o timer 
+                {
+                    "outputEventId":4,
+                    "timerDuration":null,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":4,
+                        "eventActionOutputTypeName":"Authenticated Scan controller",
+                        "timerEnabled":false
+                    }
+                },
+                // output with timer ( 30 secs )
+                {
+                    "outputEventId":5,
+                    "timerDuration":30,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":5,
+                        "eventActionOutputTypeName":"Buzzer buzzing controller",
+                        "timerEnabled":true
+                    }
+                },
+                // output with timer ( but choose to let it go on indefinitely )
+                {
+                    "outputEventId":6,
+                    "timerDuration":null,
+                    "eventActionOutputType":{
+                        "eventActionOutputId":6,
+                        "eventActionOutputTypeName":"LED light for controller",
+                        "timerEnabled":true
+                    }
+                }
+                
+            ],
+            "triggerSchedule":{
+                "triggerScheduleId":2,
+                "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
+                "timeStart":"00:00",
+                "timeEnd":"12:00",
+            },
+            "entrance":null,
+            "controller":{
+                "controllerId": 2,
+                "controllerName": "100000005a46e105",
+                "deleted": false,
+                "controllerSerialNo": "100000005a46e105"
+            }}
+]
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
     status: filterEntranceByStatus
 })
 
-const EntranceList = () => {
+const EventsManagementList = () => {
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
@@ -37,23 +186,7 @@ const EntranceList = () => {
     // get entrances and access groups
     const [entrances, setEntrances] = useState([]);
     const isMounted = useMounted();
-    const getAccessGroupsLocal = useCallback(async(entrances) => {
-        const newEntrances = [ ...entrances ]
-        const resArr = await Promise.all(
-            newEntrances.map(
-                entrance => accessGroupEntrance.getAccessGroupWhereEntranceId(entrance.entranceId)
-            )
-        );
-        const successArr = resArr.map(res => res.status == 200);
-        if(successArr.some(success => !success)) { // some res fail
-            toast.error("Access groups info failed to load");
-        }
-        const jsonArr = await Promise.all(resArr.map(res => res.json()));
-        newEntrances.forEach((entrance, i) => entrance.accessGroups = successArr[i] ? jsonArr[i] : []);
-        if (isMounted()) {
-            setEntrances(newEntrances);
-        }
-    }, [isMounted]);
+
     const getEntrancesLocal = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
@@ -66,64 +199,20 @@ const EntranceList = () => {
         }
         return data;
     }, [isMounted]);
-    const [entranceSchedules, setEntranceSchedules] = useState({}); // map entranceId to number of schedules
-    const getEntranceSchedules = async() => {
-        try {
-            const res = await entranceScheduleApi.getEntranceSchedules();
-            if(res.status != 200) throw 'cannot load entrance schedules';
-            const body = await res.json();
-            const temp = {};
-            body.forEach(sch => {
-                temp[sch.entranceId] = (temp[sch.entranceId] || 0) + 1;
-            })
-            setEntranceSchedules(temp);
-        } catch(e) {
-            console.error(e);
-            toast.error("Entrance schedules failed to load");
-        }
-    }
-    const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
-    const getControllers = async() => {
-        try {
-            const res = await controllerApi.getControllers();
-            if(res.status != 200) throw 'cannot load controllers';
-            const body = await res.json();
-            const temp = {};
-            body.forEach(con => {
-                const authArr = con.authDevices;
-                if (Array.isArray(authArr)) {
-                    authArr.forEach(auth => {
-                        const entranceId = auth.entrance?.entranceId;
-                        if (entranceId) temp[entranceId] = con;
-                    });
-                }
-            });
-            setEntranceController(temp);
-        } catch(e) {
-            console.error(e);
-            toast.error("Entrance controllers failed to load");
-        }
-    };
-    const getInfo = async() => {
-        getControllers();
-        getEntranceSchedules();
-        getAccessGroupsLocal(await getEntrancesLocal());
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(getInfo, [])  
 
     // for selection of checkboxes
-    const [selectedEntrances, setSelectedEntrances] = useState([]);
-    const selectedAllEntrances = selectedEntrances.length == entrances.length;
-    const selectedSomeEntrances = selectedEntrances.length > 0 && !selectedAllEntrances;
-    const handleSelectAllEntrances = (e) => setSelectedEntrances(e.target.checked ? entrances.map(e => e.entranceId) : []);
-    const handleSelectFactory = (entranceId) => () => {
-        if (selectedEntrances.includes(entranceId)) {
-            setSelectedEntrances(selectedEntrances.filter(id => id !== entranceId));
+    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+    const selectedAllEventsManagement = selectedEventsManagement.length == EventManagements.length;
+    const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
+    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? entrances.map(e => e.entranceId) : []);
+    const handleSelectFactory = (eventsManagementId) => () => {
+        if (selectedEventsManagement.includes(eventsManagementId)) {
+            setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
         } else {
-            setSelectedEntrances([ ...selectedEntrances, entranceId ]);
+            setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
         }
     }
+
      // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
     const open = Boolean(actionAnchor);
@@ -250,19 +339,19 @@ const EntranceList = () => {
     // Reset selectedEntrances when entrances change
 	useEffect(
 		() => {
-			if (selectedEntrances.length) {
-				setSelectedEntrances([]);
+			if (selectedEventsManagement.length) {
+				setSelectedEventsManagement([]);
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[entrances]
+		[EventsManagement]
 	);
     
 
     return(
         <>
             <Head>
-                <title>Etlas: Entrance List</title>
+                <title>Etlas: Events Management</title>
             </Head>
             <ConfirmStatusUpdate
                 entranceIds={statusUpdateIds}
@@ -282,7 +371,7 @@ const EntranceList = () => {
                     <Box sx={{ mb: 4 }}>
                         <Grid container justifyContent="space-between" spacing={3}>
                             <Grid item sx={{ m: 2.5 }}>
-                                <Typography variant="h4">Entrances</Typography>    
+                                <Typography variant="h4">Events Management</Typography>    
                             </Grid>    
                             <Grid item>
                                 <Button
@@ -400,21 +489,21 @@ const EntranceList = () => {
                                 />                                   
                             </Box>
                         </Box>
-                        <EntranceListTable 
-                            entrances={paginatedEntrances}
-                            selectedAllEntrances={selectedAllEntrances}
-                            selectedSomeEntrances={selectedSomeEntrances}
-                            handleSelectAllEntrances={handleSelectAllEntrances}
+                        
+                        <EventsManagementTable 
+                            eventsManagements={EventManagements}
+                            selectedAllEventsManagement={selectedAllEventsManagement}
+                            selectedSomeEventsManagement={selectedSomeEventsManagement}
+                            handleSelectAllEventsManagement={handleSelectAllEventsManagement}
                             handleSelectFactory={handleSelectFactory}
-                            selectedEntrances={selectedEntrances}
-                            entranceCount={filteredEntrances.length}
+                            selectedEventsManagement={selectedEventsManagement}
+                            eventsManagementCount={EventManagements.length}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             page={page}
                             rowsPerPage={rowsPerPage}
                             handleStatusSelect={handleStatusSelect}
                             openStatusUpdateDialog={openStatusUpdateDialog}
-                            entranceSchedules={entranceSchedules}
                             entranceController={entranceController}
                         />
                     </Card>
@@ -424,10 +513,10 @@ const EntranceList = () => {
     )
 }
 
-EntranceList.getLayout = (page) => (
+EventsManagementList.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );
 
-export default EntranceList;
+export default EventsManagementList;

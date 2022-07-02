@@ -4,38 +4,16 @@ import Dialog from "@mui/material/Dialog";
 import {
 	Button,
 	Box,
-	DialogActions,
 	DialogContent,
 	DialogContentText,
 	TextField
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
-	const {open, handleDialogClose, deleteAccessGroups}=props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
-
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
-
-	//move text state here
-
+	const { open, handleDialogClose, deleteRecorders } = props;
+	
 	//text field
 	const [value, setValue] = useState("");
 	const handleTextChange = (e) => setValue(e.target.value);
@@ -47,8 +25,8 @@ export const Confirmdelete = (props) => {
     }
 
     // delete action
-    const handleDeleteAccessGroups = (e) => {
-        deleteAccessGroups(e);
+    const handleDeleteVideoRecorders = () => {
+        deleteRecorders();
         handleClose();
     }
 	
@@ -69,11 +47,11 @@ export const Confirmdelete = (props) => {
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Are you sure you want to delete access group(s)? This action cannot be
+						Are you sure you want to delete video recorder(s)? This action cannot be
 						undone.
 					</DialogContentText>
 
-					<form onSubmit={handleDeleteAccessGroups}>
+					<form onSubmit={handleDeleteVideoRecorders}>
 						<TextField
 							variant="filled"
 							fullWidth 
@@ -82,15 +60,16 @@ export const Confirmdelete = (props) => {
 							autoFocus 
 						/>
 
-						<Box display="flex" justifyContent="flex-end" mt={1}>
+						<Box display="flex"
+							 justifyContent="flex-end"
+							 mt={1}>
 							<Button
 								color="error"
 								disabled={deleteDisabled}
 								variant="contained"
 								sx={{ borderRadius: 8, marginRight: 1}}
 								onClick={() => {
-									deleteAccessGroups();
-									props.setAnchorEl(null);
+									handleDeleteVideoRecorders();
 								}}
 							>
 							Delete	
@@ -99,7 +78,6 @@ export const Confirmdelete = (props) => {
 							<Button
 								onClick={() => {
 									handleClose();
-									props.setAnchorEl(null);
 								}}
 								variant="outlined"
 								sx={{ borderRadius: 8, color: "main.primary" }}

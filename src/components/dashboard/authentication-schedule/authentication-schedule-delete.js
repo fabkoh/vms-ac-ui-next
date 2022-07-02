@@ -24,7 +24,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
     const [selected, setSelected] = useState([])
     const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
     const selectedSome = selected.length > 0 && !selectedAll;
-    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authenticationScheduleId) : []);
+    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authMethodScheduleId) : []);
     const handleSelectFactory = (id) => () => {
         if (selected.includes(id)) {
             setSelected(selected.filter(i => i != id));
@@ -48,7 +48,6 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
 
     // delete action
     const handleDeleteSchedules = () => {
-        console.log(selected, selectedAll);
         deleteSchedules(selected, selectedAll);
         handleClose();
     }
@@ -108,10 +107,9 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                                         timeEnd,
                                                         authMethod
                                                     } = schedule;
-                                                    console.log("authMethodScheduleId:",authMethodScheduleId)
                                                     const isScheduleSelected = selected.includes(authMethodScheduleId);
                                                     const handleSelect = handleSelectFactory(authMethodScheduleId);
-            
+                                                        
                                                     return (
                                                         <TableRow hover key={i}>
                                                             <TableCell padding="checkbox">

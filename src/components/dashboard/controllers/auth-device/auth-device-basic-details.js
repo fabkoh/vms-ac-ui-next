@@ -71,16 +71,21 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     align={align}
                     divider
                     label="Entrance"
-                    value={deviceInfo.entrance?<NextLink
-                    href={getEntranceDetailsLink(deviceInfo.entrance)}
-                    passHref
-                    >
-                        <Link>
-                        <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
-                        </Link>
-                    </NextLink> :
-                    <WarningChip text="No entrance assigned"/>}
-                    // value={lastOnline}
+                    value={
+                        deviceInfo.entrance ? (
+                            <NextLink
+                                href={getEntranceDetailsLink(deviceInfo.entrance)}
+                                passHref
+                            >
+                                <Link>
+                                <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
+                                </Link>
+                            </NextLink>
+                        ) : (
+                            <WarningChip text="No entrance assigned"/>
+                        )
+                        // value={lastOnline}
+                    }
                 />
                 <PropertyListItem
                     align={align}

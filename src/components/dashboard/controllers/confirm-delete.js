@@ -28,8 +28,8 @@ export const Confirmdelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteControllers = () => {
-		deleteControllers();
+	const handleDeleteControllers = (e) => {
+		deleteControllers(e);
 		handleClose();
 	}
 

@@ -33,8 +33,10 @@ import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
-import { DoorFront, SelectAll } from '@mui/icons-material';
+import { DoorFront, SelectAll, Videocam } from '@mui/icons-material';
 import { controllerApi } from '../../api/controllers';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant'
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const getSections = (t) => [
   
@@ -77,9 +79,25 @@ const getSections = (t) => [
             path: '/dashboard/controllers/'
           }
         ]
+      },
+      {
+        title: t('Video Recorders'),
+        path: '/dashboard/video-recorders/',
+        icon: <Videocam fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/video-recorders/'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/video-recorders/create'
+          }
+        ]
       }
     ]
   },
+      
   {
     title: t('People'),
     items: [
@@ -110,6 +128,37 @@ const getSections = (t) => [
           {
             title: t('Add'),
             path: '/dashboard/jobs/companies/1'
+          }
+        ]
+      },
+    ]
+  },
+  {
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/events-management',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/events-management'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/persons/create'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/logs'
           }
         ]
       },
@@ -599,3 +648,4 @@ DashboardSidebar.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool
 };
+

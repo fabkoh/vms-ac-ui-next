@@ -110,15 +110,10 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                 <Typography>{ controllerIP }</Typography>
             </TableCell>
             <TableCell>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                    }}
-                >
-                    <EntranceComponent entrance={entrance1} sx={{ mr: 1 }} />
-                    <EntranceComponent entrance={entrance2} />
-                </Box>
+                <EntranceComponent entrance={entrance1} />
+            </TableCell>
+            <TableCell>
+                <EntranceComponent entrance={entrance2} />
             </TableCell>
             <TableCell>
                 {
