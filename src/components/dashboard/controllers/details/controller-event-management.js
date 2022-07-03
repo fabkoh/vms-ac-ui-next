@@ -25,11 +25,11 @@ import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
 import RenderTableCell from "../../shared/renderTableCell";
-
+import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription} from "../../../../utils/eventsManagement";
 
 
 export default function ControllerEventsManagement({
-	eventsManagementCreatelink,
+	eventsManagementCreateLink,
 	entrance,
 	controllerEventManagements,
 	deleteSchedules,
@@ -55,67 +55,6 @@ export default function ControllerEventsManagement({
 		setOpenDelete(false);
 		handleActionMenuClose();
 	};
-
-    // takes in inputEvents list and return string 
-    const eventActionInputDescription = inputEvents => {
-        
-        return (inputEvents.map(
-            inputEvent =>
-            // check if timer enabled, concatenate to string 
-            
-                <div>
-                {`${inputEvent.eventActionInputType.eventActionInputTypeName}`}
-                {inputEvent.eventActionInputType.timerEnabled ?
-                    (inputEvent.timerDuration?
-                        ` (${inputEvent.timerDuration}secs)`:
-                    ``)
-                :"" }
-                </div>      
-
-        ))
-    }
-
-    const displayEntranceOrController = eventManagement => {
-        return (
-            eventManagement.controller  ?
-                <RenderTableCell
-                    exist={eventManagement.controller ? true : false}
-                    deleted={false}
-                    id={eventManagement.controller.controllerId}
-                    name={eventManagement.controller.controllerName}
-                    link={ `/dashboard/controllers/details/${eventManagement.controller.controllerId}` }
-                    chip={<SelectAll fontSize="small" />} //Centered vertically}} />}
-                />: 
-            (eventManagement.entrance  ?
-                <RenderTableCell
-                    exist={eventManagement.entrance ? true : false}
-                    deleted={false}
-                    id={eventManagement.entrance.entranceId}
-                    name={eventManagement.entrance.entranceName}
-                    link={ `/dashboard/entrances/details/${eventManagement.entrance.entranceId}` }
-                    chip={<MeetingRoom fontSize="small" />} //Centered vertically}} />}
-                />: null)
-        )
-    }
-
-    // takes in outputActions list and return string 
-    const eventActionOutputDescription = outputActions => {
-        
-        return (outputActions.map(
-            outputAction =>
-            // check if timer enabled, concatenate to string 
-            
-                <div>
-                {`${outputAction.eventActionOutputType.eventActionOutputTypeName}`}
-                {outputAction.eventActionOutputType.timerEnabled ?
-                    (outputAction.timerDuration?
-                    ` (${outputAction.timerDuration}secs)`:
-                    ``)
-                :"" }
-                </div>      
-
-        ))
-    }
     
 	// const handleDeleteSchedules = (ids, allSelected) => {
 	// 	if (allSelected) {
@@ -165,9 +104,9 @@ export default function ControllerEventsManagement({
 				open={actionOpen}
 				onClose={handleActionMenuClose}
 			>
-				{/* <NextLink
+				<NextLink
 					href={
-                        eventsManagementCreatelink
+                        eventsManagementCreateLink
 					}
 					passHref
 				>
@@ -177,7 +116,7 @@ export default function ControllerEventsManagement({
 						<Edit />
 						&#8288;Create
 					</MenuItem>
-				</NextLink> */}
+				</NextLink>
 				{/* <MenuItem
 					disableRipple
 					// disabled={actionDisabled}

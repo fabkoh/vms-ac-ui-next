@@ -23,6 +23,7 @@ import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntran
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
 
+
 const applyFilter = createFilter({
     query: filterEntranceByString,
     status: filterEntranceByStatus

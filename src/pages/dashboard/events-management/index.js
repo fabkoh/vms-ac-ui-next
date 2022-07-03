@@ -18,12 +18,12 @@ import { Search } from "../../../icons/search";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
-import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
+import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
-import { EventsManagementTable } from "../../../components/dashboard/events-management/list/events-management-table";
+import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
 
-const EventManagements = [
+const EventsManagement = [
     // for entrance 
     {
         "eventsManagementId":1,
@@ -171,10 +171,8 @@ const EventManagements = [
                 "controllerSerialNo": "100000005a46e105"
             }}
 ]
-
 const applyFilter = createFilter({
-    query: filterEntranceByString,
-    status: filterEntranceByStatus
+    query: filterEventsManagementByString,
 })
 
 const EventsManagementList = () => {
@@ -182,48 +180,11 @@ const EventsManagementList = () => {
     useEffect(() => {
         gtm.push({ event: "page_view" });
     })
-    
-    // get entrances and access groups
-    const [entrances, setEntrances] = useState([]);
-    const isMounted = useMounted();
 
-    const getEntrancesLocal = useCallback(async () => {
-        const res = await entranceApi.getEntrances();
-        if (res.status != 200) {
-            toast.error("Entrances info failed to load");
-            return [];
-        }
-        const data = await res.json();
-        if (isMounted()) {
-            setEntrances(data);
-        }
-        return data;
-    }, [isMounted]);
 
-    // for selection of checkboxes
-    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
-    const selectedAllEventsManagement = selectedEventsManagement.length == EventManagements.length;
-    const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
-    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? entrances.map(e => e.entranceId) : []);
-    const handleSelectFactory = (eventsManagementId) => () => {
-        if (selectedEventsManagement.includes(eventsManagementId)) {
-            setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
-        } else {
-            setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
-        }
-    }
-
-     // for actions button
-    const [actionAnchor, setActionAnchor] = useState(null);
-    const open = Boolean(actionAnchor);
-    const handleActionClick = (e) => setActionAnchor(e.currentTarget);
-    const handleActionClose = () => setActionAnchor(null);
-    const actionDisabled = selectedEntrances.length == 0;
-    
     // for filtering
     const [filters, setFilters] = useState({
-        query: "",
-        status: null
+        query: ""
     })
     // query filter
     const queryRef = useRef(null);
@@ -234,132 +195,91 @@ const EventsManagementList = () => {
             query: queryRef.current?.value
         }));
     }
-    // status filter
-    const handleStatusSelect = (i) => {
-        const status = i == -1 ? null : i == 1;
-        setFilters((prevState) => ({
-            ...prevState,
-            status: status
-        }));
-    }
-    const filteredEntrances = applyFilter(entrances, filters);
+    const filteredEventsManagement = applyFilter(EventsManagement, filters);
 
+    // for selection of checkboxes
+    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+    const selectedAllEventsManagement = selectedEventsManagement.length == EventsManagement.length;
+    const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
+    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? EventsManagement.map(e => e.eventsManagementId) : []);
+    const handleSelectFactory = (eventsManagementId) => () => {
+        if (selectedEventsManagement.includes(eventsManagementId)) {
+            setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
+        } else {
+            setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
+        }
+    }
 
     // for pagination
     const [page, setPage] = useState(0);
     const handlePageChange = (e, newPage) => setPage(newPage);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
-    const paginatedEntrances = applyPagination(filteredEntrances, page, rowsPerPage);
+    const paginatedEventsManagement = applyPagination(filteredEventsManagement, page, rowsPerPage);
 
+    useEffect(() => {
+		console.log(filters)
+        console.log(paginatedEventsManagement)
+	}, [filters]);
 
-    // for updating status
-    const [statusUpdateIds, setStatusUpdateIds] = useState([]);
-    const [updateStatus, setUpdateStatus] = useState(null);
-    const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
-    const openStatusUpdateDialog = (entranceIds, updatedStatus) => {
-        setStatusUpdateIds(entranceIds);
-        setUpdateStatus(updatedStatus);
-        setStatusUpdateDialogOpen(true);
-    }
-    const handleStatusUpdateDialogClose = () => {
-        setStatusUpdateDialogOpen(false);
-        handleActionClose();
-    }
-    const handleMultipleUpdate = (updateStatus) => openStatusUpdateDialog([ ...selectedEntrances ], updateStatus);
-    const handleMultiEnable = () => handleMultipleUpdate(true);
-    const handleMultiUnlock = () => handleMultipleUpdate(false);
-    const handleStatusUpdate = async (entranceIds, updatedStatus) => {
-        handleStatusUpdateDialogClose();
-
-        const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceStatus(entranceId, updatedStatus)));
-        
-        let successCount = 0;
-        const someFailed = false;
-        resArr.forEach(res => {
-            if (res.status == 200) {
-                successCount++;
-            } else {
-                someFailed = true;
-            }
-        })
-
-        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " some entrances"); }
-        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
-
-        const newEntrances = [ ...entrances ];
-        newEntrances.forEach(entrance => {
-            if (entranceIds.includes(entrance.entranceId)) {
-                entrance.isActive = updatedStatus;
-            }
-        })
-        setEntrances(newEntrances);
-    }
-
+    // for actions button
+    const [actionAnchor, setActionAnchor] = useState(null);
+    const open = Boolean(actionAnchor);
+    const handleActionClick = (e) => setActionAnchor(e.currentTarget);
+    const handleActionClose = () => setActionAnchor(null);
+    const actionDisabled = selectedEventsManagement.length == 0;
+             
     //for delete action button
-	const [deleteOpen, setDeleteOpen] = useState(false);  
-	
-	//Set to true if an entrance is selected. controls form input visibility.
-	const [selectedState, setselectedState] = useState(false);
-	const checkSelected = () => {
-	  if(selectedEntrances.length>=1){
-		 setselectedState(true)
-	  }
-	};
-	useEffect(() => {
-		checkSelected()
-	}, [selectedEntrances]);
-	
+	const [deleteOpen, setDeleteOpen] = useState(false); 
 
-	const handleDeleteOpen = () => {        
+    const handleDeleteOpen = () => {        
 		setDeleteOpen(true);           
 	};
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrances = async(e) => {
+	const deleteEventsManagement = async(e) => {
         e.preventDefault();
-		Promise.all(selectedEntrances.map(id=>{
-			return entranceApi.deleteEntrance(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 204){
-                    controllerApi.uniconUpdater();
-					toast.success('Delete success',{duration:2000},);
-				}
-				else{
-					toast.error('Delete unsuccessful' )
-				}
-			})
-			getEntrancesLocal();
-		})
+		Promise.all(selectedEventsManagement.map(id=>{
+            console.log(id)}))
+		// 	return entranceApi.deleteEntrance(id)
+		// })).then( resArr => {
+		// 	resArr.filter(res=>{
+		// 		if(res.status == 204){
+        //             controllerApi.uniconUpdater();
+		// 			toast.success('Delete success',{duration:2000},);
+		// 		}
+		// 		else{
+		// 			toast.error('Delete unsuccessful' )
+		// 		}
+		// 	})
+		// 	getEntrancesLocal();
+		// })
 		setDeleteOpen(false);
 	};
 
-    // Reset selectedEntrances when entrances change
-	useEffect(
-		() => {
-			if (selectedEventsManagement.length) {
-				setSelectedEventsManagement([]);
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[EventsManagement]
-	);
-    
+    // useEffect(() => {
+	// 	checkSelected()
+	// }, [selectedEventsManagement]);
+
+
+    // // Reset selectedEventsManagement when EventsManagement change
+	// useEffect(
+	// 	() => {
+	// 		if (selectedEventsManagement.length) {
+	// 			setSelectedEventsManagement([]);
+	// 		}
+	// 	},
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// 	[EventsManagement]
+	// );
 
     return(
         <>
             <Head>
                 <title>Etlas: Events Management</title>
             </Head>
-            <ConfirmStatusUpdate
-                entranceIds={statusUpdateIds}
-                open={statusUpdateDialogOpen}
-                handleDialogClose={handleStatusUpdateDialogClose}
-                updateStatus={updateStatus}
-                handleStatusUpdate={handleStatusUpdate}
-            />
+            
             <Box
                 component="main"
                 sx={{
@@ -387,16 +307,10 @@ const EventsManagementList = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    <NextLink href={entranceCreateLink} passHref>
+                                    <NextLink href={eventsManagementCreateLink} passHref>
                                         <MenuItem disableRipple>
                                             <Add />
                                             &#8288;Create
-                                        </MenuItem>
-                                    </NextLink>
-                                    <NextLink href={getEntranceIdsEditLink(selectedEntrances)} passHref>    
-                                        <MenuItem disableRipple disabled={actionDisabled}>
-                                            <Edit />
-                                            &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 
@@ -412,25 +326,9 @@ const EventsManagementList = () => {
                                         setActionAnchor={setActionAnchor}
                                         open={deleteOpen} 
                                         handleDialogClose={handleDeleteClose}
-                                        selectedEntrances={selectedEntrances}
-                                        deleteEntrances={deleteEntrances}
+                                        selectedEntrances={selectedEventsManagement}
+                                        deleteEntrances={deleteEventsManagement}
                                     />    
-                                    <MenuItem 
-                                        disableRipple
-                                        onClick={handleMultiEnable}
-                                        disabled={actionDisabled}
-                                    >
-                                        <DoorFront />
-                                        &#8288;Activate
-                                    </MenuItem>
-                                    <MenuItem 
-                                        disableRipple
-                                        onClick={handleMultiUnlock}
-                                        disabled={actionDisabled}
-                                    >
-                                        <LockOpen />
-                                        &#8288;Unlock
-                                    </MenuItem>
                                 </StyledMenu>
                             </Grid> 
                         </Grid>
@@ -485,27 +383,25 @@ const EventsManagementList = () => {
                                             </InputAdornment>
                                         )
                                     }}
-                                    placeholder={filterEntranceByStringPlaceholder}
+                                    placeholder={filterEventsManagementByStringPlaceholder}
                                 />                                   
                             </Box>
                         </Box>
                         
                         <EventsManagementTable 
-                            eventsManagements={EventManagements}
+                            eventsManagements={paginatedEventsManagement}
                             selectedAllEventsManagement={selectedAllEventsManagement}
                             selectedSomeEventsManagement={selectedSomeEventsManagement}
                             handleSelectAllEventsManagement={handleSelectAllEventsManagement}
                             handleSelectFactory={handleSelectFactory}
                             selectedEventsManagement={selectedEventsManagement}
-                            eventsManagementCount={EventManagements.length}
+                            eventsManagementCount={EventsManagement.length}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             page={page}
                             rowsPerPage={rowsPerPage}
-                            handleStatusSelect={handleStatusSelect}
-                            openStatusUpdateDialog={openStatusUpdateDialog}
-                            entranceController={entranceController}
                         />
+
                     </Card>
                 </Container>    
             </Box>

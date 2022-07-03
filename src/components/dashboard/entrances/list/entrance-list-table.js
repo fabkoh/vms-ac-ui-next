@@ -8,6 +8,7 @@ import { ListFilter } from "../../shared/list-filter";
 import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
 import { getControllerDetailsLink } from "../../../../utils/controller";
 
+
 // for status options
 const statusOptions = ['Unlocked', 'Active'];
 

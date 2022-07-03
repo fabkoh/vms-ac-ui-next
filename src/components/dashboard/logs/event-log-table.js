@@ -7,6 +7,7 @@ import MeetingRoom from "@mui/icons-material/MeetingRoom";
 import WarningChip from "../shared/warning-chip";
 import RenderTableCell from "../shared/renderTableCell";
 import { Person, SelectAll } from "@mui/icons-material";
+import { LockClosed } from "../../../icons/lock-closed";
 
 const EventLogTable = ({
     page,
