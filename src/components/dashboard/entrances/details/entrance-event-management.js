@@ -26,6 +26,7 @@ import EntranceScheduleDelete from "./entrance-schedule-delete";
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
+import { eventActionInputDescription, eventActionOutputDescription} from "../../../../utils/eventsManagement";
 
 
 
@@ -57,43 +58,6 @@ export default function EntranceEventsManagement({
 		handleActionMenuClose();
 	};
 
-    // takes in inputEvents list and return string 
-    const eventActionInputDescription = inputEvents => {
-        
-        return (inputEvents.map(
-            inputEvent =>
-            // check if timer enabled, concatenate to string 
-            
-                <div>
-                {`${inputEvent.eventActionInputType.eventActionInputTypeName}`}
-                {inputEvent.eventActionInputType.timerEnabled ?
-                    (inputEvent.timerDuration?
-                        ` (${inputEvent.timerDuration}secs)`:
-                    ``)
-                :"" }
-                </div>      
-
-        ))
-    }
-
-    // takes in outputActions list and return string 
-    const eventActionOutputDescription = outputActions => {
-        
-        return (outputActions.map(
-            outputAction =>
-            // check if timer enabled, concatenate to string 
-            
-                <div>
-                {`${outputAction.eventActionOutputType.eventActionOutputTypeName}`}
-                {outputAction.eventActionOutputType.timerEnabled ?
-                    (outputAction.timerDuration?
-                    ` (${outputAction.timerDuration}secs)`:
-                    ``)
-                :"" }
-                </div>      
-
-        ))
-    }
     
 	const handleDeleteSchedules = (ids, allSelected) => {
 		if (allSelected) {

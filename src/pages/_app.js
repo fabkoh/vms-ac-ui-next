@@ -7,7 +7,7 @@ import nProgress from 'nprogress';
 import { CacheProvider } from '@emotion/react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { LocalizationProvider } from '@mui/lab';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { RTL } from '../components/rtl';
 import { SettingsButton } from '../components/settings-button';

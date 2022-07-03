@@ -97,8 +97,7 @@ const EventStringFilterHelper = (event, query) =>
                         || (event.entrance && stringIn(query, event.entrance.entranceName)) 
                         || (event.controller &&stringIn(query, event.controller.controllerName)) 
                         || (event.eventActionType && stringIn(query, event.eventActionType.eventActionTypeName)) 
-                        || (event.person &&stringIn(query, event.person.personLastName))
-                        || (event.person &&stringIn(query, event.person.personFirstName)) 
+                        || (event.person &&stringIn(query, event.person.personFirstName+" "+event.person.personLastName))
                         || (event.accessGroup &&stringIn(query,event.accessGroup.accessGroupName))
 
     
@@ -374,7 +373,7 @@ const getInfo = useCallback(async() => {
                                             </InputAdornment>
                                         )
                                     }}
-                                    placeholder="Search by Event Type(s), Entrance(s), Controller(s), Person(s), Access group(s)" // replace with const variable
+                                    placeholder="Search for Event Type(s), Entrance(s), Controller(s), Person(s) or Access group(s)" // replace with const variable
                                 />
                             </Box>
                         </Box>

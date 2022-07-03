@@ -36,6 +36,7 @@ import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
 import { controllerApi } from "../../../../api/controllers";
 import EntranceEventsManagement from "../../../../components/dashboard/entrances/details/entrance-event-management";
+import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 
 const entranceEventManagements = [
     // for entrance 
@@ -198,7 +199,6 @@ const EntranceDetails = () => {
     }, [])
 
     const link = getEntranceScheduleEditLink(entranceId);
-    const eventsManagementCreatelink = getEntranceScheduleEditLink(entranceId);
 
     const [entranceSchedules, setEntranceSchedules] = useState([]);
 
@@ -554,7 +554,7 @@ const EntranceDetails = () => {
                                     entrance={entrance}
                                     entranceEventManagements={entranceEventManagements}
                                     deleteSchedules={deleteSchedules}
-                                    eventsManagementCreatelink={eventsManagementCreatelink} 
+                                    eventsManagementCreatelink={eventsManagementCreateLink} 
                                 />
                             </Grid>
                         </Grid>
