@@ -41,6 +41,7 @@ import AuthDevicePair from "../../../../components/dashboard/controllers/details
 import { getControllerEditLink, getControllerListLink } from "../../../../utils/controller";
 import { authDeviceApi } from "../../../../api/auth-devices";
 import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
+import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 
 const controllerEventManagements = [
     // for entrance 
@@ -643,7 +644,7 @@ const ControllerDetails = () => {
                                     entrance={entrance}
                                     controllerEventManagements={controllerEventManagements}
                                     // deleteSchedules={deleteController}
-                                    // eventsManagementCreatelink={eventsManagementCreatelink} 
+                                    eventsManagementCreateLink={eventsManagementCreateLink} 
                                 />
                             </Grid>
                     </Box>

@@ -59,7 +59,7 @@ export default function AuthenticationAddOnError({errorMessages,handleClose,open
     open={open}>
         <DialogTitle>
             Error : Failed to create new schedules.      
-            The new schedules highlighted below clashes with existing schedules. Do make the necessary changes before pressing the "Add on" button again.
+            The new schedules highlighted below clashes with existing schedules. Do make the necessary changes before pressing the `&quot;`Add on`&quot;` button again.
         </DialogTitle>
         <DialogContent>
             <Table>

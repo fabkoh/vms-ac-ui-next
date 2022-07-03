@@ -7,6 +7,12 @@ import { ArrowRight } from "../../../../icons/arrow-right";
 import { ListFilter } from "../../shared/list-filter";
 import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
 import { getControllerDetailsLink } from "../../../../utils/controller";
+import RenderTableCell from "../../shared/renderTableCell";
+import { MeetingRoom, SelectAll } from "@mui/icons-material";
+import rruleDescription from "../../../../utils/rrule-desc";
+import { rrulestr } from "rrule";
+import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription} from "../../../../utils/eventsManagement";
+
 
 function EventsManagementTable({ 
     selectedEventsManagement, 
@@ -14,158 +20,74 @@ function EventsManagementTable({
     selectedAllEventsManagement,
     handleSelectAllEventsManagement, 
     eventsManagements, 
-    selectedEventsManagement, 
     handleSelectFactory, 
     eventsManagementCount, 
     onPageChange, 
     onRowsPerPageChange, 
     page,
     rowsPerPage, 
-    handleStatusSelect, 
-    openStatusUpdateDialog,
-
-    entranceSchedules,
-    entranceController,
-     ...other }) {   
-    return(
-        <div {...other}>
-            <Scrollbar>
-                <Table sx={{ minWidth: 700 }}>
-                    <TableHead sx={{ backgroundColor: "neutral.200" }}>
-                        <TableRow>
-                                <TableCell padding="checkbox">
-                                <Checkbox
-                                    checked={selectedAllEventsManagement}
-                                    indeterminate={selectedSomeEventsManagement}
-                                    onChange={handleSelectAllsEventsManagement}
-                                />  
-                                </TableCell>
-                            <TableCell>Name</TableCell>    
-                            <TableCell>No. of Access Groups</TableCell>
-                            <TableCell>No. of Schedules</TableCell>
-                            <TableCell>Controller</TableCell>
-                            <TableCell align="left">Actions</TableCell>
-                        </TableRow>    
-                    </TableHead>   
-                    <TableBody>
-                        {
-                            eventsManagements.map(eventsManagement => {
-                                const {
-                                    entranceId,
-                                    entranceName,
-                                    accessGroups,
-                                    isActive
-                                } = eventsManagement
-                                
-                                const IsEventsManagementSelected = selectedEventsManagement.includes(eventManagement.eventsManagementId);
-                                const handleSelect = handleSelectFactory(eventManagement.eventsManagementId);
-                                const detailsLink = getEntranceDetailsLink(entrance);
-                                const editLink = getEntranceIdsEditLink([entranceId]);
-                                const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
-                                const numberOfSchedules = entranceSchedules[entranceId];
-                                const controller = entranceController[entranceId];
-                                return(
-                                    <TableRow
-                                        hover
-                                        key={entranceId}
-                                        selected={isEntranceSelected}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                checked={IsEventsManagementSelected}
-                                                onChange={handleSelect}
-                                                value={IsEventsManagementSelected}
-                                            /> 
-                                        </TableCell>    
+     }) {  
+        
+        
+        return (
+            <div>
+                <Scrollbar>
+                            <Table>
+                                <TableHead sx={{ backgroundColor: "neutral.200" }}>
+                                    <TableRow>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={selectedAllEventsManagement}
+                                            indeterminate={selectedSomeEventsManagement}
+                                            onChange={handleSelectAllEventsManagement}
+                                        />  
+                                    </TableCell>
                                         <TableCell>
-                                            <NextLink
-                                                href={detailsLink}    
-                                                passHref
-                                            >
-                                                <Link color="inherit">
-                                                    <Typography noWrap>{ entranceName }</Typography>
-                                                </Link>    
-                                            </NextLink>
+                                            <div>Controller/</div> 
+                                            <div>Entrance</div>
                                         </TableCell>
-                                        <TableCell>
-                                            { 
-                                                (Array.isArray(accessGroups) && accessGroups.length > 0) ? (
-                                                    <Typography noWrap>{accessGroups.length}</Typography>
-                                                ) : (
-                                                    <WarningChip text="No access groups" />
-                                                )
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            {
-                                                numberOfSchedules ? (
-                                                    <Typography noWrap>{numberOfSchedules}</Typography>
-                                                ) : (
-                                                    <WarningChip text="No schedules" />
-                                                )
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            {
-                                                controller ? ( // TODO make this into link
-                                                    <NextLink href={getControllerDetailsLink(controller)} passHref>
-                                                        <Link color="inherit">
-                                                            <Typography noWrap>{ controller.controllerName }</Typography>
-                                                        </Link>
-                                                    </NextLink>
-                                                ) : (
-                                                    <WarningChip text="No controller" />
-                                                )
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={isActive ? "ACTIVE" : "UNLOCKED"}
-                                                onClick={handleOpenStatusUpdateDialog}
-                                                color={isActive? "success" : "error"}
-                                                sx={{
-                                                    fontSize: "12px",
-                                                    fontWeight: 600
-                                                }}
-                                                size="small"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <NextLink
-                                                href={ editLink }
-                                                passHref
-                                            >
-                                                <IconButton component="a">
-                                                    <PencilAlt fontSize="small" />    
-                                                </IconButton>    
-                                            </NextLink>
-                                            <NextLink 
-                                                href={ detailsLink }
-                                                passHref
-                                            >
-                                                <IconButton component="a">
-                                                    <ArrowRight fontSize="small" />    
-                                                </IconButton>    
-                                            </NextLink>
-                                        </TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Description</TableCell>
+                                        <TableCell>Input(s)</TableCell>
+                                        <TableCell>Output(s)</TableCell>
                                     </TableRow>
-                                )
-                            })
-                        }
-                    </TableBody>
-                </Table>
-            </Scrollbar>
+                                </TableHead>
+                                <TableBody>
+                                    {eventsManagements.map((eventManagement, i) => {
+                                        const IsEventsManagementSelected = selectedEventsManagement.includes(eventManagement.eventsManagementId);
+                                        const handleSelect = handleSelectFactory(eventManagement.eventsManagementId);
+                                        return(
+                                        <TableRow hover key={i}>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    checked={IsEventsManagementSelected}
+                                                    onChange={handleSelect}
+                                                    value={IsEventsManagementSelected}
+                                                /> 
+                                            </TableCell> 
+                                            <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
+                                            <TableCell sx={{minWidth: 150}}>{eventManagement.eventsManagementName}</TableCell>
+                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
+                                            <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
+                                            <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
+                                        </TableRow>
+                                        
+                                    )})}
+                                </TableBody>
+                            </Table>
+                        </Scrollbar> 
             <TablePagination
-                component="div"
-                count={entranceCount}
-                onPageChange={onPageChange}
-                onRowsPerPageChange={onRowsPerPageChange}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                rowsPerPageOptions={[5, 10, 15]}
-            />
+            component="div"
+            count={eventsManagementCount}
+            onPageChange={onPageChange}
+            onRowsPerPageChange={onRowsPerPageChange}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 15]}
+        />
         </div>
-    )
-}
+        );
 
-export default EventsManagementTable
+    }
+
+export default EventsManagementTable;
