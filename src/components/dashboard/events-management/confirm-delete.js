@@ -15,7 +15,7 @@ import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
-	const { open, handleDialogClose, deleteEntrances } = props;
+	const { open, handleDialogClose, deleteEventsManagement } = props;
 	// //handle delete action. put this in parent component
 	// const [Open, setOpen] = React.useState(false);
 
@@ -49,8 +49,8 @@ export const Confirmdelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteEntrances = (e) => {
-		deleteEntrances(e);
+	const handleDeleteeventManagements = (e) => {
+		deleteEventsManagement(e);
 		handleClose();
 	}
 
@@ -70,11 +70,12 @@ export const Confirmdelete = (props) => {
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Are you sure you want to delete selected entrance(s)? This action cannot
+						Are you sure you want to delete selected Event Management(s)? This action cannot
 						be undone.
 					</DialogContentText>
 
-					<form onSubmit={handleDeleteEntrances}>
+					<form onSubmit={handleDeleteeventManagements}
+                    autoComplete="off">
 						<TextField
 							variant="filled"
 							fullWidth

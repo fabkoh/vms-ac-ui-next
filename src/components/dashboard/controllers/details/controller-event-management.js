@@ -26,20 +26,20 @@ import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
 import RenderTableCell from "../../shared/renderTableCell";
 import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription} from "../../../../utils/eventsManagement";
+import ControllerEventsManagementDelete from "./controller-eventsManagement-delete";
 
 
 export default function ControllerEventsManagement({
 	eventsManagementCreateLink,
-	entrance,
 	controllerEventManagements,
-	deleteSchedules,
+	deleteEventManagements,
 }) {
 	// expanding card
 	const [expanded, setExpanded] = useState(true);
 	const handleExpandClick = () => setExpanded(!expanded);
 
 	// schedules
-	const [entranceId, setEntranceId] = useState("");
+	const [eventManagementsId, seteventManagementsId] = useState("");
     
 	// schedule actions
 	const [actionAnchor, setActionAnchor] = useState(null);
@@ -56,21 +56,21 @@ export default function ControllerEventsManagement({
 		handleActionMenuClose();
 	};
     
-	// const handleDeleteSchedules = (ids, allSelected) => {
-	// 	if (allSelected) {
-	// 		setEntranceId("");
-	// 	}
-	// 	deleteSchedules(ids);
-	// };
+	const handleDeleteEventManagements = (ids, allSelected) => {
+		if (allSelected) {
+			seteventManagementsId("");
+		}
+		deleteEventManagements(ids);
+	};
 
 	return (
 		<Card>
-			{/* <EntranceScheduleDelete
+			<ControllerEventsManagementDelete
 				open={openDelete}
-				schedules={entranceEventManagements}
+				eventManagements={controllerEventManagements}
 				handleDialogClose={closeDeleteDialog}
-				deleteSchedules={handleDeleteSchedules}
-			/> */}
+				deleteEventManagements={handleDeleteEventManagements}
+			/>
 			<Box
 				display="flex"
 				justifyContent="space-between"
@@ -117,14 +117,14 @@ export default function ControllerEventsManagement({
 						&#8288;Create
 					</MenuItem>
 				</NextLink>
-				{/* <MenuItem
+				<MenuItem
 					disableRipple
-					// disabled={actionDisabled}
+					disabled={actionDisabled}
 					onClick={openDeleteDialog}
 				>
 					<Delete />
 					&#8288;Delete
-				</MenuItem> */}
+				</MenuItem>
 			</StyledMenu>
 			<Collapse in={expanded}>
 				{/*<Divider /> */}
@@ -136,7 +136,7 @@ export default function ControllerEventsManagement({
 								<TableRow>
                                     <TableCell>
                                         <div>Controller/</div> 
-                                        <div>Entrance</div>
+                                        <div>eventManagements</div>
                                     </TableCell>
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>

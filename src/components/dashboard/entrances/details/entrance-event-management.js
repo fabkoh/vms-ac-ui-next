@@ -22,19 +22,18 @@ import StyledMenu from "../../styled-menu";
 import { Delete, Edit } from "@mui/icons-material";
 import { Scrollbar } from "../../../scrollbar";
 import { rrulestr } from "rrule";
-import EntranceScheduleDelete from "./entrance-schedule-delete";
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
 import { eventActionInputDescription, eventActionOutputDescription} from "../../../../utils/eventsManagement";
+import EntranceEventsManagementDelete from "./entrance-eventsManagement-delete";
 
 
 
 export default function EntranceEventsManagement({
 	eventsManagementCreatelink,
-	entrance,
 	entranceEventManagements,
-	deleteSchedules,
+	deleteEventManagements,
 }) {
 	// expanding card
 	const [expanded, setExpanded] = useState(true);
@@ -59,21 +58,21 @@ export default function EntranceEventsManagement({
 	};
 
     
-	const handleDeleteSchedules = (ids, allSelected) => {
+	const handleDeleteEventManagements = (ids, allSelected) => {
 		if (allSelected) {
 			setEntranceId("");
 		}
-		deleteSchedules(ids);
+		deleteEventManagements(ids);
 	};
 
 	return (
 		<Card>
-			{/* <EntranceScheduleDelete
+			<EntranceEventsManagementDelete
 				open={openDelete}
-				schedules={entranceEventManagements}
+				eventManagements={entranceEventManagements}
 				handleDialogClose={closeDeleteDialog}
-				deleteSchedules={handleDeleteSchedules}
-			/> */}
+				deleteEventManagements={handleDeleteEventManagements}
+			/>
 			<Box
 				display="flex"
 				justifyContent="space-between"
@@ -120,14 +119,14 @@ export default function EntranceEventsManagement({
 						&#8288;Create
 					</MenuItem>
 				</NextLink>
-				{/* <MenuItem
+				<MenuItem
 					disableRipple
-					// disabled={actionDisabled}
+					disabled={actionDisabled}
 					onClick={openDeleteDialog}
 				>
 					<Delete />
 					&#8288;Delete
-				</MenuItem> */}
+				</MenuItem>
 			</StyledMenu>
 			<Collapse in={expanded}>
 				{/*<Divider /> */}

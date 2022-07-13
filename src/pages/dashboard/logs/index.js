@@ -134,37 +134,6 @@ const Logs=()=>{
         setfilterEnd(value)
     }
     
-
-    function StartDateTimePicker() {
-        return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            renderInput={(props) => <TextField {...props} />}
-            label="Start Date Time"
-            value={filterStart}
-            onChange={(e)=> {}}
-            onAccept={handleStartDate}
-          />
-        </LocalizationProvider>
-      );
-    }
-    
-    function EndDateTimePicker() {  
-
-        return (
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DateTimePicker
-              renderInput={(props) => <TextField {...props} />}
-              label="End Date Time"
-              value={filterEnd}
-              onChange={(e)=> {}}
-                onAccept={handleEndDate}
-              
-            />
-          </LocalizationProvider>
-        );
-      }
-    
     function onClear() {
         setfilterStart(null)
         setfilterEnd(null)
