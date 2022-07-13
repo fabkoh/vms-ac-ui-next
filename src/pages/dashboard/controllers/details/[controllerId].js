@@ -468,6 +468,23 @@ const ControllerDetails = () => {
                      });
 	}
 
+    //delete entrance event managements 
+    const deleteEventManagements = async(ids) => {
+        console.log(ids)
+        // const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        // if (resArr.some(res => res.status != 204)) {
+        //     toast.error('Failed to delete some entrance schedules')
+        // }
+
+        // const numSuccess = resArr.filter(res => res.status == 204).length
+        // if (numSuccess) {
+        //     controllerApi.uniconUpdater();
+        //     toast.success(`Deleted ${numSuccess} entrance schedules`)
+        // }
+
+        // getInfo();
+    }
     // render view
     return (
         <>
@@ -641,9 +658,8 @@ const ControllerDetails = () => {
                                 xs={12}
                             >
                                 <ControllerEventsManagement  
-                                    entrance={entrance}
                                     controllerEventManagements={controllerEventManagements}
-                                    // deleteSchedules={deleteController}
+                                    deleteEventManagements={deleteEventManagements}
                                     eventsManagementCreateLink={eventsManagementCreateLink} 
                                 />
                             </Grid>
