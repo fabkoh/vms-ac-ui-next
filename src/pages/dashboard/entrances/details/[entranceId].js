@@ -115,7 +115,7 @@ const entranceEventManagements = [
         // for controller 
         {
             "eventsManagementId":2,
-            "eventsManagementName":"Events 2",
+            "eventsManagementName":"this is the new name 2",
             "inputEvents":[
                 // input w/o timer 
                 {
@@ -320,9 +320,9 @@ const EntranceDetails = () => {
         })
         setDeleteOpen(false);
     }; 
-
-    //delete entrance schedules
-    const deleteSchedules = async(ids) => {
+    
+    //delete entrance schedule 
+     const deleteSchedules = async(ids) => {
         const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
     
         if (resArr.some(res => res.status != 204)) {
@@ -334,6 +334,24 @@ const EntranceDetails = () => {
             controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} entrance schedules`)
         }
+
+        getInfo();
+    }
+
+    //delete entrance event managements 
+    const deleteEventManagements = async(ids) => {
+        console.log(ids)
+        // const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+    
+        // if (resArr.some(res => res.status != 204)) {
+        //     toast.error('Failed to delete some entrance schedules')
+        // }
+
+        // const numSuccess = resArr.filter(res => res.status == 204).length
+        // if (numSuccess) {
+        //     controllerApi.uniconUpdater();
+        //     toast.success(`Deleted ${numSuccess} entrance schedules`)
+        // }
 
         getInfo();
     }
@@ -553,7 +571,7 @@ const EntranceDetails = () => {
                                 <EntranceEventsManagement  
                                     entrance={entrance}
                                     entranceEventManagements={entranceEventManagements}
-                                    deleteSchedules={deleteSchedules}
+                                    deleteEventManagements={deleteEventManagements}
                                     eventsManagementCreatelink={eventsManagementCreateLink} 
                                 />
                             </Grid>

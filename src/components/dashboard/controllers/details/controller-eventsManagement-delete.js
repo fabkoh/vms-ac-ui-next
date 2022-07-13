@@ -2,16 +2,17 @@ import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";
 import { rrulestr } from "rrule";
+import { displayEntranceOrController, eventActionInputDescription, eventActionOutputDescription } from "../../../../utils/eventsManagement";
 import rruleDescription from "../../../../utils/rrule-desc";
 import { Scrollbar } from "../../../scrollbar";
 
-const steps = ['Select schedules to delete', 'Confirm delete'];
+const steps = ['Select Event Managements to delete', 'Confirm delete'];
 
-const EntranceScheduleDelete = ({ 
+const ControllerEventsManagementDelete = ({ 
     open, 
-    schedules, 
+    eventManagements, 
     handleDialogClose, 
-    deleteSchedules, }) => {
+    deleteEventManagements, }) => {
 
     // stepper
     const [activeStep, setActiveStep] = useState(0)
@@ -26,9 +27,9 @@ const EntranceScheduleDelete = ({
 
     // table select
     const [selected, setSelected] = useState([])
-    const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
+    const selectedAll = Array.isArray(eventManagements) && selected.length == eventManagements.length;
     const selectedSome = selected.length > 0 && !selectedAll;
-    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.entranceScheduleId ) : []);
+    const handleSelectAll = (e) => setSelected(e.target.checked ? eventManagements.map(eventManagement => eventManagement.eventsManagementId ) : []);
     const handleSelectFactory = (id) => () => {
         if (selected.includes(id)) {
             setSelected(selected.filter(i => i != id));
@@ -51,8 +52,8 @@ const EntranceScheduleDelete = ({
     }
 
     // delete action
-    const handleDeleteSchedules = () => {
-        deleteSchedules(selected, selectedAll);
+    const handleDeleteeventManagements = () => {
+        deleteEventManagements(selected, selectedAll);
         handleClose();
     }
 
@@ -80,7 +81,7 @@ const EntranceScheduleDelete = ({
                     // render schedule select
                     <>
                         <DialogTitle>
-                            Select Schedules to delete
+                            Select Event Managements to delete
                         </DialogTitle>
                         <DialogContent>
                             <Scrollbar>
@@ -94,39 +95,47 @@ const EntranceScheduleDelete = ({
                                                     onChange={handleSelectAll}
                                                 />
                                             </TableCell>
+                                            <TableCell>
+                                                <div>Controller/</div> 
+                                                <div>eventManagements</div>
+                                            </TableCell>
+                                            <TableCell>Name</TableCell>
+                                            <TableCell>Description</TableCell>
                                             <TableCell>Name</TableCell>
                                             <TableCell>Description</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {
-                                            Array.isArray(schedules) && (
-                                                schedules.map((schedule, i) => {
+                                            Array.isArray(eventManagements) && (
+                                                eventManagements.map((eventManagement, i) => {
                                                     const {
-                                                        entranceScheduleId,
-                                                        entranceScheduleName,
-                                                        rrule,
-                                                        timeStart,
-                                                        timeEnd
-                                                    } = schedule;
-                                                    const isScheduleSelected = selected.includes(entranceScheduleId);
-                                                    const handleSelect = handleSelectFactory(entranceScheduleId);
+                                                        eventsManagementId,
+                                                        eventsManagementName,
+                                                        inputEvents,
+                                                        outputActions,
+                                                        triggerSchedule,
+                                                        entrance,
+                                                        controller
+                                                    } = eventManagement;
+                                                    const iseventManagementselected = selected.includes(eventsManagementId);
+                                                    const handleSelect = handleSelectFactory(eventsManagementId);
                                                         
                                                     return (
                                                         <TableRow hover key={i}>
                                                             <TableCell padding="checkbox">
+
                                                                 <Checkbox
-                                                                    checked={isScheduleSelected}
-                                                                    value={isScheduleSelected}
+                                                                    checked={iseventManagementselected}
+                                                                    value={iseventManagementselected}
                                                                     onChange={handleSelect}
                                                                 />
                                                             </TableCell>
-                                                            <TableCell>
-                                                                { entranceScheduleName }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                { rruleDescription(rrulestr(rrule), timeStart, timeEnd) }
-                                                            </TableCell>
+                                                            <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
+                                                            <TableCell sx={{minWidth: 150}}>{eventsManagementName}</TableCell>
+                                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(triggerSchedule.rrule), triggerSchedule.timeStart, triggerSchedule.timeEnd) }</TableCell>
+                                                            <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(inputEvents)}</TableCell>
+                                                            <TableCell sx={{minWidth: 300}}>{ eventActionOutputDescription(outputActions)}</TableCell>
                                                         </TableRow>
                                                     )
                                                 })
@@ -176,12 +185,12 @@ const EntranceScheduleDelete = ({
                                 Are you sure you want to delete schedule(s)? This action cannot be undone.
                                 {/*
                                     selectedAll && 
-                                    <strong>{"\nDeleting all schedules would remove this entrance from the access group"}</strong>
+                                    <strong>{"\nDeleting all eventManagements would remove this entrance from the access group"}</strong>
                                 */}
                             </DialogContentText>
-                            <form onSubmit={handleDeleteSchedules}
+                            <form 
                             autocomplete="off"
-                            >
+                            onSubmit={handleDeleteeventManagements}>
                                 <TextField
                                     variant="filled"
                                     fullWidth
@@ -217,4 +226,4 @@ const EntranceScheduleDelete = ({
     )
 }
 
-export default EntranceScheduleDelete;
+export default ControllerEventsManagementDelete;

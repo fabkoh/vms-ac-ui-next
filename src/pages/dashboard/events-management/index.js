@@ -17,7 +17,7 @@ import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
-import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
+import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
@@ -326,8 +326,8 @@ const EventsManagementList = () => {
                                         setActionAnchor={setActionAnchor}
                                         open={deleteOpen} 
                                         handleDialogClose={handleDeleteClose}
-                                        selectedEntrances={selectedEventsManagement}
-                                        deleteEntrances={deleteEventsManagement}
+                                        selectedEventsManagement={selectedEventsManagement}
+                                        deleteEventsManagement={deleteEventsManagement}
                                     />    
                                 </StyledMenu>
                             </Grid> 
