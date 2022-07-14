@@ -212,7 +212,7 @@ const fakeVideoRecorders = [
         "recorderUsername": "demo",
         "recorderPassword": "password",
         "created": "2022-06-24T10:31:35.126183"
-    }, 
+    },
     {
         "recorderId": 3,
         "isActive": true,
@@ -232,4 +232,36 @@ const fakeVideoRecorders = [
     }
 ]
 
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers,fakeAuthDevices, fakeVideoRecorders};
+const fakeInputEvents = [
+    {
+        "eventActionInputId" : 1,
+        "eventActionInputName" : "name1",
+        "timerEnabled" : false,
+        "eventActionInputConfig" : null
+    },
+    {
+        "eventActionInputId" : 2,
+        "eventActionInputName" : "name2",
+        "timerEnabled" : true,
+        "eventActionInputConfig" : null
+    },
+]
+
+const fakeOutputEvents = [
+    {
+        "eventActionOutputId" : 1,
+        "eventActionOutputName" : "name1",
+        "timerEnabled" : false,
+        "eventActionOutputConfig" : null
+    },
+    {
+        "eventActionOutputId" : 2,
+        "eventActionOutputName" : "name2",
+        "timerEnabled" : true,
+        "eventActionOutputConfig" : null
+    }
+]
+
+const fakeEventsManagement = []
+
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeInputEvents, fakeOutputEvents, fakeEventsManagement };

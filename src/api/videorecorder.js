@@ -41,8 +41,6 @@ class VideoRecorderApi {
 
         fakeVideoRecorders.push(newRecorder);
 
-
-        // did not populate person field here as not required
         return Promise.resolve(new Response(JSON.stringify(newRecorder), { status: 201 }));
     }
 
@@ -74,7 +72,7 @@ class VideoRecorderApi {
         recorderPassword
     }) {
         if (useApi) {
-            return sendApi("/api/entrance", {
+            return sendApi("/api/videorecorder", {
                 method: 'PUT',
                 headers: {
                     'Content-type': 'application/json'
