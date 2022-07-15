@@ -11,7 +11,7 @@ import RenderTableCell from "../../shared/renderTableCell";
 import { MeetingRoom, SelectAll } from "@mui/icons-material";
 import rruleDescription from "../../../../utils/rrule-desc";
 import { rrulestr } from "rrule";
-import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription} from "../../../../utils/eventsManagement";
+import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription} from "../../../../utils/eventsManagement";
 
 
 function EventsManagementTable({ 
@@ -66,8 +66,10 @@ function EventsManagementTable({
                                                 /> 
                                             </TableCell> 
                                             <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
-                                            <TableCell sx={{minWidth: 150}}>{eventManagement.eventsManagementName}</TableCell>
-                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedules[0].rrule), eventManagement.triggerSchedules[0].timeStart, eventManagement.triggerSchedules[0].timeEnd) }</TableCell>
+                                            <TableCell sx={{minWidth: 200}}>{eventManagement.eventsManagementName}</TableCell>
+                                            <TableCell sx={{minWidth: 300}}>
+                                                {listDescription(eventManagement)}
+                                            </TableCell>
                                             <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
                                             <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
                                         </TableRow>
