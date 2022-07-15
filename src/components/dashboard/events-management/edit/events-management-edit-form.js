@@ -332,7 +332,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         noOptionsText="No input (without timer) event found"
                                         placeholder="Search for input (without timer) name"
                                         filterOptions={eventActionInputFilter}
-                                        value={inputEvents}
+                                        value={inputEvents.filter(e => e.timerDuration == null || e.timerDuration == undefined)}
                                         isOptionEqualToValue={eventActionInputEqual}
                                         error={
                                             Boolean(inputEvents.length==0)
@@ -431,7 +431,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         noOptionsText="No output (without timer) event found"
                                         placeholder="Search for output (without timer) name"
                                         filterOptions={eventActionOutputFilter}
-                                        value={outputActions}
+                                        value={outputActions.filter(e => e.timerDuration == null || e.timerDuration == undefined)}
                                         isOptionEqualToValue={eventActionOutputEqual}
                                         error={
                                             Boolean(outputActions.length==0)

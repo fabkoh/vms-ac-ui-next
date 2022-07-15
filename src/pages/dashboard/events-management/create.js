@@ -35,8 +35,8 @@ const CreateEventManagement = () => {
     const [outputEvents, setOutputEvents] = useState([]);
     const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState([]);
     const [outputEventsWithoutTimer, setOutputEventsWithoutTimer] = useState([]);
-    const [inputEventsWithTimer, setInputEventsWithTimer] = useState([]);
-    const [outputEventsWithTimer, setOutputEventsWithTimer] = useState([]);
+    const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
+    const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
@@ -250,8 +250,24 @@ const CreateEventManagement = () => {
     }
     const addOn = (e) => {
         e.preventDefault();
-
-        console.log(eventsManagementInfoArr)
+        console.log(inputEventsWithTimer);
+        const inputEventsWithTimerKeys = Object.keys(inputEventsWithTimer)
+        const outputEventsWithTimerKeys = Object.keys(outputEventsWithTimer)
+        for (let i = 0; i < inputEventsWithTimerKeys.length; i++) {
+            let key = inputEventsWithTimerKeys[i];
+            const updatedInfo = [...eventsManagementInfoArr];
+            const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == key);
+            const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
+            let newInputEvents = []
+            for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
+                if (eventManagementToBeUpdatedInputEvents[j].timerDuration == null || eventManagementToBeUpdatedInputEvents[j].timerDuration == undefined) {
+                    newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
+                }
+            }
+            newInputEvents.push(...inputEventsWithTimer[key]);
+            eventManagementToBeUpdated['inputEvents'] = newInputEvents;
+            setEventsManagementInfoArr(updatedInfo);
+        }
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=200){
@@ -327,7 +343,7 @@ const CreateEventManagement = () => {
             }
         })
         const filteredInputEventsWithTimerFromEventManagement = eventManagementToBeUpdated['inputEvents'].filter(i => i.timerDuration != null)
-        eventManagementToBeUpdated['inputEvents'] = filteredInputEventsWithTimerFromEventManagement.push(newValueMapped);
+        eventManagementToBeUpdated['inputEvents'] = filteredInputEventsWithTimerFromEventManagement.push(...newValueMapped);
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer(newValue);
     }
@@ -343,26 +359,43 @@ const CreateEventManagement = () => {
             }
         })
         const filteredOutputEventsWithTimerFromEventManagement = eventManagementToBeUpdated['outputActions'].filter(i => i.timerDuration != null)
-        eventManagementToBeUpdated['outputActions'] = filteredOutputEventsWithTimerFromEventManagement.push(newValueMapped);
+        eventManagementToBeUpdated['outputActions'] = filteredOutputEventsWithTimerFromEventManagement.push(...newValueMapped);
         setEventsManagementInfoArr(updatedInfo);
         setOutputEventsWithoutTimer(newValue);
     }
 
+
+    // TODO: Add validations for input and output events for controller etc
     const changeInputEventsWithTimer = (newValue, id) => {
-        // const updatedInfo = [...eventsManagementInfoArr];
-        // const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
-        // const filteredInputEventsWithoutTimerFromEventManagement = eventManagementToBeUpdated['inputEvents'].filter(i => i.timerDuration == null || i.timerDuration == undefined)
-        // eventManagementToBeUpdated['inputEvents'] = filteredInputEventsWithoutTimerFromEventManagement.push(newValue);
-        // setEventsManagementInfoArr(updatedInfo);
-        setInputEventsWithTimer(newValue);
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
+        let newInputEvents = []
+        for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
+            if (eventManagementToBeUpdatedInputEvents[j].timerDuration == null || eventManagementToBeUpdatedInputEvents[j].timerDuration == undefined) {
+                newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
+            }
+        }
+        newInputEvents.push(...newValue);
+        eventManagementToBeUpdated['inputEvents'] = newInputEvents;
+        setEventsManagementInfoArr(updatedInfo);
+        setInputEventsWithTimer({ ...inputEventsWithTimer, [id]: newValue });
     }
+
     const changeOutputEventsWithTimer = (newValue, id) => {
-        // const updatedInfo = [...eventsManagementInfoArr];
-        // const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
-        // const filteredOutputEventsWithTimerFromEventManagement = eventManagementToBeUpdated['outputActions'].filter(i => i.timerDuration != null)
-        // eventManagementToBeUpdated['outputActions'] = filteredOutputEventsWithTimerFromEventManagement.push(newValue);
-        // setEventsManagementInfoArr(updatedInfo);
-        setOutputEventsWithTimer(newValue);
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const eventManagementToBeUpdatedOutputEvents = eventManagementToBeUpdated['outputActions'];
+        let newOutputEvents = []
+        for (let j = 0; j < eventManagementToBeUpdatedOutputEvents.length; j++) {
+            if (eventManagementToBeUpdatedOutputEvents[j].timerDuration == null || eventManagementToBeUpdatedOutputEvents[j].timerDuration == undefined) {
+                newOutputEvents.push(eventManagementToBeUpdatedOutputEvents[j])
+            }
+        }
+        newOutputEvents.push(...newValue);
+        eventManagementToBeUpdated['outputActions'] = newOutputEvents;
+        setEventsManagementInfoArr(updatedInfo);
+        setOutputEventsWithTimer({...outputEventsWithTimer, [id]: newValue });
     }
  
     return(

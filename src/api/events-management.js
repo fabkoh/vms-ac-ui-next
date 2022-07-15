@@ -75,7 +75,7 @@ class EventsManagementApi {
 
     replaceEventsManagement(eventsManagementList, entranceIds, controllerIds) {
         if (useApi) {
-            return sendApi(`/api/eventsmanagement/replace?entranceids=${encodeArrayForSpring(entranceIds)}&controllerIds=${encodeArrayForSpring(controllerIds)}`, 
+            return sendApi(`/api/eventsmanagement/replace?entranceIds=${encodeArrayForSpring(entranceIds)}&controllerIds=${encodeArrayForSpring(controllerIds)}`, 
                 {
                     method: 'PUT',
                     headers: {
@@ -89,7 +89,7 @@ class EventsManagementApi {
 
     addEventsManagement(eventsManagementList, entranceIds, controllerIds) {
         if (useApi) {
-            return sendApi(`/api/eventsmanagement/add?entranceids=${encodeArrayForSpring(entranceIds)}&controllerIds=${encodeArrayForSpring(controllerIds)}`, 
+            return sendApi(`/api/eventsmanagement/add?entranceIds=${encodeArrayForSpring(entranceIds)}&controllerIds=${encodeArrayForSpring(controllerIds)}`, 
                 {
                     method: 'PUT',
                     headers: {
