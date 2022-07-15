@@ -23,7 +23,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/controllers/confirm-delete';
 import { ConfirmReset } from '../../../../components/dashboard/controllers/confirm-reset';
@@ -42,6 +41,7 @@ import { getControllerEditLink, getControllerListLink } from "../../../../utils/
 import { authDeviceApi } from "../../../../api/auth-devices";
 import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
 import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
+import { eventsManagementApi } from "../../../../api/eventManagements";
 
 const controllerEventManagements = [
     // for entrance 
@@ -196,13 +196,13 @@ const ControllerDetails = () => {
 
     // load entrance details
     const isMounted = useMounted();
-    const [entrance, setEntrance] = useState(null);
     const { controllerId }  = router.query; //change to controller Id
     // console.log("controllerId",controllerId)
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
 
+    const [controllerEventManagements,setControllerEventManagements]= useState([])
     const [controllerInfo, setControllerInfo] = useState(null)
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
@@ -260,12 +260,28 @@ const ControllerDetails = () => {
         })
         // setStatusLoaded(true)
     }
+
+    const getControllerEventsManagement = useCallback(async () => {
+        try {
+      //const data = await personApi.getFakePersons() 
+        const res = await eventsManagementApi.getControllerEventsManagement(controllerId);
     
+        const data = await res.json()
+            if (isMounted()) {
+                console.log(data)
+                setControllerEventManagements(data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }, [isMounted]);
+
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
         getController(controllerId)
         getStatus()
+        getControllerEventsManagement()
     }, [isMounted])
 
     useEffect(() => {

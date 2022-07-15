@@ -17,13 +17,22 @@ import MultipleSelectInput from "../../shared/multi-select-input";
 import ErrorCard from "../../shared/error-card";
 import EditFormTooltip from "../../shared/edit_form_tooltip";
 import { getAccessGroupLabel, filterAccessGroupsByState, filterAccessGroupByStringPlaceholder, isAccessGroupEqual } from "../../../../utils/access-group"
+import SingleSelect from "../../shared/single-select-input";
 
-const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameChange, onDescriptionChange, onAccessGroupChange, edit, allAccessGroups }) => {
+const thirdPartyOptionsList =[
+    {label:"N.A.",value:"N.A."},
+    {label:"GEN_OUT_1",value:"GEN_OUT_1"},
+    {label:"GEN_OUT_2",value:"GEN_OUT_2"},
+    {label:"GEN_OUT_3",value:"GEN_OUT_3"},
+]
+
+const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameChange, onDescriptionChange, onAccessGroupChange, edit, allAccessGroups,onThirdPartyOptionsChange }) => {
     const {
         entranceId,
         entranceName,
         entranceDesc,
-        accessGroups
+        accessGroups,
+        thirdPartyOption
     } = entranceInfo;
 
     const {
@@ -100,6 +109,7 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                         xs={12}
                     >
                         <TextField
+                            autoComplete="off"
                             fullWidth
                             label="Name"
                             name="entranceName"
@@ -129,7 +139,24 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                                     onChange={onDescriptionChange}
                                 />
                             </Grid>
+
+                            <Stack spacing={3}>
+							<Grid container alignItems="center" xs={12} md={6}>
+							<SingleSelect
+								label="Third Party Options"
+								value={thirdPartyOption}
+								getLabel={(singlethirdPartyOption)=>singlethirdPartyOption.label}
+								getValue={(singlethirdPartyOption)=>singlethirdPartyOption.value}
+								onChange={onThirdPartyOptionsChange}
+								options={thirdPartyOptionsList}
+								noclear
+								fullWidth
+							/>
+							</Grid>
+						</Stack>
+
                             <Divider />
+                            
                             <Grid
                                 item
                                 md={12}

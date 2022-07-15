@@ -6,7 +6,8 @@ class EntranceApi {
     createEntrance({
         entranceName,
         entranceDesc,
-        accessGroups
+        accessGroups,
+        thirdPartyOption
     }) {
         if (useApi) {
             return sendApi("/api/entrance", {
@@ -17,7 +18,8 @@ class EntranceApi {
                 body: JSON.stringify({
                     entranceName,
                     entranceDesc,
-                    accessGroups
+                    accessGroups,
+                    thirdPartyOption
                 })
             })
         }
@@ -26,7 +28,8 @@ class EntranceApi {
             entranceId: fakeEntrances.map(group => group.entranceId)
                                            .reduce((a, b) => Math.max(a, b), 0) + 1,
             entranceName,
-            entranceDesc
+            entranceDesc,
+            thirdPartyOption
         }
 
         fakeEntrances.push(newEntrance);
@@ -69,7 +72,9 @@ class EntranceApi {
         entranceId,
         entranceName,
         entranceDesc,
-        accessGroups
+        accessGroups,
+        thirdPartyOption
+
     }) {
         if (useApi) {
             return sendApi("/api/entrance", {
@@ -81,11 +86,12 @@ class EntranceApi {
                     entranceId,
                     entranceName,
                     entranceDesc,
-                    accessGroups
+                    accessGroups,
+                    thirdPartyOption
                 })
             });
         }
-        const updatedEntrance = { entranceId, entranceName, entranceDesc };
+        const updatedEntrance = { entranceId, entranceName, entranceDesc, thirdPartyOption };
         const index = fakeEntrances.findIndex(e => e.entranceId == entranceId);
 
         if (index == -1) {
