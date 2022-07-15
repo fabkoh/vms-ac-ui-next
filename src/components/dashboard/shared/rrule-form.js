@@ -39,18 +39,18 @@ const Rrule = (props) => {
 	const [rule, setRule] = useState({
 		//rule object use to create the string and text description
 		freq:RRule.DAILY,
-		interval,
-		byweekday, //[0,1,2,3,4,5,6]
-		bymonthday,
-		bysetpos,
-		bymonth,
+		interval: null,
+		byweekday: null, //[0,1,2,3,4,5,6]
+		bymonthday: null,
+		bysetpos: null,
+		bymonth: null,
 	});
 	const [nonChangingRule, setNonChangingRule] = useState({
-		dtstart,
-		until,
-		count,
-		timeStart,
-		timeEnd,
+		dtstart: null,
+		until: null,
+		count: null,
+		timeStart: null,
+		timeEnd: null,
 	})
 	// const theme = useTheme();
 	// const matches = useMediaQuery(theme.breakpoints.up);
@@ -180,11 +180,20 @@ const Rrule = (props) => {
 	const AllDayRenderer = (allDay) => {
 		if (allDay) {
 			return (
-				<Grid container alignItems="center" xs={12}>
-					<Grid item ml={2} mr={2} >
-						<Typography mr={2} fontWeight="bold">From</Typography>
+				<Grid container
+					alignItems="center"
+					xs={12}>
+					<Grid item
+						ml={2}
+						mr={2} >
+						<Typography mr={2}
+							fontWeight="bold">From</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} minWidth={150} >
+					<Grid item
+						ml={2}
+						mr={2}
+						mt={1}
+						minWidth={150} >
 						<TextField
 							type="time"
 							onChange={handleTimeStart}
@@ -195,10 +204,16 @@ const Rrule = (props) => {
 							value={nonChangingRule.timeStart}
 							></TextField>
 					</Grid>
-					<Grid item ml={2} minWidth={50}>
-						<Typography mr={2} fontWeight="bold">to</Typography>
+					<Grid item
+						ml={2}
+						minWidth={50}>
+						<Typography mr={2}
+						fontWeight="bold">to</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} >
+					<Grid item
+						ml={2}
+						mr={2}
+						mt={1} >
 						<TextField
 							type="time"
 							onChange={handleTimeEnd}
@@ -330,7 +345,7 @@ const Rrule = (props) => {
 	// const weektoday = weekarray[tempday-1] //needs rework
 	const WeeknoHandler = () => {
 		const date = nonChangingRule.dtstart.getDate();
-		const weekno = Math.floor(date/7);
+		let weekno = Math.floor(date/7);
 		if(weekno == 0 || date == 7){
 			return weekno="1st"
 		}
@@ -347,8 +362,16 @@ const Rrule = (props) => {
 		
 	}
 	const WeeknoHandlerValue = () => {
-		try{const date = nonChangingRule.dtstart.getDate();
-		const weekno = Math.floor(date/7);}catch(err){console.log(err)}
+		let date;
+		let weekno;
+		try {
+			date = nonChangingRule.dtstart.getDate();
+			weekno = Math.floor(date / 7);
+		}
+		catch (err) {
+			console.log(err);
+			return;
+		}
 		if(weekno == 0 || date == 7){
 			return weekno=1
 		}
@@ -370,18 +393,29 @@ const Rrule = (props) => {
 		setMonthOptionsMenu(e.target.value)
 	}
 	const monthMenuSetter1 = () => {
-		try{const date = nonChangingRule.dtstart.getDate()}catch(err){console.log(err)}	
+		let date;
+		try {
+			date = nonChangingRule.dtstart.getDate()
+		} catch (err) {
+			console.log(err);
+			return;
+		}	
 		if(monthOptionsMenu=="1"){
 			setRule(prevState=>({...prevState,byweekday:[],bysetpos:[]}))
 			setRule(prevState=>({...prevState,bymonthday:date}))	
 		}
 	}
 	const monthMenuSetter2 = () => {
-		try{
-			const tempday = nonChangingRule.dtstart.getDay();
-			const newtempday = tempday-1;
+		let newtempday;
+		let tempday;
+		try {
+			tempday = nonChangingRule.dtstart.getDay();
+			newtempday = tempday-1;
 			newtempday ==-1? newtempday=6:false
-		}catch(err){console.log(err)}	
+		} catch (err) {
+			console.log(err);
+			return;
+		}	
 		if(monthOptionsMenu=="2"){
 			setRule(prevState=>({...prevState,bymonthday:[]}))
 			setRule(prevState=>({...prevState,byweekday:[newtempday],bysetpos:[WeeknoHandlerValue()]}))	
@@ -402,14 +436,22 @@ const Rrule = (props) => {
 		if (repeatToggle) {
 			if (e == RRule.WEEKLY) {
 				return (
-					<Grid container alignItems="center" flexwrap="wrap">
+					<Grid container
+						alignItems="center"
+						flexwrap="wrap">
 						<Grid item>
-							<Typography container ml={3} mr={3} mt={1} fontWeight="bold">
+							<Typography container
+								ml={3}
+								mr={3}
+								mt={1}
+								fontWeight="bold">
 								{" "}
 								on
 							</Typography>
 						</Grid>
-						<Grid item justifyContent="flex-start" required>
+						<Grid item
+							justifyContent="flex-start"
+							required>
 							<ToggleButtonGroup
 								color="info"
 								// flexwrap="wrap"
@@ -433,33 +475,44 @@ const Rrule = (props) => {
 			}
 			if (e == RRule.MONTHLY) {
 				return (
-					<Grid container alignItems="center" flexwrap="wrap">
+					<Grid container
+						alignItems="center"
+						flexwrap="wrap">
 						<Grid item>
-							<Typography container ml={3} mr={3} mt={1} fontWeight="bold">
+							<Typography container
+								ml={3}
+								mr={3}
+								mt={1}
+								fontWeight="bold">
 								{" "}
 								on
 							</Typography>
 						</Grid>
-						<Grid item mt={1}>
-							<Select
-							value={monthOptionsMenu}
-							onChange={handleMonthOptionsMenu}
-							defaultValue={rule.freq==RRule.WEEKLY? "1":null}
-							// value={monthOptions}
-							// onChange={handleMonthOptions}
-							>
-								<MenuItem value="1">
-									 {nonChangingRule.dtstart?`day ${nonChangingRule.dtstart.getDate()} of the month` :"select start date"}
-									{/* {monthMenuRenderer1(monthOptionsMenu)} */}
-									 </MenuItem>
-								<MenuItem value="2">
-									{nonChangingRule.dtstart?
-									(`the ${WeeknoHandler()} ${handleWeekarray()}`):
-										("select start date")
-								}
+						{nonChangingRule.dtstart ?
+							<Grid item
+								mt={1}>
+								<Select
+									value={monthOptionsMenu}
+									onChange={handleMonthOptionsMenu}
+									defaultValue={rule.freq == RRule.WEEKLY ? "1" : null}
+								// value={monthOptions}
+								// onChange={handleMonthOptions}
+								>
+									<MenuItem value="1">
+										{`Day ${nonChangingRule.dtstart.getDate()} of the month`}
+									</MenuItem>
+									<MenuItem value="2">
+										{`The ${WeeknoHandler()} ${handleWeekarray()}`}
+									</MenuItem>
+								</Select>
+							</Grid>
+							: <Grid item
+								mt={1}>
+								<MenuItem >
+									Select start date
 								</MenuItem>
-							</Select>
-						</Grid>
+							</Grid>
+						}
 					</Grid>
 				);
 			}
@@ -469,18 +522,33 @@ const Rrule = (props) => {
 				// const newmonth = month + 1;
 				// setRule(prevState=>({...prevState,bymonth:newmonth,bymonthday:day}))
 				return (
-					<Grid container alignItems="center" flexWrap="wrap">
+					<Grid container
+						alignItems="center"
+						flexWrap="wrap">
 						<Grid item>
-							<Typography container ml={3} mr={3} mt={1} fontWeight="bold">
+							<Typography container
+								ml={3}
+								mr={3}
+								mt={1}
+								fontWeight="bold">
 								{" "}
 								on
 							</Typography>
 						</Grid>
-						<Grid item mt={1}>
-							<MenuItem >
-							{nonChangingRule.dtstart?` ${rule.bymonthday} ${monthconverter()}` :"select start date"}
-							</MenuItem>
-						</Grid>
+						{nonChangingRule.dtstart ?
+							<Grid item
+								mt={1}>
+								<MenuItem >
+									{`${rule.bymonthday} ${monthconverter()}`}
+								</MenuItem>
+							</Grid>
+							: <Grid item
+								mt={1}>
+								<MenuItem >
+									Select start date
+								</MenuItem>
+							</Grid>
+						}
 					</Grid>
 				);
 			}
@@ -547,7 +615,9 @@ const Rrule = (props) => {
 	const endRenderer = (e) => {
 		if (e == "after") {
 			return (
-				<Grid container alignItems="center" mt={2}>
+				<Grid container
+					alignItems="center"
+					mt={2}>
 					<TextField
 						sx={{ ml: 2, mr: 2, maxWidth: 150 }}
 						type="number"
@@ -555,7 +625,8 @@ const Rrule = (props) => {
 						value={nonChangingRule.count}
 						onChange={handleCount}
 					></TextField>
-					<Typography fontWeight="bold" sx={{ ml: 3, mr: 3 }}>
+					<Typography fontWeight="bold"
+						sx={{ ml: 3, mr: 3 }}>
 						occurences
 					</Typography>
 				</Grid>
@@ -564,14 +635,24 @@ const Rrule = (props) => {
 		if (e == "on") {
 			
 			return (
-				<Grid container alignItems="center" mt={2}>
-					<TextField sx={{ ml: 2 }} required={end=="on"} type="date" value={until} onChange={handleUntil} error={invalidUntil()} helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
+				<Grid container
+					alignItems="center"
+					mt={2}>
+					<TextField sx={{ ml: 2 }}
+						required={end=="on"}
+						type="date"
+						value={until}
+						onChange={handleUntil}
+						error={invalidUntil()}
+						helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								
 			);
 		}
 		if (e == "never") {      //renders nothing but empty container is used for consistent sizing
 			return(
-				<Grid container mt={2} minHeight={79}>  
+				<Grid container
+					mt={2}
+					minHeight={79}>  
 					<Grid item>
 						<Typography>{" "}</Typography>
 					</Grid>
@@ -584,7 +665,9 @@ const Rrule = (props) => {
 	//checkers before submit(lift state to form)
 	//if freq=RRule.WEEKLY, byweekday must not be empty
 	return (
-		<Grid container justifyContent="space-between" sx={{ width: "100%" }}>
+		<Grid container
+			justifyContent="space-between"
+			sx={{ width: "100%" }}>
 			<Grid
 				container
 				// md={6}
@@ -593,7 +676,8 @@ const Rrule = (props) => {
 				justifyContent="flex-start"
 				sx={{ width: "100%" }}
 			>
-				<Typography fontWeight="bold" mr={2}>
+				<Typography fontWeight="bold"
+					mr={2}>
 					Date of first occurrence :{" "}
 				</Typography>
 				<TextField
@@ -620,11 +704,17 @@ const Rrule = (props) => {
 			<Divider style={{width:'100%'}}/>
 			<Grid container>
 				{repeatToggle && (
-					<Grid container mt={2} mb={2} alignItems="center">
-						<Grid item mr={2} mt={1}>
+					<Grid container
+						mt={2}
+						mb={2}
+						alignItems="center">
+						<Grid item
+							mr={2}
+							mt={1}>
 							<Typography fontWeight="bold">Repeats every{"  "}</Typography>
 						</Grid>
-						<Grid item mt={1}>
+						<Grid item
+							mt={1}>
 							<TextField
 								type="number"
 								sx={{ mr: 2, maxWidth: 150, minWidth: 150 }}
@@ -632,7 +722,8 @@ const Rrule = (props) => {
 								value={rule.interval}
 							/>
 						</Grid>
-						<Grid item mt={1}>
+						<Grid item
+							mt={1}>
 							<Select
 								// required={repeatToggle?true:false}
 								value={rule.freq}
@@ -646,7 +737,8 @@ const Rrule = (props) => {
 								<MenuItem value={0}>Year</MenuItem>
 							</Select>
 						</Grid>
-						<Grid item alignItems="center">
+						<Grid item
+							alignItems="center">
 							{FreqRender(rule.freq)}
 						</Grid>
 					</Grid>
@@ -655,14 +747,19 @@ const Rrule = (props) => {
 			<Divider width={repeatToggle?"100%":"0"}/>
 			<Grid item>
 				{repeatToggle && (
-					<Grid container alignItems="center" mb={2}>
+					<Grid container
+						alignItems="center"
+						mb={2}>
 						<Grid item>
-							<Typography item fontWeight="bold" mr={2}>
+							<Typography item
+								fontWeight="bold"
+								mr={2}>
 								{" "}
 								Ends
 							</Typography>
 						</Grid>
-						<Grid item mt={1}>
+						<Grid item
+							mt={1}>
 							<Select
 								value={end}
 								onChange={(e) => {
@@ -674,13 +771,19 @@ const Rrule = (props) => {
 								<MenuItem value="never">never</MenuItem>
 							</Select>
 						</Grid>
-						<Grid item mt={2}>{endRenderer(end)}</Grid>
+						<Grid item
+						mt={2}>{endRenderer(end)}</Grid>
 					</Grid>
 				)}
 			</Grid>
 			<Divider width={repeatToggle?"100%":"0"} />
-			<Grid container mt={2} ml={-2} alignItems="center" xs={12}>
-				<Grid item mr={3}>
+			<Grid container
+				mt={2}
+				ml={-2}
+				alignItems="center"
+				xs={12}>
+				<Grid item
+					mr={3}>
 					<FormControl>
 						<FormGroup>
 							<FormControlLabel

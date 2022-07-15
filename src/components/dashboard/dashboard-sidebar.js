@@ -147,7 +147,7 @@ const getSections = (t) => [
           },
           {
             title: t('Add'),
-            path: '/dashboard/persons/create'
+            path: '/dashboard/events-management/create'
           }
         ]
       },
