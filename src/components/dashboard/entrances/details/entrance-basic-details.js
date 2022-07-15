@@ -6,7 +6,7 @@ import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const EntranceBasicDetails = (props) => {
-    const { entranceName, entranceDesc, isActive } = props.entrance;
+    const { entranceName, entranceDesc, isActive, thirdPartyOption } = props.entrance;
     
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
@@ -27,6 +27,7 @@ export const EntranceBasicDetails = (props) => {
                     label="Description"
                     value={entranceDesc}
                 >
+                    
                     {
                         // if no entranceDesc, render warning
                         !entranceDesc && (
@@ -40,6 +41,12 @@ export const EntranceBasicDetails = (props) => {
                         )
                     }
                 </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Third Party Option"
+                    value={thirdPartyOption}
+                />
                 <PropertyListItem
                     align={align}
                     divider

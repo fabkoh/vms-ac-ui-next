@@ -96,13 +96,13 @@ const ControllerEventsManagementDelete = ({
                                                 />
                                             </TableCell>
                                             <TableCell>
-                                                <div>Controller/</div> 
-                                                <div>eventManagements</div>
+                                                <div>Controller(s)/</div> 
+                                                <div>Entrance(s)</div>
                                             </TableCell>
                                             <TableCell>Name</TableCell>
                                             <TableCell>Description</TableCell>
-                                            <TableCell>Name</TableCell>
-                                            <TableCell>Description</TableCell>
+                                            <TableCell>Trigger(s)</TableCell>
+									        <TableCell>Action(s)</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -114,7 +114,7 @@ const ControllerEventsManagementDelete = ({
                                                         eventsManagementName,
                                                         inputEvents,
                                                         outputActions,
-                                                        triggerSchedule,
+                                                        triggerSchedules,
                                                         entrance,
                                                         controller
                                                     } = eventManagement;
@@ -133,7 +133,7 @@ const ControllerEventsManagementDelete = ({
                                                             </TableCell>
                                                             <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
                                                             <TableCell sx={{minWidth: 150}}>{eventsManagementName}</TableCell>
-                                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(triggerSchedule.rrule), triggerSchedule.timeStart, triggerSchedule.timeEnd) }</TableCell>
+                                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(triggerSchedules[0].rrule), triggerSchedules[0].timeStart, triggerSchedules[0].timeEnd) }</TableCell>
                                                             <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(inputEvents)}</TableCell>
                                                             <TableCell sx={{minWidth: 300}}>{ eventActionOutputDescription(outputActions)}</TableCell>
                                                         </TableRow>

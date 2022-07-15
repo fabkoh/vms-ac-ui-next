@@ -37,6 +37,7 @@ import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule
 import { controllerApi } from "../../../../api/controllers";
 import EntranceEventsManagement from "../../../../components/dashboard/entrances/details/entrance-event-management";
 import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
+import { eventsManagementApi } from "../../../../api/eventManagements";
 
 const entranceEventManagements = [
     // for entrance 
@@ -201,7 +202,7 @@ const EntranceDetails = () => {
     const link = getEntranceScheduleEditLink(entranceId);
 
     const [entranceSchedules, setEntranceSchedules] = useState([]);
-
+    const [entranceEventManagements, setEntranceEventManagements] = useState([]);
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
 
@@ -262,12 +263,29 @@ const EntranceDetails = () => {
     }
 
     
+const getEntranceEventsManagement = useCallback(async () => {
+    try {
+  //const data = await personApi.getFakePersons() 
+    const res = await eventsManagementApi.getEntranceEventsManagement(entranceId);
+
+    const data = await res.json()
+        if (isMounted()) {
+            console.log(data)
+            setEntranceEventManagements(data);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}, [isMounted]);
+
+
 
     const getInfo = useCallback(async() => {
         //get entrance and access group entrance
         getEntrance();
         getAccessGroups();
         getEntranceSchedules();
+        getEntranceEventsManagement();
     }, [isMounted])
 
     useEffect(() => {

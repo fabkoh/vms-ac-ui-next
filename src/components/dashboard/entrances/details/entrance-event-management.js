@@ -116,7 +116,7 @@ export default function EntranceEventsManagement({
 					// disabled={actionDisabled}
 					>
 						<Edit />
-						&#8288;Create
+						&#8288;Modify
 					</MenuItem>
 				</NextLink>
 				<MenuItem
@@ -139,8 +139,8 @@ export default function EntranceEventsManagement({
                                     
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>
-                                    <TableCell>Input(s)</TableCell>
-									<TableCell>Output(s)</TableCell>
+                                    <TableCell>Trigger(s)</TableCell>
+									<TableCell>Action(s)</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -151,7 +151,7 @@ export default function EntranceEventsManagement({
                           
                                     <TableRow hover key={i}>
                                         <TableCell sx={{minWidth: 150}}>{eventManagement.eventsManagementName}</TableCell>
-                                        <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedule.rrule), eventManagement.triggerSchedule.timeStart, eventManagement.triggerSchedule.timeEnd) }</TableCell>
+                                        <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(eventManagement.triggerSchedules[0].rrule), eventManagement.triggerSchedules[0].timeStart, eventManagement.triggerSchedules[0].timeEnd) }</TableCell>
                                         <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
                                         <TableCell sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
 									</TableRow>

@@ -24,7 +24,8 @@ const CreateEntrances = () => {
         entranceId,
         entranceName: '',
         entranceDesc: '',
-        accessGroups: []
+        accessGroups: [],
+        thirdPartyOption:'N.A.'
     });
     const getEmptyEntranceValidations = (entranceId) => ({
         entranceId,
@@ -232,7 +233,17 @@ const CreateEntrances = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
+
+    const changeThirdPartyOption = (e, id) => {
+        const updatedInfo = [ ...entranceInfoArr ];
+        updatedInfo.find(info => info.entranceId == id).thirdPartyOption = e.target.value;
+        setEntranceInfoArr(updatedInfo);
+    }
+
     const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onThirdPartyOptionsChange = (id) => (e) => changeThirdPartyOption(e, id);
+
+    
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -364,6 +375,7 @@ const CreateEntrances = () => {
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
                                         allAccessGroups={allAccessGroups}
                                         onAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                        onThirdPartyOptionsChange={onThirdPartyOptionsChange(id)}
                                     />
                                 )
                             })}

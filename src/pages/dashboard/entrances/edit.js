@@ -51,6 +51,7 @@ const EditEntrances = () => {
                 entranceDesc: body.entranceDesc,
                 originalName: body.entranceName, // fields for validation
                 accessGroups: [], // for now
+                thirdPartyOption: body.thirdPartyOption
             });
             validations.push({
                 entranceId: body.entranceId,
@@ -292,7 +293,17 @@ const EditEntrances = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
+
+    const changeThirdPartyOption = (e, id) => {
+        const updatedInfo = [ ...entranceInfoArr ];
+        // this method is reliant on text field having a name field == key in info object ie entranceName, entranceDesc
+        console.log(e.target.value)
+        updatedInfo.find(info => info.entranceId == id).thirdPartyOption = e.target.value;
+        setEntranceInfoArr(updatedInfo);
+    }
+
     const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onThirdPartyOptionsChange = (id) => (e) => changeThirdPartyOption(e, id);
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -404,6 +415,7 @@ const EditEntrances = () => {
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
                                         allAccessGroups={allAccessGroups}
                                         onAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                        onThirdPartyOptionsChange={onThirdPartyOptionsChange(id)}
                                         edit
                                     />
                                 )
