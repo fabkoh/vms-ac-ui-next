@@ -2,7 +2,7 @@ import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";
 import { rrulestr } from "rrule";
-import { displayEntranceOrController, eventActionInputDescription, eventActionOutputDescription } from "../../../../utils/eventsManagement";
+import { displayEntranceOrController, eventActionInputDescription, eventActionOutputDescription,listDescription } from "../../../../utils/eventsManagement";
 import rruleDescription from "../../../../utils/rrule-desc";
 import { Scrollbar } from "../../../scrollbar";
 
@@ -132,8 +132,8 @@ const ControllerEventsManagementDelete = ({
                                                                 />
                                                             </TableCell>
                                                             <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
-                                                            <TableCell sx={{minWidth: 150}}>{eventsManagementName}</TableCell>
-                                                            <TableCell sx={{minWidth: 250}}>{ rruleDescription(rrulestr(triggerSchedules[0].rrule), triggerSchedules[0].timeStart, triggerSchedules[0].timeEnd) }</TableCell>
+                                                            <TableCell sx={{minWidth: 200}}>{eventsManagementName}</TableCell>
+                                                            <TableCell sx={{minWidth: 300}}> {listDescription(eventManagement) }</TableCell>
                                                             <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(inputEvents)}</TableCell>
                                                             <TableCell sx={{minWidth: 300}}>{ eventActionOutputDescription(outputActions)}</TableCell>
                                                         </TableRow>
