@@ -18,7 +18,7 @@ import rruleDescription from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
 
 // for textfield placeholder
-const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Input(s) or Output(s)";
+const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Trigger(s) or Action(s)";
 
 const stringFilterHelper = (eventsManagement, query) => {
         return(
@@ -76,7 +76,7 @@ const eventActionInputDescription = inputEvents => {
         // check if timer enabled, concatenate to string 
         
             <div key={i}>
-            {`${inputEvent.eventActionInputType.eventActionInputTypeName}`}
+            {`${inputEvent.eventActionInputType.eventActionInputName}`}
             {inputEvent.eventActionInputType.timerEnabled ?
                 (inputEvent.timerDuration?
                     ` (${inputEvent.timerDuration}secs)`:
@@ -118,7 +118,7 @@ const eventActionOutputDescription = outputActions => {
         // check if timer enabled, concatenate to string 
         
             <div key={i}>
-            {`${outputAction.eventActionOutputType.eventActionOutputTypeName}`}
+            {`${outputAction.eventActionOutputType.eventActionOutputName}`}
             {outputAction.eventActionOutputType.timerEnabled ?
                 (outputAction.timerDuration?
                 ` (${outputAction.timerDuration}secs)`:

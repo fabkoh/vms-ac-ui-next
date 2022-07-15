@@ -22,6 +22,7 @@ import { filterEventsManagementByStringPlaceholder, filterEventsManagementByStri
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
+import { eventsManagementApi } from "../../../api/eventManagements";
 
 const EventsManagement = [
     // for entrance 
@@ -171,6 +172,8 @@ const EventsManagement = [
                 "controllerSerialNo": "100000005a46e105"
             }}
 ]
+
+
 const applyFilter = createFilter({
     query: filterEventsManagementByString,
 })
@@ -181,6 +184,31 @@ const EventsManagementList = () => {
         gtm.push({ event: "page_view" });
     })
 
+    const isMounted = useMounted();
+    const [EventsManagement, setEventsManagement] = useState([]);
+
+    const getEventsManagement = useCallback(async () => {
+        try {
+
+        const res = await eventsManagementApi.getAllEventsManagement()
+    
+        const data = await res.json()
+            if (isMounted()) {
+                setEventsManagement(data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }, [isMounted]);
+    
+    
+    useEffect(
+        () => {
+            getEventsManagement()
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
 
     // for filtering
     const [filters, setFilters] = useState({
@@ -210,6 +238,10 @@ const EventsManagementList = () => {
         }
     }
 
+
+    
+
+
     // for pagination
     const [page, setPage] = useState(0);
     const handlePageChange = (e, newPage) => setPage(newPage);
@@ -217,10 +249,12 @@ const EventsManagementList = () => {
     const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
     const paginatedEventsManagement = applyPagination(filteredEventsManagement, page, rowsPerPage);
 
+
     useEffect(() => {
 		console.log(filters)
         console.log(paginatedEventsManagement)
 	}, [filters]);
+
 
     // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
@@ -310,7 +344,7 @@ const EventsManagementList = () => {
                                     <NextLink href={eventsManagementCreateLink} passHref>
                                         <MenuItem disableRipple>
                                             <Add />
-                                            &#8288;Create
+                                            &#8288;Modify
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 
