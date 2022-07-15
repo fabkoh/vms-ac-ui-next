@@ -110,7 +110,6 @@ const EntranceEventsManagementDelete = ({
                                                         eventsManagementName,
                                                         inputEvents,
                                                         outputActions,
-                                                        triggerSchedules,
                                                         entrance,
                                                         controller
                                                     } = eventManagement;
