@@ -345,7 +345,7 @@ const Rrule = (props) => {
 	// const weektoday = weekarray[tempday-1] //needs rework
 	const WeeknoHandler = () => {
 		const date = nonChangingRule.dtstart.getDate();
-		const weekno = Math.floor(date/7);
+		let weekno = Math.floor(date/7);
 		if(weekno == 0 || date == 7){
 			return weekno="1st"
 		}
@@ -362,8 +362,16 @@ const Rrule = (props) => {
 		
 	}
 	const WeeknoHandlerValue = () => {
-		try{const date = nonChangingRule.dtstart.getDate();
-		const weekno = Math.floor(date/7);}catch(err){console.log(err)}
+		let date;
+		let weekno;
+		try {
+			date = nonChangingRule.dtstart.getDate();
+			weekno = Math.floor(date / 7);
+		}
+		catch (err) {
+			console.log(err);
+			return;
+		}
 		if(weekno == 0 || date == 7){
 			return weekno=1
 		}
@@ -385,18 +393,29 @@ const Rrule = (props) => {
 		setMonthOptionsMenu(e.target.value)
 	}
 	const monthMenuSetter1 = () => {
-		try{const date = nonChangingRule.dtstart.getDate()}catch(err){console.log(err)}	
+		let date;
+		try {
+			date = nonChangingRule.dtstart.getDate()
+		} catch (err) {
+			console.log(err);
+			return;
+		}	
 		if(monthOptionsMenu=="1"){
 			setRule(prevState=>({...prevState,byweekday:[],bysetpos:[]}))
 			setRule(prevState=>({...prevState,bymonthday:date}))	
 		}
 	}
 	const monthMenuSetter2 = () => {
-		try{
-			const tempday = nonChangingRule.dtstart.getDay();
-			const newtempday = tempday-1;
+		let newtempday;
+		let tempday;
+		try {
+			tempday = nonChangingRule.dtstart.getDay();
+			newtempday = tempday-1;
 			newtempday ==-1? newtempday=6:false
-		}catch(err){console.log(err)}	
+		} catch (err) {
+			console.log(err);
+			return;
+		}	
 		if(monthOptionsMenu=="2"){
 			setRule(prevState=>({...prevState,bymonthday:[]}))
 			setRule(prevState=>({...prevState,byweekday:[newtempday],bysetpos:[WeeknoHandlerValue()]}))	
@@ -469,27 +488,31 @@ const Rrule = (props) => {
 								on
 							</Typography>
 						</Grid>
-						<Grid item
+						{nonChangingRule.dtstart ?
+							<Grid item
 								mt={1}>
-							<Select
-							value={monthOptionsMenu}
-							onChange={handleMonthOptionsMenu}
-							defaultValue={rule.freq==RRule.WEEKLY? "1":null}
-							// value={monthOptions}
-							// onChange={handleMonthOptions}
-							>
-								<MenuItem value="1">
-									 {nonChangingRule.dtstart?`day ${nonChangingRule.dtstart.getDate()} of the month` :"select start date"}
-									{/* {monthMenuRenderer1(monthOptionsMenu)} */}
-									 </MenuItem>
-								<MenuItem value="2">
-									{nonChangingRule.dtstart?
-									(`the ${WeeknoHandler()} ${handleWeekarray()}`):
-										("select start date")
-								}
+								<Select
+									value={monthOptionsMenu}
+									onChange={handleMonthOptionsMenu}
+									defaultValue={rule.freq == RRule.WEEKLY ? "1" : null}
+								// value={monthOptions}
+								// onChange={handleMonthOptions}
+								>
+									<MenuItem value="1">
+										{`Day ${nonChangingRule.dtstart.getDate()} of the month`}
+									</MenuItem>
+									<MenuItem value="2">
+										{`The ${WeeknoHandler()} ${handleWeekarray()}`}
+									</MenuItem>
+								</Select>
+							</Grid>
+							: <Grid item
+								mt={1}>
+								<MenuItem >
+									Select start date
 								</MenuItem>
-							</Select>
-						</Grid>
+							</Grid>
+						}
 					</Grid>
 				);
 			}
@@ -512,12 +535,20 @@ const Rrule = (props) => {
 								on
 							</Typography>
 						</Grid>
-						<Grid item
-							mt={1}>
-							<MenuItem >
-							{nonChangingRule.dtstart?` ${rule.bymonthday} ${monthconverter()}` :"select start date"}
-							</MenuItem>
-						</Grid>
+						{nonChangingRule.dtstart ?
+							<Grid item
+								mt={1}>
+								<MenuItem >
+									{`${rule.bymonthday} ${monthconverter()}`}
+								</MenuItem>
+							</Grid>
+							: <Grid item
+								mt={1}>
+								<MenuItem >
+									Select start date
+								</MenuItem>
+							</Grid>
+						}
 					</Grid>
 				);
 			}

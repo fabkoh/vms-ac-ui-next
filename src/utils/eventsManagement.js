@@ -55,11 +55,7 @@ const getEntranceIdsEditLink = (ids) =>  '/dashboard/entrances/edit?ids=' + enco
 
 
 const entranceListLink = '/dashboard/entrances';
-<<<<<<< Updated upstream
-const eventsManagementCreateLink = '/dashboard/entrances/create';
-=======
 const eventsManagementCreateLink = '/dashboard/events-management/create';
->>>>>>> Stashed changes
 
 const getEntranceLabel = (entrance) => isObject(entrance) && entrance.entranceName;
 
