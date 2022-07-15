@@ -129,6 +129,25 @@ const eventActionOutputDescription = outputActions => {
     ))
 }
 
+const listDescription = eventManagement => 
+{
+    return(eventManagement.triggerSchedules.map((trigger,i) => {
+    if(i<eventManagement.triggerSchedules.length-1)
+        return(
+            <div key={i} >
+                {rruleDescription(rrulestr(trigger.rrule), 
+                trigger.timeStart, 
+                trigger.timeEnd)}
+                <br /><br />
+            </div>)
+        else return(
+            <div key={i}>
+                {rruleDescription(rrulestr(trigger.rrule), 
+                trigger.timeStart, 
+                trigger.timeEnd)}
+            </div>
+        )}))}
+
 export { 
     filterEventsManagementByStringPlaceholder, 
     filterEventsManagementByString,
@@ -143,5 +162,6 @@ export {
     isEntranceEqual,
     eventActionInputDescription,
     displayEntranceOrController,
-    eventActionOutputDescription
+    eventActionOutputDescription,
+    listDescription
  }
