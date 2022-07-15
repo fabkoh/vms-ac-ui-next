@@ -18,6 +18,10 @@ class EventsManagementApi {
         if (useApi) { return sendApi(`/api/eventsmanagements/controller/${controllerId}`); }
         return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
+
+    deleteEventsManagement(id){
+        if (useApi) { return sendApi(`/api/eventsmanagement/${id}`, { method: 'DELETE' }); }
+    }
 }
 
 export const eventsManagementApi = new EventsManagementApi();

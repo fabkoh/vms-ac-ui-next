@@ -275,21 +275,20 @@ const EventsManagementList = () => {
 	const deleteEventsManagement = async(e) => {
         e.preventDefault();
 		Promise.all(selectedEventsManagement.map(id=>{
-            console.log(id)}))
-		// 	return entranceApi.deleteEntrance(id)
-		// })).then( resArr => {
-		// 	resArr.filter(res=>{
-		// 		if(res.status == 204){
-        //             controllerApi.uniconUpdater();
-		// 			toast.success('Delete success',{duration:2000},);
-		// 		}
-		// 		else{
-		// 			toast.error('Delete unsuccessful' )
-		// 		}
-		// 	})
-		// 	getEntrancesLocal();
-		// })
+			return eventsManagementApi.deleteEventsManagement(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 200){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful' )
+				}
+			})
+			getEventsManagement();
+		})
 		setDeleteOpen(false);
+        setSelectedEventsManagement([])
 	};
 
     // useEffect(() => {

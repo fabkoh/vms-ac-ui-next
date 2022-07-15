@@ -356,20 +356,19 @@ const getEntranceEventsManagement = useCallback(async () => {
         getInfo();
     }
 
-    //delete entrance event managements 
+    // delete entrance Event Managements
     const deleteEventManagements = async(ids) => {
         console.log(ids)
-        // const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
+        const resArr = await Promise.all(ids.map(eventsManagementApi.deleteEventsManagement));
     
-        // if (resArr.some(res => res.status != 204)) {
-        //     toast.error('Failed to delete some entrance schedules')
-        // }
+        if (resArr.some(res => res.status != 200)) {
+            toast.error('Failed to delete some Events Managements')
+        }
 
-        // const numSuccess = resArr.filter(res => res.status == 204).length
-        // if (numSuccess) {
-        //     controllerApi.uniconUpdater();
-        //     toast.success(`Deleted ${numSuccess} entrance schedules`)
-        // }
+        const numSuccess = resArr.filter(res => res.status == 200).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} Events Managements`)
+        }
 
         getInfo();
     }
