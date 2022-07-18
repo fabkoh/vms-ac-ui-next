@@ -461,13 +461,13 @@ const Rrule = (props) => {
 								onChange={handleByweekday}
 								sx={{ mt: 1 ,flexWrap:"wrap"}}
 							>
-								<ToggleButton value={0}>Mon</ToggleButton>
-								<ToggleButton value={1}>Tue</ToggleButton>
-								<ToggleButton value={2}>Wed</ToggleButton>
-								<ToggleButton value={3}>Thu</ToggleButton>
-								<ToggleButton value={4}>Fri</ToggleButton>
-								<ToggleButton value={5}>Sat</ToggleButton>
-								<ToggleButton value={6}>Sun</ToggleButton>
+								<ToggleButton value={0}>M</ToggleButton>
+								<ToggleButton value={1}>T</ToggleButton>
+								<ToggleButton value={2}>W</ToggleButton>
+								<ToggleButton value={3}>T</ToggleButton>
+								<ToggleButton value={4}>F</ToggleButton>
+								<ToggleButton value={5}>S</ToggleButton>
+								<ToggleButton value={6}>S</ToggleButton>
 							</ToggleButtonGroup>
 						</Grid>
 					</Grid>
@@ -626,7 +626,7 @@ const Rrule = (props) => {
 						onChange={handleCount}
 					></TextField>
 					<Typography fontWeight="bold"
-						sx={{ ml: 3, mr: 3, mb: 3 }}>
+						sx={{ ml: 3, mr: 3 }}>
 						occurences
 					</Typography>
 				</Grid>
@@ -766,8 +766,8 @@ const Rrule = (props) => {
 									handleEndOption(e);
 								}}
 							>
-								<MenuItem value="on">on this date</MenuItem>
-								<MenuItem value="after">after a number of occurences</MenuItem>
+								<MenuItem value="on">on</MenuItem>
+								<MenuItem value="after">after</MenuItem>
 								<MenuItem value="never">never</MenuItem>
 							</Select>
 						</Grid>

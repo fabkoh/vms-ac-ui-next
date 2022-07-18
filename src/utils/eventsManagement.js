@@ -69,7 +69,7 @@ const filterEntrancesByState = filterByState(filterEntrancesByString);
 const isEntranceEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.entranceId != null && e1.entranceId === e2.entranceId;
 
 // takes in inputEvents list and return string 
-const eventActionInputDescription = (inputEvents) => {
+const eventActionInputDescription = inputEvents => {
         
     return (inputEvents.map(
         (inputEvent,i) =>

@@ -100,29 +100,15 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     }
 
     const changeInputTime = (e, inputId) => {
-        const MAX_TIMER_DURATION = 300;
-        const validations = [...inputWithTimerEventsManagementValidations];
-        if (e.target.value > MAX_TIMER_DURATION) {
-            validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
-            setInputWithTimerEventsManagementValidations(validations);
-        } else {
-            const updatedInfo = [...inputWithTimerEventsManagementArr];
-            updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = e.target.value;
-            setInputWithTimerEventsManagementArr(updatedInfo);
-        }
+        const updatedInfo = [...inputWithTimerEventsManagementArr];
+        updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = e.target.value;
+        setInputWithTimerEventsManagementArr(updatedInfo);
     }
 
     const changeOutputTime = (e, outputId) => {
-        const MAX_TIMER_DURATION = 300;
-        const validations = [...outputWithTimerEventsManagementValidations];
-        if (e.target.value > MAX_TIMER_DURATION) {
-            validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
-            setOutputWithTimerEventsManagementValidations(validations);
-        } else {
-            const updatedInfo = [...outputWithTimerEventsManagementArr];
-            updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = e.target.value;
-            setOutputWithTimerEventsManagementArr(updatedInfo);
-        }
+        const updatedInfo = [...outputWithTimerEventsManagementArr];
+        updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = e.target.value;
+        setOutputWithTimerEventsManagementArr(updatedInfo);
     }
 
 	const changeSelectionInputWithTime = (e, inputId) => {
@@ -399,11 +385,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                                 error={ Boolean(false)}
                                             />
                                         </Grid>
-                                        <Grid item
-                                            mr={2}
-                                            mt={1}>
-                                            <Typography fontWeight="bold">seconds</Typography>
-                                        </Grid>
                                         <Button
                                             variant="outlined"
                                             color="error"
@@ -499,11 +480,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                                 onChange={(e) => {changeOutputTime(e,i)}}
                                                 value={info.timerDuration}
                                             />
-                                        </Grid>
-                                        <Grid item
-                                            mr={2}
-                                            mt={1}>
-                                            <Typography fontWeight="bold">seconds</Typography>
                                         </Grid>
                                         <Button
                                             variant="outlined"
