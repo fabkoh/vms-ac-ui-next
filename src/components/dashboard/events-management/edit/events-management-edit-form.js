@@ -25,6 +25,8 @@ import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
 const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents,allOutputEvents,eventActionInputEqual,eventActionInputFilter,getEventActionInputName,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputEventsWithoutTimer,changeInputEventsWithTimer, changeOutputEventsWithTimer}) => {
+    const MAX_INPUT_TIMER_DURATION = 300;
+    const MAX_OUTPUT_TIMER_DURATION = 300;
     const getEmptyInputWithTimer = (inputId) => ({
         inputId, // this id will not be used for anything
         timerDuration: 1,
@@ -100,9 +102,11 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     }
 
     const changeInputTime = (e, inputId) => {
-        const MAX_TIMER_DURATION = 300;
-        if (e.target.value > MAX_TIMER_DURATION) {
-            const validations = [...inputWithTimerEventsManagementValidations];
+        const validations = [...inputWithTimerEventsManagementValidations];
+        if (e.target.value < 0) {
+            validations.find(info => info.inputId == inputId).timerDurationInputNotPositive = true;
+            setInputWithTimerEventsManagementValidations(validations)
+        } else if (e.target.value > MAX_INPUT_TIMER_DURATION) {
             validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
             setInputWithTimerEventsManagementValidations(validations);
         } else {
@@ -113,9 +117,11 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     }
 
     const changeOutputTime = (e, outputId) => {
-        const MAX_TIMER_DURATION = 300;
-        if (e.target.value > MAX_TIMER_DURATION) {
-            const validations = [...outputWithTimerEventsManagementValidations];
+        const validations = [...outputWithTimerEventsManagementValidations];
+        if(e.target.value < 0) {
+            validations.find(info => info.outputId == outputId).timerDurationOutputNotPositive = true;
+            setOutputWithTimerEventsManagementValidations(validations);
+        } else if (e.target.value > MAX_OUTPUT_TIMER_DURATION) {
             validations.find(info => info.outputId == outputId).timerDurationOutputTooLarge = true;
             setOutputWithTimerEventsManagementValidations(validations);
         } else {
@@ -304,6 +310,9 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                 <Stack
                     spacing={3}
                 >
+                    <Grid item>
+                        <Typography fontWeight="bold" fontSize={32}>Events Mangement Name:</Typography>
+                    </Grid>
                     <Grid
                         item
                         md={6}
@@ -321,6 +330,10 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                             }
                             error={ Boolean(eventsManagementNameBlank)}
                         />
+                    </Grid>
+                    <Grid item
+                        mt={1}>
+                        <Typography fontWeight="bold" fontSize={32} marginTop={4}>Triggers:</Typography>
                     </Grid>
                     <Collapse in={expanded}>
                         <Stack spacing={3}>
@@ -361,8 +374,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                 <Grid container
                                     key={info.inputId}>
                                 <Grid container
-                                        mt={2}
-                                        mb={2}
                                         alignItems="center">
                                         <Grid item
                                             mr={2}
@@ -402,7 +413,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">seconds</Typography>
+                                            <Typography fontWeight="bold">seconds (max {MAX_INPUT_TIMER_DURATION})</Typography>
                                         </Grid>
                                         <Button
                                             variant="outlined"
@@ -425,6 +436,10 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     Add input events with timer
                                 </Button>
                             </div>
+                            <Grid item
+                                mt={1}>
+                                <Typography fontWeight="bold" fontSize={32} marginTop={4}>Actions:</Typography>
+                            </Grid>
                             <Grid
                                 container
                                 mb={3}
@@ -465,8 +480,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                 <Grid container
                                     key={info.outputId}>
                                 <Grid container
-                                        mt={2}
-                                        mb={2}
                                         alignItems="center">
                                         <Grid item
                                             mr={2}
@@ -503,7 +516,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">seconds</Typography>
+                                            <Typography fontWeight="bold">seconds (max {MAX_OUTPUT_TIMER_DURATION})</Typography>
                                         </Grid>
                                         <Button
                                             variant="outlined"
@@ -526,6 +539,11 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     Add output events with timer
                                 </Button>
                             </div>
+                            <Grid item
+                                mr={2}
+                                mb={1}>
+                                <Typography fontWeight="bold" fontSize={32} marginTop={4}>Schedule:</Typography>
+                            </Grid>
                             <Grid
                                 item
                                 md={12}
