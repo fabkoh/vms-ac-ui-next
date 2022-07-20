@@ -84,7 +84,8 @@ export default function EntranceEventsManagement({
 						title="Events Management"
 						subheader="The inputs below will trigger the outputs"
 						avatar={
-							<ExpandMore expand={expanded} onClick={handleExpandClick}>
+							<ExpandMore expand={expanded}
+										onClick={handleExpandClick}>
 								<ExpandMoreIcon />
 							</ExpandMore>
 						}
@@ -138,9 +139,9 @@ export default function EntranceEventsManagement({
 								<TableRow>
                                     
 									<TableCell>Name</TableCell>
-									<TableCell>Description</TableCell>
-                                    <TableCell>Trigger(s)</TableCell>
-									<TableCell>Action(s)</TableCell>
+									<TableCell>Description(s)</TableCell>
+                                    <TableCell>Input(s)</TableCell>
+									<TableCell>Output(s)</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -149,7 +150,8 @@ export default function EntranceEventsManagement({
                                 return(
 									
                           
-                                    <TableRow hover key={i}>
+                                    <TableRow hover
+											key={i}>
                                         <TableCell sx={{minWidth: 200}}>{eventManagement.eventsManagementName}</TableCell>
                                         <TableCell sx={{minWidth: 300}}>{listDescription(eventManagement)}</TableCell>
                                         <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>

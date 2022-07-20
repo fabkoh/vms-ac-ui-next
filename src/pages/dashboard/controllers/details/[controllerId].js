@@ -41,156 +41,7 @@ import { getControllerEditLink, getControllerListLink } from "../../../../utils/
 import { authDeviceApi } from "../../../../api/auth-devices";
 import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
 import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
-import { eventsManagementApi } from "../../../../api/eventManagements";
-
-const controllerEventManagements = [
-    // for entrance 
-    {
-        "eventsManagementId":1,
-        "eventsManagementName":"Events 1",
-        "inputEvents":[
-            // input w/o timer 
-            {
-                "inputEventId":1,
-                "timerDuration":null,
-                "eventActionInputType":{
-                    "eventActionInputId":1,
-                    "eventActionInputTypeName":"Authenticated Scan",
-                    "timerEnabled":false
-                }
-            },
-            // input with timer ( 30 secs )
-            {
-                "inputEventId":2,
-                "timerDuration":30,
-                "eventActionInputType":{
-                    "eventActionInputId":2,
-                    "eventActionInputTypeName":"Door Opened",
-                    "timerEnabled":true
-                }
-            }
-            
-        ],
-        "outputActions":[
-            // output w/o timer 
-            {
-                "outputEventId":1,
-                "timerDuration":null,
-                "eventActionOutputType":{
-                    "eventActionOutputId":1,
-                    "eventActionOutputTypeName":"Authenticated Scan",
-                    "timerEnabled":false
-                }
-            },
-            // output with timer ( 30 secs )
-            {
-                "outputEventId":2,
-                "timerDuration":30,
-                "eventActionOutputType":{
-                    "eventActionOutputId":2,
-                    "eventActionOutputTypeName":"Buzzer buzzing",
-                    "timerEnabled":true
-                }
-            },
-            // output with timer ( but choose to let it go on indefinitely )
-            {
-                "outputEventId":3,
-                "timerDuration":null,
-                "eventActionOutputType":{
-                    "eventActionOutputId":3,
-                    "eventActionOutputTypeName":"LED light",
-                    "timerEnabled":true
-                }
-            }
-            
-        ],
-        "triggerSchedule":{
-            "triggerScheduleId":1,
-            "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
-            "timeStart":"00:00",
-            "timeEnd":"12:00",
-        },
-        "entrance":{
-            "entranceId": 3,
-            "entranceName": "Abandoned Entrance",
-            "deleted": false
-        },
-        "controller":null},
-    
-        // for controller 
-        {
-            "eventsManagementId":2,
-            "eventsManagementName":"Events 2",
-            "inputEvents":[
-                // input w/o timer 
-                {
-                    "inputEventId":4,
-                    "timerDuration":null,
-                    "eventActionInputType":{
-                        "eventActionInputId":4,
-                        "eventActionInputTypeName":"Authenticated Scan controller",
-                        "timerEnabled":false
-                    }
-                },
-                // input with timer ( 30 secs )
-                {
-                    "inputEventId":5,
-                    "timerDuration":30,
-                    "eventActionInputType":{
-                        "eventActionInputId":5,
-                        "eventActionInputTypeName":"Door Opened",
-                        "timerEnabled":true
-                    }
-                }
-                
-            ],
-            "outputActions":[
-                // output w/o timer 
-                {
-                    "outputEventId":4,
-                    "timerDuration":null,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":4,
-                        "eventActionOutputTypeName":"Authenticated Scan controller",
-                        "timerEnabled":false
-                    }
-                },
-                // output with timer ( 30 secs )
-                {
-                    "outputEventId":5,
-                    "timerDuration":30,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":5,
-                        "eventActionOutputTypeName":"Buzzer buzzing controller",
-                        "timerEnabled":true
-                    }
-                },
-                // output with timer ( but choose to let it go on indefinitely )
-                {
-                    "outputEventId":6,
-                    "timerDuration":null,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":6,
-                        "eventActionOutputTypeName":"LED light for controller",
-                        "timerEnabled":true
-                    }
-                }
-                
-            ],
-            "triggerSchedule":{
-                "triggerScheduleId":2,
-                "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
-                "timeStart":"00:00",
-                "timeEnd":"12:00",
-            },
-            "entrance":null,
-            "controller":{
-                "controllerId": 2,
-                "controllerName": "100000005a46e105",
-                "deleted": false,
-                "controllerSerialNo": "100000005a46e105"
-            }}
-]
+import { eventsManagementApi } from "../../../../api/events-management";
 
 const ControllerDetails = () => {
 
@@ -202,8 +53,8 @@ const ControllerDetails = () => {
         gtm.push({ event: 'page_view' });
     }, [])
 
-    const [controllerEventManagements,setControllerEventManagements]= useState([])
     const [controllerInfo, setControllerInfo] = useState(null)
+    const [controllerEventManagements, setControllerEventManagements] = useState([]);
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
     const [authStatus, setAuthStatus] = useState({})
@@ -225,6 +76,27 @@ const ControllerDetails = () => {
             })
         }catch(err){console.log(err)}
     }
+
+    const getControllerEventManagements = async() => {
+        try {
+            const eventManagements = await eventsManagementApi.getEventsManagementForController(controllerId);
+
+            if (eventManagements.status == 200) {
+                const body = await eventManagements.json();
+                if (isMounted()) {
+                    setControllerEventManagements(body);
+                }
+            }
+            else {
+                toast.error("Controller Event Managements Not Loaded");
+                setControllerEventManagements([]);
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
     const getPairs = (controllerInfo) => {
         const E1=[]
         const E2=[]
@@ -261,27 +133,11 @@ const ControllerDetails = () => {
         // setStatusLoaded(true)
     }
 
-    const getControllerEventsManagement = useCallback(async () => {
-        try {
-      //const data = await personApi.getFakePersons() 
-        const res = await eventsManagementApi.getControllerEventsManagement(controllerId);
-    
-        const data = await res.json()
-            if (isMounted()) {
-                console.log(data)
-                setControllerEventManagements(data);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    }, [isMounted]);
-
-
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
         getController(controllerId)
         getStatus()
-        getControllerEventsManagement()
+        getControllerEventManagements();
     }, [isMounted])
 
     useEffect(() => {
