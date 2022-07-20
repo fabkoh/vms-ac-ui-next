@@ -93,22 +93,25 @@ class EventsManagementApi {
         }
     }
 
-    getEventsManagement() {
+    getAllEventsManagement() {
         if (useApi) { return sendApi('/api/eventsmanagement'); }
-        return Promise.resolve(new Response(JSON.stringify(fakeEventsManagement), { status: 200 }));
+        return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
 
-    getEventsManagementForEntrance(id) {
-        if (useApi) { return sendApi(`/api/eventsmanagement/entrance/${id}`); }
-        const filteredFakeEventsManagement = fakeEventsManagement.filter(i => i.entrance);
-        return Promise.resolve(new Response(filteredFakeEventsManagement), { status: 200 })
+    getEntranceEventsManagement(entranceId) {
+        if (useApi) { return sendApi(`/api/eventsmanagement/entrance/${entranceId}`); }
+        return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
 
-    getEventsManagementForController(id) {
-        if (useApi) { return sendApi(`/api/eventsmanagement/controller/${id}`); }
-        const filteredFakeEventsManagement = fakeEventsManagement.filter(i => i.controller);
-        return Promise.resolve(new Response(filteredFakeEventsManagement), { status: 200 })
+    getControllerEventsManagement(controllerId) {
+        if (useApi) { return sendApi(`/api/eventsmanagement/controller/${controllerId}`); }
+        return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
+
+    deleteEventsManagement(id){
+        if (useApi) { return sendApi(`/api/eventsmanagement/${id}`, { method: 'DELETE' }); }
+    }
+    
 
     getInputEvents(forController) {
         if (useApi) { return sendApi(`/api/event/input/types?forController=${forController}`); }
@@ -118,10 +121,6 @@ class EventsManagementApi {
     getOutputEvents(forController) {
         if (useApi) { return sendApi(`/api/event/output/types?forController=${forController}`); }
         return Promise.resolve(new Response(JSON.stringify(fakeOutputEvents), { status: 200 }));
-    }
-
-    deleteEventsManagement(id){
-        if (useApi) { return sendApi(`/api/eventsmanagement/${id}`, { method: 'DELETE' }); }
     }
 }
 

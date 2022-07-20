@@ -30,7 +30,7 @@ const EventsManagementList = () => {
 
     const getEventManagements = useCallback(async () => {
         try {
-            const eventManagements = await eventsManagementApi.getEventsManagement();
+            const eventManagements = await eventsManagementApi.getAllEventsManagement();
 
             if (eventManagements.status == 200) {
                 const body = await eventManagements.json();
@@ -133,7 +133,7 @@ const EventsManagementList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			})
-			getEventsManagement();
+			getEventManagements();
 		})
 		setDeleteOpen(false);
         setSelectedEventsManagement([])
@@ -195,7 +195,7 @@ const EventsManagementList = () => {
                                         passHref>
                                         <MenuItem disableRipple>
                                             <Add />
-                                            &#8288;Create
+                                            &#8288;Modify
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 
