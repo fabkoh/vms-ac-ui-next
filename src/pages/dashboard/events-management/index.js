@@ -4,8 +4,6 @@ import Head from "next/head";
 import NextLink from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import entranceApi from "../../../api/entrance";
-import accessGroupEntrance from "../../../api/access-group-entrance-n-to-n";
 import { AuthGuard } from "../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
 import StyledMenu from "../../../components/dashboard/styled-menu";
@@ -19,196 +17,44 @@ import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
-import { controllerApi } from "../../../api/controllers";
-import { entranceScheduleApi } from "../../../api/entrance-schedule";
+import { eventsManagementApi } from "../../../api/events-management";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
-import { eventsManagementApi } from "../../../api/eventManagements";
-
-const EventsManagement = [
-    // for entrance 
-    {
-        "eventsManagementId":1,
-        "eventsManagementName":"Events 1",
-        "inputEvents":[
-            // input w/o timer 
-            {
-                "inputEventId":1,
-                "timerDuration":null,
-                "eventActionInputType":{
-                    "eventActionInputId":1,
-                    "eventActionInputTypeName":"Authenticated Scan",
-                    "timerEnabled":false
-                }
-            },
-            // input with timer ( 30 secs )
-            {
-                "inputEventId":2,
-                "timerDuration":30,
-                "eventActionInputType":{
-                    "eventActionInputId":2,
-                    "eventActionInputTypeName":"Door Opened",
-                    "timerEnabled":true
-                }
-            }
-            
-        ],
-        "outputActions":[
-            // output w/o timer 
-            {
-                "outputEventId":1,
-                "timerDuration":null,
-                "eventActionOutputType":{
-                    "eventActionOutputId":1,
-                    "eventActionOutputTypeName":"Authenticated Scan",
-                    "timerEnabled":false
-                }
-            },
-            // output with timer ( 30 secs )
-            {
-                "outputEventId":2,
-                "timerDuration":30,
-                "eventActionOutputType":{
-                    "eventActionOutputId":2,
-                    "eventActionOutputTypeName":"Buzzer buzzing",
-                    "timerEnabled":true
-                }
-            },
-            // output with timer ( but choose to let it go on indefinitely )
-            {
-                "outputEventId":3,
-                "timerDuration":null,
-                "eventActionOutputType":{
-                    "eventActionOutputId":3,
-                    "eventActionOutputTypeName":"LED light",
-                    "timerEnabled":true
-                }
-            }
-            
-        ],
-        "triggerSchedule":{
-            "triggerScheduleId":1,
-            "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
-            "timeStart":"00:00",
-            "timeEnd":"12:00",
-        },
-        "entrance":{
-            "entranceId": 3,
-            "entranceName": "Abandoned Entrance",
-            "deleted": false
-        },
-        "controller":null},
-    
-        // for controller 
-        {
-            "eventsManagementId":2,
-            "eventsManagementName":"Events 2",
-            "inputEvents":[
-                // input w/o timer 
-                {
-                    "inputEventId":4,
-                    "timerDuration":null,
-                    "eventActionInputType":{
-                        "eventActionInputId":4,
-                        "eventActionInputTypeName":"Authenticated Scan controller",
-                        "timerEnabled":false
-                    }
-                },
-                // input with timer ( 30 secs )
-                {
-                    "inputEventId":5,
-                    "timerDuration":30,
-                    "eventActionInputType":{
-                        "eventActionInputId":5,
-                        "eventActionInputTypeName":"Door Opened",
-                        "timerEnabled":true
-                    }
-                }
-                
-            ],
-            "outputActions":[
-                // output w/o timer 
-                {
-                    "outputEventId":4,
-                    "timerDuration":null,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":4,
-                        "eventActionOutputTypeName":"Authenticated Scan controller",
-                        "timerEnabled":false
-                    }
-                },
-                // output with timer ( 30 secs )
-                {
-                    "outputEventId":5,
-                    "timerDuration":30,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":5,
-                        "eventActionOutputTypeName":"Buzzer buzzing controller",
-                        "timerEnabled":true
-                    }
-                },
-                // output with timer ( but choose to let it go on indefinitely )
-                {
-                    "outputEventId":6,
-                    "timerDuration":null,
-                    "eventActionOutputType":{
-                        "eventActionOutputId":6,
-                        "eventActionOutputTypeName":"LED light for controller",
-                        "timerEnabled":true
-                    }
-                }
-                
-            ],
-            "triggerSchedule":{
-                "triggerScheduleId":2,
-                "rrule":"DTSTART:20220701T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;WKST=MO", 
-                "timeStart":"00:00",
-                "timeEnd":"12:00",
-            },
-            "entrance":null,
-            "controller":{
-                "controllerId": 2,
-                "controllerName": "100000005a46e105",
-                "deleted": false,
-                "controllerSerialNo": "100000005a46e105"
-            }}
-]
-
 
 const applyFilter = createFilter({
     query: filterEventsManagementByString,
 })
 
 const EventsManagementList = () => {
+    const isMounted = useMounted();
+    const [eventsManagement, setEventsManagement] = useState([]);
+
+    const getEventManagements = useCallback(async () => {
+        try {
+            const eventManagements = await eventsManagementApi.getEventsManagement();
+
+            if (eventManagements.status == 200) {
+                const body = await eventManagements.json();
+                if (isMounted()) {
+                    setEventsManagement(body);
+                }
+            }
+            else {
+                toast.error("Event Managements Not Loaded");
+                setEventsManagement([]);
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }, [isMounted]);
+
+    useEffect(() => {
+        getEventManagements();
+    }, [])
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
     })
-
-    const isMounted = useMounted();
-    const [EventsManagement, setEventsManagement] = useState([]);
-
-    const getEventsManagement = useCallback(async () => {
-        try {
-
-        const res = await eventsManagementApi.getAllEventsManagement()
-    
-        const data = await res.json()
-            if (isMounted()) {
-                setEventsManagement(data);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    }, [isMounted]);
-    
-    
-    useEffect(
-        () => {
-            getEventsManagement()
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
 
     // for filtering
     const [filters, setFilters] = useState({
@@ -223,13 +69,13 @@ const EventsManagementList = () => {
             query: queryRef.current?.value
         }));
     }
-    const filteredEventsManagement = applyFilter(EventsManagement, filters);
+    const filteredEventsManagement = applyFilter(eventsManagement, filters);
 
     // for selection of checkboxes
     const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
-    const selectedAllEventsManagement = selectedEventsManagement.length == EventsManagement.length;
+    const selectedAllEventsManagement = selectedEventsManagement.length == eventsManagement.length;
     const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
-    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? EventsManagement.map(e => e.eventsManagementId) : []);
+    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? eventsManagement.map(e => e.eventsManagementId) : []);
     const handleSelectFactory = (eventsManagementId) => () => {
         if (selectedEventsManagement.includes(eventsManagementId)) {
             setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
@@ -253,6 +99,7 @@ const EventsManagementList = () => {
     useEffect(() => {
 		console.log(filters)
         console.log(paginatedEventsManagement)
+        console.log(eventsManagement)
 	}, [filters]);
 
 
@@ -271,7 +118,8 @@ const EventsManagementList = () => {
 	};
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
-	}
+    }
+
 	const deleteEventsManagement = async(e) => {
         e.preventDefault();
 		Promise.all(selectedEventsManagement.map(id=>{
@@ -322,8 +170,11 @@ const EventsManagementList = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
-                        <Grid container justifyContent="space-between" spacing={3}>
-                            <Grid item sx={{ m: 2.5 }}>
+                        <Grid container
+                            justifyContent="space-between"
+                            spacing={3}>
+                            <Grid item
+                                sx={{ m: 2.5 }}>
                                 <Typography variant="h4">Events Management</Typography>    
                             </Grid>    
                             <Grid item>
@@ -340,10 +191,11 @@ const EventsManagementList = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    <NextLink href={eventsManagementCreateLink} passHref>
+                                    <NextLink href={eventsManagementCreateLink}
+                                        passHref>
                                         <MenuItem disableRipple>
                                             <Add />
-                                            &#8288;Modify
+                                            &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 
@@ -371,8 +223,10 @@ const EventsManagementList = () => {
                                 mt: 3
                             }}
                         >
-                            <Button startIcon={<Upload fontSize="small" />} sx={{ m: 1 }}>Import</Button>    
-                            <Button startIcon={<Download fontSize="small" />} sx={{ m: 1 }}>Export</Button>
+                            <Button startIcon={<Upload fontSize="small" />}
+                                    sx={{ m: 1 }}>Import</Button>    
+                            <Button startIcon={<Download fontSize="small" />}
+                                    sx={{ m: 1 }}>Export</Button>
                             <Tooltip
                                 title="Excel template can be found at {}"
                                 enterTouchDelay={0}
@@ -428,7 +282,7 @@ const EventsManagementList = () => {
                             handleSelectAllEventsManagement={handleSelectAllEventsManagement}
                             handleSelectFactory={handleSelectFactory}
                             selectedEventsManagement={selectedEventsManagement}
-                            eventsManagementCount={EventsManagement.length}
+                            eventsManagementCount={eventsManagement.length}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             page={page}

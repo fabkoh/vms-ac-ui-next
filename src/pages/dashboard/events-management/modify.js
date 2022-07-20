@@ -13,7 +13,6 @@ import router, { useRouter } from "next/router";
 import formUtils from "../../../utils/form-utils";
 import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-edit-form";
 import MultipleSelectInput from "../../../components/dashboard/shared/multi-select-input"
-import { accessGroupScheduleApi } from "../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../api/controllers";
 import entranceApi from "../../../api/entrance";
@@ -33,8 +32,8 @@ const CreateEventManagement = () => {
     const [controllers, setControllers] = useState([]);
     const [inputEvents, setInputEvents] = useState([]);
     const [outputEvents, setOutputEvents] = useState([]);
-    const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState([]);
-    const [outputEventsWithoutTimer, setOutputEventsWithoutTimer] = useState([]);
+    const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState({});
+    const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState({});
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
@@ -50,26 +49,21 @@ const CreateEventManagement = () => {
         }
     }, [isMounted]);
 
-    const getAllInputEvents = useCallback(async() => {
-        const inputEventsRes = await eventsManagementApi.getInputEvents();
+    const getAllInputOutputEvents = useCallback(async(forController) => {
+        const inputEventsRes = await eventsManagementApi.getInputEvents(forController);
+        const outputEventsRes = await eventsManagementApi.getOutputEvents(forController);
         if (inputEventsRes.status !== 200) {
             toast.error("Input events option not loaded");
-            return [];
+            setInputEvents([]);
         }
-        const inputEventsJson = await inputEventsRes.json();
-        if (isMounted()){
-            setInputEvents(inputEventsJson);
-        }
-    }, [isMounted]);
-
-    const getAllOutputEvents = useCallback(async() => {
-        const outputEventsRes = await eventsManagementApi.getOutputEvents();
         if (outputEventsRes.status !== 200) {
             toast.error("Output events option not loaded");
-            return [];
+            setOutputEvents([]);
         }
+        const inputEventsJson = await inputEventsRes.json();
         const outputEventsJson = await outputEventsRes.json();
         if (isMounted()){
+            setInputEvents(inputEventsJson);
             setOutputEvents(outputEventsJson);
         }
     }, [isMounted]);
@@ -86,26 +80,29 @@ const CreateEventManagement = () => {
         }
         return data;
     }, [isMounted]);
+
     useEffect(() => {
         try {
             getAllControllers();
             getAllEntrances();
-            getAllInputEvents();
-            getAllOutputEvents();
         } catch (error) {
             console.log(error)
         }
     }, [])
       
-    //
+    useEffect(() => {
+        try {
+            getAllInputOutputEvents(controllers.length > 0);
+        } catch (error) {
+            console.log(error)
+        }
+    }, [controllers])
 
     // empty objects for initialisation of new card
     const getEmptyEventsManagementInfo = (eventsManagementId) => ({
         eventsManagementId,
         eventsManagementName:"",
-        rrule:"",
-        timeStart:"",
-        timeEnd: "",
+        triggerSchedules: [],
         inputEvents: [],
         outputActions: [],
     });
@@ -153,26 +150,14 @@ const CreateEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
     }
 
-    //set rrule string
-    const changeRrule = (string,id) =>{
-        const updatedInfo = [ ...eventsManagementInfoArr ];
-        updatedInfo.find(info => info.eventsManagementId == id)['rrule']=string;
+    // change triggerSchedules
+    const changeTriggerSchedules = (value,id) =>{
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        eventManagementToBeUpdated['triggerSchedules'] = value;
         setEventsManagementInfoArr(updatedInfo);
-        console.log(eventsManagementInfoArr)
     }
-    //set timestartend
-    const changeTimeStart = (start,id) =>{
-        const updatedInfo = [ ...eventsManagementInfoArr ];
-        updatedInfo.find(info => info.eventsManagementId == id)['timeStart']=start;
-        setEventsManagementInfoArr(updatedInfo);
-        checkTimeStart(start,id)
-    }
-    const changeTimeEnd = (end,id) =>{
-        const updatedInfo = [ ...eventsManagementInfoArr ];
-        updatedInfo.find(info => info.eventsManagementId == id)['timeEnd']=end;
-        setEventsManagementInfoArr(updatedInfo);
-        checkTimeEnd(end,id)
-    }
+
     const checkTimeEnd = (end,id) => {
         const endTime = end;
         const newValidations = [ ...eventsManagementValidationsArr ];
@@ -234,10 +219,9 @@ const CreateEventManagement = () => {
 
     const replaceAll = (e) => {
         e.preventDefault();
-
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=200){
+            if (res.status!=201){
                 return toast.error("Error replacing all event managements")
             }
             else{
@@ -250,27 +234,9 @@ const CreateEventManagement = () => {
     }
     const addOn = (e) => {
         e.preventDefault();
-        console.log(inputEventsWithTimer);
-        const inputEventsWithTimerKeys = Object.keys(inputEventsWithTimer)
-        const outputEventsWithTimerKeys = Object.keys(outputEventsWithTimer)
-        for (let i = 0; i < inputEventsWithTimerKeys.length; i++) {
-            let key = inputEventsWithTimerKeys[i];
-            const updatedInfo = [...eventsManagementInfoArr];
-            const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == key);
-            const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-            let newInputEvents = []
-            for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
-                if (eventManagementToBeUpdatedInputEvents[j].timerDuration == null || eventManagementToBeUpdatedInputEvents[j].timerDuration == undefined) {
-                    newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
-                }
-            }
-            newInputEvents.push(...inputEventsWithTimer[key]);
-            eventManagementToBeUpdated['inputEvents'] = newInputEvents;
-            setEventsManagementInfoArr(updatedInfo);
-        }
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=200){
+            if (res.status!=201){
                 return toast.error("Error adding event managements")
             }
             else{
@@ -334,6 +300,7 @@ const CreateEventManagement = () => {
     const changeInputEventsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
         const newValueMapped = newValue.map(i => {
             return {
                 timerDuration: null,
@@ -342,14 +309,21 @@ const CreateEventManagement = () => {
                 }
             }
         })
-        const filteredInputEventsWithTimerFromEventManagement = eventManagementToBeUpdated['inputEvents'].filter(i => i.timerDuration != null)
-        eventManagementToBeUpdated['inputEvents'] = filteredInputEventsWithTimerFromEventManagement.push(...newValueMapped);
+        let newInputEvents = []
+        for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
+            if (eventManagementToBeUpdatedInputEvents[j].timerDuration) {
+                newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
+            }
+        }
+        newInputEvents.push(...newValueMapped);
+        eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
-        setInputEventsWithoutTimer(newValue);
+        setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
     }
-    const changeOutputEventsWithoutTimer = (newValue, id) => {
+    const changeOutputActionsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const eventManagementToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
         const newValueMapped = newValue.map(i => {
             return {
                 timerDuration: null,
@@ -358,10 +332,16 @@ const CreateEventManagement = () => {
                 }
             }
         })
-        const filteredOutputEventsWithTimerFromEventManagement = eventManagementToBeUpdated['outputActions'].filter(i => i.timerDuration != null)
-        eventManagementToBeUpdated['outputActions'] = filteredOutputEventsWithTimerFromEventManagement.push(...newValueMapped);
+        let newOutputActions = []
+        for (let j = 0; j < eventManagementToBeUpdatedOutputActions.length; j++) {
+            if (eventManagementToBeUpdatedOutputActions[j].timerDuration) {
+                newOutputActions.push(eventManagementToBeUpdatedOutputActions[j])
+            }
+        }
+        newOutputActions.push(...newValueMapped);
+        eventManagementToBeUpdated['outputActions'] = newOutputActions;
         setEventsManagementInfoArr(updatedInfo);
-        setOutputEventsWithoutTimer(newValue);
+        setOutputActionsWithoutTimer({...outputActionsWithoutTimer, [id]: newValue});
     }
 
 
@@ -382,18 +362,18 @@ const CreateEventManagement = () => {
         setInputEventsWithTimer({ ...inputEventsWithTimer, [id]: newValue });
     }
 
-    const changeOutputEventsWithTimer = (newValue, id) => {
+    const changeOutputActionsWithTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedOutputEvents = eventManagementToBeUpdated['outputActions'];
-        let newOutputEvents = []
+        let newOutputActions = []
         for (let j = 0; j < eventManagementToBeUpdatedOutputEvents.length; j++) {
             if (eventManagementToBeUpdatedOutputEvents[j].timerDuration == null || eventManagementToBeUpdatedOutputEvents[j].timerDuration == undefined) {
-                newOutputEvents.push(eventManagementToBeUpdatedOutputEvents[j])
+                newOutputActions.push(eventManagementToBeUpdatedOutputEvents[j])
             }
         }
-        newOutputEvents.push(...newValue);
-        eventManagementToBeUpdated['outputActions'] = newOutputEvents;
+        newOutputActions.push(...newValue);
+        eventManagementToBeUpdated['outputActions'] = newOutputActions;
         setEventsManagementInfoArr(updatedInfo);
         setOutputEventsWithTimer({...outputEventsWithTimer, [id]: newValue });
     }
@@ -402,7 +382,7 @@ const CreateEventManagement = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Create Events Management
+                    Etlas: Modify Events Management
                 </title>
             </Head>
             <Box
@@ -438,7 +418,7 @@ const CreateEventManagement = () => {
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Create Events Management
+                            Modify Events Management
                         </Typography>
                         {/* <Grid container
                             marginLeft={0.5}
@@ -501,25 +481,25 @@ const CreateEventManagement = () => {
                                     key={eventsManagementInfo.eventsManagementId}
                                     eventsManagementInfo={eventsManagementInfo}
                                     removeCard={removeCard}
-                                    changeTimeStart={changeTimeStart}
-                                    changeTimeEnd={changeTimeEnd}
                                     eventsManagementValidations={eventsManagementValidationsArr[i]}
                                     changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
                                     changeNameCheck={changeNameCheck}
-                                    changeRrule={changeRrule}
+                                    changeTriggerSchedules={changeTriggerSchedules}
                                     checkUntil={checkUntil(eventsManagementInfo.eventsManagementId)}
                                     changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
-                                    changeOutputEventsWithoutTimer={changeOutputEventsWithoutTimer}
+                                    changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
                                     eventActionInputEqual={eventActionInputEqual}
                                     eventActionInputFilter={eventActionInputFilter}
                                     getEventActionInputName={getEventActionInputName}
                                     eventActionOutputEqual={eventActionOutputEqual}
                                     eventActionOutputFilter={eventActionOutputFilter}
                                     getEventActionOutputName={getEventActionOutputName}
+                                    changeInputEventsWithTimer={changeInputEventsWithTimer}
+                                    changeOutputActionsWithTimer={changeOutputActionsWithTimer}
+                                    inputEventsValueWithoutTimer={inputEventsWithoutTimer}
+                                    outputActionsValueWithoutTimer={outputActionsWithoutTimer}
                                     allInputEvents={inputEvents}
                                     allOutputEvents={outputEvents}
-                                    changeInputEventsWithTimer={changeInputEventsWithTimer}
-                                    changeOutputEventsWithTimer={changeOutputEventsWithTimer}
                                 />
                             ))}
                             <div>
@@ -545,8 +525,6 @@ const CreateEventManagement = () => {
                                         // onClick={replaceAll}
                                         disabled={
                                             entrancesControllers.length == 0 ||
-                                            inputEvents.length == 0 ||
-                                            outputActions.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||

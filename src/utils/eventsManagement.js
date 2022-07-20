@@ -16,6 +16,7 @@ import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
 import rruleDescription from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
+import {Grid} from "@mui/material";
 
 // for textfield placeholder
 const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Trigger(s) or Action(s)";
@@ -41,45 +42,26 @@ const stringFilterHelper = (eventsManagement, query) => {
 
 const filterEventsManagementByString = (eventsManagement, queryString) => stringFilterHelper(eventsManagement, queryString.toLowerCase());
 
-// returns true if status == null or
-//                 isActive == status
-const filterEntranceByStatus = (entrance, status) => status == null || entrance.isActive == status;
+const eventsManagementListLink = '/dashboard/events-management';
+const eventsManagementCreateLink = '/dashboard/events-management/modify';
 
-const getEntranceDetailsLink = (entrance) => isObject(entrance) && `/dashboard/entrances/details/${entrance.entranceId}`;
+const getEventManagementLabel = (eventManagement) => isObject(eventManagement) && eventManagement.eventsManagementName;
 
-const getEntranceEditLink = (entrances) => (
-    '/dashboard/entrances/edit?ids=' + encodeURIComponent(JSON.stringify(entrances.filter(isObject).map(e => e.entranceId)))
-);
+const filterEventManagementsByState = filterByState(filterEventsManagementByString);
 
-const getEntranceIdsEditLink = (ids) =>  '/dashboard/entrances/edit?ids=' + encodeURIComponent(JSON.stringify(ids));
-
-
-const entranceListLink = '/dashboard/entrances';
-const eventsManagementCreateLink = '/dashboard/events-management/create';
-
-const getEntranceLabel = (entrance) => isObject(entrance) && entrance.entranceName;
-
-const filterEntrancesByString = (entrances, queryString) => {
-    const query = queryString.toLowerCase();
-    return entrances.filter(e => stringFilterHelper(e, query))
-}
-
-const filterEntrancesByState = filterByState(filterEntrancesByString);
-
-const isEntranceEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.entranceId != null && e1.entranceId === e2.entranceId;
+const isEventManagementEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.eventManagementId != null && e1.eventManagementId === e2.eventManagementId;
 
 // takes in inputEvents list and return string 
 const eventActionInputDescription = inputEvents => {
         
     return (inputEvents.map(
-        (inputEvent,i) =>
-        // check if timer enabled, concatenate to string 
-        
+        (inputEvent, i) =>
+            // check if timer enabled, concatenate to string 
             <div key={i}>
             {`${inputEvent.eventActionInputType.eventActionInputName}`}
             {inputEvent.eventActionInputType.timerEnabled ?
                 (inputEvent.timerDuration?
-                    ` (${inputEvent.timerDuration}secs)`:
+                    ` (${inputEvent.timerDuration} secs)`:
                 ``)
             :"" }
             </div>      
@@ -121,7 +103,7 @@ const eventActionOutputDescription = outputActions => {
             {`${outputAction.eventActionOutputType.eventActionOutputName}`}
             {outputAction.eventActionOutputType.timerEnabled ?
                 (outputAction.timerDuration?
-                ` (${outputAction.timerDuration}secs)`:
+                ` (${outputAction.timerDuration} secs)`:
                 ``)
             :"" }
             </div>      
@@ -152,14 +134,9 @@ export {
     filterEventsManagementByStringPlaceholder, 
     filterEventsManagementByString,
     eventsManagementCreateLink, 
-    entranceListLink, 
-    getEntranceEditLink, 
-    getEntranceIdsEditLink, 
-    getEntranceDetailsLink, 
-    getEntranceLabel, 
-    filterEntrancesByString, 
-    filterEntrancesByState, 
-    isEntranceEqual,
+    eventsManagementListLink,
+    getEventManagementLabel, 
+    isEventManagementEqual,
     eventActionInputDescription,
     displayEntranceOrController,
     eventActionOutputDescription,

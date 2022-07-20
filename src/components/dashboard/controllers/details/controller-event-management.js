@@ -82,7 +82,8 @@ export default function ControllerEventsManagement({
 						title="Events Management"
 						subheader="The inputs below will trigger the outputs"
 						avatar={
-							<ExpandMore expand={expanded} onClick={handleExpandClick}>
+							<ExpandMore expand={expanded}
+								onClick={handleExpandClick}>
 								<ExpandMoreIcon />
 							</ExpandMore>
 						}
@@ -139,14 +140,15 @@ export default function ControllerEventsManagement({
                                         <div>Entrance(s)</div>
                                     </TableCell>
 									<TableCell>Name</TableCell>
-									<TableCell>Description</TableCell>
-                                    <TableCell>Trigger(s)</TableCell>
-									<TableCell>Action(s)</TableCell>
+									<TableCell>Description(s)</TableCell>
+                                    <TableCell>Input(s)</TableCell>
+									<TableCell>Output(s)</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								{controllerEventManagements.map((eventManagement, i) => (
-									<TableRow hover key={i}>
+									<TableRow hover
+										key={i}>
                                         <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
                                         <TableCell sx={{minWidth: 200}}>{eventManagement.eventsManagementName}</TableCell>
                                         <TableCell sx={{minWidth: 300}}> {listDescription(eventManagement)}</TableCell>
