@@ -79,7 +79,7 @@ const ControllerDetails = () => {
 
     const getControllerEventManagements = async() => {
         try {
-            const eventManagements = await eventsManagementApi.getEventsManagementForController(controllerId);
+            const eventManagements = await eventsManagementApi.getControllerEventsManagement(controllerId);
 
             if (eventManagements.status == 200) {
                 const body = await eventManagements.json();

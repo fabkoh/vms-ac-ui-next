@@ -117,7 +117,7 @@ const EntranceDetails = () => {
 const getEntranceEventsManagement = useCallback(async () => {
     try {
   //const data = await personApi.getFakePersons() 
-    const res = await eventsManagementApi.getEventsManagementForEntrance(entranceId);
+    const res = await eventsManagementApi.getEntranceEventsManagement(entranceId);
 
     const data = await res.json()
         if (isMounted()) {
