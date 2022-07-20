@@ -41,7 +41,7 @@ const CreateEventManagement = () => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
             toast.error("Controllers not loaded");
-            return [];
+            setAllControllers([]);
         }
         const controllersJson = await controllersRes.json();
         if (isMounted()){
@@ -53,11 +53,11 @@ const CreateEventManagement = () => {
         const inputEventsRes = await eventsManagementApi.getInputEvents(forController);
         const outputEventsRes = await eventsManagementApi.getOutputEvents(forController);
         if (inputEventsRes.status !== 200) {
-            toast.error("Input events option not loaded");
+            toast.error("Trigger options failed to load");
             setInputEvents([]);
         }
         if (outputEventsRes.status !== 200) {
-            toast.error("Output events option not loaded");
+            toast.error("Action options failed to load");
             setOutputEvents([]);
         }
         const inputEventsJson = await inputEventsRes.json();
@@ -71,8 +71,8 @@ const CreateEventManagement = () => {
     const getAllEntrances = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
-            toast.error("Entrances info failed to load");
-            return [];
+            toast.error("Entrances failed to load");
+            setAllEntrances([]);
         }
         const data = await res.json();
         if (isMounted()) {
@@ -297,25 +297,23 @@ const CreateEventManagement = () => {
         setControllers(controllersIds);
         // setEventsManagementInfoArr(updatedInfo);
     }
-    const changeInputEventsWithoutTimer = (newValue, id) => {
+    const changeInputEventsWithoutTimer = (e, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        const newValueMapped = newValue.map(i => {
-            return {
-                timerDuration: null,
-                eventActionInputType: {
-                    eventActionInputId : i.eventActionInputId
-                }
-            }
-        })
+        const newValue = e.target.value
         let newInputEvents = []
         for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
             if (eventManagementToBeUpdatedInputEvents[j].timerDuration) {
                 newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
             }
         }
-        newInputEvents.push(...newValueMapped);
+        newInputEvents.push(...[{
+                timerDuration: null,
+                eventActionInputType: {
+                    eventActionInputId : newValue
+                }
+        }]);
         eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
@@ -469,7 +467,7 @@ const CreateEventManagement = () => {
                                 }
                                 helperText={
                                     Boolean(entrancesControllers.length == 0) && "Error : no entrance/ controller selected" || 
-                                    Boolean(controllers.length != 0) && "Note: When a controller is selected, some input/output types may be unavailable. You may only create events management for entrances with those input/output types"
+                                    Boolean(controllers.length != 0) && "Note: When a controller is selected, some trigger/action(s) may be unavailable. You may only create events management for entrances with those input/output types"
                                 }
                             />
                         </Grid>
