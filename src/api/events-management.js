@@ -9,9 +9,7 @@ class EventsManagementApi {
         outputActions,
         controllerIds,
         entranceIds,
-        rrule,
-        timeStart,
-        timeEnd
+        triggerSchedules
     }) {
         if (useApi) {
             return sendApi("/api/eventsmanagement", {
@@ -23,11 +21,9 @@ class EventsManagementApi {
                     eventsManagementName,
                     inputEvents,
                     outputActions,
-                    controllerId,
-                    entranceId,
-                    rrule,
-                    timeStart,
-                    timeEnd
+                    controllerIds,
+                    entranceIds,
+                    triggerSchedules
                 })
             })
         }
@@ -43,9 +39,7 @@ class EventsManagementApi {
                     outputActions,
                     controllerId: controllerIds[i],
                     entranceId: null,
-                    rrule,
-                    timeStart,
-                    timeEnd
+                    triggerSchedules
                 }
                 fakeEventsManagement.push(newEventManagement);
                 newEventsManagementArr.push(newEventManagement);
@@ -61,9 +55,7 @@ class EventsManagementApi {
                     outputActions,
                     controllerId: null,
                     entranceId: entranceIds[i],
-                    rrule,
-                    timeStart,
-                    timeEnd
+                    triggerSchedules
                 }
                 fakeEventsManagement.push(newEventManagement);
                 newEventsManagementArr.push(newEventManagement);
@@ -108,20 +100,28 @@ class EventsManagementApi {
 
     getEventsManagementForEntrance(id) {
         if (useApi) { return sendApi(`/api/eventsmanagement/entrance/${id}`); }
+        const filteredFakeEventsManagement = fakeEventsManagement.filter(i => i.entrance);
+        return Promise.resolve(new Response(filteredFakeEventsManagement), { status: 200 })
     }
 
     getEventsManagementForController(id) {
         if (useApi) { return sendApi(`/api/eventsmanagement/controller/${id}`); }
+        const filteredFakeEventsManagement = fakeEventsManagement.filter(i => i.controller);
+        return Promise.resolve(new Response(filteredFakeEventsManagement), { status: 200 })
     }
 
-    getInputEvents() {
-        if (useApi) { return sendApi('/api/event/input/types'); }
+    getInputEvents(forController) {
+        if (useApi) { return sendApi(`/api/event/input/types?forController=${forController}`); }
         return Promise.resolve(new Response(JSON.stringify(fakeInputEvents), { status: 200 }));
     }
 
-    getOutputEvents() {
-        if (useApi) { return sendApi('/api/event/output/types'); }
+    getOutputEvents(forController) {
+        if (useApi) { return sendApi(`/api/event/output/types?forController=${forController}`); }
         return Promise.resolve(new Response(JSON.stringify(fakeOutputEvents), { status: 200 }));
+    }
+
+    deleteEventsManagement(id){
+        if (useApi) { return sendApi(`/api/eventsmanagement/${id}`, { method: 'DELETE' }); }
     }
 }
 

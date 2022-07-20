@@ -337,8 +337,8 @@ const Rrule = (props) => {
 	
 	const weekarray = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 	const handleWeekarray = () => {
-		const weekarrayno = nonChangingRule.dtstart.getDay();
-		const newweekarrayno = weekarrayno - 1
+		let weekarrayno = nonChangingRule.dtstart.getDay();
+		let newweekarrayno = weekarrayno - 1
 		newweekarrayno==-1? newweekarrayno=6:false;
 		return weekarray[newweekarrayno]
 	}
@@ -428,7 +428,7 @@ const Rrule = (props) => {
 	
 	const montharray =["January","Feburary","March","April","May","June","July","August","September","October","November","December"]
 	const monthconverter = () => {
-		const tempmonth = rule.bymonth - 1
+		let tempmonth = rule.bymonth - 1
 		tempmonth ==-1? tempmonth=1:false
 		return montharray[tempmonth]
 	}

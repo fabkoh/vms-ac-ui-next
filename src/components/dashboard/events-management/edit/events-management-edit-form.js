@@ -9,7 +9,6 @@ import {
     CardContent,
     Stack,
     Typography,
-    Box,
     Select,
 	MenuItem,
 } from "@mui/material";
@@ -21,24 +20,27 @@ import EditFormTooltip from "../../shared/edit_form_tooltip";
 import Rrule from "../../shared/rrule-form";
 import rruleDescription from "../../../../utils/rrule-desc";
 import Add from "@mui/icons-material/Add";
-import { whitespace } from "stylis";
-import { WrapText } from "@mui/icons-material";
 
-const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents,allOutputEvents,eventActionInputEqual,eventActionInputFilter,getEventActionInputName,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputEventsWithoutTimer,changeInputEventsWithTimer, changeOutputEventsWithTimer}) => {
+const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionInputEqual,eventActionInputFilter,getEventActionInputName,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer}) => {
+    const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
+    const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
+    const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
+    const outputEventsWithoutTimer = allOutputEvents.filter(e => !e.timerEnabled);
     const MAX_INPUT_TIMER_DURATION = 300;
     const MAX_OUTPUT_TIMER_DURATION = 300;
+
     const getEmptyInputWithTimer = (inputId) => ({
         inputId, // this id will not be used for anything
         timerDuration: 1,
         eventActionInputType: {
-            eventActionInputId: null
+            eventActionInputId: inputEventsWithTimer[0]?.eventActionInputId ?? null
         }
     });
     const getEmptyOutputWithTimer = (outputId) => ({
         outputId, // this id will not be used for anything
         timerDuration: 1,
         eventActionOutputType: {
-            eventActionOutputId: null
+            eventActionOutputId: outputEventsWithTimer[0]?.eventActionOutputId ?? null
         }
     });
 
@@ -59,13 +61,13 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     });
 
     const [inputWithTimerEventsManagementArr, 
-        setInputWithTimerEventsManagementArr] = useState([getEmptyInputWithTimer(0)]);
+        setInputWithTimerEventsManagementArr] = useState([]);
     const [inputWithTimerEventsManagementValidations, 
-        setInputWithTimerEventsManagementValidations] = useState([getEmptyInputWithTimerValidation(0)]);
+        setInputWithTimerEventsManagementValidations] = useState([]);
     const [outputWithTimerEventsManagementArr, 
-        setOutputWithTimerEventsManagementArr] = useState([getEmptyOutputWithTimer(0)]);
+        setOutputWithTimerEventsManagementArr] = useState([]);
     const [outputWithTimerEventsManagementValidations, 
-        setOutputWithTimerEventsManagementValidations] = useState([getEmptyOutputWithTimerValidation(0)]);
+        setOutputWithTimerEventsManagementValidations] = useState([]);
 
     // add card logic
     const getNewIdForInputWithTimer = () => inputWithTimerEventsManagementArr.map(info => info.inputId)
@@ -143,11 +145,63 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
         setOutputWithTimerEventsManagementArr(updatedInfo);
     }
 
-    
+    const getEmptyTriggerSchedule = (triggerScheduleId) => ({
+        triggerScheduleId, // this id will not be used for anything
+        triggerName: `${triggerScheduleId}`,
+        rrule: null,
+        timeStart: null,
+        timeEnd: null,
+    });
+
+    const getEmptyTriggerScheduleValidation = (triggerScheduleId) => ({
+        triggerScheduleId,
+        timeStartInvalid: false,
+        timeEndInvalid: false,
+        untilInvalid: false,
+    });
+
+    const [triggerScheduleArr, setTriggerScheduleArr] = useState([getEmptyTriggerSchedule(0)]);
+    const [triggerScheduleValidations, setTriggerScheduleValidations] = useState([getEmptyTriggerScheduleValidation(0)]);
+
+    const getNewIdForTriggerSchedule = () => triggerScheduleArr.map(info => info.triggerScheduleId)
+                                             .reduce((a, b) => Math.max(a, b), -1) + 1
+
+    const addTriggerScheduleCard = () => {
+        const newId = getNewIdForTriggerSchedule();
+        setTriggerScheduleArr([ ...triggerScheduleArr, getEmptyTriggerSchedule(newId) ]);
+        setTriggerScheduleValidations([ ...triggerScheduleValidations, getEmptyTriggerScheduleValidation(newId) ]);
+    }
+
+    const removeTriggerScheduleCard = (id) => {
+        const newTriggerScheduleArr = triggerScheduleArr.filter(info => info.triggerScheduleId != id);
+        const newValidations = triggerScheduleValidations.filter(validation => validation.triggerScheduleId != id);
+
+        setTriggerScheduleArr(newTriggerScheduleArr);
+        setTriggerScheduleValidations(newValidations);       
+    }
+
+    const changeRruleTriggerSchedule = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['rrule'] = value;
+        setTriggerScheduleArr(updatedInfo);
+    }
+
+    const changeTimeStartTriggerSchedule = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeStart'] = value;
+        setTriggerScheduleArr(updatedInfo);
+    }
+
+    const changeTimeEndTriggerSchedule = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeEnd'] = value;
+        setTriggerScheduleArr(updatedInfo);
+    }
+
     const {
         eventsManagementId,
         eventsManagementName,
-        triggerSchedule,
+        triggerSchedules,
         entrance,
         controller,
         inputEvents,
@@ -169,15 +223,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
         } = controller;
     }
 
-    if (triggerSchedule) {
-        const {
-            triggerScheduleId,
-            rrule,
-            timeStart,
-            timeEnd,
-        } = triggerSchedule;
-    }
-
     const {
         eventsManagementNameBlank,
         timeStartInvalid,
@@ -190,50 +235,44 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
 
-    //handler for name
-    const [name, setName] = useState()
-    const handleName = (e) => {
-        // const temparray = [...accgrpschedinfoarr]
-        // temparray.find(sched=>sched.accgrpschedid == id)[entranceSchedule] = e.target.value
-        //
-    }
     //get timestart timeend 
-    const [start, setStart] = useState()
-    const [end, setEnd] = useState()
-    const getStart = (e) => {
-        setStart(e)
-    }
-    const getEnd = (e) => {
-        setEnd(e)
-    }
-    
+    const [start, setStart] = useState({})
+    const [end, setEnd] = useState({})
     //get rrule string and text from rrulecomponent
-    const [description, setDescription] = useState()
-    const [rrulestring, setRrulestring] = useState()
-    const [rule, setRule] = useState()
-    const handleRrule = (e) => {
-        descriptionHandler(e)
-        // setDescription(e.toText())
-        setRrulestring(e.toString())
-        setRule(e)
+    const [description, setDescription] = useState({})
+    const [rrulestring, setRrulestring] = useState({})
+    const [rule, setRule] = useState({})
+    const getStart = (triggerScheduleId) => (e) => {
+        changeTimeStartTriggerSchedule(e, triggerScheduleId);
+        setStart({ ...start, [triggerScheduleId]: e });
+        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], e, end[triggerScheduleId]) })
+    }
+    const getEnd = (triggerScheduleId) => (e) => {
+        changeTimeEndTriggerSchedule(e, triggerScheduleId);
+        setEnd({ ...end, [triggerScheduleId]: e });
+        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], start[triggerScheduleId], e) })
+    }
+    const handleRrule = (triggerScheduleId) => (e) => {
+        descriptionHandler(triggerScheduleId, e);
+        changeRruleTriggerSchedule(e?.toString() ?? "", triggerScheduleId);
+        setRrulestring({ ...rrulestring, [triggerScheduleId]: e.toString() })
+        setRule({ ...rule, [triggerScheduleId]: e });
     }
     //Description handler
-    const descriptionHandler = (e) => { //e should be the rrule obj
-        setDescription(rruleDescription(e, start, end))
+    const descriptionHandler = (triggerScheduleId, e) => { //e should be the rrule obj
+        setDescription({ ...description, [triggerScheduleId]: rruleDescription(e, start[triggerScheduleId], end[triggerScheduleId]) })
     }
+
     useEffect(() => {
-        changeRrule(rrulestring,eventsManagementId)
-        changeTimeStart(start,eventsManagementId)
-        changeTimeEnd(end,eventsManagementId)
-        descriptionHandler(rule,eventsManagementId)
-    }, [rrulestring, start, end])
+        changeTriggerSchedules(triggerScheduleArr, eventsManagementId);
+    }, [triggerScheduleArr])
     
     useEffect(() => {
         changeInputEventsWithTimer(inputWithTimerEventsManagementArr, eventsManagementId);
     }, [inputWithTimerEventsManagementArr])
 
     useEffect(() => {
-        changeOutputEventsWithTimer(outputWithTimerEventsManagementArr, eventsManagementId);
+        changeOutputActionsWithTimer(outputWithTimerEventsManagementArr, eventsManagementId);
     }, [outputWithTimerEventsManagementArr])
     
     //blocker for invalid until date
@@ -241,11 +280,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
     const handleInvalidUntil = (bool) => {
         setUntilHolder(bool)
     }
-
-    const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
-    const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
-    const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
-    const outputEventsWithoutTimer = allOutputEvents.filter(e => !e.timerEnabled);
 
     useEffect(() => {
         checkUntil(untilHolder)
@@ -261,7 +295,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
         }>
             <CardHeader
                 avatar={
-                    // avatar are children flushed to the left
                     <ExpandMore
                         expand={expanded}
                         onClick={handleExpandClick}
@@ -271,7 +304,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                 }
                 title="Events Management"
                 action={
-                    // action are children flushed to the right
                     (
                         <Grid item
                             container>
@@ -289,7 +321,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                             >
                                 Remove
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -299,7 +331,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }
@@ -310,9 +342,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                 <Stack
                     spacing={3}
                 >
-                    <Grid item>
-                        <Typography fontWeight="bold" fontSize={32}>Events Mangement Name:</Typography>
-                    </Grid>
                     <Grid
                         item
                         md={6}
@@ -331,10 +360,6 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                             error={ Boolean(eventsManagementNameBlank)}
                         />
                     </Grid>
-                    <Grid item
-                        mt={1}>
-                        <Typography fontWeight="bold" fontSize={32} marginTop={4}>Triggers:</Typography>
-                    </Grid>
                     <Collapse in={expanded}>
                         <Stack spacing={3}>
                             <Grid
@@ -344,7 +369,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     mr={2}
                                     mb={2}
                                     >
-                                    <Typography fontWeight="bold">Input (without timer) :</Typography>
+                                    <Typography fontWeight="bold">Trigger (without timer) :</Typography>
                                 </Grid> 
                                 <Grid
                                     item
@@ -355,17 +380,17 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         options={inputEventsWithoutTimer}
                                         setSelected={(e) => changeInputEventsWithoutTimer(e,eventsManagementId)}
                                         getOptionLabel={getEventActionInputName}
-                                        label="Input (without timer)"
-                                        noOptionsText="No input (without timer) event found"
-                                        placeholder="Search for input (without timer) name"
+                                        label="Trigger (without timer)"
+                                        noOptionsText="No trigger (without timer) found"
+                                        placeholder="Search for trigger (without timer) name"
                                         filterOptions={eventActionInputFilter}
-                                        value={inputEvents.filter(e => e.timerDuration == null || e.timerDuration == undefined)}
+                                        value={inputEventsValueWithoutTimer[eventsManagementId]}
                                         isOptionEqualToValue={eventActionInputEqual}
                                         error={
                                             Boolean(inputEvents.length==0)
                                         }
                                         helperText={
-                                            Boolean(inputEvents.length==0)&&"Error : no input event selected"
+                                            Boolean(inputEvents.length==0)&&"Error : no trigger selected"
                                         }
                                     />
                                 </Grid>
@@ -378,7 +403,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">Input (with timer):</Typography>
+                                            <Typography fontWeight="bold">Trigger (with timer):</Typography>
                                         </Grid>
                                         <Grid item
                                             mt={1}
@@ -389,9 +414,9 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                                 // required={repeatToggle?true:false}
                                                 sx={{ maxWidth: 400, minWidth: 400 }}
                                                 value={info.eventActionInputType.eventActionInputId}
-                                                onChange={(e) => {changeSelectionInputWithTime(e,info.inputId)}}
+                                                onChange={(e) => { changeSelectionInputWithTime(e, info.inputId) }}
                                             >
-                                                {outputEventsWithTimer.map(e => {
+                                                {inputEventsWithTimer.map(e => {
                                                     return <MenuItem
                                                         key={e.eventActionInputId}
                                                         value={e.eventActionInputId}>{e.eventActionInputName}</MenuItem>
@@ -432,14 +457,11 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     variant="outlined"
                                     startIcon={<Add />}
                                     onClick={addInputWithTimerCard}
+                                    disabled={inputEventsWithTimer.length === 0}
                                 >
-                                    Add input events with timer
+                                    Add trigger with timer
                                 </Button>
                             </div>
-                            <Grid item
-                                mt={1}>
-                                <Typography fontWeight="bold" fontSize={32} marginTop={4}>Actions:</Typography>
-                            </Grid>
                             <Grid
                                 container
                                 mb={3}
@@ -450,7 +472,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     mr={2}
                                     mb={2}
                                 >
-                                    <Typography fontWeight="bold">Output (without timer) :</Typography>
+                                    <Typography fontWeight="bold">Action (without timer) :</Typography>
                                 </Grid>                 
                                 <Grid
                                     item
@@ -459,19 +481,19 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                 >
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
-                                        setSelected={(e) => changeOutputEventsWithoutTimer(e,eventsManagementId)}
+                                        setSelected={(e) => changeOutputActionsWithoutTimer(e,eventsManagementId)}
                                         getOptionLabel={getEventActionOutputName}
-                                        label="Output (without timer)"
-                                        noOptionsText="No output (without timer) event found"
-                                        placeholder="Search for output (without timer) name"
+                                        label="Action (without timer)"
+                                        noOptionsText="No action (without timer) found"
+                                        placeholder="Search for action (without timer) name"
                                         filterOptions={eventActionOutputFilter}
-                                        value={outputActions.filter(e => e.timerDuration == null || e.timerDuration == undefined)}
+                                        value={outputActionsValueWithoutTimer[eventsManagementId]}
                                         isOptionEqualToValue={eventActionOutputEqual}
                                         error={
                                             Boolean(outputActions.length==0)
                                         }
                                         helperText={
-                                            Boolean(outputActions.length==0)&&"Error : no output action selected"
+                                            Boolean(outputActions.length==0)&&"Error : no action selected"
                                         }
                                     />
                                 </Grid>
@@ -484,7 +506,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">Output (with timer):</Typography>
+                                            <Typography fontWeight="bold">Action (with timer):</Typography>
                                         </Grid>
                                         <Grid item
                                             mt={1}
@@ -495,7 +517,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                                 // required={repeatToggle?true:false}
                                                 sx={{ maxWidth: 400, minWidth: 400 }}
                                                 value={info.eventActionOutputType.eventActionOutputId}
-                                                onChange={(e) => {changeSelectionOutputWithTime(e,info.outputId)}}
+                                                onChange={(e) => { changeSelectionOutputWithTime(e, info.outputId) }}
                                             >
                                                 {outputEventsWithTimer.map(e => {
                                                     return <MenuItem
@@ -523,6 +545,7 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                             color="error"
                                             sx={{mt:1}}
                                             onClick={() => removeOutputWithTimerCard(info.outputId)}
+                                            disabled={outputEventsWithTimer.length === 0}
                                         >
                                             Remove
                                         </Button>
@@ -536,50 +559,71 @@ const EditEventManagementForm = ({checkUntil,changeTimeStart,changeTimeEnd,chang
                                     startIcon={<Add />}
                                     onClick={addOutputWithTimerCard}
                                 >
-                                    Add output events with timer
+                                    Add action with timer
                                 </Button>
                             </div>
-                            <Grid item
-                                mr={2}
-                                mb={1}>
-                                <Typography fontWeight="bold" fontSize={32} marginTop={4}>Schedule:</Typography>
-                            </Grid>
-                            <Grid
-                                item
-                                md={12}
-                                xs={12}
-                            >
-                                <TextField
-                                    fullWidth
-                                    name="Desc"
-                                    multiline
-                                    value={(description)} //add new rrule obj here. value={new RRule(string)} from rrulefrom
-                                    disabled
-                                />
-                            </Grid>
-                            <Divider />
-                            <Grid
-                                item
-                                md={12}
-                                xs={12}
-                            >
-                                <Rrule
-                                    handleRrule={handleRrule}
-                                    getStart={getStart}
-                                    getEnd={getEnd}
-                                    timeEndInvalid={timeEndInvalid}
-                                    handleInvalidUntil={handleInvalidUntil}
-                                />
-                            </Grid>
-                            <Divider />
-                            <Grid
-                                item
-                                md={12}
-                                xs={12}
-                                container
-                                alignItems="center"
-                            >
-                            </Grid>
+                            {triggerScheduleArr.map((schedule, i) => (
+                                <Grid container
+                                    key={schedule.triggerScheduleId}>
+                                <Grid container
+                                        mt={2}
+                                        mb={2}
+                                        alignItems="center">
+                                        <Grid item
+                                            md={10}
+                                            xs={10}
+                                            mr={2}
+                                            mb={2}
+                                        >
+                                            <TextField
+                                                fullWidth
+                                                name="Desc"
+                                                multiline
+                                                value={(description[schedule.triggerScheduleId])} //add new rrule obj here. value={new RRule(string)} from rrulefrom
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item
+                                            mr={2}
+                                            mb={2}
+                                        
+                                        >
+                                            <Button
+                                                variant="outlined"
+                                                color="error"
+                                                sx={{mt:1}}
+                                                onClick={() => removeTriggerScheduleCard(schedule.triggerScheduleId)}
+                                            >
+                                                Remove
+                                            </Button>            
+                                        </Grid>
+                                        <Grid
+                                            item
+                                            md={12}
+                                            xs={12}
+                                        >
+                                            <Rrule
+                                                handleRrule={handleRrule(schedule.triggerScheduleId)}
+                                                getStart={getStart(schedule.triggerScheduleId)}
+                                                getEnd={getEnd(schedule.triggerScheduleId)}
+                                                timeEndInvalid={triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid}
+                                                handleInvalidUntil={handleInvalidUntil}
+                                            />
+                                        </Grid>
+                                        <Divider />
+                                    </Grid>
+                            </Grid>                           
+                            ))}
+                            <div>
+                                <Button
+                                    size="large"
+                                    variant="outlined"
+                                    startIcon={<Add />}
+                                    onClick={addTriggerScheduleCard}
+                                >
+                                    Add schedules
+                                </Button>
+                            </div>
                         </Stack>
                     </Collapse>
                 </Stack>

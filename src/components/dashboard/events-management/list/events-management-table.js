@@ -1,16 +1,5 @@
-import { Checkbox, Chip, IconButton, Link, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
+import { Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import { Scrollbar } from "../../../scrollbar";
-import WarningChip from "../../shared/warning-chip";
-import NextLink from "next/link";
-import { PencilAlt } from "../../../../icons/pencil-alt";
-import { ArrowRight } from "../../../../icons/arrow-right";
-import { ListFilter } from "../../shared/list-filter";
-import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
-import { getControllerDetailsLink } from "../../../../utils/controller";
-import RenderTableCell from "../../shared/renderTableCell";
-import { MeetingRoom, SelectAll } from "@mui/icons-material";
-import rruleDescription from "../../../../utils/rrule-desc";
-import { rrulestr } from "rrule";
 import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription} from "../../../../utils/eventsManagement";
 
 
@@ -47,9 +36,9 @@ function EventsManagementTable({
                                             <div>Entrance</div>
                                         </TableCell>
                                         <TableCell>Name</TableCell>
-                                        <TableCell>Description</TableCell>
-                                        <TableCell>Trigger(s)</TableCell>
-                                        <TableCell>Action(s)</TableCell>
+                                        <TableCell>Description(s)</TableCell>
+                                        <TableCell>Input(s)</TableCell>
+                                        <TableCell>Output(s)</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -57,7 +46,8 @@ function EventsManagementTable({
                                         const IsEventsManagementSelected = selectedEventsManagement.includes(eventManagement.eventsManagementId);
                                         const handleSelect = handleSelectFactory(eventManagement.eventsManagementId);
                                         return(
-                                        <TableRow hover key={i}>
+                                        <TableRow hover
+                                            key={i}>
                                             <TableCell padding="checkbox">
                                                 <Checkbox
                                                     checked={IsEventsManagementSelected}
