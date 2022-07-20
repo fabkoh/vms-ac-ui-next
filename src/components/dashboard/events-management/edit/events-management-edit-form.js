@@ -376,23 +376,26 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                     md={12}
                                     xs={12}
                                 >
-                                    <MultipleSelectInput
-                                        options={inputEventsWithoutTimer}
-                                        setSelected={(e) => changeInputEventsWithoutTimer(e,eventsManagementId)}
-                                        getOptionLabel={getEventActionInputName}
-                                        label="Trigger (without timer)"
-                                        noOptionsText="No trigger (without timer) found"
-                                        placeholder="Search for trigger (without timer) name"
-                                        filterOptions={eventActionInputFilter}
+                                    <Select
+                                        sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
+                                        required={inputEvents.length===0}
                                         value={inputEventsValueWithoutTimer[eventsManagementId]}
-                                        isOptionEqualToValue={eventActionInputEqual}
+                                        onChange={(e) => { changeInputEventsWithoutTimer(e, eventsManagementId) }}
                                         error={
                                             Boolean(inputEvents.length==0)
                                         }
                                         helperText={
                                             Boolean(inputEvents.length==0)&&"Error : no trigger selected"
                                         }
-                                    />
+                                        renderValue={(value) => { return <div>{value ? inputEventsWithoutTimer.find(e => e.eventActionInputId == value).eventActionInputName : "Choose trigger (without timer)"}</div>}}
+                                        displayEmpty
+                                    >
+                                        {inputEventsWithoutTimer.map(e => {
+                                            return <MenuItem
+                                                key={e.eventActionInputId}
+                                                value={e.eventActionInputId}>{e.eventActionInputName}</MenuItem>
+                                        })}
+                                    </Select>
                                 </Grid>
                             </Grid>
                             {inputWithTimerEventsManagementArr.map((info, i) => (
@@ -545,7 +548,6 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                             color="error"
                                             sx={{mt:1}}
                                             onClick={() => removeOutputWithTimerCard(info.outputId)}
-                                            disabled={outputEventsWithTimer.length === 0}
                                         >
                                             Remove
                                         </Button>
@@ -558,6 +560,7 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                     variant="outlined"
                                     startIcon={<Add />}
                                     onClick={addOutputWithTimerCard}
+                                    disabled={outputEventsWithTimer.length === 0}
                                 >
                                     Add action with timer
                                 </Button>
