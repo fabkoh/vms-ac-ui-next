@@ -41,7 +41,7 @@ const CreateEventManagement = () => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
             toast.error("Controllers not loaded");
-            return [];
+            setAllControllers([]);
         }
         const controllersJson = await controllersRes.json();
         if (isMounted()){
@@ -53,11 +53,11 @@ const CreateEventManagement = () => {
         const inputEventsRes = await eventsManagementApi.getInputEvents(forController);
         const outputEventsRes = await eventsManagementApi.getOutputEvents(forController);
         if (inputEventsRes.status !== 200) {
-            toast.error("Input events option not loaded");
+            toast.error("Trigger options failed to load");
             setInputEvents([]);
         }
         if (outputEventsRes.status !== 200) {
-            toast.error("Output events option not loaded");
+            toast.error("Action options failed to load");
             setOutputEvents([]);
         }
         const inputEventsJson = await inputEventsRes.json();
@@ -71,8 +71,8 @@ const CreateEventManagement = () => {
     const getAllEntrances = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
-            toast.error("Entrances info failed to load");
-            return [];
+            toast.error("Entrances failed to load");
+            setAllEntrances([]);
         }
         const data = await res.json();
         if (isMounted()) {
@@ -109,7 +109,11 @@ const CreateEventManagement = () => {
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
         eventsManagementNameBlank: false,
-
+        eventsManagementInputEventsEmpty: false,
+        eventsManagementInputEventsInvalidId: false,
+        eventsManagementOutputActionsEmpty: false,
+        eventsManagementOutputActionsInvalidId: false,
+        eventsManagementTriggerSchedulesEmpty: false,
         timeEndInvalid:false,
         timeStartInvalid:false,
         untilInvalid:false,
@@ -156,30 +160,24 @@ const CreateEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         eventManagementToBeUpdated['triggerSchedules'] = value;
         setEventsManagementInfoArr(updatedInfo);
+
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementTriggerSchedulesEmpty = value.length === 0;
+        setEventsManagementValidationsArr(newValidations);
     }
 
-    const checkTimeEnd = (end,id) => {
-        const endTime = end;
+    const checkAnyTimeEndForEventManagement = (id) => (bool) => {
         const newValidations = [ ...eventsManagementValidationsArr ];
         const validation = newValidations.find(v => v.eventsManagementId == id);
-        // store a temp updated access group info
-        const newAccessGroupScheduleInfoArr = [ ...eventsManagementInfoArr ]
-        const tempStartTime = newAccessGroupScheduleInfoArr.find(group => group.eventsManagementId == id)['timeStart'];
-
-        if(tempStartTime=="00:00"){
-            validation.timeEndInvalid = false;
-            setEventsManagementValidationsArr(newValidations)
-        }
-        
-        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<=tempStartTime);
+        validation.timeEndInvalid = bool;
         setEventsManagementValidationsArr(newValidations)
     }
-    const checkTimeStart = (start,id) => {
-        const starttime = start;
+    const checkAnyTimeStartForEventManagement = (id) => (bool) => {
         const newValidations = [ ...eventsManagementValidationsArr ];
         const validation = newValidations.find(v => v.eventsManagementId == id);
-
-        validation.timeStartInvalid = (formUtils.checkBlank(starttime));
+        validation.timeStartInvalid = bool;
         setEventsManagementValidationsArr(newValidations)
     }
 
@@ -206,13 +204,10 @@ const CreateEventManagement = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
-    const checkUntil = (id) =>(e) => {
+    const checkAnyUntilForEventManagement = (id) => (bool) => {
         const newValidations = [...eventsManagementValidationsArr];
-        console.log("newValidations", newValidations);
         const validation = newValidations.find(v => v.eventsManagementId == id);
-        console.log("validation", id);
-        validation.untilInvalid = e
-        // console.log("newValidations",newValidations)
+        validation.untilInvalid = bool
         setEventsManagementValidationsArr(newValidations);
 
     }
@@ -264,15 +259,6 @@ const CreateEventManagement = () => {
         ))
     }
 
-    const eventActionInputEqual = (option, value) => option.eventActionInputId == value.eventActionInputId;
-    const eventActionInputFilter = (inputEvents, state) => {
-        const text = state.inputValue.toLowerCase(); // case insensitive search
-        return inputEvents.filter(e => (
-            e.eventActionInputName.toLowerCase().includes(text)
-        ))
-    }
-    const getEventActionInputName = (e) => e.eventActionInputName;
-
     const eventActionOutputEqual = (option, value) => option.eventActionOutputId == value.eventActionOutputId;
     const eventActionOutputFilter = (outputEvents, state) => {
         const text = state.inputValue.toLowerCase(); // case insensitive search
@@ -297,28 +283,35 @@ const CreateEventManagement = () => {
         setControllers(controllersIds);
         // setEventsManagementInfoArr(updatedInfo);
     }
-    const changeInputEventsWithoutTimer = (newValue, id) => {
+    const changeInputEventsWithoutTimer = (e, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        const newValueMapped = newValue.map(i => {
-            return {
-                timerDuration: null,
-                eventActionInputType: {
-                    eventActionInputId : i.eventActionInputId
-                }
-            }
-        })
+        const newValue = e.target.value
         let newInputEvents = []
         for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
             if (eventManagementToBeUpdatedInputEvents[j].timerDuration) {
                 newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
             }
         }
-        newInputEvents.push(...newValueMapped);
+        newInputEvents.push(...[{
+                timerDuration: null,
+                eventActionInputType: {
+                    eventActionInputId : newValue
+                }
+        }]);
         eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
+
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
+        if (!newValue) {
+            validation.eventsManagementInputEventsInvalidId = true;
+        }
+        setEventsManagementValidationsArr(newValidations);
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
@@ -341,11 +334,18 @@ const CreateEventManagement = () => {
         newOutputActions.push(...newValueMapped);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
         setEventsManagementInfoArr(updatedInfo);
-        setOutputActionsWithoutTimer({...outputActionsWithoutTimer, [id]: newValue});
+        setOutputActionsWithoutTimer({ ...outputActionsWithoutTimer, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
+        if (newValueMapped.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
+            validation.eventsManagementOutputActionsInvalidId = true;
+        }
+        setEventsManagementValidationsArr(newValidations);
     }
 
-
-    // TODO: Add validations for input and output events for controller etc
     const changeInputEventsWithTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
@@ -360,6 +360,15 @@ const CreateEventManagement = () => {
         eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithTimer({ ...inputEventsWithTimer, [id]: newValue });
+
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
+        if (newValue.filter(i => i.eventActionInputType.eventActionInputId == null || i.eventActionInputType.eventActionInputId == undefined).length > 0) {
+            validation.eventsManagementInputEventsInvalidId = true;
+        }
+        setEventsManagementValidationsArr(newValidations);
     }
 
     const changeOutputActionsWithTimer = (newValue, id) => {
@@ -375,7 +384,16 @@ const CreateEventManagement = () => {
         newOutputActions.push(...newValue);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
         setEventsManagementInfoArr(updatedInfo);
-        setOutputEventsWithTimer({...outputEventsWithTimer, [id]: newValue });
+        setOutputEventsWithTimer({ ...outputEventsWithTimer, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
+        if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
+            validation.eventsManagementOutputActionsInvalidId = true;
+        }
+        setEventsManagementValidationsArr(newValidations);
     }
  
     return(
@@ -469,7 +487,7 @@ const CreateEventManagement = () => {
                                 }
                                 helperText={
                                     Boolean(entrancesControllers.length == 0) && "Error : no entrance/ controller selected" || 
-                                    Boolean(controllers.length != 0) && "Note: When a controller is selected, some input/output types may be unavailable. You may only create events management for entrances with those input/output types"
+                                    Boolean(controllers.length != 0) && "Note: When a controller is selected, some trigger/action(s) may be unavailable. You may only create events management for entrances with those input/output types"
                                 }
                             />
                         </Grid>
@@ -485,12 +503,11 @@ const CreateEventManagement = () => {
                                     changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
                                     changeNameCheck={changeNameCheck}
                                     changeTriggerSchedules={changeTriggerSchedules}
-                                    checkUntil={checkUntil(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
                                     changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
                                     changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
-                                    eventActionInputEqual={eventActionInputEqual}
-                                    eventActionInputFilter={eventActionInputFilter}
-                                    getEventActionInputName={getEventActionInputName}
                                     eventActionOutputEqual={eventActionOutputEqual}
                                     eventActionOutputFilter={eventActionOutputFilter}
                                     getEventActionOutputName={getEventActionOutputName}
@@ -547,13 +564,13 @@ const CreateEventManagement = () => {
                                         value="add button"
                                         // onClick={addOn}
                                         disabled={
-                                            entrancesControllers.length == 0
-                                            // eventsManagementValidationsArr.some( // check if validations fail
-                                            //     validation => validation.eventsManagementNameBlank        ||
-                                            //     validation.timeEndInvalid ||
-                                            //     validation.untilInvalid ||
-                                            //     validation.timeStartInvalid
-                                            // )
+                                            entrancesControllers.length == 0 ||
+                                            eventsManagementValidationsArr.some( // check if validations fail
+                                                validation => validation.eventsManagementNameBlank        ||
+                                                validation.timeEndInvalid ||
+                                                validation.untilInvalid ||
+                                                validation.timeStartInvalid
+                                            )
                                         }
                                     >
                                         Add on

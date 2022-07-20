@@ -20,8 +20,9 @@ import EditFormTooltip from "../../shared/edit_form_tooltip";
 import Rrule from "../../shared/rrule-form";
 import rruleDescription from "../../../../utils/rrule-desc";
 import Add from "@mui/icons-material/Add";
+import formUtils from "../../../../utils/form-utils";
 
-const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionInputEqual,eventActionInputFilter,getEventActionInputName,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer}) => {
+const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer}) => {
     const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
     const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
     const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
@@ -104,42 +105,74 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
     }
 
     const changeInputTime = (e, inputId) => {
+        const updatedInfo = [...inputWithTimerEventsManagementArr];
+        updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = e.target.value;
+        setInputWithTimerEventsManagementArr(updatedInfo);
+
         const validations = [...inputWithTimerEventsManagementValidations];
-        if (e.target.value < 0) {
-            validations.find(info => info.inputId == inputId).timerDurationInputNotPositive = true;
-            setInputWithTimerEventsManagementValidations(validations)
-        } else if (e.target.value > MAX_INPUT_TIMER_DURATION) {
+        const validation = validations.find(info => info.inputId == inputId);
+        if (!e.target.value) {
+            validation.timerDurationInputBlank = true;
+            setInputWithTimerEventsManagementValidations(validations);
+        }
+        if (e.target.value < 1) {
+            validation.timerDurationInputNotPositive = true;
+            setInputWithTimerEventsManagementValidations(validations);
+        } else if (e.target.value > MAX_INPUT_TIMER_DURATION) {;
             validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
             setInputWithTimerEventsManagementValidations(validations);
         } else {
-            const updatedInfo = [...inputWithTimerEventsManagementArr];
-            updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = e.target.value;
-            setInputWithTimerEventsManagementArr(updatedInfo);
+            validation.timerDurationInputTooLarge = false;
+            validation.timerDurationInputNotPositive = false;
+            validation.timerDurationInputBlank = false;
+            setInputWithTimerEventsManagementValidations(validations);
         }
     }
 
     const changeOutputTime = (e, outputId) => {
+        const updatedInfo = [...outputWithTimerEventsManagementArr];
+        updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = e.target.value;
+        setOutputWithTimerEventsManagementArr(updatedInfo);
+
         const validations = [...outputWithTimerEventsManagementValidations];
-        if(e.target.value < 0) {
-            validations.find(info => info.outputId == outputId).timerDurationOutputNotPositive = true;
+        const validation = validations.find(info => info.outputId == outputId);
+        if (!e.target.value) {
+            validation.timerDurationOutputBlank = true;
+            setOutputWithTimerEventsManagementValidations(validations);
+        }
+        if(e.target.value < 1) {
+            validation.timerDurationOutputNotPositive = true;
             setOutputWithTimerEventsManagementValidations(validations);
         } else if (e.target.value > MAX_OUTPUT_TIMER_DURATION) {
-            validations.find(info => info.outputId == outputId).timerDurationOutputTooLarge = true;
+            validation.timerDurationOutputTooLarge = true;
             setOutputWithTimerEventsManagementValidations(validations);
         } else {
-            const updatedInfo = [...outputWithTimerEventsManagementArr];
-            updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = e.target.value;
-            setOutputWithTimerEventsManagementArr(updatedInfo);
+            validation.timerDurationOutputTooLarge = false;
+            validation.timerDurationOutputNotPositive = false;
+            validation.timerDurationOutputBlank = false;
+            setOutputWithTimerEventsManagementValidations(validations);
         }
     }
 
-	const changeSelectionInputWithTime = (e, inputId) => {
+    const changeSelectionInputWithTime = (e, inputId) => {
+        const validations = [...inputWithTimerEventsManagementValidations];
+        const validation = validations.find(info => info.inputId == inputId);
+        if (!e.target.value) {
+            validation.eventActionInputIdBlank = true;
+            setInputWithTimerEventsManagementValidations(validations);
+        }
         const updatedInfo = [...inputWithTimerEventsManagementArr];
         updatedInfo.find(info => info.inputId == inputId)['eventActionInputType']['eventActionInputId'] = e.target.value;
         setInputWithTimerEventsManagementArr(updatedInfo);
     }
     
     const changeSelectionOutputWithTime = (e, outputId) => {
+        const validations = [...outputWithTimerEventsManagementValidations];
+        const validation = validations.find(info => info.outputId == outputId);
+        if (!e.target.value) {
+            validation.eventActionOutputIdBlank = true;
+            setOutputWithTimerEventsManagementValidations(validations);
+        }
         const updatedInfo = [...outputWithTimerEventsManagementArr];
         updatedInfo.find(info => info.outputId == outputId)['eventActionOutputType']['eventActionOutputId'] = e.target.value;
         setOutputWithTimerEventsManagementArr(updatedInfo);
@@ -190,12 +223,42 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
         const updatedInfo = [...triggerScheduleArr];
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeStart'] = value;
         setTriggerScheduleArr(updatedInfo);
+        checkTimeStart(value,triggerScheduleId)
     }
 
     const changeTimeEndTriggerSchedule = (value, triggerScheduleId) => {
         const updatedInfo = [...triggerScheduleArr];
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeEnd'] = value;
         setTriggerScheduleArr(updatedInfo);
+        checkTimeEnd(value, triggerScheduleId);
+    }
+
+    const checkTimeEnd = (end,id) => {
+        const endTime = end;
+        const newValidations = [ ...triggerScheduleValidations ];
+        const validation = newValidations.find(v => v.triggerScheduleId == id);
+        // store a temp updated access group info
+        const newTriggerScheduleArr = [ ...triggerScheduleArr ]
+        const tempStartTime = newTriggerScheduleArr.find(info => info.triggerScheduleId == id)['timeStart'];
+
+        if(tempStartTime=="00:00"){
+            validation.timeEndInvalid = false;
+            setTriggerScheduleValidations(newValidations);
+            setEndHolderForEventManagement({...endHolderForEventManagement, [eventsManagementId]: false})
+        }
+        const value = (formUtils.checkBlank(endTime) || endTime <= tempStartTime);
+        validation.timeEndInvalid = value;
+        setEndHolderForEventManagement({...endHolderForEventManagement, [eventsManagementId]: value})
+        setTriggerScheduleValidations(newValidations)
+    }
+    const checkTimeStart = (start,id) => {
+        const starttime = start;
+        const newValidations = [ ...triggerScheduleValidations ];
+        const validation = newValidations.find(v => v.triggerScheduleId == id);
+        const value = (formUtils.checkBlank(starttime));
+        validation.timeStartInvalid = value;
+        setTriggerScheduleValidations(newValidations);
+        setStartHolderForEventManagement({ ...startHolderForEventManagement, [eventsManagementId]: value });
     }
 
     const {
@@ -229,6 +292,11 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
         timeEndInvalid,
         untilInvalid,
         submitFailed,
+        eventsManagementInputEventsEmpty,
+        eventsManagementInputEventsInvalidId,
+        eventsManagementOutputActionsEmpty,
+        eventsManagementOutputActionsInvalidId,
+        eventsManagementTriggerSchedulesEmpty
     } = eventsManagementValidations;
    
     // expanding form
@@ -238,6 +306,9 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
     //get timestart timeend 
     const [start, setStart] = useState({})
     const [end, setEnd] = useState({})
+    const [untilHolderForEventManagement, setUntilHolderForEventManagement] = useState({})
+    const [startHolderForEventManagement, setStartHolderForEventManagement] = useState({})
+    const [endHolderForEventManagement, setEndHolderForEventManagement] = useState({})
     //get rrule string and text from rrulecomponent
     const [description, setDescription] = useState({})
     const [rrulestring, setRrulestring] = useState({})
@@ -276,14 +347,18 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
     }, [outputWithTimerEventsManagementArr])
     
     //blocker for invalid until date
-    const [untilHolder, setUntilHolder] = useState(false)
-    const handleInvalidUntil = (bool) => {
-        setUntilHolder(bool)
+    const handleInvalidUntil = (triggerScheduleId) => (bool) => {
+        const newValidations = [ ...triggerScheduleValidations ];
+        const validation = newValidations.find(v => v.triggerScheduleId == triggerScheduleId);
+        validation.untilInvalid = bool;
+        setUntilHolderForEventManagement({...untilHolderForEventManagement, [eventsManagementId]: bool})
     }
 
     useEffect(() => {
-        checkUntil(untilHolder)
-    }, [untilHolder])
+        checkAnyUntilForEventManagement(untilHolderForEventManagement[eventsManagementId]);
+        checkAnyTimeStartForEventManagement(startHolderForEventManagement[eventsManagementId]);
+        checkAnyTimeEndForEventManagement(endHolderForEventManagement[eventsManagementId]);
+    }, [untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
     
     return (
         <ErrorCard error={
@@ -291,7 +366,12 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
             timeStartInvalid ||
             timeEndInvalid ||
             untilInvalid ||
-            submitFailed
+            submitFailed ||
+            eventsManagementInputEventsEmpty ||
+            eventsManagementInputEventsInvalidId ||
+            eventsManagementOutputActionsEmpty ||
+            eventsManagementOutputActionsInvalidId ||
+            eventsManagementTriggerSchedulesEmpty
         }>
             <CardHeader
                 avatar={
@@ -376,23 +456,26 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                     md={12}
                                     xs={12}
                                 >
-                                    <MultipleSelectInput
-                                        options={inputEventsWithoutTimer}
-                                        setSelected={(e) => changeInputEventsWithoutTimer(e,eventsManagementId)}
-                                        getOptionLabel={getEventActionInputName}
-                                        label="Trigger (without timer)"
-                                        noOptionsText="No trigger (without timer) found"
-                                        placeholder="Search for trigger (without timer) name"
-                                        filterOptions={eventActionInputFilter}
+                                    <Select
+                                        sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
+                                        required={inputEvents.length===0}
                                         value={inputEventsValueWithoutTimer[eventsManagementId]}
-                                        isOptionEqualToValue={eventActionInputEqual}
+                                        onChange={(e) => { changeInputEventsWithoutTimer(e, eventsManagementId) }}
                                         error={
                                             Boolean(inputEvents.length==0)
                                         }
-                                        helperText={
-                                            Boolean(inputEvents.length==0)&&"Error : no trigger selected"
-                                        }
-                                    />
+                                        renderValue={(value) => { return <div>{value ? inputEventsWithoutTimer.find(e => e.eventActionInputId == value).eventActionInputName : "Choose trigger (without timer)"}</div>}}
+                                        displayEmpty
+                                    >
+                                        {inputEventsWithoutTimer.map(e => {
+                                            return <MenuItem
+                                                key={e.eventActionInputId}
+                                                value={e.eventActionInputId}>{e.eventActionInputName}</MenuItem>
+                                        })}
+                                    </Select>
+                                    <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
+                                        {Boolean(inputEvents.length==0)&&"Error: no trigger selected"}
+                                    </Grid>
                                 </Grid>
                             </Grid>
                             {inputWithTimerEventsManagementArr.map((info, i) => (
@@ -415,6 +498,7 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                                 sx={{ maxWidth: 400, minWidth: 400 }}
                                                 value={info.eventActionInputType.eventActionInputId}
                                                 onChange={(e) => { changeSelectionInputWithTime(e, info.inputId) }}
+                                                error={Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).eventActionInputIdBlank)}
                                             >
                                                 {inputEventsWithTimer.map(e => {
                                                     return <MenuItem
@@ -431,14 +515,13 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                                 value={info.timerDuration}
                                                 required
                                                 onChange={(e)=>{changeInputTime(e,info.inputId)}}
-                                                helperText={""}
-                                                error={ Boolean(false)}
+                                                error={ Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputBlank) || Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputTooLarge) || Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputNotPositive)}
                                             />
                                         </Grid>
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">seconds (max {MAX_INPUT_TIMER_DURATION})</Typography>
+                                            <Typography fontWeight="bold">second(s)</Typography>
                                         </Grid>
                                         <Button
                                             variant="outlined"
@@ -448,6 +531,9 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                         >
                                             Remove
                                         </Button>
+                                    </Grid>
+                                    <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
+                                        {Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).eventActionInputIdBlank) && "Error: empty selection of trigger (with timer) is not allowed" || Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputBlank) && "Error: timer duration cannot be empty" || Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputTooLarge) && "Error: timer duration cannot be too large" || Boolean(inputWithTimerEventsManagementValidations.find(e => e.inputId === info.inputId).timerDurationInputNotPositive) && "Error: timer duration must be longer than 1 second"}
                                     </Grid>
                             </Grid>                           
                             ))}
@@ -518,6 +604,7 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                                 sx={{ maxWidth: 400, minWidth: 400 }}
                                                 value={info.eventActionOutputType.eventActionOutputId}
                                                 onChange={(e) => { changeSelectionOutputWithTime(e, info.outputId) }}
+                                                error={Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank)}
                                             >
                                                 {outputEventsWithTimer.map(e => {
                                                     return <MenuItem
@@ -531,24 +618,27 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                             <TextField
                                                 type="number"
                                                 sx={{ mr: 2, maxWidth: 150, minWidth: 150 }}
-                                                onChange={(e) => {changeOutputTime(e,i)}}
+                                                onChange={(e) => { changeOutputTime(e, i) }}
+                                                error={ Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive)}
                                                 value={info.timerDuration}
                                             />
                                         </Grid>
                                         <Grid item
                                             mr={2}
                                             mt={1}>
-                                            <Typography fontWeight="bold">seconds (max {MAX_OUTPUT_TIMER_DURATION})</Typography>
+                                            <Typography fontWeight="bold">second(s)</Typography>
                                         </Grid>
                                         <Button
                                             variant="outlined"
                                             color="error"
                                             sx={{mt:1}}
                                             onClick={() => removeOutputWithTimerCard(info.outputId)}
-                                            disabled={outputEventsWithTimer.length === 0}
                                         >
                                             Remove
                                         </Button>
+                                    </Grid>
+                                    <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
+                                        {Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank) && "Error: empty selection of action (with timer) is not allowed" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) && "Error: timer duration cannot be empty" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) && "Error: timer duration cannot be too large" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive) && "Error: timer duration must be longer than 1 second"}
                                     </Grid>
                             </Grid>                           
                             ))}
@@ -558,6 +648,7 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                     variant="outlined"
                                     startIcon={<Add />}
                                     onClick={addOutputWithTimerCard}
+                                    disabled={outputEventsWithTimer.length === 0}
                                 >
                                     Add action with timer
                                 </Button>
@@ -607,7 +698,7 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                                 getStart={getStart(schedule.triggerScheduleId)}
                                                 getEnd={getEnd(schedule.triggerScheduleId)}
                                                 timeEndInvalid={triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid}
-                                                handleInvalidUntil={handleInvalidUntil}
+                                                handleInvalidUntil={handleInvalidUntil(schedule.triggerScheduleId)}
                                             />
                                         </Grid>
                                         <Divider />
@@ -624,6 +715,9 @@ const EditEventManagementForm = ({checkUntil,changeTriggerSchedules,changeTextFi
                                     Add schedules
                                 </Button>
                             </div>
+                            <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
+                                {Boolean(eventsManagementTriggerSchedulesEmpty)&&"Error: schedules cannot be empty"}
+                            </Grid>
                         </Stack>
                     </Collapse>
                 </Stack>
