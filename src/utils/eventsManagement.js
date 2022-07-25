@@ -22,6 +22,7 @@ import {Grid} from "@mui/material";
 const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Trigger(s) or Action(s)";
 
 const stringFilterHelper = (eventsManagement, query) => {
+
         return(
         query === "" 
         || stringIn(query, eventsManagement.eventsManagementName) 
@@ -29,8 +30,8 @@ const stringFilterHelper = (eventsManagement, query) => {
         || (eventsManagement.outputActions.some(outputAction=> stringIn(query, outputAction.eventActionOutputType.eventActionOutputTypeName)))
         || (eventsManagement.entrance ? stringIn(query, eventsManagement.entrance.entranceName):false) 
         || (eventsManagement.controller ? stringIn(query, eventsManagement.controller.controllerName):false) 
-        || stringIn(query, rruleDescription(rrulestr(eventsManagement.triggerSchedule.rrule), eventsManagement.triggerSchedule.timeStart, eventsManagement.triggerSchedule.timeEnd))
-        )}
+        || (eventsManagement.triggerSchedules.some(schedule=> stringIn(query, rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd))))
+    )}
 
 // returns true if queryString === "" or
 //                 lowercase queryString in lowercase entranceName or
@@ -39,6 +40,7 @@ const stringFilterHelper = (eventsManagement, query) => {
 //                 lowercase queryString in lowercase inputEvents or 
 //                 lowercase queryString in lowercase outputActions or
 //                 lowercase queryString in lowercase rruleDescription 
+
 
 const filterEventsManagementByString = (eventsManagement, queryString) => stringFilterHelper(eventsManagement, queryString.toLowerCase());
 

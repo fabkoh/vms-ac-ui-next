@@ -64,7 +64,7 @@ export default function ControllerEventsManagement({
 	};
 
 	return (
-		<Card>
+		<Card >
 			<ControllerEventsManagementDelete
 				open={openDelete}
 				eventManagements={controllerEventManagements}
@@ -80,7 +80,7 @@ export default function ControllerEventsManagement({
 				<Box>
 					<CardHeader
 						title="Events Management"
-						subheader="The inputs below will trigger the outputs"
+						subheader="The trigger(s) below will lead to the action(s)."
 						avatar={
 							<ExpandMore expand={expanded}
 								onClick={handleExpandClick}>
@@ -141,8 +141,8 @@ export default function ControllerEventsManagement({
                                     </TableCell>
 									<TableCell>Name</TableCell>
 									<TableCell>Description(s)</TableCell>
-                                    <TableCell>Input(s)</TableCell>
-									<TableCell>Output(s)</TableCell>
+                                    <TableCell>Trigger(s)</TableCell>
+									<TableCell>Action(s)</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
