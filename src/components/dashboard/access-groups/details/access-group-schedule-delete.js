@@ -176,7 +176,7 @@ const AccessGroupScheduleDelete = ({ open, schedules, handleDialogClose, deleteS
                                 }
                             </DialogContentText>
                             <form onSubmit={handleDeleteSchedules}
-                            autocomplete="off"
+                            autoComplete="off"
                             >
                                 <TextField
                                     variant="filled"

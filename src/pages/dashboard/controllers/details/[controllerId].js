@@ -523,16 +523,17 @@ const ControllerDetails = () => {
                                 handleToggleMasterpin={handleToggleMasterpinE2}
                                 />
                             </Grid>                         
-                        </Grid>
-                        <Grid
-                                item
-                                xs={12}
-                            >
-                                <ControllerEventsManagement  
-                                    controllerEventManagements={controllerEventManagements}
-                                    deleteEventManagements={deleteEventManagements}
-                                    eventsManagementCreateLink={eventsManagementCreateLink} 
-                                />
+                       
+                            <Grid
+                                    item
+                                    xs={12}
+                                >
+                                    <ControllerEventsManagement  
+                                        controllerEventManagements={controllerEventManagements}
+                                        deleteEventManagements={deleteEventManagements}
+                                        eventsManagementCreateLink={eventsManagementCreateLink} 
+                                    />
+                            </Grid>
                             </Grid>
                     </Box>
                 </Container>

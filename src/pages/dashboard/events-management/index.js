@@ -97,9 +97,7 @@ const EventsManagementList = () => {
 
 
     useEffect(() => {
-		console.log(filters)
-        console.log(paginatedEventsManagement)
-        console.log(eventsManagement)
+
 	}, [filters]);
 
 
