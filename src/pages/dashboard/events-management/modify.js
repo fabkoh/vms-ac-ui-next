@@ -18,8 +18,7 @@ import { controllerApi } from "../../../api/controllers";
 import entranceApi from "../../../api/entrance";
 import { eventsManagementApi } from "../../../api/events-management";
 
-const CreateEventManagement = () => {
-    //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
+const ModifyEventManagement = () => {
     const router = useRouter();
     const isMounted = useMounted();
     const temp = router.query;
@@ -89,14 +88,6 @@ const CreateEventManagement = () => {
             console.log(error)
         }
     }, [])
-      
-    useEffect(() => {
-        try {
-            getAllInputOutputEvents(controllers.length > 0);
-        } catch (error) {
-            console.log(error)
-        }
-    }, [controllers])
 
     // empty objects for initialisation of new card
     const getEmptyEventsManagementInfo = (eventsManagementId) => ({
@@ -125,6 +116,59 @@ const CreateEventManagement = () => {
     const [eventsManagementValidationsArr, 
         setEventsManagementValidationsArr] = useState([getEmptyEventsManagementValidations(0)]);
 
+    useEffect(() => {
+        try {
+            getAllInputOutputEvents(controllers.length > 0);
+            // const inputEventsId = inputEvents.map(event => event.eventActionInputId);
+            // const outputActionsId = outputEvents.map(event => event.eventActionOutputId);
+            // const updatedEventsManagementInfo = [...eventsManagementInfoArr];
+            // for (let i = 0; i < updatedEventsManagementInfo.length; i++) {
+            //     const eventsManagementInfo = updatedEventsManagementInfo[i];
+            //     const eventsManagementInfoInputEvents = eventsManagementInfo.inputEvents;
+            //     const eventsManagementInfoOutputActions = eventsManagementInfo.outputActions;
+            //     let newInputEvents = [];
+            //     let newInputEventsWithoutTimer = [];
+            //     let newInputEventsWithTimer = [];
+            //     for (let j = 0; j < eventsManagementInfoInputEvents.length; j++) {
+            //         const inputEvent = eventsManagementInfoInputEvents[j];
+            //         const inputEventFromApi = inputEvents.find(event => event.eventActionInputId === inputEvent.eventActionInputType.eventActionInputId);
+            //         if (inputEvent.eventActionInputType.eventActionInputId in inputEventsId) {
+            //             newInputEvents.push(inputEvent);
+            //             if (inputEvent.timerDuration === null || inputEvent.timerDuration === undefined) {
+            //                 newInputEventsWithoutTimer.push(inputEventFromApi);
+            //             } else {
+            //                 newInputEventsWithTimer.push(inputEventFromApi);
+            //             }
+            //         }
+            //     }
+            //     eventsManagementInfo['inputEvents'] = newInputEvents;
+            //     setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [eventsManagementInfo.eventsManagementId]: newInputEventsWithoutTimer });
+            //     setInputEventsWithTimer({ ...inputEventsWithTimer, [eventsManagementInfo.eventsManagementId]: newInputEventsWithTimer });
+                
+            //     let newOutputActions = [];
+            //     let newOutputActionsWithoutTimer = [];
+            //     let newOutputActionsWithTimer = [];
+            //     for (let j = 0; j < eventsManagementInfoOutputActions.length; j++) {
+            //         const outputAction = eventsManagementInfoOutputActions[j];
+            //         const outputActionFromApi = outputEvents.find(event => event.eventActionOutputId === outputAction.eventActionOutputType.eventActionOutputId);
+            //         if (outputAction.eventActionOutputType.eventActionOutputId in outputActionsId) {
+            //             newOutputActions.push(outputAction);
+            //             if (outputAction.timerDuration === null || outputAction.timerDuration === undefined) {
+            //                 newOutputActionsWithoutTimer.push(outputActionFromApi);
+            //             } else {
+            //                 newOutputActionsWithTimer.push(outputActionFromApi);
+            //             }
+            //         }
+            //     }
+            //     eventsManagementInfo['outputActions'] = newOutputActions;
+            //     setOutputActionsWithoutTimer({ ...outputActionsWithoutTimer, [eventsManagementInfo.eventsManagementId]: newOutputActionsWithoutTimer });
+            //     setOutputEventsWithTimer({ ...outputEventsWithTimer, [eventsManagementInfo.eventsManagementId]: newOutputActionsWithTimer });
+            // }
+            // setEventsManagementInfoArr(updatedInfo);
+        } catch (error) {
+            console.log(error)
+        }
+    }, [controllers])
 
     // add card logic
     const getNewId = () => eventsManagementInfoArr.map(info => info.eventsManagementId)
@@ -283,23 +327,24 @@ const CreateEventManagement = () => {
         setControllers(controllersIds);
         // setEventsManagementInfoArr(updatedInfo);
     }
-    const changeInputEventsWithoutTimer = (e, id) => {
+    const changeInputEventsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        const newValue = e.target.value
         let newInputEvents = []
         for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
             if (eventManagementToBeUpdatedInputEvents[j].timerDuration) {
                 newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
             }
         }
-        newInputEvents.push(...[{
+        if (newValue) {
+            newInputEvents.push(...[{
                 timerDuration: null,
                 eventActionInputType: {
-                    eventActionInputId : newValue
+                    eventActionInputId: newValue
                 }
-        }]);
+            }]);
+        }
         eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
@@ -599,7 +644,7 @@ const CreateEventManagement = () => {
     )
 }
 
-CreateEventManagement.getLayout = (page) => (
+ModifyEventManagement.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -607,4 +652,4 @@ CreateEventManagement.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default CreateEventManagement;
+export default ModifyEventManagement;
