@@ -177,7 +177,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                                 Are you sure you want to delete schedule(s)? This action cannot be undone.
                             </DialogContentText>
                             <form onSubmit={handleDeleteSchedules}
-                            autocomplete="off"
+                            autoComplete="off"
                             >
                                 <TextField
                                     variant="filled"

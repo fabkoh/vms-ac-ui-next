@@ -189,7 +189,7 @@ const ControllerEventsManagementDelete = ({
                                 */}
                             </DialogContentText>
                             <form 
-                            autocomplete="off"
+                            autoComplete="off"
                             onSubmit={handleDeleteeventManagements}>
                                 <TextField
                                     variant="filled"

@@ -37,8 +37,8 @@ function EventsManagementTable({
                                         </TableCell>
                                         <TableCell>Name</TableCell>
                                         <TableCell>Description(s)</TableCell>
-                                        <TableCell>Input(s)</TableCell>
-                                        <TableCell>Output(s)</TableCell>
+                                        <TableCell>Trigger(s)</TableCell>
+                                        <TableCell>Action(s)</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

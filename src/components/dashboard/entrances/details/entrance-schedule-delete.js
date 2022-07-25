@@ -180,7 +180,7 @@ const EntranceScheduleDelete = ({
                                 */}
                             </DialogContentText>
                             <form onSubmit={handleDeleteSchedules}
-                            autocomplete="off"
+                            autoComplete="off"
                             >
                                 <TextField
                                     variant="filled"
