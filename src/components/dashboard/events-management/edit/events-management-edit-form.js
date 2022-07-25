@@ -330,12 +330,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
     const getStart = (triggerScheduleId) => (e) => {
         changeTimeStartTriggerSchedule(e, triggerScheduleId);
         setStart({ ...start, [triggerScheduleId]: e });
-        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], e, end[triggerScheduleId]) })
     }
     const getEnd = (triggerScheduleId) => (e) => {
         changeTimeEndTriggerSchedule(e, triggerScheduleId);
         setEnd({ ...end, [triggerScheduleId]: e });
-        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], start[triggerScheduleId], e) })
     }
     const handleRrule = (triggerScheduleId) => (e) => {
         descriptionHandler(triggerScheduleId, e);
