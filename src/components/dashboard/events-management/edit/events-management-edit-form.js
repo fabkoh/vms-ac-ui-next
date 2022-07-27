@@ -637,7 +637,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     item
                                     md={12}
                                     xs={12}
-                                >
+                                    // this console log somehow helps to make the multiple select value updates after selecting some controller
+                                >   {console.log(outputActionsValueWithoutTimerState)}
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
                                         setSelected={(e) => changeOutputActionsWithoutTimer(e,eventsManagementId)}
