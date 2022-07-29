@@ -295,16 +295,18 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         submitFailed,
         eventsManagementInputEventsEmpty,
         eventsManagementInputEventsInvalidId,
+        eventsManagementInputEventsConflict,
         eventsManagementOutputActionsEmpty,
         eventsManagementOutputActionsInvalidId,
-        eventsManagementTriggerSchedulesEmpty
+        eventsManagementOutputActionsConflict,
+        eventsManagementTriggerSchedulesEmpty,
     } = eventsManagementValidations;
    
     const inputEventsValueForWithoutTimer = inputEventsValueWithoutTimer[eventsManagementId];
     const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
     const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
     const [outputActionsValueWithoutTimerState, setOutputActionsValueWithoutTimerState] = useState(outputActionsValueForWithoutTimer);
-    
+
     useEffect(() => { 
         setInputEventsValueWithoutTimerState(inputEventsValueForWithoutTimer);
     }, [inputEventsValueForWithoutTimer]);
@@ -442,8 +444,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
             submitFailed ||
             eventsManagementInputEventsEmpty ||
             eventsManagementInputEventsInvalidId ||
+            eventsManagementInputEventsConflict ||
             eventsManagementOutputActionsEmpty ||
             eventsManagementOutputActionsInvalidId ||
+            eventsManagementOutputActionsConflict ||
             eventsManagementTriggerSchedulesEmpty
         }>
             <CardHeader
@@ -547,7 +551,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         })}
                                     </Select>
                                     <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
-                                        {Boolean(inputEvents.length==0)&&"Error: no trigger selected"}
+                                        {Boolean(inputEvents.length == 0) && "Error: no trigger selected" || Boolean(eventsManagementInputEventsConflict) && "Error: trigger conflict. One type of custom trigger can only be used as either IN or OUT and not both"}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -712,7 +716,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         </Button>
                                     </Grid>
                                     <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
-                                        {Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank) && "Error: empty selection of action (with timer) is not allowed" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) && "Error: timer duration cannot be empty" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) && "Error: timer duration cannot be too large" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive) && "Error: timer duration must be longer than 1 second"}
+                                        {Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank) && "Error: empty selection of action (with timer) is not allowed" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) && "Error: timer duration cannot be empty" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) && "Error: timer duration cannot be too large" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive) && "Error: timer duration must be longer than 1 second" || Boolean(eventsManagementOutputActionsConflict) && "Error: action conflict. One type of custom action can only be used as either IN or OUT and not both"}
                                     </Grid>
                             </Grid>                           
                             ))}
