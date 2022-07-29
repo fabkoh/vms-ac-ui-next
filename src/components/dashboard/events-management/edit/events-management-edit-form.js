@@ -434,7 +434,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
             changeOutputActionsWithoutTimer(newOutputActionsWithoutTimer, eventsManagementId);
         }
     }, [allInputEvents, allOutputEvents])
-    
+
     return (
         <ErrorCard error={
             eventsManagementNameBlank ||
@@ -533,6 +533,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     md={12}
                                     xs={12}
                                 >
+                                    {/* Remove console log at your own risk */}
+                                    {console.log(inputEventsValueWithoutTimerState, "inputEventsValueWithoutTimerState")}
                                     <Select
                                         sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
                                         required={inputEvents.length===0}
@@ -641,8 +643,9 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     item
                                     md={12}
                                     xs={12}
-                                    // this console log somehow helps to make the multiple select value updates after selecting some controller
-                                >   {console.log(outputActionsValueWithoutTimerState)}
+                                >  
+                                    {/* Remove console log at your own risk */}
+                                    {console.log(outputActionsValueWithoutTimerState)}
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
                                         setSelected={(e) => changeOutputActionsWithoutTimer(e,eventsManagementId)}
