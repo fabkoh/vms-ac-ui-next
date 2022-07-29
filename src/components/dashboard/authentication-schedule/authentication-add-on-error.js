@@ -22,7 +22,8 @@ const BootstrapDialogTitle = (props) => {
   const { children, onClose, ...other } = props;
 
   return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+    <DialogTitle sx={{ m: 0, p: 2 }}
+{...other}>
       {children}
       {onClose ? (
         <IconButton
@@ -47,7 +48,17 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function AuthenticationAddOnError({errorMessages,handleClose,open, ...rest}) {
+export default function AuthenticationAddOnError({
+  errorMessages,
+  handleClose,
+  open,
+  // selectedSchedules,
+  // handleSelectFactory,
+  // selectedSomeSchedules, 
+  // selectedAllSchedules,
+  // handleSelectAllSchedules,
+  // deleteSchedules,
+  ...rest }) {
   
 
   return (
@@ -56,30 +67,50 @@ export default function AuthenticationAddOnError({errorMessages,handleClose,open
     <Dialog
     onBackdropClick={handleClose}
     fullWidth
+    maxWidth='lg'
     open={open}>
-        <DialogTitle>
-            Error : Failed to create new schedules.      
-            The new schedules highlighted below clashes with existing schedules. Do make the necessary changes before pressing the `&quot;`Add on`&quot;` button again.
+        <DialogTitle sx={{ color: "#F44336" }}>
+          Error : Failed to create new schedules.
         </DialogTitle>
-        <DialogContent>
+      <DialogContent>
+            <Box marginTop={1}
+                  marginBottom={5}>
+                <Alert severity="info"
+                    variant="outlined">The new schedules highlighted below clashes with existing schedules. Do make the necessary changes before pressing the <b>Add on</b> button again.
+                </Alert>
+            </Box>
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell>New Schedule(s)</TableCell>
                         <TableCell>Auth Device with Existing Schedule(s)</TableCell>
+                        {/* <TableCell padding="checkbox">
+                            <Checkbox
+                                checked={selectedAllSchedules}
+                                indeterminate={selectedSomeSchedules}
+                                onChange={handleSelectAllSchedules}
+                            />  
+                        </TableCell> */}
                     </TableRow> 
                 </TableHead>
                 <TableBody>
                     {errorMessages.map(([key,clashes],i) => {
-                        console.log(clashes)
+                      console.log(clashes);
+                        // const IsScheduleSelected = selectedSchedules.includes(clash.authMethodScheduleId);
+                        // const handleSelect = handleSelectFactory(clash.authMethodScheduleId);
                         return ( 
                             <TableRow key={`row${i}`}>
                                 <TableCell>{key}</TableCell>
                                 <TableCell> {clashes.controller} {clashes.entrance==null?"( No Entrance ) ":clashes.entrance}
-                                    {clashes.authDevice.authDeviceName} ({clashes.authDevice.authDeviceDirection}) </TableCell>
+                              {clashes.authDevice.authDeviceName} ({clashes.authDevice.authDeviceDirection}) </TableCell>
+                                {/* <TableCell padding="checkbox">
+                                    <Checkbox
+                                      checked={IsScheduleSelected}
+                                      onChange={handleSelect}
+                                      value={IsScheduleSelected}
+                                    />
+                                </TableCell> */}
                             </TableRow>
-
-                            
                         )
                     })}
 
@@ -87,9 +118,15 @@ export default function AuthenticationAddOnError({errorMessages,handleClose,open
             </Table>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button autoFocus
+                  onClick={handleClose}>
             Close
-          </Button>
+        </Button>
+        {/* <Button onClick={deleteSchedules}
+                  sx={{ color: "#F44336" }}
+                  autoFocus>
+            Delete Selected
+        </Button> */}
         </DialogActions>
     </Dialog>
   );
