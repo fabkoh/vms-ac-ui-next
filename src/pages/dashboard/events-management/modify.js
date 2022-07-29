@@ -17,6 +17,8 @@ import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../api/controllers";
 import entranceApi from "../../../api/entrance";
 import { eventsManagementApi } from "../../../api/events-management";
+import EventsManagementAddOnError from "../../../components/dashboard/events-management/events-management-add-on-error";
+import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 
 const ModifyEventManagement = () => {
     const router = useRouter();
@@ -36,6 +38,69 @@ const ModifyEventManagement = () => {
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
+    const [open, setOpen] = useState(false);
+    const [errorMessages, setErrorMessages] = useState([]);
+    const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+
+    // for selection of checkboxes
+    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+    const selectedAllEventsManagement = selectedEventsManagement.length === [...new Set(singleErrorMessage.map(e => e.eventsManagementId))].length;
+    const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
+    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? [...new Set(singleErrorMessage.map(e => e.eventsManagementId))] : []);
+    const handleSelectFactory = (eventsManagementId) => () => {
+        console.log(eventsManagementId, "the eventsManagementId getting passed");
+        console.log(singleErrorMessage, "singleErrorMessage");
+        if (selectedEventsManagement.includes(eventsManagementId)) {
+            setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
+        } else {
+            setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
+        }
+    }
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessages([]);
+        setSingleErrorMessage([]);
+    };
+
+    const handleErrorMessages = (res) => {
+        console.log(res, "errorMessages");
+        setErrorMessages(res);
+        setOpen(true);
+    }
+
+    //for delete action button
+	const [deleteOpen, setDeleteOpen] = useState(false); 
+
+    const handleDeleteOpen = () => {        
+		setDeleteOpen(true);           
+	};
+	const handleDeleteClose = () => {
+		setDeleteOpen(false);
+    }
+
+
+    // This check is dependant on the name of the custom input to not change eg: remain GEN_IN_1 and GEN_OUT_1
+    // Only check for this conflict in changeInputEventsWithoutTimer and changeOutputActionsWithTimer as these are the types of the custom input/output
+    const [customInputEventsSelected, setCustomInputEventsSelected] = useState({});     // List of custom input events (GEN_IN_1, etc) that is selected for validation
+    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState({});    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
+
+    const deleteEventsManagement = async() => {
+		Promise.all(selectedEventsManagement.map(id=>{
+			return eventsManagementApi.deleteEventsManagement(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 200){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful' )
+				}
+			})
+		})
+		setDeleteOpen(false);
+        setSelectedEventsManagement([])
+    };
+    
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
@@ -102,8 +167,10 @@ const ModifyEventManagement = () => {
         eventsManagementNameBlank: false,
         eventsManagementInputEventsEmpty: false,
         eventsManagementInputEventsInvalidId: false,
+        eventsManagementInputEventsConflict: false,
         eventsManagementOutputActionsEmpty: false,
         eventsManagementOutputActionsInvalidId: false,
+        eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
         timeEndInvalid:false,
         timeStartInvalid:false,
@@ -260,8 +327,18 @@ const ModifyEventManagement = () => {
         e.preventDefault();
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=201){
-                return toast.error("Error replacing all event managements")
+            if (res.status!=201){ 
+                (res.json()).then(data => {
+                    const array = [];
+                    Object.entries(data[0]).map(([key,value]) => {
+                        value.map( singleData => 
+                            // console.log(key, singleData))
+                            array.push(singleData))
+                    })
+                    setSingleErrorMessage(array)
+                    handleErrorMessages(data)
+                    // getClashingEventsManagement
+                })     
             }
             else{
                 toast.success("Successfully replaced all event managements")
@@ -275,8 +352,18 @@ const ModifyEventManagement = () => {
         e.preventDefault();
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=201){
-                return toast.error("Error adding event managements")
+            if (res.status!=201){ 
+                (res.json()).then(data => {
+                    const array = [];
+                    Object.entries(data[0]).map(([key,value]) => {
+                        value.map( singleData => 
+                            // console.log(key, singleData))
+                            array.push(singleData))
+                    })
+                    setSingleErrorMessage(array)
+                    handleErrorMessages(data)
+                    // getClashingEventsManagement
+                })     
             }
             else{
                 toast.success("Event managements successfully added")
@@ -330,6 +417,7 @@ const ModifyEventManagement = () => {
     const changeInputEventsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const inputEventToBeAdded = inputEvents.find(e => e.eventActionInputId == newValue);
         const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
         let newInputEvents = []
         for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
@@ -355,6 +443,26 @@ const ModifyEventManagement = () => {
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (!newValue) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+            switch (inputEventToBeAdded.eventActionInputName) {
+                case 'GEN_IN_1':
+                    if (customOutputEventsSelected['GEN_OUT_1']) {
+                        validation.eventsManagementInputEventsConflict = true;
+                    }
+                    break;
+                case 'GEN_IN_2':
+                    if (customOutputEventsSelected['GEN_OUT_2']) {
+                        validation.eventsManagementInputEventsConflict = true;
+                    }
+                    break;
+                case 'GEN_IN_3':
+                    if (customOutputEventsSelected['GEN_OUT_2']) {
+                        validation.eventsManagementInputEventsConflict = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
         setEventsManagementValidationsArr(newValidations);
     }
@@ -438,6 +546,29 @@ const ModifyEventManagement = () => {
         if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
         }
+
+        for (let i = 0; i < newValue.length; i++) {
+            const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
+            switch (outputActionToBeAdded.eventActionOutputName) {
+                case 'GEN_OUT_1':
+                    if (customInputEventsSelected['GEN_IN_1']) {
+                        validation.eventsManagementOutputActionsConflict = true;
+                    }
+                    break;
+                case 'GEN_OUT_2':
+                    if (customOutputEventsSelected['GEN_IN_2']) {
+                        validation.eventsManagementOutputActionsConflict = true;
+                    }
+                    break;
+                case 'GEN_OUT_3':
+                    if (customOutputEventsSelected['GEN_IN_3']) {
+                        validation.eventsManagementOutputActionsConflict = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
         setEventsManagementValidationsArr(newValidations);
     }
  
@@ -455,6 +586,23 @@ const ModifyEventManagement = () => {
                     py: 8
                 }}
             >
+                <Confirmdelete
+                    open={deleteOpen} 
+                    handleDialogClose={handleDeleteClose}
+                    selectedEventsManagement={selectedEventsManagement}
+                    deleteEventsManagement={deleteEventsManagement}
+                />
+                <EventsManagementAddOnError
+                    errorMessages={errorMessages}
+                    handleClose={handleClose}
+                    open={open}
+                    deleteEventsManagement={handleDeleteOpen}
+                    handleSelectFactory={handleSelectFactory}
+                    selectedEventsManagement={selectedEventsManagement}
+                    selectedSomeEventsManagement={selectedSomeEventsManagement}
+                    selectedAllEventsManagement={selectedAllEventsManagement}
+                    handleSelectAllEventsManagement={handleSelectAllEventsManagement}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -539,31 +687,33 @@ const ModifyEventManagement = () => {
                     </Grid>
                     <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
                         <Stack spacing={3}>
-                            { eventsManagementInfoArr.map((eventsManagementInfo, i) => (
-                                <EditEventManagementForm
-                                    key={eventsManagementInfo.eventsManagementId}
-                                    eventsManagementInfo={eventsManagementInfo}
-                                    removeCard={removeCard}
-                                    eventsManagementValidations={eventsManagementValidationsArr[i]}
-                                    changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
-                                    changeNameCheck={changeNameCheck}
-                                    changeTriggerSchedules={changeTriggerSchedules}
-                                    checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
-                                    changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
-                                    eventActionOutputEqual={eventActionOutputEqual}
-                                    eventActionOutputFilter={eventActionOutputFilter}
-                                    getEventActionOutputName={getEventActionOutputName}
-                                    changeInputEventsWithTimer={changeInputEventsWithTimer}
-                                    changeOutputActionsWithTimer={changeOutputActionsWithTimer}
-                                    inputEventsValueWithoutTimer={inputEventsWithoutTimer}
-                                    outputActionsValueWithoutTimer={outputActionsWithoutTimer}
-                                    allInputEvents={inputEvents}
-                                    allOutputEvents={outputEvents}
-                                />
-                            ))}
+                            {eventsManagementInfoArr.map((eventsManagementInfo, i) => {
+                                return (
+                                    <EditEventManagementForm
+                                        key={eventsManagementInfo.eventsManagementId}
+                                        eventsManagementInfo={eventsManagementInfo}
+                                        removeCard={removeCard}
+                                        eventsManagementValidations={eventsManagementValidationsArr[i]}
+                                        changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
+                                        changeNameCheck={changeNameCheck}
+                                        changeTriggerSchedules={changeTriggerSchedules}
+                                        checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
+                                        changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
+                                        eventActionOutputEqual={eventActionOutputEqual}
+                                        eventActionOutputFilter={eventActionOutputFilter}
+                                        getEventActionOutputName={getEventActionOutputName}
+                                        changeInputEventsWithTimer={changeInputEventsWithTimer}
+                                        changeOutputActionsWithTimer={changeOutputActionsWithTimer}
+                                        inputEventsValueWithoutTimer={inputEventsWithoutTimer}
+                                        outputActionsValueWithoutTimer={outputActionsWithoutTimer}
+                                        allInputEvents={inputEvents}
+                                        allOutputEvents={outputEvents}
+                                    />
+                                )
+                            })}
                             <div>
                                 <Button
                                     size="large"
@@ -591,7 +741,14 @@ const ModifyEventManagement = () => {
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.eventsManagementInputEventsEmpty ||
+                                                validation.eventsManagementInputEventsInvalidId ||
+                                                validation.eventsManagementInputEventsConflict ||
+                                                validation.eventsManagementOutputActionsEmpty ||
+                                                validation.eventsManagementOutputActionsInvalidId ||
+                                                validation.eventsManagementOutputActionsConflict ||
+                                                validation.eventsManagementTriggerSchedulesEmpty
                                             )
                                         }
                                     >
@@ -614,7 +771,14 @@ const ModifyEventManagement = () => {
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.eventsManagementInputEventsEmpty ||
+                                                validation.eventsManagementInputEventsInvalidId ||
+                                                validation.eventsManagementInputEventsConflict ||
+                                                validation.eventsManagementOutputActionsEmpty ||
+                                                validation.eventsManagementOutputActionsInvalidId ||
+                                                validation.eventsManagementOutputActionsConflict ||
+                                                validation.eventsManagementTriggerSchedulesEmpty
                                             )
                                         }
                                     >
