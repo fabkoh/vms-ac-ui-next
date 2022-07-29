@@ -75,7 +75,8 @@ const ModifyEventManagement = () => {
     const handleDeleteOpen = () => {        
 		setDeleteOpen(true);           
 	};
-	const handleDeleteClose = () => {
+    const handleDeleteClose = () => {
+        handleClose();
 		setDeleteOpen(false);
     }
 
@@ -98,7 +99,7 @@ const ModifyEventManagement = () => {
 				}
 			})
 		})
-		setDeleteOpen(false);
+        setDeleteOpen(false);
         setSelectedEventsManagement([])
     };
     
