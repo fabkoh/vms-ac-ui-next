@@ -19,6 +19,7 @@ import entranceApi from "../../../api/entrance";
 import { eventsManagementApi } from "../../../api/events-management";
 import EventsManagementAddOnError from "../../../components/dashboard/events-management/events-management-add-on-error";
 import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
+import { input } from "aws-amplify";
 
 const ModifyEventManagement = () => {
     const router = useRouter();
@@ -81,8 +82,8 @@ const ModifyEventManagement = () => {
 
     // This check is dependant on the name of the custom input to not change eg: remain GEN_IN_1 and GEN_OUT_1
     // Only check for this conflict in changeInputEventsWithoutTimer and changeOutputActionsWithTimer as these are the types of the custom input/output
-    const [customInputEventsSelected, setCustomInputEventsSelected] = useState({});     // List of custom input events (GEN_IN_1, etc) that is selected for validation
-    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState({});    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
+    const [customInputEventsSelected, setCustomInputEventsSelected] = useState(new Set());     // List of custom input events (GEN_IN_1, etc) that is selected for validation
+    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState(new Set());    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
 
     const deleteEventsManagement = async() => {
 		Promise.all(selectedEventsManagement.map(id=>{
@@ -398,7 +399,53 @@ const ModifyEventManagement = () => {
         ))
     }
     const getEventActionOutputName = (e) => e.eventActionOutputName;
-    
+
+    const checkInputOutputConflict = () => {
+        const selectedOutputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currOutputActions = currEventManagement.outputActions;
+            for (let j = 0; j < currOutputActions.length; j++) {
+                if (currOutputActions[j].timerDuration) {
+                    const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
+                    const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
+                    if (outputEventEntity.eventActionOutputName == 'GEN_OUT_1') {
+                        selectedOutputEvents.add('GEN_OUT_1');
+                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_2') {
+                        selectedOutputEvents.add('GEN_OUT_2');
+                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_3') {
+                        selectedOutputEvents.add('GEN_OUT_3');
+                    }
+                }
+            }
+        }
+
+        console.log(selectedOutputEvents, "selectedOutputEvents");
+        setCustomOutputEventsSelected(selectedOutputEvents);
+  
+        const selectedInputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            for (let j = 0; j < currInputEvents.length; j++) {
+                if (currInputEvents[j].timerDuration) {
+                    continue;
+                }
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                if (inputEventEntity.eventActionInputName == 'GEN_IN_1') {
+                    selectedInputEvents.add('GEN_IN_1');
+                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_2') {
+                    selectedInputEvents.add('GEN_IN_2');
+                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_3') {
+                    selectedInputEvents.add('GEN_IN_3');
+                }
+            }
+        }
+        console.log(selectedInputEvents, "selectedInputEvents");
+        setCustomInputEventsSelected(selectedInputEvents);
+    }
+
     const changeEntranceController = (newValue) => {
         setEntrancesControllers(newValue);
         // const updatedInfo = [...eventsManagementInfoArr];
@@ -437,6 +484,7 @@ const ModifyEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
 
+        checkInputOutputConflict();
         // validations
         const newValidations = [...eventsManagementValidationsArr];
         const validation = newValidations.find(v => v.eventsManagementId == id);
@@ -446,21 +494,22 @@ const ModifyEventManagement = () => {
         } else {
             switch (inputEventToBeAdded.eventActionInputName) {
                 case 'GEN_IN_1':
-                    if (customOutputEventsSelected['GEN_OUT_1']) {
+                    if (customOutputEventsSelected.has('GEN_OUT_1')) {
                         validation.eventsManagementInputEventsConflict = true;
                     }
                     break;
                 case 'GEN_IN_2':
-                    if (customOutputEventsSelected['GEN_OUT_2']) {
+                    if (customOutputEventsSelected.has('GEN_OUT_2')) {
                         validation.eventsManagementInputEventsConflict = true;
                     }
                     break;
                 case 'GEN_IN_3':
-                    if (customOutputEventsSelected['GEN_OUT_2']) {
+                    if (customOutputEventsSelected.has('GEN_OUT_3')) {
                         validation.eventsManagementInputEventsConflict = true;
                     }
                     break;
                 default:
+                    validation.eventsManagementInputEventsConflict = false;
                     break;
             }
         }
@@ -539,6 +588,8 @@ const ModifyEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
         setOutputEventsWithTimer({ ...outputEventsWithTimer, [id]: newValue });
         
+        checkInputOutputConflict();
+
         // validations
         const newValidations = [...eventsManagementValidationsArr];
         const validation = newValidations.find(v => v.eventsManagementId == id);
@@ -551,21 +602,22 @@ const ModifyEventManagement = () => {
             const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
             switch (outputActionToBeAdded.eventActionOutputName) {
                 case 'GEN_OUT_1':
-                    if (customInputEventsSelected['GEN_IN_1']) {
+                    if (customInputEventsSelected.has('GEN_IN_1')) {
                         validation.eventsManagementOutputActionsConflict = true;
                     }
                     break;
                 case 'GEN_OUT_2':
-                    if (customOutputEventsSelected['GEN_IN_2']) {
+                    if (customInputEventsSelected.has('GEN_IN_2')) {
                         validation.eventsManagementOutputActionsConflict = true;
                     }
                     break;
                 case 'GEN_OUT_3':
-                    if (customOutputEventsSelected['GEN_IN_3']) {
+                    if (customInputEventsSelected.has('GEN_IN_3')) {
                         validation.eventsManagementOutputActionsConflict = true;
                     }
                     break;
                 default:
+                    validation.eventsManagementOutputActionsConflict = false;
                     break;
             }
         }
