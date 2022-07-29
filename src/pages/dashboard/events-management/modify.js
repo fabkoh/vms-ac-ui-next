@@ -401,11 +401,11 @@ const ModifyEventManagement = () => {
                 if (currOutputActions[j].timerDuration) {
                     const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
                     const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
-                    if (outputEventEntity.eventActionOutputName == 'GEN_OUT_1') {
+                    if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
                         selectedOutputEvents.add('GEN_OUT_1');
-                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_2') {
+                    } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_2') {
                         selectedOutputEvents.add('GEN_OUT_2');
-                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_3') {
+                    } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_3') {
                         selectedOutputEvents.add('GEN_OUT_3');
                     }
                 }
@@ -425,11 +425,11 @@ const ModifyEventManagement = () => {
                 }
                 const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
                 const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
-                if (inputEventEntity.eventActionInputName == 'GEN_IN_1') {
+                if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
                     selectedInputEvents.add('GEN_IN_1');
-                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_2') {
+                } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_2') {
                     selectedInputEvents.add('GEN_IN_2');
-                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_3') {
+                } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_3') {
                     selectedInputEvents.add('GEN_IN_3');
                 }
             }
@@ -446,15 +446,15 @@ const ModifyEventManagement = () => {
 
             validation.eventsManagementInputEventsConflict = false;
             console.log(inputEventToBeAdded.eventActionInputName, "inputEventToBeAddedInChangeInputEventsWithoutTimer");
-            if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_1') {
+            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
                 if (selectedOutputEvents.has('GEN_OUT_1')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
-            } else if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_2') {
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
                 if (selectedOutputEvents.has('GEN_OUT_2')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
-            } else if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_3') {
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
                 if (selectedOutputEvents.has('GEN_OUT_3')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
@@ -465,16 +465,16 @@ const ModifyEventManagement = () => {
         const eventManagementsToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
         for (let i = 0; i < eventManagementsToBeUpdatedOutputActions.length; i++) {
             const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === eventManagementsToBeUpdatedOutputActions[i].eventActionOutputType.eventActionOutputId);
-            if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_1') {
+            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
                 if (selectedInputEvents.has('GEN_IN_1')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
             }
-            else if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_2') {
+            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
                 if (selectedInputEvents.has('GEN_IN_2')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
-            } else if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_3') {
+            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
                 if (selectedInputEvents.has('GEN_IN_3')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
@@ -564,7 +564,7 @@ const ModifyEventManagement = () => {
                 if (currOutputActions[j].timerDuration) {
                     const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
                     const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
-                    if (outputEventEntity.eventActionOutputName == 'GEN_OUT_1') {
+                    if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
                         selectedOutputEvents.add('GEN_OUT_1');
                     } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_2') {
                         selectedOutputEvents.add('GEN_OUT_2');
@@ -588,7 +588,7 @@ const ModifyEventManagement = () => {
                 }
                 const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
                 const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
-                if (inputEventEntity.eventActionInputName == 'GEN_IN_1') {
+                if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
                     selectedInputEvents.add('GEN_IN_1');
                 } else if (inputEventEntity.eventActionInputName == 'GEN_IN_2') {
                     selectedInputEvents.add('GEN_IN_2');
@@ -611,16 +611,16 @@ const ModifyEventManagement = () => {
         validation.eventsManagementOutputActionsConflict = false;
         for (let i = 0; i < newValue.length; i++) {
             const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
-            if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_1') {
+            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
                 if (selectedInputEvents.has('GEN_IN_1')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
             }
-            else if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_2') {
+            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
                 if (selectedInputEvents.has('GEN_IN_2')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
-            } else if (outputActionToBeAdded.eventActionOutputName === 'GEN_OUT_3') {
+            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
                 if (selectedInputEvents.has('GEN_IN_3')) {
                     validation.eventsManagementOutputActionsConflict = true;
                 }
@@ -631,15 +631,15 @@ const ModifyEventManagement = () => {
         const eventManagementsToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
         for (let i = 0; i < eventManagementsToBeUpdatedInputEvents.length; i++) {
             const inputEventToBeAdded = inputEvents.find(e=> e.eventActionInputId === eventManagementsToBeUpdatedInputEvents[i].eventActionInputType.eventActionInputId);
-            if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_1') {
+            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
                 if (selectedOutputEvents.has('GEN_OUT_1')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
-            } else if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_2') {
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
                 if (selectedOutputEvents.has('GEN_OUT_2')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
-            } else if (inputEventToBeAdded.eventActionInputName === 'GEN_IN_3') {
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
                 if (selectedOutputEvents.has('GEN_OUT_3')) {
                     validation.eventsManagementInputEventsConflict = true;
                 }
