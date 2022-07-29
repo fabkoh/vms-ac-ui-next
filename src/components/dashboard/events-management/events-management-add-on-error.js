@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { eventActionInputText, eventActionOutputText } from '../../../utils/eventsManagement';
 
-
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -67,18 +66,23 @@ export default function EventsManagementAddOnError({
     <Dialog
     onBackdropClick={handleClose}
     fullWidth
-    maxWidth='xl'
+    maxWidth='lg'
     open={open}>
-        <DialogTitle>
-            Error : Failed to create new event management.      
-            <br/><br/>The new event managements highlighted below has trigger/output configurations that clash with existing event managements.<br/><br/>Please take note that you can only use each custom trigger/action as either GEN_IN or GEN_OUT and not both. Do make the necessary changes and ensure your hardware is configured properly before pressing the &quot;Add on/Replace all&quot; button again.
+      <DialogTitle sx={{ color: "#F44336" }}>
+            Error : Failed to create new event management.
         </DialogTitle>
-        <DialogContent>
+      <DialogContent>
+            <Box marginTop={1}
+                  marginBottom={5}>
+                <Alert severity="info"
+                    variant="outlined">The new event managements highlighted below has trigger/output configurations that clash with existing event managements.<br/><br/>Please take note that you can only use each custom trigger/action as either GEN_IN or GEN_OUT and not both. Do make the necessary changes and ensure your hardware is configured properly before pressing the <b>Add on/Replace all</b> button again.
+                </Alert>
+            </Box>
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell>New Event Management(s)</TableCell>
-                        <TableCell>Event Management with Clashing Trigger/Output Configurations(s)</TableCell>
+                        <TableCell>Event Management(s) with Clashing Trigger/Output Configurations</TableCell>
                         <TableCell padding="checkbox">
                             <Checkbox
                                 checked={selectedAllEventsManagement}
@@ -101,7 +105,7 @@ export default function EventsManagementAddOnError({
                               const handleSelect = handleSelectFactory(clash.eventsManagementId);
                               return (
                                 <TableRow key={`row${j}`}>
-                                  <TableCell> ID {clash.eventsManagementId} : {clash.eventsManagementName} for {clash.entrance?.entranceName || clash.controller?.controllerName || "(linked to unknown entity)"}{" "}
+                                  <TableCell> ID {clash.eventsManagementId} : Event Management {clash.eventsManagementName} for {clash.entrance?.entranceName || clash.controller?.controllerName || "(linked to unknown entity)"}{" "}
                                     with the following triggers: {eventActionInputText(clash.inputEvents)} and the following output actions: {eventActionOutputText(clash.outputActions)} </TableCell>
                                   <TableCell padding="checkbox">
                                     <Checkbox
@@ -123,7 +127,8 @@ export default function EventsManagementAddOnError({
           <Button onClick={handleClose}>
             Close
           </Button>
-          <Button onClick={deleteEventsManagement}
+        <Button onClick={deleteEventsManagement}
+                  sx={{ color: "#F44336" }}
                   autoFocus>
             Delete Selected
           </Button>
