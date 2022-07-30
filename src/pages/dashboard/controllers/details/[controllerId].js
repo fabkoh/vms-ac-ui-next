@@ -328,7 +328,7 @@ const ControllerDetails = () => {
     }
 
 	const removeEntranceButton = (authPair) => async(e) => {
-        e.preventDefault();
+        //e.preventDefault();
         authDeviceApi.removeEntrance(authPair)
                      .then(res => {
                          if(res.status!=200) { toast.success("Error removing entrance"); }
@@ -507,7 +507,7 @@ const ControllerDetails = () => {
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
-                                removeEntrance={removeEntranceButton}
+                                removeEntrance={() => removeEntranceButton(E1)}
                                 />
                             </Grid>                         
                             <Grid
@@ -515,7 +515,7 @@ const ControllerDetails = () => {
                                 xs={12}
                             >
                                 <AuthDevicePair
-                                removeEntrance={removeEntranceButton}
+                                removeEntrance={() => removeEntranceButton(E2)}
                                 authPair={E2}
                                 controllerId={controllerId}
                                 status={authStatus}
