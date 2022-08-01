@@ -71,6 +71,35 @@ const eventActionInputDescription = inputEvents => {
     ))
 }
 
+const eventActionInputText = inputEvents => {
+    return (inputEvents.map(
+        (inputEvent, i) => {
+            let timerDuration = ""
+            if (inputEvent.eventActionInputType.timerEnabled) {
+                if (inputEvent.timerDuration) {
+                    timerDuration = ` (${inputEvent.timerDuration} secs)`
+                }
+            }
+            return `${inputEvent.eventActionInputType.eventActionInputName}${timerDuration}`
+        }
+    )).join(", ");
+}
+
+const eventActionOutputText = outputActions => {
+    return (outputActions.map(
+        (outputAction, i) => {
+            let timerDuration = ""
+            if (outputAction.eventActionOutputType.timerEnabled) {
+                if (outputAction.timerDuration) {
+                    timerDuration = ` (${outputAction.timerDuration} secs)`
+                }
+            }
+            return `${outputAction.eventActionOutputType.eventActionOutputName}${timerDuration}`
+        }
+    )).join(", ");
+}
+
+
 const displayEntranceOrController = eventManagement => {
     return (
         eventManagement.controller  ?
@@ -142,5 +171,7 @@ export {
     eventActionInputDescription,
     displayEntranceOrController,
     eventActionOutputDescription,
+    eventActionOutputText,
+    eventActionInputText,
     listDescription
  }

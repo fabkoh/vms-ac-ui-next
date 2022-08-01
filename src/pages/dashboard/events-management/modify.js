@@ -17,9 +17,11 @@ import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../api/controllers";
 import entranceApi from "../../../api/entrance";
 import { eventsManagementApi } from "../../../api/events-management";
+import EventsManagementAddOnError from "../../../components/dashboard/events-management/events-management-add-on-error";
+import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
+import { input } from "aws-amplify";
 
-const CreateEventManagement = () => {
-    //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
+const ModifyEventManagement = () => {
     const router = useRouter();
     const isMounted = useMounted();
     const temp = router.query;
@@ -37,6 +39,70 @@ const CreateEventManagement = () => {
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
+    const [open, setOpen] = useState(false);
+    const [errorMessages, setErrorMessages] = useState([]);
+    const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+
+    // for selection of checkboxes
+    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+    const selectedAllEventsManagement = selectedEventsManagement.length === [...new Set(singleErrorMessage.map(e => e.eventsManagementId))].length;
+    const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
+    const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? [...new Set(singleErrorMessage.map(e => e.eventsManagementId))] : []);
+    const handleSelectFactory = (eventsManagementId) => () => {
+        console.log(eventsManagementId, "the eventsManagementId getting passed");
+        console.log(singleErrorMessage, "singleErrorMessage");
+        if (selectedEventsManagement.includes(eventsManagementId)) {
+            setSelectedEventsManagement(selectedEventsManagement.filter(id => id !== eventsManagementId));
+        } else {
+            setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
+        }
+    }
+    const handleClose = () => {
+        setOpen(false);
+        setErrorMessages([]);
+        setSingleErrorMessage([]);
+    };
+
+    const handleErrorMessages = (res) => {
+        console.log(res, "errorMessages");
+        setErrorMessages(res);
+        setOpen(true);
+    }
+
+    //for delete action button
+	const [deleteOpen, setDeleteOpen] = useState(false); 
+
+    const handleDeleteOpen = () => {        
+		setDeleteOpen(true);           
+	};
+    const handleDeleteClose = () => {
+        handleClose();
+		setDeleteOpen(false);
+    }
+
+
+    // This check is dependant on the name of the custom input to not change eg: remain GEN_IN_1 and GEN_OUT_1
+    // Only check for this conflict in changeInputEventsWithoutTimer and changeOutputActionsWithTimer as these are the types of the custom input/output
+    const [customInputEventsSelected, setCustomInputEventsSelected] = useState(new Set());     // List of custom input events (GEN_IN_1, etc) that is selected for validation
+    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState(new Set());    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
+
+    const deleteEventsManagement = async() => {
+		Promise.all(selectedEventsManagement.map(id=>{
+			return eventsManagementApi.deleteEventsManagement(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 200){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful' )
+				}
+			})
+		})
+        setDeleteOpen(false);
+        setSelectedEventsManagement([])
+    };
+    
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
@@ -89,14 +155,6 @@ const CreateEventManagement = () => {
             console.log(error)
         }
     }, [])
-      
-    useEffect(() => {
-        try {
-            getAllInputOutputEvents(controllers.length > 0);
-        } catch (error) {
-            console.log(error)
-        }
-    }, [controllers])
 
     // empty objects for initialisation of new card
     const getEmptyEventsManagementInfo = (eventsManagementId) => ({
@@ -111,8 +169,10 @@ const CreateEventManagement = () => {
         eventsManagementNameBlank: false,
         eventsManagementInputEventsEmpty: false,
         eventsManagementInputEventsInvalidId: false,
+        eventsManagementInputEventsConflict: false,
         eventsManagementOutputActionsEmpty: false,
         eventsManagementOutputActionsInvalidId: false,
+        eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
         timeEndInvalid:false,
         timeStartInvalid:false,
@@ -125,6 +185,13 @@ const CreateEventManagement = () => {
     const [eventsManagementValidationsArr, 
         setEventsManagementValidationsArr] = useState([getEmptyEventsManagementValidations(0)]);
 
+    useEffect(() => {
+        try {
+            getAllInputOutputEvents(controllers.length > 0);
+        } catch (error) {
+            console.log(error)
+        }
+    }, [controllers])
 
     // add card logic
     const getNewId = () => eventsManagementInfoArr.map(info => info.eventsManagementId)
@@ -216,8 +283,18 @@ const CreateEventManagement = () => {
         e.preventDefault();
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=201){
-                return toast.error("Error replacing all event managements")
+            if (res.status!=201){ 
+                (res.json()).then(data => {
+                    const array = [];
+                    Object.entries(data[0]).map(([key,value]) => {
+                        value.map( singleData => 
+                            // console.log(key, singleData))
+                            array.push(singleData))
+                    })
+                    setSingleErrorMessage(array)
+                    handleErrorMessages(data)
+                    // getClashingEventsManagement
+                })     
             }
             else{
                 toast.success("Successfully replaced all event managements")
@@ -231,8 +308,18 @@ const CreateEventManagement = () => {
         e.preventDefault();
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
-            if (res.status!=201){
-                return toast.error("Error adding event managements")
+            if (res.status!=201){ 
+                (res.json()).then(data => {
+                    const array = [];
+                    Object.entries(data[0]).map(([key,value]) => {
+                        value.map( singleData => 
+                            // console.log(key, singleData))
+                            array.push(singleData))
+                    })
+                    setSingleErrorMessage(array)
+                    handleErrorMessages(data)
+                    // getClashingEventsManagement
+                })
             }
             else{
                 toast.success("Event managements successfully added")
@@ -267,7 +354,7 @@ const CreateEventManagement = () => {
         ))
     }
     const getEventActionOutputName = (e) => e.eventActionOutputName;
-    
+
     const changeEntranceController = (newValue) => {
         setEntrancesControllers(newValue);
         // const updatedInfo = [...eventsManagementInfoArr];
@@ -283,34 +370,117 @@ const CreateEventManagement = () => {
         setControllers(controllersIds);
         // setEventsManagementInfoArr(updatedInfo);
     }
-    const changeInputEventsWithoutTimer = (e, id) => {
+    const changeInputEventsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const inputEventToBeAdded = inputEvents.find(e => e.eventActionInputId == newValue);
         const eventManagementToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        const newValue = e.target.value
         let newInputEvents = []
         for (let j = 0; j < eventManagementToBeUpdatedInputEvents.length; j++) {
             if (eventManagementToBeUpdatedInputEvents[j].timerDuration) {
                 newInputEvents.push(eventManagementToBeUpdatedInputEvents[j])
             }
         }
-        newInputEvents.push(...[{
+        if (newValue) {
+            newInputEvents.push(...[{
                 timerDuration: null,
                 eventActionInputType: {
-                    eventActionInputId : newValue
+                    eventActionInputId: newValue
                 }
-        }]);
+            }]);
+        }
         eventManagementToBeUpdated['inputEvents'] = newInputEvents;
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
 
+        const selectedOutputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currOutputActions = currEventManagement.outputActions;
+            for (let j = 0; j < currOutputActions.length; j++) {
+                if (currOutputActions[j].timerDuration) {
+                    const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
+                    const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
+                    if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
+                        selectedOutputEvents.add('GEN_OUT_1');
+                    } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_2') {
+                        selectedOutputEvents.add('GEN_OUT_2');
+                    } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_3') {
+                        selectedOutputEvents.add('GEN_OUT_3');
+                    }
+                }
+            }
+        }
+
+        console.log(selectedOutputEvents, "selectedOutputEvents");
+        setCustomOutputEventsSelected(selectedOutputEvents);
+  
+        const selectedInputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            for (let j = 0; j < currInputEvents.length; j++) {
+                if (currInputEvents[j].timerDuration) {
+                    continue;
+                }
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
+                    selectedInputEvents.add('GEN_IN_1');
+                } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_2') {
+                    selectedInputEvents.add('GEN_IN_2');
+                } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_3') {
+                    selectedInputEvents.add('GEN_IN_3');
+                }
+            }
+        }
+        console.log(selectedInputEvents, "selectedInputEvents");
+        setCustomInputEventsSelected(selectedInputEvents);
         // validations
         const newValidations = [...eventsManagementValidationsArr];
         const validation = newValidations.find(v => v.eventsManagementId == id);
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (!newValue) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+
+            validation.eventsManagementInputEventsConflict = false;
+            console.log(inputEventToBeAdded.eventActionInputName, "inputEventToBeAddedInChangeInputEventsWithoutTimer");
+            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
+                if (selectedOutputEvents.has('GEN_OUT_1')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
+                if (selectedOutputEvents.has('GEN_OUT_2')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
+                if (selectedOutputEvents.has('GEN_OUT_3')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            }
         }
+
+        validation.eventsManagementOutputActionsConflict = false;
+        const eventManagementsToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
+        for (let i = 0; i < eventManagementsToBeUpdatedOutputActions.length; i++) {
+            const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === eventManagementsToBeUpdatedOutputActions[i].eventActionOutputType.eventActionOutputId);
+            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
+                if (selectedInputEvents.has('GEN_IN_1')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            }
+            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
+                if (selectedInputEvents.has('GEN_IN_2')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
+                if (selectedInputEvents.has('GEN_IN_3')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            }
+        }
+
         setEventsManagementValidationsArr(newValidations);
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
@@ -386,6 +556,50 @@ const CreateEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
         setOutputEventsWithTimer({ ...outputEventsWithTimer, [id]: newValue });
         
+        const selectedOutputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currOutputActions = currEventManagement.outputActions;
+            for (let j = 0; j < currOutputActions.length; j++) {
+                if (currOutputActions[j].timerDuration) {
+                    const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
+                    const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
+                    if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
+                        selectedOutputEvents.add('GEN_OUT_1');
+                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_2') {
+                        selectedOutputEvents.add('GEN_OUT_2');
+                    } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_3') {
+                        selectedOutputEvents.add('GEN_OUT_3');
+                    }
+                }
+            }
+        }
+
+        console.log(selectedOutputEvents, "selectedOutputEvents");
+        setCustomOutputEventsSelected(selectedOutputEvents);
+  
+        const selectedInputEvents = new Set();
+        for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            for (let j = 0; j < currInputEvents.length; j++) {
+                if (currInputEvents[j].timerDuration) {
+                    continue;
+                }
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
+                    selectedInputEvents.add('GEN_IN_1');
+                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_2') {
+                    selectedInputEvents.add('GEN_IN_2');
+                } else if (inputEventEntity.eventActionInputName == 'GEN_IN_3') {
+                    selectedInputEvents.add('GEN_IN_3');
+                }
+            }
+        }
+        console.log(selectedInputEvents, "selectedInputEvents");
+        setCustomInputEventsSelected(selectedInputEvents);
+
         // validations
         const newValidations = [...eventsManagementValidationsArr];
         const validation = newValidations.find(v => v.eventsManagementId == id);
@@ -393,6 +607,49 @@ const CreateEventManagement = () => {
         if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
         }
+
+        validation.eventsManagementOutputActionsConflict = false;
+        for (let i = 0; i < newValue.length; i++) {
+            const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
+            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
+                if (selectedInputEvents.has('GEN_IN_1')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            }
+            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
+                if (selectedInputEvents.has('GEN_IN_2')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
+                if (selectedInputEvents.has('GEN_IN_3')) {
+                    validation.eventsManagementOutputActionsConflict = true;
+                }
+            }
+        }
+
+        validation.eventsManagementInputEventsConflict = false;
+        const eventManagementsToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
+        for (let i = 0; i < eventManagementsToBeUpdatedInputEvents.length; i++) {
+            const inputEventToBeAdded = inputEvents.find(e=> e.eventActionInputId === eventManagementsToBeUpdatedInputEvents[i].eventActionInputType.eventActionInputId);
+            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
+                if (selectedOutputEvents.has('GEN_OUT_1')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
+                if (selectedOutputEvents.has('GEN_OUT_2')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
+                if (selectedOutputEvents.has('GEN_OUT_3')) {
+                    validation.eventsManagementInputEventsConflict = true;
+                }
+            }
+        }
+
+        console.log("eventsManagementInputEventsConflict", validation.eventsManagementInputEventsConflict);
+        console.log("eventsManagementOutputActionsConflict", validation.eventsManagementOutputActionsConflict);
+        console.log(customInputEventsSelected, "customInputEventsSelected");
+        console.log(customOutputEventsSelected, "customOutputEventsSelected");
         setEventsManagementValidationsArr(newValidations);
     }
  
@@ -410,6 +667,23 @@ const CreateEventManagement = () => {
                     py: 8
                 }}
             >
+                <Confirmdelete
+                    open={deleteOpen} 
+                    handleDialogClose={handleDeleteClose}
+                    selectedEventsManagement={selectedEventsManagement}
+                    deleteEventsManagement={deleteEventsManagement}
+                />
+                <EventsManagementAddOnError
+                    errorMessages={errorMessages}
+                    handleClose={handleClose}
+                    open={open}
+                    deleteEventsManagement={handleDeleteOpen}
+                    handleSelectFactory={handleSelectFactory}
+                    selectedEventsManagement={selectedEventsManagement}
+                    selectedSomeEventsManagement={selectedSomeEventsManagement}
+                    selectedAllEventsManagement={selectedAllEventsManagement}
+                    handleSelectAllEventsManagement={handleSelectAllEventsManagement}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -494,31 +768,33 @@ const CreateEventManagement = () => {
                     </Grid>
                     <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
                         <Stack spacing={3}>
-                            { eventsManagementInfoArr.map((eventsManagementInfo, i) => (
-                                <EditEventManagementForm
-                                    key={eventsManagementInfo.eventsManagementId}
-                                    eventsManagementInfo={eventsManagementInfo}
-                                    removeCard={removeCard}
-                                    eventsManagementValidations={eventsManagementValidationsArr[i]}
-                                    changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
-                                    changeNameCheck={changeNameCheck}
-                                    changeTriggerSchedules={changeTriggerSchedules}
-                                    checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                    changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
-                                    changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
-                                    eventActionOutputEqual={eventActionOutputEqual}
-                                    eventActionOutputFilter={eventActionOutputFilter}
-                                    getEventActionOutputName={getEventActionOutputName}
-                                    changeInputEventsWithTimer={changeInputEventsWithTimer}
-                                    changeOutputActionsWithTimer={changeOutputActionsWithTimer}
-                                    inputEventsValueWithoutTimer={inputEventsWithoutTimer}
-                                    outputActionsValueWithoutTimer={outputActionsWithoutTimer}
-                                    allInputEvents={inputEvents}
-                                    allOutputEvents={outputEvents}
-                                />
-                            ))}
+                            {eventsManagementInfoArr.map((eventsManagementInfo, i) => {
+                                return (
+                                    <EditEventManagementForm
+                                        key={eventsManagementInfo.eventsManagementId}
+                                        eventsManagementInfo={eventsManagementInfo}
+                                        removeCard={removeCard}
+                                        eventsManagementValidations={eventsManagementValidationsArr[i]}
+                                        changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
+                                        changeNameCheck={changeNameCheck}
+                                        changeTriggerSchedules={changeTriggerSchedules}
+                                        checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                        changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
+                                        changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
+                                        eventActionOutputEqual={eventActionOutputEqual}
+                                        eventActionOutputFilter={eventActionOutputFilter}
+                                        getEventActionOutputName={getEventActionOutputName}
+                                        changeInputEventsWithTimer={changeInputEventsWithTimer}
+                                        changeOutputActionsWithTimer={changeOutputActionsWithTimer}
+                                        inputEventsValueWithoutTimer={inputEventsWithoutTimer}
+                                        outputActionsValueWithoutTimer={outputActionsWithoutTimer}
+                                        allInputEvents={inputEvents}
+                                        allOutputEvents={outputEvents}
+                                    />
+                                )
+                            })}
                             <div>
                                 <Button
                                     size="large"
@@ -546,7 +822,14 @@ const CreateEventManagement = () => {
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.eventsManagementInputEventsEmpty ||
+                                                validation.eventsManagementInputEventsInvalidId ||
+                                                validation.eventsManagementInputEventsConflict ||
+                                                validation.eventsManagementOutputActionsEmpty ||
+                                                validation.eventsManagementOutputActionsInvalidId ||
+                                                validation.eventsManagementOutputActionsConflict ||
+                                                validation.eventsManagementTriggerSchedulesEmpty
                                             )
                                         }
                                     >
@@ -569,7 +852,14 @@ const CreateEventManagement = () => {
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
-                                                validation.timeStartInvalid
+                                                validation.timeStartInvalid ||
+                                                validation.eventsManagementInputEventsEmpty ||
+                                                validation.eventsManagementInputEventsInvalidId ||
+                                                validation.eventsManagementInputEventsConflict ||
+                                                validation.eventsManagementOutputActionsEmpty ||
+                                                validation.eventsManagementOutputActionsInvalidId ||
+                                                validation.eventsManagementOutputActionsConflict ||
+                                                validation.eventsManagementTriggerSchedulesEmpty
                                             )
                                         }
                                     >
@@ -599,7 +889,7 @@ const CreateEventManagement = () => {
     )
 }
 
-CreateEventManagement.getLayout = (page) => (
+ModifyEventManagement.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -607,4 +897,4 @@ CreateEventManagement.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default CreateEventManagement;
+export default ModifyEventManagement;

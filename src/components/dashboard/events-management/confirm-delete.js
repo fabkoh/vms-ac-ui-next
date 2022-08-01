@@ -84,7 +84,9 @@ export const Confirmdelete = (props) => {
 							autoFocus
 						/>
 
-						<Box display="flex" justifyContent="flex-end" mt={1}>
+						<Box display="flex"
+							justifyContent="flex-end"
+							mt={1}>
 							<Button
 								type="submit"
 								color="error"
@@ -98,7 +100,9 @@ export const Confirmdelete = (props) => {
 							<Button
 								onClick={() => {
 									handleClose();
-									props.setActionAnchor(null);
+									if (props.setActionAnchor) {
+										props.setActionAnchor(null);
+									}
 								}}
 								variant="outlined"
 								sx={{ borderRadius: 8, color: "main.primary" }}

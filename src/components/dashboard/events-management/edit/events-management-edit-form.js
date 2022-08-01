@@ -21,6 +21,7 @@ import Rrule from "../../shared/rrule-form";
 import rruleDescription from "../../../../utils/rrule-desc";
 import Add from "@mui/icons-material/Add";
 import formUtils from "../../../../utils/form-utils";
+import { ContactSupportOutlined } from "@mui/icons-material";
 
 const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer}) => {
     const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
@@ -294,11 +295,26 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         submitFailed,
         eventsManagementInputEventsEmpty,
         eventsManagementInputEventsInvalidId,
+        eventsManagementInputEventsConflict,
         eventsManagementOutputActionsEmpty,
         eventsManagementOutputActionsInvalidId,
-        eventsManagementTriggerSchedulesEmpty
+        eventsManagementOutputActionsConflict,
+        eventsManagementTriggerSchedulesEmpty,
     } = eventsManagementValidations;
    
+    const inputEventsValueForWithoutTimer = inputEventsValueWithoutTimer[eventsManagementId];
+    const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
+    const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
+    const [outputActionsValueWithoutTimerState, setOutputActionsValueWithoutTimerState] = useState(outputActionsValueForWithoutTimer);
+
+    useEffect(() => { 
+        setInputEventsValueWithoutTimerState(inputEventsValueForWithoutTimer);
+    }, [inputEventsValueForWithoutTimer]);
+
+    useEffect(() => { 
+        setOutputActionsValueWithoutTimerState(outputActionsValueForWithoutTimer);
+    }, [outputActionsValueForWithoutTimer]);
+    
     // expanding form
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);
@@ -316,12 +332,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
     const getStart = (triggerScheduleId) => (e) => {
         changeTimeStartTriggerSchedule(e, triggerScheduleId);
         setStart({ ...start, [triggerScheduleId]: e });
-        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], e, end[triggerScheduleId]) })
     }
     const getEnd = (triggerScheduleId) => (e) => {
         changeTimeEndTriggerSchedule(e, triggerScheduleId);
         setEnd({ ...end, [triggerScheduleId]: e });
-        setDescription({ ...description, [triggerScheduleId]: rruleDescription(rule[triggerScheduleId], start[triggerScheduleId], e) })
     }
     const handleRrule = (triggerScheduleId) => (e) => {
         descriptionHandler(triggerScheduleId, e);
@@ -359,7 +373,68 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         checkAnyTimeStartForEventManagement(startHolderForEventManagement[eventsManagementId]);
         checkAnyTimeEndForEventManagement(endHolderForEventManagement[eventsManagementId]);
     }, [untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
-    
+
+    useEffect(() => {
+        const inputEventsId = allInputEvents.map(event => event.eventActionInputId);
+        const outputActionsId = allOutputEvents.map(event => event.eventActionOutputId);
+        const inputWithTimerValidations = [...inputWithTimerEventsManagementValidations];
+        const outputWithTimerValidations = [...outputWithTimerEventsManagementValidations];
+        let newInputEventsWithTimer = [];
+        let newInputEventsWithTimerValidation = [];
+        let newOutputActionsWithTimer = [];
+        let newOutputActionsWithTimerValidation = [];
+        for (let i = 0; i < inputWithTimerEventsManagementArr.length; i++) {
+            const inputEvent = inputWithTimerEventsManagementArr[i];
+            const validation = inputWithTimerValidations.find(info => info.inputId == inputEvent.inputId);
+            if (inputEvent.eventActionInputType.eventActionInputId in inputEventsId) {
+                newInputEventsWithTimer.push(inputEvent);
+                newInputEventsWithTimerValidation.push(validation);
+            }
+        }
+
+        for (let i = 0; i < outputWithTimerEventsManagementArr.length; i++) {
+            const outputAction = outputWithTimerEventsManagementArr[i];
+            const validation = outputWithTimerValidations.find(info => info.outputId == outputAction.outputId);
+            if (outputAction.eventActionOutputType.eventActionOutputId in outputActionsId) {
+                newOutputActionsWithTimer.push(outputAction);
+                newOutputActionsWithTimerValidation.push(validation);
+            }
+        }
+
+        setInputWithTimerEventsManagementArr(newInputEventsWithTimer);
+        setInputWithTimerEventsManagementValidations(newInputEventsWithTimerValidation);
+
+        setOutputWithTimerEventsManagementArr(newOutputActionsWithTimer);
+        setOutputWithTimerEventsManagementValidations(newOutputActionsWithTimerValidation);
+
+        if (inputEventsValueWithoutTimerState) {
+
+            let newInputEventsWithoutTimer = null;
+        
+            for (let i = 0; i < inputEventsId.length; i++) {
+                if (inputEventsValueWithoutTimerState === inputEventsId[i])   {
+                    newInputEventsWithoutTimer = inputEventsValueWithoutTimerState;
+                }
+            }
+        
+            setInputEventsValueWithoutTimerState(newInputEventsWithoutTimer);
+            changeInputEventsWithoutTimer(newInputEventsWithoutTimer, eventsManagementId);
+        }
+
+        if (outputActionsValueWithoutTimerState) {
+            let newOutputActionsWithoutTimer = [];
+            for (let i = 0; i < outputActionsValueWithoutTimerState.length; i++) {
+                for (let j = 0; j < outputActionsId.length; j++) {
+                    if (outputActionsValueWithoutTimerState[i].eventActionOutputId === outputActionsId[j]) {
+                        newOutputActionsWithoutTimer.push(outputActionsValueWithoutTimerState[i]);
+                    }
+                }
+            }
+            setOutputActionsValueWithoutTimerState(newOutputActionsWithoutTimer);
+            changeOutputActionsWithoutTimer(newOutputActionsWithoutTimer, eventsManagementId);
+        }
+    }, [allInputEvents, allOutputEvents])
+
     return (
         <ErrorCard error={
             eventsManagementNameBlank ||
@@ -369,8 +444,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
             submitFailed ||
             eventsManagementInputEventsEmpty ||
             eventsManagementInputEventsInvalidId ||
+            eventsManagementInputEventsConflict ||
             eventsManagementOutputActionsEmpty ||
             eventsManagementOutputActionsInvalidId ||
+            eventsManagementOutputActionsConflict ||
             eventsManagementTriggerSchedulesEmpty
         }>
             <CardHeader
@@ -456,15 +533,17 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     md={12}
                                     xs={12}
                                 >
+                                    {/* Remove console log at your own risk */}
+                                    {console.log(inputEventsValueWithoutTimerState, "inputEventsValueWithoutTimerState")}
                                     <Select
                                         sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
                                         required={inputEvents.length===0}
-                                        value={inputEventsValueWithoutTimer[eventsManagementId]}
-                                        onChange={(e) => { changeInputEventsWithoutTimer(e, eventsManagementId) }}
+                                        value={inputEventsValueWithoutTimerState}
+                                        onChange={(e) => { changeInputEventsWithoutTimer(e.target.value, eventsManagementId) }}
                                         error={
                                             Boolean(inputEvents.length==0)
                                         }
-                                        renderValue={(value) => { return <div>{value ? inputEventsWithoutTimer.find(e => e.eventActionInputId == value).eventActionInputName : "Choose trigger (without timer)"}</div>}}
+                                        renderValue={(value) => { return <div>{value ? inputEventsWithoutTimer.find(e => e.eventActionInputId == value)?.eventActionInputName : "Choose trigger (without timer)"}</div>}}
                                         displayEmpty
                                     >
                                         {inputEventsWithoutTimer.map(e => {
@@ -474,7 +553,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         })}
                                     </Select>
                                     <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
-                                        {Boolean(inputEvents.length==0)&&"Error: no trigger selected"}
+                                        {Boolean(inputEvents.length == 0) && "Error: no trigger selected" || Boolean(eventsManagementInputEventsConflict) && "Error: trigger conflict. One type of custom trigger can only be used as either IN or OUT and not both"}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -564,7 +643,9 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     item
                                     md={12}
                                     xs={12}
-                                >
+                                >  
+                                    {/* Remove console log at your own risk */}
+                                    {console.log(outputActionsValueWithoutTimerState)}
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
                                         setSelected={(e) => changeOutputActionsWithoutTimer(e,eventsManagementId)}
@@ -573,7 +654,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         noOptionsText="No action (without timer) found"
                                         placeholder="Search for action (without timer) name"
                                         filterOptions={eventActionOutputFilter}
-                                        value={outputActionsValueWithoutTimer[eventsManagementId]}
+                                        value={outputActionsValueWithoutTimerState}
                                         isOptionEqualToValue={eventActionOutputEqual}
                                         error={
                                             Boolean(outputActions.length==0)
@@ -638,7 +719,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         </Button>
                                     </Grid>
                                     <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
-                                        {Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank) && "Error: empty selection of action (with timer) is not allowed" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) && "Error: timer duration cannot be empty" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) && "Error: timer duration cannot be too large" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive) && "Error: timer duration must be longer than 1 second"}
+                                        {Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).eventActionOutputIdBlank) && "Error: empty selection of action (with timer) is not allowed" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputBlank) && "Error: timer duration cannot be empty" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputTooLarge) && "Error: timer duration cannot be too large" || Boolean(outputWithTimerEventsManagementValidations.find(e => e.outputId === info.outputId).timerDurationOutputNotPositive) && "Error: timer duration must be longer than 1 second" || Boolean(eventsManagementOutputActionsConflict) && "Error: action conflict. One type of custom action can only be used as either IN or OUT and not both"}
                                     </Grid>
                             </Grid>                           
                             ))}
