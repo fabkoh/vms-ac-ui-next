@@ -86,7 +86,8 @@ const ModifyEventManagement = () => {
     const [customInputEventsSelected, setCustomInputEventsSelected] = useState(new Set());     // List of custom input events (GEN_IN_1, etc) that is selected for validation
     const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState(new Set());    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
 
-    const deleteEventsManagement = async() => {
+    const deleteEventsManagement = async (e) => {
+        e.preventDefault();
 		Promise.all(selectedEventsManagement.map(id=>{
 			return eventsManagementApi.deleteEventsManagement(id)
 		})).then( resArr => {
