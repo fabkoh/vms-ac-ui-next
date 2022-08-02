@@ -59,12 +59,11 @@ const EntranceEventsManagementDelete = ({
 
 
     return (
-        <Dialog 
-            open={open}
-            onClose={handleClose}
-            onBackdropClick={handleClose}
-            fullWidth
-        >
+        <Dialog
+        onBackdropClick={handleClose}
+        fullWidth
+        maxWidth='lg'
+        open={open}>
             <Box padding={2}>
                 <Stepper activeStep={activeStep}>
                     {
