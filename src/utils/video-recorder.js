@@ -29,9 +29,10 @@ const filterRecorderByStatus = (recorder, status) => status == null || recorder.
 
 const getVideoRecorderDetailsLink = (recorder) => isObject(recorder) && `/dashboard/video-recorders/details/${recorder.recorderId}`;
 
-const getVideoRecorderEditLink = (recorders) => (
-    '/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
-);
+const getVideoRecorderEditLink = (recorderId) => {
+    console.warn("recorders ===>", recorderId)
+    return `/dashboard/video-recorders/edit/id=${recorderId}` //'/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
+};
 
 const getVideoRecorderIdsEditLink = (ids) =>  '/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(ids));
 
@@ -50,4 +51,4 @@ const filterRecorderByState = filterByState(filterVideoRecordersByString);
 
 const isRecorderEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.recorderId != null && e1.recorderId === e2.recorderId;
 
-export { filterVideoByStringPlaceholder, filterRecorderByString, filterRecorderByStatus, videoRecorderListLink, videoRecorderCreateLink, getVideoRecorderEditLink as getEntranceEditLink, getVideoRecorderIdsEditLink, getVideoRecorderDetailsLink, getVideoRecorderLabel, filterVideoRecordersByString, filterRecorderByState, isRecorderEqual }
+export { filterVideoByStringPlaceholder, filterRecorderByString, filterRecorderByStatus, videoRecorderListLink, videoRecorderCreateLink, getVideoRecorderEditLink, getVideoRecorderIdsEditLink, getVideoRecorderDetailsLink, getVideoRecorderLabel, filterVideoRecordersByString, filterRecorderByState, isRecorderEqual }

@@ -5,7 +5,7 @@ import NextLink from "next/link";
 import { PencilAlt } from "../../../icons/pencil-alt";
 import { ArrowRight } from "../../../icons/arrow-right";
 import { ListFilter } from "../shared/list-filter";
-import { getVideoRecorderDetailsLink, getVideoRecorderIdsEditLink } from "../../../utils/video-recorder";
+import { getVideoRecorderDetailsLink, getVideoRecorderEditLink } from "../../../utils/video-recorder";
 import { toDisplayDateString } from "../../../utils/utils";
 
 // for status options
@@ -60,7 +60,7 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                 const isVideoRecorderSelected = selectedVideoRecorders.includes(recorderId);
                                 const handleSelect = handleSelectFactory(recorderId);
                                 const detailsLink = getVideoRecorderDetailsLink(recorder);
-                                const editLink = getVideoRecorderIdsEditLink([recorderId]);
+                                const editLink = getVideoRecorderEditLink(recorderId);
                                 return(
                                     <TableRow
                                         hover
@@ -86,8 +86,8 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                         </TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={isActive ? "ACTIVE" : "NON-ACTIVE"}
-                                                color={isActive? "success" : "error"}
+                                                label={recorderName === "Real Video Recorder" ? "ACTIVE" : "NON-ACTIVE"}
+                                                color={recorderName === "Real Video Recorder"? "success" : "error"}
                                                 sx={{
                                                     fontSize: "12px",
                                                     fontWeight: 600

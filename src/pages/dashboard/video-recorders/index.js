@@ -18,6 +18,7 @@ import VideoListTable from "../../../components/dashboard/video-recorders/video-
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { Confirmdelete } from "../../../components/dashboard/video-recorders/confirm-delete";
 import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecorderIdsEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
+import Script from 'next/script'
 const applyFilter = createFilter({
     query: filterRecorderByString,
     status: filterRecorderByStatus
@@ -298,6 +299,12 @@ const EntranceList = () => {
 
 EntranceList.getLayout = (page) => (
     <AuthGuard>
+        <Head>
+            <script src="/static/sdk/codebase/encryption/AES.js"></script>
+                <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
+                <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
+                <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+        </Head>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );

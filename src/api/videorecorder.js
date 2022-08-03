@@ -11,7 +11,7 @@ class VideoRecorderApi {
         recorderUsername,
         recorderPassword
     }) {
-        if (useApi) {
+       if (useApi) {
             return sendApi("/api/videorecorder", {
                 method: 'POST',
                 headers: {
@@ -53,7 +53,8 @@ class VideoRecorderApi {
     }
 
     getRecorder(id) {
-        if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
+        console.warn("made it here", id)
+        //if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
 
         const recorder = { ...fakeVideoRecorders.find(recorder => recorder.recorderId == id) };
 

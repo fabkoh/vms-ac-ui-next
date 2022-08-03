@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = process.env.NEXT_PUBLIC_USE_API || true;
+const useApi = process.env.NEXT_PUBLIC_USE_API || false;
 
 // fake data
 const fakePersons = [
@@ -212,6 +212,23 @@ const fakeVideoRecorders = [
         "recorderUsername": "demo",
         "recorderPassword": "password",
         "created": "2022-06-24T10:31:35.126183"
+    }, 
+    {
+        "recorderId": 3,
+        "isActive": true,
+        "recorderName": "Real Video Recorder",
+        "recorderSerialNumber": "DS-7616NI-I21620210923CCRRG74241239WCVU",
+        "recorderIpAddress": "128.106.80.68",
+        "recorderPortNumber": 8085,
+        "recorderChannels": [
+            "IPdome"
+        ],
+        "recorderCameras": [
+            "IPdome"
+        ],
+        "recorderUsername": "admin",
+        "recorderPassword": "ISSNVRTest01",
+        "created": "2022-07-22T07:21:00.172114"
     }
 ]
 

@@ -54,11 +54,6 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     value={	statusLoaded?
                         (authStatus[deviceInfo.authDeviceDirection]?"Online":(deviceInfo.lastOnline?toDisplayDateString(deviceInfo.lastOnline):"Never")):
                     (<CircularProgress size='1rem'/>)}
-                    // value={	statusLoaded?
-                    //     (authStatus?(authStatus[deviceInfo.authDeviceDirection]?"Online":deviceInfo.lastOnline):(deviceInfo.lastOnline?deviceInfo.lastOnline:"Never")):
-                    // (<CircularProgress size='1rem'/>)}
-                    // value={deviceInfo?.lastOnline?deviceInfo.lastOnline:"never"}
-                    // value={controllerMAC}
                 />
                 <PropertyListItem
                     align={align}
