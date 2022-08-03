@@ -23,7 +23,6 @@ import { authDeviceApi } from "../../../../api/auth-devices";
 const EditController = () => {
     const isMounted = useMounted();
     const { recorderId }  = router.query; 
-    console.log("router.query", router.query)
     const [videoRecorderInfo, setVideoRecorderInfo] = useState(null)
     const [controllerValidations, setControllerValidations] = useState({
         invalidIP:false,
@@ -77,7 +76,6 @@ const EditController = () => {
                     setStatusLoaded(true)
                     toast.success("Status successfully fetched")
                     const data = await res.json();
-                    console.log(data)
                     setAuthStatus(data)
                 }
                 // setAuthStatus(E1)
