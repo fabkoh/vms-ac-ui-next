@@ -6,5 +6,10 @@ export function encodeArrayForSpring(array) {
 }
 
 export function sendApi(path, init={}) {
-    return fetch(apiUri + path, init);
+    return fetch(apiUri + path, init)
+        .catch((error) => {
+            console.error('Error:', error);
+            console.log("server is down!!");
+            return Promise.resolve(new Response({}, { status: 599 }));
+    });;
 }
