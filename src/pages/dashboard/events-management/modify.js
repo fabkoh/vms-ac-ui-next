@@ -109,6 +109,7 @@ const ModifyEventManagement = () => {
         if (controllersRes.status !== 200) {
             toast.error("Controllers not loaded");
             setAllControllers([]);
+            return;
         }
         const controllersJson = await controllersRes.json();
         if (isMounted()){
@@ -126,6 +127,7 @@ const ModifyEventManagement = () => {
         if (outputEventsRes.status !== 200) {
             toast.error("Action options failed to load");
             setOutputEvents([]);
+            return;
         }
         const inputEventsJson = await inputEventsRes.json();
         const outputEventsJson = await outputEventsRes.json();
@@ -140,6 +142,7 @@ const ModifyEventManagement = () => {
         if (res.status != 200) {
             toast.error("Entrances failed to load");
             setAllEntrances([]);
+            return;
         }
         const data = await res.json();
         if (isMounted()) {

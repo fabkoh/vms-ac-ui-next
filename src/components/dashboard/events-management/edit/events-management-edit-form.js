@@ -797,7 +797,11 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                 </Button>
                             </div>
                             <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
-                                {Boolean(eventsManagementTriggerSchedulesEmpty)&&"Error: schedules cannot be empty"}
+                                {
+                                    Boolean(eventsManagementTriggerSchedulesEmpty) && "Error: schedules cannot be empty" ||
+                                    Boolean(untilInvalid) && "Error: until is invalid" ||
+                                    Boolean(submitFailed) && "Error: submit failed" 
+                                }
                             </Grid>
                         </Stack>
                     </Collapse>
