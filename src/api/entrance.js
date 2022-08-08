@@ -72,6 +72,7 @@ class EntranceApi {
         entranceId,
         entranceName,
         entranceDesc,
+        used,
         accessGroups,
         thirdPartyOption
 
@@ -86,6 +87,7 @@ class EntranceApi {
                     entranceId,
                     entranceName,
                     entranceDesc,
+                    used,
                     accessGroups,
                     thirdPartyOption
                 })

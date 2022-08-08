@@ -220,21 +220,30 @@ const EditController = () => {
                 toast.success("Controller info updated")
                 router.replace(getControllerListLink())
             }
-        }).then(
+        })
+        .then(
+            authDeviceApi.removeEntrance(E1)
+        )
+        .then(
+            authDeviceApi.removeEntrance(E2)
+        )
+        .then(
         Promise.resolve(authDeviceApi.assignEntrance(E1))
         .then(res=>{
             if(res.status==200){
                 toast.success("Entrance E1 updated")
             }
             else(toast.error("Failed to update entrance E1"))
-        })).then(
+        }))
+        .then(
         Promise.resolve(authDeviceApi.assignEntrance(E2))
         .then(res=>{
             if(res.status==200){
                 toast.success("Entrance E2 updated")
             }
             else(toast.error("Failed to update entrance E2"))
-        })).then(
+        }))
+        .then(
             Promise.resolve(authDeviceApi.updateUnicon())
             .then(res=>{
                 if(res.status==200){
