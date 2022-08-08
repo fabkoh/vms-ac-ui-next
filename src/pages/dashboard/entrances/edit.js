@@ -49,6 +49,7 @@ const EditEntrances = () => {
                 entranceId: body.entranceId,
                 entranceName: body.entranceName,
                 entranceDesc: body.entranceDesc,
+                used: body.used,
                 originalName: body.entranceName, // fields for validation
                 accessGroups: [], // for now
                 thirdPartyOption: body.thirdPartyOption
