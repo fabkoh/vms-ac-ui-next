@@ -91,6 +91,10 @@ class ControllerApi {
 			})
 		}}
     
+        getAllCurrentAuthMethod(controllerId){
+        if(useApi){return sendApi(`/api/controller/currentAuthMethod/${controllerId}`)}
+    }
+    
 
 
 
