@@ -249,7 +249,7 @@ const EditController = () => {
                 if(res.status==200){
                     toast.success("Updated Controllers")
                 }
-                else(toast.error("Failed to update entrance E1"))
+                else(toast.error("Failed to update controller"))
             }))
     }
     return(
