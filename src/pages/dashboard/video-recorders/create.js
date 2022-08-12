@@ -347,16 +347,16 @@ const CreateRecorders = () => {
                         // some failed
                         toast.error('Error creating the highlighted recorder(s)');
                         Promise.all(failedResIndex.map(i => resArr[i].json()))
-                            .then(failedResArr => {
+                            .then(failedRes => {
                                 setRecorderInfoArr(failedResIndex.map(i => recorderInfoArr[i])); // set failed recorders to stay
                                 setRecorderValidationsArr(failedResIndex.map((i) => {
                                     let recordValidation = recorderValidationsArr[i]
-                                    recordValidation.recorderNameError = failedResArr[i].recorderName ?? "";
-                                    recordValidation.recorderSerialNumberError = failedResArr[i].recorderSerialNumber ?? "";
-                                    recordValidation.recorderIpAddressError = failedResArr[i].recorderIpAddress ?? "";
-                                    recordValidation.recorderPortNumberError = failedResArr[i].recorderPortNumber ?? "";
-                                    recordValidation.recorderUsernameError = failedResArr[i].recorderUsername ?? "";
-                                    recordValidation.recorderPasswordError = failedResArr[i].recorderPassword ?? "";
+                                    recordValidation.recorderNameError = failedRes.recorderName ?? "";
+                                    recordValidation.recorderSerialNumberError = failedRes.recorderSerialNumber ?? "";
+                                    recordValidation.recorderIpAddressError = failedRes.recorderIpAddress ?? "";
+                                    recordValidation.recorderPortNumberError = failedRes.recorderPortNumber ?? "";
+                                    recordValidation.recorderUsernameError = failedRes.recorderUsername ?? "";
+                                    recordValidation.recorderPasswordError = failedRes.recorderPassword ?? "";
                                     recordValidation.submitFailed = true;
                                     return recordValidation;
                                 })); // set failed recorder validations to stay

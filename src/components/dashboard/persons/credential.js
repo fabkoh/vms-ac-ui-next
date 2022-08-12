@@ -57,7 +57,6 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
     }
 
     const TTLHelperText = (endDate != null && endDate < today) ? "Note: expiry is before today" : "Expiry date is end inclusive";
-    const credentialInUse = validation.credentialInUseIds.includes(credId);
     const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
 
@@ -106,9 +105,8 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                         label="Value"
                         handleChange={handleCredUidChange}
                         inputRef={credUidRef}
-                        error={credentialInUse || credentialRepeated || credentialUidRepeatedForNotPinTypeCred}
+                        error={ credentialRepeated || credentialUidRepeatedForNotPinTypeCred}
                         helperText={
-                            (credentialInUse && "Error: credential type and value in use") ||
                             (credentialRepeated && "Error: repeated credential type & value in form") ||
                             (credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") || ' '
                         }

@@ -254,12 +254,12 @@ const EditController = () => {
             }
         })
         .then(
-            authDeviceApi.removeEntrance(E1)
+            () => Promise.resolve(authDeviceApi.removeEntrance(E1))
         )
         .then(
-            authDeviceApi.removeEntrance(E2)
+            () => Promise.resolve(authDeviceApi.removeEntrance(E2))
         )
-        .then(
+        .then( () =>
         Promise.resolve(authDeviceApi.assignEntrance(E1))
         .then(res=>{
             if(res.status==200){
@@ -267,7 +267,7 @@ const EditController = () => {
             }
             else(toast.error("Failed to update entrance E1"))
         }))
-        .then(
+        .then( () =>
         Promise.resolve(authDeviceApi.assignEntrance(E2))
         .then(res=>{
             if(res.status==200){
@@ -275,14 +275,14 @@ const EditController = () => {
             }
             else(toast.error("Failed to update entrance E2"))
         }))
-        .then(
-            Promise.resolve(authDeviceApi.updateUnicon())
-            .then(res=>{
-                if(res.status==200){
-                    toast.success("Updated Controllers")
-                }
-                else(toast.error("Failed to update entrance E1"))
-            }))
+        .then( () =>
+        Promise.resolve(authDeviceApi.updateUnicon())
+        .then(res=>{
+            if(res.status==200){
+                toast.success("Updated Controllers")
+            }
+            else(toast.error("Failed to update controller"))
+        }))
     }
     return(
         <>
