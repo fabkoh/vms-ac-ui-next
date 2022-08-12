@@ -27,9 +27,14 @@ const toDisplayDateString = (str) => {
     return (
         str.slice(8, 10) + ' ' +
         months[Number(str.slice(5, 7))] + ' ' +
+<<<<<<< HEAD
 
         str.slice(0, 4) + ' ' +
         str.slice(11, 19)
+=======
+        str.slice(0, 4) + ', ' +
+        str.slice(11, 16)
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
     );
 };
 // takes in a raw date string eg 05-30-2022T13:09:14.372126 and converts to display date string eg 6 May 2022 13:09:14

@@ -11,7 +11,11 @@ class VideoRecorderApi {
         recorderUsername,
         recorderPassword
     }) {
+<<<<<<< HEAD
         if (useApi) {
+=======
+       if (useApi) {
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
             return sendApi("/api/videorecorder", {
                 method: 'POST',
                 headers: {
@@ -41,6 +45,11 @@ class VideoRecorderApi {
 
         fakeVideoRecorders.push(newRecorder);
 
+<<<<<<< HEAD
+=======
+
+        // did not populate person field here as not required
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
         return Promise.resolve(new Response(JSON.stringify(newRecorder), { status: 201 }));
     }
 
@@ -51,7 +60,12 @@ class VideoRecorderApi {
     }
 
     getRecorder(id) {
+<<<<<<< HEAD
         if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
+=======
+        console.warn("made it here", id)
+        //if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
 
         const recorder = { ...fakeVideoRecorders.find(recorder => recorder.recorderId == id) };
 
@@ -72,7 +86,11 @@ class VideoRecorderApi {
         recorderPassword
     }) {
         if (useApi) {
+<<<<<<< HEAD
             return sendApi("/api/videorecorder", {
+=======
+            return sendApi("/api/entrance", {
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
                 method: 'PUT',
                 headers: {
                     'Content-type': 'application/json'

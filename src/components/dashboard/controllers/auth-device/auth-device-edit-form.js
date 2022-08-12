@@ -27,9 +27,6 @@ const AuthdeviceEditForm = ({
 	defaultAuthMethodHandler,
 	authMethodList,
 }) => {
-	// const controllerName = useRef(controllerInfo['controllerName'])
-
-	// expanding form
 	const [expanded, setExpanded] = useState(true);
 	const handleExpandClick = () => setExpanded(!expanded);
 
@@ -38,13 +35,6 @@ const AuthdeviceEditForm = ({
 	}
 	return (
 		<ErrorCard
-		// error={
-		//     accessGroupNameBlank        ||
-		//     accessGroupNameExists       ||
-		//     accessGroupNameDuplicated   ||
-		//     accessGroupPersonDuplicated ||
-		//     submitFailed
-		// }
 		>
 			<CardHeader
 				avatar={

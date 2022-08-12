@@ -5,7 +5,11 @@ import NextLink from "next/link";
 import { PencilAlt } from "../../../icons/pencil-alt";
 import { ArrowRight } from "../../../icons/arrow-right";
 import { ListFilter } from "../shared/list-filter";
+<<<<<<< HEAD
 import { getVideoRecorderDetailsLink, getVideoRecorderIdsEditLink } from "../../../utils/video-recorder";
+=======
+import { getVideoRecorderDetailsLink, getVideoRecorderEditLink } from "../../../utils/video-recorder";
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
 import { toDisplayDateString } from "../../../utils/utils";
 
 // for status options
@@ -60,7 +64,11 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                 const isVideoRecorderSelected = selectedVideoRecorders.includes(recorderId);
                                 const handleSelect = handleSelectFactory(recorderId);
                                 const detailsLink = getVideoRecorderDetailsLink(recorder);
+<<<<<<< HEAD
                                 const editLink = getVideoRecorderIdsEditLink([recorderId]);
+=======
+                                const editLink = getVideoRecorderEditLink(recorderId);
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
                                 return(
                                     <TableRow
                                         hover
@@ -86,8 +94,13 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                         </TableCell>
                                         <TableCell>
                                             <Chip
+<<<<<<< HEAD
                                                 label={isActive ? "ACTIVE" : "NON-ACTIVE"}
                                                 color={isActive? "success" : "error"}
+=======
+                                                label={recorderName === "Real Video Recorder" ? "ACTIVE" : "NON-ACTIVE"}
+                                                color={recorderName === "Real Video Recorder"? "success" : "error"}
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
                                                 sx={{
                                                     fontSize: "12px",
                                                     fontWeight: 600
