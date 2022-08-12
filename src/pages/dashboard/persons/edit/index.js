@@ -14,7 +14,7 @@ import { arraySameContents, isObject } from "../../../../utils/utils";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
 import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
-import { deleteCredential, deleteCredentialApi, getCredentialsApi, getCredentialWherePersonIdApi, saveCredentialApi } from "../../../../api/credentials";
+import { deleteCredentialApi, getCredentialsApi, saveCredentialApi } from "../../../../api/credentials";
 import { getCredTypesApi } from "../../../../api/credential-types";
 import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
@@ -183,11 +183,7 @@ const EditPersonsTwo = () => {
         
         return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0);
     }
-    const getCredentialsLocal = async(personId) => {
-        const res = await getCredentialWherePersonIdApi(personId)
-        const data = await res.json();
-        return data
-    }
+
     const getPersons = async () => {
         try {
             const res = await personApi.getPersons();
