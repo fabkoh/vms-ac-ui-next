@@ -14,7 +14,7 @@ import { arraySameContents, isObject } from "../../../../utils/utils";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
 import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
-import { deleteCredentialApi, getCredentialsApi, saveCredentialApi } from "../../../../api/credentials";
+import { deleteCredentialApi, saveCredentialApi, getCredentialWherePersonIdApi} from "../../../../api/credentials";
 import { getCredTypesApi } from "../../../../api/credential-types";
 import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
@@ -50,44 +50,12 @@ const EditPersonsTwo = () => {
     
     // credTypes
     const [credTypes, setCredTypes] = useState([]);
-    const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
-    const [usedCredUidsForNonPin, setUsedCredUidsForNonPin] = useState([]);
 
     // get info
     const isMounted = useMounted(); 
     useEffect(() => {
         console.log("personsinfo",personsInfo)
     }, [personsInfo])
-    
-    const getCredentials = async() => {
-        try {
-            //TODO: Find a better way of doing this. Seems like a security risk to send the entire credentials over just to check for repeated values
-            const res = await getCredentialsApi();
-            if (res.status != 200) {
-                toast.error("Credentials failed to load");
-                throw new Error("Credentials failed to load");
-            }
-            const body = await res.json();
-            const newCredentials = {};
-            const newCredUidsForNonPin = [];
-            body.forEach(cred => {
-                const credTypeId = cred.credType?.credTypeId;
-                if (credTypeId != CredTypePinID) {
-                    newCredUidsForNonPin.push(cred.credUid);
-                }
-                if (!(credTypeId in newCredentials)) {
-                    newCredentials[credTypeId] = [];
-                }
-                newCredentials[credTypeId].push(cred.credUid);
-            })
-            console.log(newCredentials);
-            setCredentials(newCredentials);
-            setUsedCredUidsForNonPin(newCredUidsForNonPin);
-        } catch(e) {
-            console.error(e);
-            toast.error("Error loading credentials");
-        }
-    }
 
     const getCredTypes = async () => {
         try {
@@ -154,9 +122,9 @@ const EditPersonsTwo = () => {
                 uidInUse:false,
                 uidRepeated:false,
                 uidBlank:false,
-                credentialInUseIds: [],
                 credentialRepeatedIds: [],
                 credentialUidRepeatedIds: [],
+                credentialSubmitFailed : {},
 
                 // note
                 numberInUse: false,
@@ -175,13 +143,8 @@ const EditPersonsTwo = () => {
         console.log("personsvalidations",personsValidation)
     }, [personsValidation])
     
-    const cardError = (v) => {
-        if (isObject(v)) {
-            console.log("card Error", v);
-        }
-        
-        
-        return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0);
+    const cardError = (v) => {      
+        return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated|| v.uidBlank || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0 || Object.keys(v.credentialSubmitFailed).length > 0 );
     }
 
     const getPersons = async () => {
@@ -219,7 +182,6 @@ const EditPersonsTwo = () => {
         getPersonsLocal(ids)
         getAccessGroups();
         getPersons();
-        getCredentials();
         getCredTypes();
     }, [isMounted]);
     
@@ -260,10 +222,9 @@ const EditPersonsTwo = () => {
         person.credentials = person.credentials.filter(c => c.credId != credId);
         setPersonsInfo(newPersons);
 
-        const b1 = checkCredInUseHelper(newPersons, personsValidation);
-        const b2 = checkCredRepeatedHelper(newPersons, personsValidation);
-        const b3 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
-        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
+        const b1 = checkCredRepeatedHelper(newPersons, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
+        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     };
 
 
@@ -316,59 +277,10 @@ const EditPersonsTwo = () => {
     }
 
     // returns if validArr is changed
-    const checkCredInUseHelper = (infoArr, validArr) => {
-        let toChange = false;
-
-        infoArr.forEach((person, i) => {
-            const newCredentialsInUse = [] //stores cred Ids currently used. 
-            person.credentials.forEach(cred => { // populate the above array
-                if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
-                    const inUseValues = credentials[cred.credTypeId]; //credentials is from db. stores credUid for the credIds of form person. doesnt add when new cred added?
-                    // console.log("inusevalues",inUseValues)
-                    // console.log("cred",cred) created creds are in person.credentials array. correct behaviour.
-                    // person.originalCreds.forEach(oCred=>{
-                    //     // console.log("ocred",oCred)
-                    //     // console.log("ocred",person.originalCreds)
-                    // if (inUseValues.includes(cred.credUid)&& (cred.credTypeId == oCred.credTypeId) && (cred.credUid == oCred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                    //     newCredentialsInUse.push(cred.credId);
-                    // }
-                    // })
-                    // const orig={1:[],2:[]}
-                    const origUids = []
-                    const origIds = []
-                    person.originalCreds.forEach(oCred=>{
-                        origUids.push(oCred.credUid)
-                        origIds.push(oCred.credId)
-                    })
-                    // person.originalCreds.forEach(oCred=>{
-                    //     orig[oCred.credTypeId].push(oCred.credUid)
-                    // })
-                    // !credentials[credtypeid].includes(orig[credtypeid].map(uid=>return uid)) means u reuse so not in use? 
-                    // console.log("orig",orig)
-                    // console.log("origUids",origUids)
-                    // if (inUseValues.includes(cred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                    //     newCredentialsInUse.push(cred.credId);
-                    // }
-                    if (inUseValues && inUseValues.includes(cred.credUid)&& !origIds.includes(cred.credId)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                        newCredentialsInUse.push(cred.credId);
-                    }
-                }
-                // console.log("newCredentialsInUse",newCredentialsInUse)
-            });
-            if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
-                toChange = true;
-                validArr[i].credentialInUseIds = newCredentialsInUse;
-            }
-        });
-
-        return toChange
-    }
-
-    // returns if validArr is changed
     const checkCredRepeatedHelper = (infoArr, validArr) => {
         let toChange = false;
 
-        const credMap = {}; // maps credTypeId to array of credUid  //should this contain db map of credId:CredUid?
+        const credMap = {}; // maps credTypeId to array of credUid
         const repeatedCred = []; // array of [credTypeId, credUid]
         infoArr.forEach(person => 
             person.credentials.forEach(
@@ -423,14 +335,10 @@ const EditPersonsTwo = () => {
                     const credTypeId = cred.credTypeId;
                     const uid = cred.credUid;
                     if (credTypeId != '' && uid != '' && credTypeId != CredTypePinID) {
-                        console.log(credTypeId, "credTypeId");
                         if (!(uid in credMap)) {
                             credMap[uid] = [person.personUid, cred.credId];
                         } else {
                             credMap[uid].push([person.personUid, cred.credId]);
-                            repeatedCredUidCredIds.push(cred.credId);
-                        }
-                        if (usedCredUidsForNonPin.includes(uid)) { // from the database
                             repeatedCredUidCredIds.push(cred.credId);
                         }
                     }
@@ -483,22 +391,18 @@ const EditPersonsTwo = () => {
         newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
         // console.log("credtypechange",newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId))
         setPersonsInfo(newInfo);
-        const b1 = checkCredInUseHelper(newInfo, personsValidation);
-        const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
-        const b3 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
-        // if( b1) { setPersonsValidation([ ...personsValidation ]); }
-        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
+        const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
+        if(b1 || b2 ) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
         // personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref;
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
         // console.log("uidchange,originalcreds?",personsInfo.find(p => p.personId == personId).originalCreds)
-        const b1 = checkCredInUseHelper(personsInfo, personsValidation);
-        const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
-        const b3 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
-        // if( b1) { setPersonsValidation([ ...personsValidation ]); }
-        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
+        const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
+        if(b1 || b2 ) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredValidChangeFactory = (personId) => (credId) => (bool) => {
@@ -549,20 +453,54 @@ const EditPersonsTwo = () => {
             }
             const body = await res.json();
             const personId = body.personId;
+            const newValidations = [...personsValidation];
+            const newInfo = [...personsInfo];
+            const personValidation = newValidations.find(p => p.personId == personId);
+            const personInfo = newInfo.find(p => p.personId == personId);
+            personValidation.credentialSubmitFailed = {} // reset submit failed error
             // const toDelete = person.credentials.filter(cred=>!person.originalCredId.includes(cred.credId)).filter(credId=>credId>0)
             const newCredIds = person.credentials.map(cred => cred.credId)
             const toDelete = person.originalCreds.filter(cred=> !newCredIds.includes(cred.credId))
             
+            let hasAnyCredErrors = false;
             const delRes = await Promise.all(toDelete.map(cred=>deleteCredentialApi(cred.credId)))
             if(delRes.some(res=> res.status!=204)){
                 toast.error("Unable to delete some credentials")
             }
             const credResArr = await Promise.all(person.credentials.map((cred, i) => saveCredentialApi(cred, personId, cred.credId < 0)));
-            console.log("credResArr",credResArr)
-            if (credResArr.some(res => res.status > 201)) { // some failed
+            let successfulCredArr = credResArr.filter(res => res.status == 201 || res.status == 200);
+            let failedCredArr = credResArr.filter(res => res.status > 201);
+            let newCredsToStay = [];
+            let credSubmitFailed = {};
+            if (failedCredArr.length > 0) { // some failed
+                hasAnyCredErrors = true;
+                for (let i = 0; i < failedCredArr.length; i++) {
+                    const failedCred = await failedCredArr[i].json();
+                    console.log(failedCred, "failedCred");
+                    credSubmitFailed = { ...credSubmitFailed, ... failedCred };
+                }
+                personValidation.credentialSubmitFailed = credSubmitFailed; // return error format { [credId]: "Error message" }
                 toast.error("Unable to create credential for " + getPersonName(body));
             }
-
+            for (let i = 0; i < successfulCredArr.length; i++) {
+                let result = await successfulCredArr[i].json();
+                result['credTypeId'] = result.credType.credTypeId;
+                newCredsToStay.push(result);
+            }
+            
+            let failedCredIdsArr = Object.keys(credSubmitFailed);
+            for (let i = 0; i < personInfo.credentials.length; i++) {
+                if (failedCredIdsArr.includes(personInfo.credentials[i].credId.toString())) {
+                    newCredsToStay.push(personInfo.credentials[i]);
+                }
+            }
+            personInfo.credentials = newCredsToStay;
+            setPersonsInfo(newInfo);
+            setPersonsValidation(newValidations);
+            if (hasAnyCredErrors) {
+                console.log("personsInfo", personInfo);
+                return false;
+            }
             return true;
         } catch(e) {
             console.error(e);

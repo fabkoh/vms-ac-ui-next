@@ -26,6 +26,7 @@ const saveCredentialApi = (
                         'Content-type': 'application/json'
                     },
                     body: JSON.stringify({
+                        credId,
                         credUid,
                         credTTL,
                         isValid,
