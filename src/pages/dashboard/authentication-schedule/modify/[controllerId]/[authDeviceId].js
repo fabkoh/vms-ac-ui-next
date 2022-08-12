@@ -352,7 +352,6 @@ const ModifyauthMethodSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })
@@ -397,7 +396,6 @@ const ModifyauthMethodSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added");
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`)
             }
         })

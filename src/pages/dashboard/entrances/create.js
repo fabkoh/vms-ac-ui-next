@@ -298,7 +298,6 @@ const CreateEntrances = () => {
 
                     const numCreated = entranceInfoArr.length - failedResIndex.length
                     if (numCreated) {
-                        controllerApi.uniconUpdater();
                         toast.success(`${numCreated} entrances created`); 
                     }
 

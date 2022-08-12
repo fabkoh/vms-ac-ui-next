@@ -335,7 +335,6 @@ const AccessGroupList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			});
-			controllerApi.uniconUpdater();
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);

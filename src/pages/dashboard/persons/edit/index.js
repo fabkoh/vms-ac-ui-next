@@ -585,7 +585,6 @@ const EditPersonsTwo = () => {
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
             if (numSuccess) { 
-                controllerApi.uniconUpdater();
                 toast.success(`Successfully edited ${numSuccess} persons`);
             }
 

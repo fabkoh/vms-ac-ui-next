@@ -180,7 +180,6 @@ const getEntranceEventsManagement = useCallback(async () => {
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            controllerApi.uniconUpdater();
             router.replace(entranceListLink);
         }
         else{
@@ -200,7 +199,6 @@ const getEntranceEventsManagement = useCallback(async () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} entrance schedules`)
         }
 
@@ -250,7 +248,6 @@ const getEntranceEventsManagement = useCallback(async () => {
             entranceApi.updateEntranceStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                controllerApi.uniconUpdater();
                 toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
             } else {
                 toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
