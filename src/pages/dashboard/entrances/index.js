@@ -236,7 +236,6 @@ const EntranceList = () => {
 		})).then( resArr => {
 			resArr.filter(res=>{
 				if(res.status == 204){
-                    controllerApi.uniconUpdater();
 					toast.success('Delete success',{duration:2000},);
 				}
 				else{

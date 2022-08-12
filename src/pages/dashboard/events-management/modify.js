@@ -302,7 +302,6 @@ const ModifyEventManagement = () => {
             }
             else{
                 toast.success("Successfully replaced all event managements")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/events-management`)
             }
         })
@@ -327,7 +326,6 @@ const ModifyEventManagement = () => {
             }
             else{
                 toast.success("Event managements successfully added")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/events-management`)
             }
         })

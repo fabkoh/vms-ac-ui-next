@@ -110,7 +110,6 @@ const PersonDetails = () => {
     ).then((res)=>{
       if (res.status == 204){
         toast.success('Delete success');
-        controllerApi.uniconUpdater();
         router.replace(personListLink);
       }
       else{

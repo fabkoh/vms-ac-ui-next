@@ -120,7 +120,6 @@ const AuthDeviceDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} authentication schedules`);
         }
 
@@ -177,7 +176,6 @@ const AuthDeviceDetails = () => {
             if(res.status != 200) {
                 toast.error("Remove unsuccessful");
             } else {
-                controllerApi.uniconUpdater();
                 toast.success("Successfully removed Authentication Device");
                 router.replace(getControllerDetailsLinkWithId(controllerId));
             }
@@ -203,7 +201,6 @@ const AuthDeviceDetails = () => {
                 toast.error('Reset unsuccessful');
             } else {
                 toast.success("Reset Authentication Device success");
-                controllerApi.uniconUpdater();
                 getInfo();
             }
         });
@@ -218,7 +215,6 @@ const AuthDeviceDetails = () => {
             if (res.status != 200) throw new Error("Failed to send req");
             toast.success(`Successfully ${verb} masterpin`);
             setDeviceInfo(prevState=>({...prevState,masterpin:bool}));
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
