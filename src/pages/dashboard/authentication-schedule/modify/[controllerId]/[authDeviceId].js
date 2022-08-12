@@ -182,7 +182,7 @@ const ModifyauthMethodSchedule = () => {
 
     // if clahses, return true 
     const checkRruleAndTimeClahses = (rrule1,timeStart1,timeEnd1,rrule2,timeStart2, timeEnd2) => {
-        const returnStatement = false;
+        var returnStatement = false;
 
         if (rrule1 != undefined && rrule2 != undefined){
             console.log("rrule1: ",typeof(rrule1),rrule1,rrule1.indexOf("BYDAY="))
