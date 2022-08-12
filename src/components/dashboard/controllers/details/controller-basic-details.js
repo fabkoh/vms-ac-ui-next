@@ -81,6 +81,13 @@ export const ControllerBasicDetails = ({controller,authStatus,statusLoaded}) => 
                 <PropertyListItem
                     align={align}
                     divider
+                    label="Last Sync"
+                    value={controller?.lastSync ? toDisplayDateString(controller.lastSync) : "Never"}
+                    // value={lastOnline}
+                />
+                <PropertyListItem
+                    align={align}
+                    divider
                     label="Status"
                     value={statusLoaded?
                         (Object.keys(authStatus).length>0?(<SeverityPill color="success">Connected</SeverityPill>):(<SeverityPill color="error">Disconnected</SeverityPill>)):
