@@ -98,7 +98,6 @@ const EditAuthDevice = () => {
         .then(res => {
             if(res.status == 200) {
                 toast.success("Update success");
-                controllerApi.uniconUpdater();
                 router.replace(getControllerDetailsLinkWithId(controllerId));   
             } else {
                 toast.error("Failed to update authentication device");

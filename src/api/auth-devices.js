@@ -72,13 +72,13 @@ class AuthDeviceApi {
             }
         }
     }
-    removeEntrance(authDeviceList) {   //to remove entrance, set entranceId = null
+    async removeEntrance(authDeviceList) {   //to remove entrance, set entranceId = null
         // console.log("authDeviceList",authDeviceList)
         const toUpdate = authDeviceList.map(dev=>({
             authDeviceId:dev.authDeviceId,
         }))    
         if (useApi) {        
-                return sendApi(`/api/authdevice/entrance`, 
+                return await sendApi(`/api/authdevice/entrance`, 
                 {
                     method: 'PUT',
                     headers: {

@@ -18,6 +18,7 @@ import router from "next/router";
 import { getCredentialsApi, saveCredentialApi } from "../../../api/credentials";
 import { getPersonName } from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
+import { CredTypePinID } from "../../../utils/constants";
 
 const getNextId = createCounterObject(1);
 
@@ -41,6 +42,7 @@ const getNewPersonValidation = (id) => ({
     uidRepeated: false,
     credentialInUseIds: [],
     credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
+    credentialUidRepeatedIds: [],
     // note
     numberInUse: false,
     numberRepeated: false,
@@ -57,7 +59,7 @@ const getNewCredential = (id) => ({
     isPerm: false
 });
 
-const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0);
+const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0);
 
 const CreatePersonsTwo = () => {
 
@@ -76,6 +78,7 @@ const CreatePersonsTwo = () => {
     // credTypes
     const [credTypes, setCredTypes] = useState([]);
     const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
+    const [usedCredUidsForNonPin, setUsedCredUidsForNonPin] = useState([]);
 
     // get info
     const isMounted = useMounted(); 
@@ -88,7 +91,11 @@ const CreatePersonsTwo = () => {
             }
             const body = await res.json();
             const newCredentials = {};
+            const newCredUidsForNonPin = [];
             body.forEach(cred => {
+                if (credTypeId != CredTypePinID) {
+                    newCredUidsForNonPin.push(cred.credUid);
+                }
                 const credTypeId = cred.credType?.credTypeId;
                 if (!(credTypeId in newCredentials)) {
                     newCredentials[credTypeId] = [];
@@ -96,6 +103,7 @@ const CreatePersonsTwo = () => {
                 newCredentials[credTypeId].push(cred.credUid);
             })
             setCredentials(newCredentials);
+            setUsedCredUidsForNonPin(newCredUidsForNonPin);
         } catch(e) {
             console.error(e);
             toast.error("Error loading credentials");
@@ -193,7 +201,8 @@ const CreatePersonsTwo = () => {
 
         const b1 = checkCredInUseHelper(newPersons, personsValidation);
         const b2 = checkCredRepeatedHelper(newPersons, personsValidation);
-        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+        const b3 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
+        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     };
 
     // editing logic
@@ -252,7 +261,7 @@ const CreatePersonsTwo = () => {
             person.credentials.forEach(cred => { // populate the above array
                 if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
                     const inUseValues = credentials[cred.credTypeId];
-                    if (inUseValues.includes(cred.credUid)) {
+                    if (inUseValues?.includes(cred.credUid)) {
                         newCredentialsInUse.push(cred.credId);
                     }
                 }
@@ -308,6 +317,40 @@ const CreatePersonsTwo = () => {
                 }
             }
         );
+
+        return toChange;
+    }
+
+    // to check if same credUid for not pin is being repeated
+    const checkCredUidRepeatedForNotPinTypeCred = (infoArr, validArr) => {
+        let toChange = false;
+
+        const credMap = {}; // maps credUidto array of a list of [persons id, cred id]
+        const repeatedCredUidCredIds = []
+        infoArr.forEach((person, i) => {
+            person.credentials.forEach(
+                cred => {
+                    const credTypeId = cred.credTypeId;
+                    const uid = cred.credUid;
+                    if (credTypeId != '' && uid != '' && credTypeId != CredTypePinID) {
+                        if (!(uid in credMap)) {
+                            credMap[uid] = [person.personUid, cred.credId];
+                        } else {
+                            credMap[uid].push([person.personUid, cred.credId]);
+                            repeatedCredUidCredIds.push(cred.credId);
+                        }
+                        if (usedCredUidsForNonPin.includes(uid)) { // from the database
+                            repeatedCredUidCredIds.push(cred.credId);
+                        }
+                    }
+                }
+            )
+        
+            if (!arraySameContents(repeatedCredUidCredIds, validArr[i].credentialUidRepeatedIds)) {
+                toChange = true;
+                validArr[i].credentialUidRepeatedIds = repeatedCredUidCredIds;
+            }
+        });
 
         return toChange;
     }
@@ -371,7 +414,8 @@ const CreatePersonsTwo = () => {
 
         const b1 = checkCredInUseHelper(newInfo, personsValidation);
         const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
-        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+        const b3 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
+        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
@@ -379,7 +423,8 @@ const CreatePersonsTwo = () => {
         
         const b1 = checkCredInUseHelper(personsInfo, personsValidation);
         const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
-        if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+        const b3 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
+        if(b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredValidChangeFactory = (personId) => (credId) => (bool) => {
@@ -435,7 +480,6 @@ const CreatePersonsTwo = () => {
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
             if (numSuccess) {
-                controllerApi.uniconUpdater();
                 toast.success(`Successfully created ${numSuccess} persons`); 
             }
 

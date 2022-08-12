@@ -231,6 +231,8 @@ const Rrule = (props) => {
 			);
 		}
 	};
+
+	const today = new Date().toISOString().split("T")[0];
 	//end of All Day toggle + renderer
 
 	//handles interval
@@ -633,7 +635,7 @@ const Rrule = (props) => {
 			);
 		}
 		if (e == "on") {
-			
+			const startDate = new Date(dtstart).toISOString().split("T")[0];
 			return (
 				<Grid container
 					alignItems="center"
@@ -643,6 +645,10 @@ const Rrule = (props) => {
 						type="date"
 						value={until}
 						onChange={handleUntil}
+						defaultValue={startDate}
+						inputProps={{
+							min: startDate
+						}}						
 						error={invalidUntil()}
 						helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								
@@ -684,7 +690,11 @@ const Rrule = (props) => {
 					type="date"
 					value={dtstart}
 					onChange={handleDtstart}
-					onKeyDown={(e)=>e.preventDefault()}
+					onKeyDown={(e) => e.preventDefault()}
+					defaultValue={today}
+					inputProps={{
+						min: today
+					}}
 					// onKeyPress={(e)=>e.preventDefault()}
 					required
 					sx={{ minWidth: 200, mr: 10 }}

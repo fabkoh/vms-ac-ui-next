@@ -141,7 +141,6 @@ const AccessGroupDetails = () => {
         .then(res => {
             if (res.status == 204) {
                 toast.success('Delete success');
-                controllerApi.uniconUpdater();
                 router.replace(accessGroupListLink);
             } else {
                 toast.error('Delete unsuccessful')
@@ -160,7 +159,6 @@ const AccessGroupDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} access group schedules`)
         }
 

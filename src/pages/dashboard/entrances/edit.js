@@ -49,6 +49,7 @@ const EditEntrances = () => {
                 entranceId: body.entranceId,
                 entranceName: body.entranceName,
                 entranceDesc: body.entranceDesc,
+                used: body.used,
                 originalName: body.entranceName, // fields for validation
                 accessGroups: [], // for now
                 thirdPartyOption: body.thirdPartyOption
@@ -344,7 +345,6 @@ const EditEntrances = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
-            controllerApi.uniconUpdater();
             toast.success(`${numEdited} entrances edited`);
             if (numEdited == resArr.length) { // all success
                 router.replace('/dashboard/entrances');

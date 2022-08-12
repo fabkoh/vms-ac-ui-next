@@ -304,9 +304,6 @@ const PersonList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			})
-			if(success) {
-				controllerApi.uniconUpdater();
-			}
 			getPersonsLocal();
 		})
 		setDeleteOpen(false);

@@ -83,10 +83,11 @@ const ModifyEventManagement = () => {
 
     // This check is dependant on the name of the custom input to not change eg: remain GEN_IN_1 and GEN_OUT_1
     // Only check for this conflict in changeInputEventsWithoutTimer and changeOutputActionsWithTimer as these are the types of the custom input/output
-    const [customInputEventsSelected, setCustomInputEventsSelected] = useState(new Set());     // List of custom input events (GEN_IN_1, etc) that is selected for validation
-    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState(new Set());    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
+    const [customInputEventsSelected, setCustomInputEventsSelected] = useState({});     // List of custom input events (GEN_IN_1, etc) that is selected for validation
+    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState({});    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
 
-    const deleteEventsManagement = async() => {
+    const deleteEventsManagement = async (e) => {
+        e.preventDefault();
 		Promise.all(selectedEventsManagement.map(id=>{
 			return eventsManagementApi.deleteEventsManagement(id)
 		})).then( resArr => {
@@ -108,6 +109,7 @@ const ModifyEventManagement = () => {
         if (controllersRes.status !== 200) {
             toast.error("Controllers not loaded");
             setAllControllers([]);
+            return;
         }
         const controllersJson = await controllersRes.json();
         if (isMounted()){
@@ -125,6 +127,7 @@ const ModifyEventManagement = () => {
         if (outputEventsRes.status !== 200) {
             toast.error("Action options failed to load");
             setOutputEvents([]);
+            return;
         }
         const inputEventsJson = await inputEventsRes.json();
         const outputEventsJson = await outputEventsRes.json();
@@ -139,6 +142,7 @@ const ModifyEventManagement = () => {
         if (res.status != 200) {
             toast.error("Entrances failed to load");
             setAllEntrances([]);
+            return;
         }
         const data = await res.json();
         if (isMounted()) {
@@ -298,7 +302,6 @@ const ModifyEventManagement = () => {
             }
             else{
                 toast.success("Successfully replaced all event managements")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/events-management`)
             }
         })
@@ -323,7 +326,6 @@ const ModifyEventManagement = () => {
             }
             else{
                 toast.success("Event managements successfully added")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/events-management`)
             }
         })
@@ -393,7 +395,7 @@ const ModifyEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
         setInputEventsWithoutTimer({ ...inputEventsWithoutTimer, [id]: newValue });
 
-        const selectedOutputEvents = new Set();
+        const selectedOutputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
             let currOutputActions = currEventManagement.outputActions;
@@ -402,11 +404,23 @@ const ModifyEventManagement = () => {
                     const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
                     const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
                     if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
-                        selectedOutputEvents.add('GEN_OUT_1');
+                        if (selectedOutputEvents['GEN_OUT_1'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_1'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_1'].push(currEventManagement.eventsManagementId);
+                        }
                     } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_2') {
-                        selectedOutputEvents.add('GEN_OUT_2');
+                        if (selectedOutputEvents['GEN_OUT_2'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_2'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_2'].push(currEventManagement.eventsManagementId);
+                        }
                     } else if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_3') {
-                        selectedOutputEvents.add('GEN_OUT_3');
+                        if (selectedOutputEvents['GEN_OUT_3'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_3'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_3'].push(currEventManagement.eventsManagementId);
+                        }
                     }
                 }
             }
@@ -415,7 +429,7 @@ const ModifyEventManagement = () => {
         console.log(selectedOutputEvents, "selectedOutputEvents");
         setCustomOutputEventsSelected(selectedOutputEvents);
   
-        const selectedInputEvents = new Set();
+        const selectedInputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
             let currInputEvents = currEventManagement.inputEvents;
@@ -426,11 +440,23 @@ const ModifyEventManagement = () => {
                 const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
                 const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
                 if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
-                    selectedInputEvents.add('GEN_IN_1');
+                    if (selectedInputEvents['GEN_IN_1'] == undefined) {
+                        selectedInputEvents['GEN_IN_1'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_1'].push(currEventManagement.eventsManagementId);
+                    }
                 } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_2') {
-                    selectedInputEvents.add('GEN_IN_2');
+                    if (selectedInputEvents['GEN_IN_2'] == undefined) {
+                        selectedInputEvents['GEN_IN_2'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_2'].push(currEventManagement.eventsManagementId);
+                    }
                 } else if (inputEventEntity?.eventActionInputName == 'GEN_IN_3') {
-                    selectedInputEvents.add('GEN_IN_3');
+                    if (selectedInputEvents['GEN_IN_3'] == undefined) {
+                        selectedInputEvents['GEN_IN_3'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_3'].push(currEventManagement.eventsManagementId);
+                    }
                 }
             }
         }
@@ -438,48 +464,108 @@ const ModifyEventManagement = () => {
         setCustomInputEventsSelected(selectedInputEvents);
         // validations
         const newValidations = [...eventsManagementValidationsArr];
+        for (let i = 0; i < newValidations.length; i++) {
+            const currValidation = newValidations[i];
+            // reset all events management conflict as false
+            currValidation.eventsManagementInputEventsConflict = false;
+            currValidation.eventsManagementOutputActionsConflict = false;
+        }
+
+        for (const [key, value] of Object.entries(selectedInputEvents)) {
+            if (key == 'GEN_IN_1') {
+                let genOut1s = selectedOutputEvents['GEN_OUT_1'];
+                if (genOut1s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut1s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut1s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            } else if (key == 'GEN_IN_2') {
+                let genOut2s = selectedOutputEvents['GEN_OUT_2'];
+                if (genOut2s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut2s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut2s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            } else if (key == 'GEN_IN_3') {
+               let genOut3s = selectedOutputEvents['GEN_OUT_3'];
+                if (genOut3s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut3s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut3s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // for (const [key, value] of Object.entries(selectedOutputEvents)) {
+        //     console.log(key, value);
+        //     if (value.length > 1) {
+        //         for (let i = 0; i < value.length; i++) {
+        //             const newValidations = [...eventsManagementValidationsArr];
+        //             const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        // }
+
         const validation = newValidations.find(v => v.eventsManagementId == id);
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (!newValue) {
             validation.eventsManagementInputEventsInvalidId = true;
-        } else {
-
-            validation.eventsManagementInputEventsConflict = false;
-            console.log(inputEventToBeAdded.eventActionInputName, "inputEventToBeAddedInChangeInputEventsWithoutTimer");
-            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
-                if (selectedOutputEvents.has('GEN_OUT_1')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
-                if (selectedOutputEvents.has('GEN_OUT_2')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
-                if (selectedOutputEvents.has('GEN_OUT_3')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            }
         }
 
-        validation.eventsManagementOutputActionsConflict = false;
-        const eventManagementsToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
-        for (let i = 0; i < eventManagementsToBeUpdatedOutputActions.length; i++) {
-            const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === eventManagementsToBeUpdatedOutputActions[i].eventActionOutputType.eventActionOutputId);
-            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
-                if (selectedInputEvents.has('GEN_IN_1')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            }
-            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
-                if (selectedInputEvents.has('GEN_IN_2')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
-                if (selectedInputEvents.has('GEN_IN_3')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            }
-        }
+        // else {
+
+        //     validation.eventsManagementInputEventsConflict = false;
+        //     console.log(inputEventToBeAdded.eventActionInputName, "inputEventToBeAddedInChangeInputEventsWithoutTimer");
+        //     if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
+        //         if (selectedOutputEvents.has('GEN_OUT_1')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
+        //         if (selectedOutputEvents.has('GEN_OUT_2')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
+        //         if (selectedOutputEvents.has('GEN_OUT_3')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     }
+        // }
+
+        // validation.eventsManagementOutputActionsConflict = false;
+        // const eventManagementsToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
+        // for (let i = 0; i < eventManagementsToBeUpdatedOutputActions.length; i++) {
+        //     const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === eventManagementsToBeUpdatedOutputActions[i].eventActionOutputType.eventActionOutputId);
+        //     if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
+        //         if (selectedInputEvents.has('GEN_IN_1')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        //     else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
+        //         if (selectedInputEvents.has('GEN_IN_2')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
+        //         if (selectedInputEvents.has('GEN_IN_3')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        // }
 
         setEventsManagementValidationsArr(newValidations);
     }
@@ -556,7 +642,7 @@ const ModifyEventManagement = () => {
         setEventsManagementInfoArr(updatedInfo);
         setOutputEventsWithTimer({ ...outputEventsWithTimer, [id]: newValue });
         
-        const selectedOutputEvents = new Set();
+        const selectedOutputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
             let currOutputActions = currEventManagement.outputActions;
@@ -565,11 +651,23 @@ const ModifyEventManagement = () => {
                     const outputEventId = currOutputActions[j].eventActionOutputType.eventActionOutputId;
                     const outputEventEntity = outputEvents.find(e => e.eventActionOutputId == outputEventId);
                     if (outputEventEntity?.eventActionOutputName == 'GEN_OUT_1') {
-                        selectedOutputEvents.add('GEN_OUT_1');
+                        if (selectedOutputEvents['GEN_OUT_1'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_1'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_1'].push(currEventManagement.eventsManagementId);
+                        }
                     } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_2') {
-                        selectedOutputEvents.add('GEN_OUT_2');
+                        if (selectedOutputEvents['GEN_OUT_2'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_2'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_2'].push(currEventManagement.eventsManagementId);
+                        }
                     } else if (outputEventEntity.eventActionOutputName == 'GEN_OUT_3') {
-                        selectedOutputEvents.add('GEN_OUT_3');
+                        if (selectedOutputEvents['GEN_OUT_3'] == undefined) {
+                            selectedOutputEvents['GEN_OUT_3'] = [currEventManagement.eventsManagementId];
+                        } else {
+                            selectedOutputEvents['GEN_OUT_3'].push(currEventManagement.eventsManagementId);
+                        }
                     }
                 }
             }
@@ -578,7 +676,7 @@ const ModifyEventManagement = () => {
         console.log(selectedOutputEvents, "selectedOutputEvents");
         setCustomOutputEventsSelected(selectedOutputEvents);
   
-        const selectedInputEvents = new Set();
+        const selectedInputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
             let currInputEvents = currEventManagement.inputEvents;
@@ -589,11 +687,23 @@ const ModifyEventManagement = () => {
                 const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
                 const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
                 if (inputEventEntity?.eventActionInputName == 'GEN_IN_1') {
-                    selectedInputEvents.add('GEN_IN_1');
+                    if (selectedInputEvents['GEN_IN_1'] == undefined) {
+                        selectedInputEvents['GEN_IN_1'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_1'].push(currEventManagement.eventsManagementId);
+                    }
                 } else if (inputEventEntity.eventActionInputName == 'GEN_IN_2') {
-                    selectedInputEvents.add('GEN_IN_2');
+                    if (selectedInputEvents['GEN_IN_2'] == undefined) {
+                        selectedInputEvents['GEN_IN_2'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_2'].push(currEventManagement.eventsManagementId);
+                    }
                 } else if (inputEventEntity.eventActionInputName == 'GEN_IN_3') {
-                    selectedInputEvents.add('GEN_IN_3');
+                    if (selectedInputEvents['GEN_IN_3'] == undefined) {
+                        selectedInputEvents['GEN_IN_3'] = [currEventManagement.eventsManagementId];
+                    } else {
+                        selectedInputEvents['GEN_IN_3'].push(currEventManagement.eventsManagementId);
+                    }
                 }
             }
         }
@@ -601,55 +711,110 @@ const ModifyEventManagement = () => {
         setCustomInputEventsSelected(selectedInputEvents);
 
         // validations
+
         const newValidations = [...eventsManagementValidationsArr];
+        for (let i = 0; i < newValidations.length; i++) {
+            const currValidation = newValidations[i];
+            // reset all events management conflict as false
+            currValidation.eventsManagementInputEventsConflict = false;
+            currValidation.eventsManagementOutputActionsConflict = false;
+        }
+
+        for (const [key, value] of Object.entries(selectedInputEvents)) {
+            if (key == 'GEN_IN_1') {
+                let genOut1s = selectedOutputEvents['GEN_OUT_1'];
+                if (genOut1s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut1s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut1s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            } else if (key == 'GEN_IN_2') {
+                let genOut2s = selectedOutputEvents['GEN_OUT_2'];
+                if (genOut2s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut2s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut2s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            } else if (key == 'GEN_IN_3') {
+               let genOut3s = selectedOutputEvents['GEN_OUT_3'];
+                if (genOut3s != undefined) {
+                    for (let i = 0; i < value.length; i++) {
+                        const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+                        validation.eventsManagementInputEventsConflict = true;
+                        for (let i = 0; i < genOut3s.length; i++) {
+                            const validation = newValidations.find(v => v.eventsManagementId == genOut3s[i]);
+                            validation.eventsManagementOutputActionsConflict = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // for (const [key, value] of Object.entries(selectedOutputEvents)) {
+        //     console.log(key, value);
+        //     if (value.length > 1) {
+        //         for (let i = 0; i < value.length; i++) {
+        //             const newValidations = [...eventsManagementValidationsArr];
+        //             const validation = newValidations.find(v => v.eventsManagementId == value[i]);
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        // }
+
         const validation = newValidations.find(v => v.eventsManagementId == id);
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
         }
 
-        validation.eventsManagementOutputActionsConflict = false;
-        for (let i = 0; i < newValue.length; i++) {
-            const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
-            if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
-                if (selectedInputEvents.has('GEN_IN_1')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            }
-            else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
-                if (selectedInputEvents.has('GEN_IN_2')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
-                if (selectedInputEvents.has('GEN_IN_3')) {
-                    validation.eventsManagementOutputActionsConflict = true;
-                }
-            }
-        }
+        // validation.eventsManagementOutputActionsConflict = false;
+        // for (let i = 0; i < newValue.length; i++) {
+        //     const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
+        //     if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
+        //         if (selectedInputEvents.has('GEN_IN_1')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        //     else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
+        //         if (selectedInputEvents.has('GEN_IN_2')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
+        //         if (selectedInputEvents.has('GEN_IN_3')) {
+        //             validation.eventsManagementOutputActionsConflict = true;
+        //         }
+        //     }
+        // }
 
-        validation.eventsManagementInputEventsConflict = false;
-        const eventManagementsToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        for (let i = 0; i < eventManagementsToBeUpdatedInputEvents.length; i++) {
-            const inputEventToBeAdded = inputEvents.find(e=> e.eventActionInputId === eventManagementsToBeUpdatedInputEvents[i].eventActionInputType.eventActionInputId);
-            if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
-                if (selectedOutputEvents.has('GEN_OUT_1')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
-                if (selectedOutputEvents.has('GEN_OUT_2')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
-                if (selectedOutputEvents.has('GEN_OUT_3')) {
-                    validation.eventsManagementInputEventsConflict = true;
-                }
-            }
-        }
+        // validation.eventsManagementInputEventsConflict = false;
+        // const eventManagementsToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
+        // for (let i = 0; i < eventManagementsToBeUpdatedInputEvents.length; i++) {
+        //     const inputEventToBeAdded = inputEvents.find(e=> e.eventActionInputId === eventManagementsToBeUpdatedInputEvents[i].eventActionInputType.eventActionInputId);
+        //     if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
+        //         if (selectedOutputEvents.has('GEN_OUT_1')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
+        //         if (selectedOutputEvents.has('GEN_OUT_2')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
+        //         if (selectedOutputEvents.has('GEN_OUT_3')) {
+        //             validation.eventsManagementInputEventsConflict = true;
+        //         }
+        //     }
+        // }
 
-        console.log("eventsManagementInputEventsConflict", validation.eventsManagementInputEventsConflict);
-        console.log("eventsManagementOutputActionsConflict", validation.eventsManagementOutputActionsConflict);
-        console.log(customInputEventsSelected, "customInputEventsSelected");
-        console.log(customOutputEventsSelected, "customOutputEventsSelected");
         setEventsManagementValidationsArr(newValidations);
     }
  
