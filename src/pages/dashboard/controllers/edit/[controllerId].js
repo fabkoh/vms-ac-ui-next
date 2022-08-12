@@ -218,7 +218,6 @@ const EditController = () => {
             }
             else{
                 toast.success("Controller info updated")
-                router.replace(getControllerListLink())
             }
         })
         .then(
@@ -240,6 +239,7 @@ const EditController = () => {
         .then(res=>{
             if(res.status==200){
                 toast.success("Entrance E2 updated")
+                router.replace(getControllerListLink())
             }
             else(toast.error("Failed to update entrance E2"))
         }))
