@@ -18,12 +18,20 @@ import VideoListTable from "../../../components/dashboard/video-recorders/video-
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { Confirmdelete } from "../../../components/dashboard/video-recorders/confirm-delete";
 import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecorderIdsEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
+<<<<<<< HEAD
+=======
+import Script from 'next/script'
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
 const applyFilter = createFilter({
     query: filterRecorderByString,
     status: filterRecorderByStatus
 })
 
+<<<<<<< HEAD
 const RecorderList = () => {
+=======
+const EntranceList = () => {
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
@@ -296,10 +304,25 @@ const RecorderList = () => {
     )
 }
 
+<<<<<<< HEAD
 RecorderList.getLayout = (page) => (
     <AuthGuard>
+=======
+EntranceList.getLayout = (page) => (
+    <AuthGuard>
+        <Head>
+            <script src="/static/sdk/codebase/encryption/AES.js"></script>
+                <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
+                <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
+                <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+        </Head>
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );
 
+<<<<<<< HEAD
 export default RecorderList;
+=======
+export default EntranceList;
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e

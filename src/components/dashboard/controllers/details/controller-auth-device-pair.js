@@ -49,7 +49,7 @@ import { authDeviceApi } from "../../../../api/auth-devices";
 import toast from "react-hot-toast";
 import RemoveEntrance from "./remove-entrance";
 
-export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices,handleToggleMasterpin,removeEntrance }) {
+export default function AuthDevicePair({ authPair,controllerId, status, statusLoaded, resetAuthDevices, deleteAuthDevices,handleToggleMasterpin,removeEntrance, getCurrentAuthMethod }) {
 	// const status = {
 	// 	"E1_IN": true,
 	// 	"E1_OUT": true,
@@ -240,7 +240,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 								</TableCell> */}
 								<TableCell>Name</TableCell>
 								<TableCell>Direction</TableCell>
-								<TableCell>No. of auth methods</TableCell>
+								<TableCell>Current Auth Method</TableCell>
 								<TableCell>masterpin</TableCell>
 								<TableCell>Status</TableCell>
 								<TableCell>lastOnline</TableCell>
@@ -268,7 +268,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											</NextLink>
 										</TableCell>
 										<TableCell>{device.authDeviceDirection}</TableCell>
-										<TableCell>{1}</TableCell>
+										<TableCell>{getCurrentAuthMethod(authDeviceId)}</TableCell>
 										<TableCell>
 											{<Switch onClick={(e)=>handleToggleMasterpin(authDeviceId,e)} checked={device.masterpin} />}
 										</TableCell>

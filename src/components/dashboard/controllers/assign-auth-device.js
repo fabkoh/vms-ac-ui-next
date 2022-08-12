@@ -37,7 +37,7 @@ import { toDisplayDateString } from "../../../utils/utils";
 
 //this is the authdevice list for edit page. can only assign entrance. other details for viewing only.
 
-const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntrance,controllerValidations}) => {
+const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntrance,controllerValidations,getCurrentAuthMethod}) => {
     console.log("authPair",authPair)
     // expanding form
     const [expanded, setExpanded] = useState(true);
@@ -142,7 +142,7 @@ const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntra
 								</TableCell> */}
 								<TableCell>Name</TableCell>
 								<TableCell>Direction</TableCell>
-								<TableCell>No. of auth methods</TableCell>
+								<TableCell>Current Auth Method</TableCell>
 								<TableCell>masterpin</TableCell>
 								<TableCell>Status</TableCell>
 								<TableCell>lastOnline</TableCell>
@@ -169,7 +169,7 @@ const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntra
 											{/* </NextLink> */}
 										</TableCell>
 										<TableCell>{device.authDeviceDirection}</TableCell>
-										<TableCell>{1}</TableCell>
+										<TableCell>{getCurrentAuthMethod(device.authDeviceId)}</TableCell>
 										<TableCell>
 											{<Switch disabled checked={device.masterpin} />}
 										</TableCell>

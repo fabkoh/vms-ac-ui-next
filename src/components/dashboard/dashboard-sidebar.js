@@ -86,11 +86,19 @@ const getSections = (t) => [
         icon: <Videocam fontSize="small" />,
         children: [
           {
+<<<<<<< HEAD
             title: t('List'),
             path: '/dashboard/video-recorders/'
           },
           {
             title: t('Add'),
+=======
+            title: 'List',
+            path: '/dashboard/video-recorders/'
+          },
+          {
+            title: 'Add',
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
             path: '/dashboard/video-recorders/create'
           }
         ]

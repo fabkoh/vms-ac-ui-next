@@ -82,14 +82,18 @@ class ControllerApi {
     uniconUpdater() {
         if (useApi) { return sendApi(`/api/uniconUpdater`, { method: 'POST' })
         .then( res => {
-				if(res.status == 200){
-					toast.success('Synced successfully',{duration:2000},);
-				}
-				else{
-					toast.error('Synced unsuccessfully' )
-				}
-			})
-		}}
+                if(res.status == 200){
+                    toast.success('Synced successfully',{duration:2000},);
+                }
+                else{
+                    toast.error('Synced unsuccessfully' )
+                }
+            })
+        }}
+    
+        getAllCurrentAuthMethod(controllerId){
+        if(useApi){return sendApi(`/api/controller/currentAuthMethod/${controllerId}`)}
+    }
     
 
 

@@ -4,7 +4,7 @@
   "author": "Devias",
   "private": true,
   "scripts": {
-    "dev": "next",
+    "dev": "node server.js",
     "build": "next build",
     "start": "next start",
     "export": "next export",
@@ -45,11 +45,17 @@
     "@mui/material": "^5.0.4",
     "@mui/styles": "^5.3.0",
     "@mui/system": "^5.0.4",
+<<<<<<< HEAD
     "@mui/x-date-pickers": "^5.0.0-alpha.7",
+=======
+    "@mui/x-date-pickers": "^5.0.0-beta.3",
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
     "@react-pdf/renderer": "^1.6.13",
     "@reduxjs/toolkit": "^1.5.0",
     "apexcharts": "^3.23.1",
     "aws-amplify": "^3.0.20",
+    "cookie": "^0.5.0",
+    "cookies": "^0.8.0",
     "date-fns": "^2.21.3",
     "draft-js": "^0.11.7",
     "firebase": "^8.2.3",
@@ -59,7 +65,12 @@
     "intl-tel-input": "^17.0.15",
     "lodash.debounce": "^4.0.8",
     "material-ui-phone-number": "^3.0.0",
+<<<<<<< HEAD
     "next": "^12.2.1-canary.2",
+=======
+    "moment": "^2.29.4",
+    "next": "12.0.3-canary.7",
+>>>>>>> 4845b6f844cd459845023c6646fd82ec2b60981e
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
     "prop-types": "^15.7.2",
@@ -78,6 +89,7 @@
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "request": "^2.88.2",
     "rrule": "^2.6.9",
     "simplebar": "^5.3.6",
     "simplebar-react": "^2.3.6",

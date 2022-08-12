@@ -26,9 +26,7 @@ import { rrulestr } from "rrule";
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
-//import EntranceScheduleDelete from "../../entrances/details/entrance-schedule-delete";
 import AuthenticationScheduleDelete from "../../authentication-schedule/authentication-schedule-delete";
-
 
 export default function AuthenticationSchedules({
 	link,
