@@ -363,7 +363,6 @@ const EditAccessGroups = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
-            controllerApi.uniconUpdater();
             toast.success(`${numEdited} access groups edited`);
             if (numEdited == resArr.length) { // all success
                 router.replace('/dashboard/access-groups');

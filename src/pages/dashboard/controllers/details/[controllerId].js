@@ -189,7 +189,6 @@ const ControllerDetails = () => {
             }
             else{                                           
                 toast.success('Delete success');
-                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -234,7 +233,6 @@ const ControllerDetails = () => {
             }
             else{
                 toast.success('Reset success');
-                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -295,7 +293,6 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE1(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -317,7 +314,6 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE2(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -335,7 +331,6 @@ const ControllerDetails = () => {
                          else {
                             toast.success("Successfully removed entrance");
                             getInfo();
-                            controllerApi.uniconUpdater;
                          }
                      });
 	}

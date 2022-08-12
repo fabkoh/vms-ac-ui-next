@@ -480,7 +480,6 @@ const CreatePersonsTwo = () => {
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
             if (numSuccess) {
-                controllerApi.uniconUpdater();
                 toast.success(`Successfully created ${numSuccess} persons`); 
             }
 
