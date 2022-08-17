@@ -114,9 +114,9 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 									<TableCell width="20%">-</TableCell>
 									<TableCell width="20%">
 										{ camera.online ? (
-											<SeverityPill color="success" style={{color: 'transparent'}}>_'</SeverityPill> 
+											<SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> 
 										) : (
-											<SeverityPill color="error" style={{color: 'transparent'}}>_'</SeverityPill>
+											<SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>
 										) }
 									</TableCell>
 									<TableCell width="10%" align="left">

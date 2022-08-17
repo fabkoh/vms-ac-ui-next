@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env NODE_ENV=production node server.js",
     "export": "next export",
     "build-export": "next build && next export",
     "lint": "next lint",
@@ -50,6 +50,7 @@
     "aws-amplify": "^3.0.20",
     "cookie": "^0.5.0",
     "cookies": "^0.8.0",
+    "cross-env": "^7.0.3",
     "date-fns": "^2.21.3",
     "draft-js": "^0.11.7",
     "firebase": "^8.2.3",

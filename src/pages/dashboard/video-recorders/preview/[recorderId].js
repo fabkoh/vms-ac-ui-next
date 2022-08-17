@@ -402,7 +402,7 @@ const VideoRecorderPreview = () => {
                                   {"name": "2x2", "value": 2},
                                   {"name": "3x3", "value": 3},
                                   {"name": "4x4", "value": 4}
-                                ].map(({name, value})  => (<MenuItem  value = {value}>{name}</MenuItem>))
+                                ].map(({name, value})  => (<MenuItem key = {value} value = {value}>{name}</MenuItem>))
                               }
                             </Select>
                           </div>
