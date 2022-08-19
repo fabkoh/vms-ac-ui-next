@@ -49,7 +49,7 @@ export const VideoRecorderBasicDetails = ({recorder}) => {
                     align={align}
                     divider
                     label="Camera Status"
-                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_'</SeverityPill> : <CircularProgress size='1rem'/>}
+                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
                 >
                 </PropertyListItem>
 
@@ -57,7 +57,7 @@ export const VideoRecorderBasicDetails = ({recorder}) => {
                     align={align}
                     divider
                     label="Alarm Status"
-                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_'</SeverityPill> : <CircularProgress size='1rem'/>}
+                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
                 >
                 </PropertyListItem>
             </PropertyList>

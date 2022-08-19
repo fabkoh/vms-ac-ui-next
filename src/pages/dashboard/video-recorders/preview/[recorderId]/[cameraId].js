@@ -938,7 +938,7 @@ const VideoCameraDetails = () => {
                               value={ptz_speed}
                               label="Speed">
                               {
-                                [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem  value = {value}>{value}</MenuItem>))
+                                [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value} value = {value}>{value}</MenuItem>))
                               }
                             </Select>
                           </div>
@@ -1158,7 +1158,7 @@ const VideoCameraDetails = () => {
                             value={preset_view}
                             label="Preset View">
                             {
-                              [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem  value = {value}>{value}</MenuItem>))
+                              [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value} value = {value}>{value}</MenuItem>))
                             }
                           </Select>
                         </div>
@@ -1208,7 +1208,7 @@ const VideoCameraDetails = () => {
                                 [
                                   {"name": "Main stream", "value": 1},
                                   {"name": "Sub stream", "value": 2}
-                                ].map(({name, value})  => (<MenuItem  value = {value}>{name}</MenuItem>))
+                                ].map(({name, value})  => (<MenuItem key = {value} value = {value}>{name}</MenuItem>))
                               }
                             </Select>
                           </div>
@@ -1321,7 +1321,7 @@ const VideoCameraDetails = () => {
                               playback_files.map(({
                                 start_time, end_time, file_name, playbackURI
                               }, index) => (
-                                <tr>
+                                <tr key = {index}>
                                   <td>{index + 1}</td>
                                   <td>{file_name}</td>
                                   <td>{formatDate(start_time)}</td>

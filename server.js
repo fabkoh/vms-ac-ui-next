@@ -7,8 +7,9 @@ const Cookies 			= require('cookies');
 const request 			= require('request');
 
 const dev 		= process.env.NODE_ENV !== 'production'
-const hostname= 'localhost'
-const port 		= 3000
+
+const hostname  = '0.0.0.0'
+const port 		= (dev) ? 3000 : 5000;
 const app 		= next({ dev, hostname, port })
 const handle 	= app.getRequestHandler()
 
