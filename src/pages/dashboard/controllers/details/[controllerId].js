@@ -57,6 +57,7 @@ const ControllerDetails = () => {
     const [controllerEventManagements, setControllerEventManagements] = useState([]);
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
+    const [currentAuth,setCurrentAuth] = useState()
     const [authStatus, setAuthStatus] = useState({})
 
     const getController = async(controllerId) => {
@@ -133,9 +134,42 @@ const ControllerDetails = () => {
         // setStatusLoaded(true)
     }
 
+    const getAllCurrentAuthMethod = async(controllerId) => {
+        var authmethod = {}
+        try{
+            Promise.resolve(controllerApi.getAllCurrentAuthMethod(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    // console.log(data)
+                    setCurrentAuth(data)
+                }
+                else{
+                    console.log("ERROR")
+                }
+            })
+        }catch(err){console.log(err)}
+    }
+
+    const getCurrentAuthMethod = (authdeviceId) => {
+        if (currentAuth){
+            // console.log(typeof(currentAuth))
+            // console.log()
+            // current = currentAuth.authDeviceId
+            console.log(currentAuth)
+            console.log(authdeviceId,currentAuth[authdeviceId])
+            return currentAuth[authdeviceId]
+            // return currentAuth[authdeviceId]
+        }
+
+
+    }
+
+
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
         getController(controllerId)
+        getAllCurrentAuthMethod(controllerId)
         getStatus()
         getControllerEventManagements();
     }, [isMounted])
@@ -501,6 +535,7 @@ const ControllerDetails = () => {
                                 controllerId={controllerId}
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
                                 removeEntrance={() => removeEntranceButton(E1)}
                                 />
@@ -515,6 +550,7 @@ const ControllerDetails = () => {
                                 controllerId={controllerId}
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE2}
                                 />
                             </Grid>                         

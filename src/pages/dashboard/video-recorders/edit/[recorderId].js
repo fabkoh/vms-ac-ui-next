@@ -16,7 +16,7 @@ import formUtils from "../../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
 import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
-import { videoRecorderApi } from "../../../../api/videorecorder";
+import videoRecorderApi from "../../../../api/videorecorder";
 import { getVideoRecorderEditLink, getVideoRecorderListLink, getVideoRecorderDetailsLink } from "../../../../utils/video-recorder";
 import { authDeviceApi } from "../../../../api/auth-devices";
 
