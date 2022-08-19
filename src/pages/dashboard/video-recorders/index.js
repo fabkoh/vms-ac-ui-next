@@ -19,6 +19,9 @@ import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { Confirmdelete } from "../../../components/dashboard/video-recorders/confirm-delete";
 import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecorderIdsEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
 import Script from 'next/script'
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+
 const applyFilter = createFilter({
     query: filterRecorderByString,
     status: filterRecorderByStatus
@@ -32,12 +35,18 @@ const RecorderList = () => {
     
     // get entrances and access groups
     const [recorders, setRecorders] = useState([]);
+
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     const isMounted = useMounted();
 
     const getRecordersLocal = useCallback(async () => {
         const res = await videoRecorderApi.getRecorders();
         if (res.status != 200) {
             toast.error("Recorders info failed to load");
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             return [];
         }
         const data = await res.json();
@@ -162,6 +171,10 @@ const RecorderList = () => {
                     py:8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <Grid container

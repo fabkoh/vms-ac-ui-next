@@ -19,6 +19,8 @@ import { Confirmdelete } from "../../../components/dashboard/events-management/c
 import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../api/events-management";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const applyFilter = createFilter({
     query: filterEventsManagementByString,
@@ -27,6 +29,7 @@ const applyFilter = createFilter({
 const EventsManagementList = () => {
     const isMounted = useMounted();
     const [eventsManagement, setEventsManagement] = useState([]);
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getEventManagements = useCallback(async () => {
         try {
@@ -39,12 +42,15 @@ const EventsManagementList = () => {
                 }
             }
             else {
-                toast.error("Event Managements Not Loaded");
+                toast.error("Error loading event managements");
                 setEventsManagement([]);
+                if (eventManagements.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
             }
         }
         catch (err) {
-            console.error(err);
+            toast.error("Some error has occurred");
         }
     }, [isMounted]);
 
@@ -168,6 +174,10 @@ const EventsManagementList = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                            open={serverDownOpen}
+                            handleDialogClose={() => setServerDownOpen(false)}
+                        />
                         <Grid container
                             justifyContent="space-between"
                             spacing={3}>

@@ -38,6 +38,8 @@ import { controllerApi } from "../../../../api/controllers";
 import EntranceEventsManagement from "../../../../components/dashboard/entrances/details/entrance-event-management";
 import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../../api/events-management";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const EntranceDetails = () => {
 
@@ -45,7 +47,8 @@ const EntranceDetails = () => {
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
     const { entranceId } = router.query;
-    
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
@@ -66,7 +69,11 @@ const EntranceDetails = () => {
                     setAccessGroup(body);
                 }
             } else {
-                toast.error('Access Group info not loaded');
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error('Error loading access group info');
+                setAccessGroup([]);
                 throw new Error('Access Group info not loaded');
             }
         } catch(err) {
@@ -78,9 +85,14 @@ const EntranceDetails = () => {
     const getEntrance = useCallback(async() => {
         try {
             const res = await entranceApi.getEntrance(entranceId);
-            if(res.status != 200) {
-                toast.error('Entrance not found');
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    toast.error("Entrance not found due to server is down. Please try again later")
+                } else {
+                    toast.error('Entrance not found');
+                }
                 router.replace(entranceListLink);
+                return;
             }
             const body = await res.json();
 
@@ -105,7 +117,11 @@ const EntranceDetails = () => {
                 }
             }
             else {
-                toast.error("Entrance Schedule Info Not Loaded");
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading entrance schedule info");
+                setEntranceSchedules([]);
             }
         }
         catch (err) {
@@ -116,13 +132,21 @@ const EntranceDetails = () => {
     
 const getEntranceEventsManagement = useCallback(async () => {
     try {
-  //const data = await personApi.getFakePersons() 
-    const res = await eventsManagementApi.getEntranceEventsManagement(entranceId);
+        //const data = await personApi.getFakePersons() 
+        const res = await eventsManagementApi.getEntranceEventsManagement(entranceId);
 
-    const data = await res.json()
-        if (isMounted()) {
-            console.log(data)
-            setEntranceEventManagements(data);
+        if (res.status == 200) {
+            const data = await res.json()
+            if (isMounted()) {
+                console.log(data)
+                setEntranceEventManagements(data);
+            }
+        } else {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrance events management info");
+            setEntranceEventManagements([]);
         }
     } catch (err) {
         console.error(err);
@@ -288,6 +312,10 @@ const getEntranceEventsManagement = useCallback(async () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>

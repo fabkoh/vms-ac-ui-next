@@ -19,10 +19,14 @@ import AssignAuthDevice from "../../../../components/dashboard/controllers/assig
 import { getControllerDetailsLink, getControllerListLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 import { authDeviceApi } from "../../../../api/auth-devices";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const EditController = () => {
     const isMounted = useMounted();
     const { controllerId }  = router.query; 
+
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const [controllerInfo, setControllerInfo] = useState()
     const [controllerValidations, setControllerValidations] = useState({
@@ -43,9 +47,14 @@ const EditController = () => {
                     // console.log("getController",data)
                     getPairs(data)
                 }
-                else{
-                    toast.error("Controller info not found")
+                else {
+                    if (res.status == serverDownCode) {
+                        toast.error("Error loading controller info due to server is down");
+                    } else {
+                        toast.error("Controller info not found")
+                    }
                     router.replace(getControllerListLink)
+                    return;
                 }
             })
         }catch(err){console.log(err)}
@@ -71,7 +80,10 @@ const EditController = () => {
                 toast.dismiss()
                 if(res.status!=200){
                     setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    toast.error("Failed to fetch status");
                 }
                 else{
                     setStatusLoaded(true)
@@ -113,7 +125,14 @@ const EditController = () => {
                 E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false
                 E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false
             }
-            else{toast.error("Failed to fetch entrance data")}
+            else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Failed to fetch entrance data");
+                setAllEntrances([]);
+                return;
+            }
         })        
        
         setAllEntrances(toUpdate)
@@ -243,14 +262,6 @@ const EditController = () => {
             }
             else(toast.error("Failed to update entrance E2"))
         }))
-        .then( () =>
-        Promise.resolve(authDeviceApi.updateUnicon())
-        .then(res=>{
-            if(res.status==200){
-                toast.success("Updated Controllers")
-            }
-            else(toast.error("Failed to update controller"))
-        }))
     }
     return(
         <>
@@ -266,6 +277,10 @@ const EditController = () => {
                     py: 8
                 }}
             >
+                <ServerDownError 
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -321,7 +336,8 @@ const EditController = () => {
                                 controllerValidations={controllerValidations}
                                 />
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

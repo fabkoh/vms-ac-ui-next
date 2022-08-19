@@ -20,6 +20,8 @@ import { eventsManagementApi } from "../../../api/events-management";
 import EventsManagementAddOnError from "../../../components/dashboard/events-management/events-management-add-on-error";
 import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 import { input } from "aws-amplify";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const ModifyEventManagement = () => {
     const router = useRouter();
@@ -40,6 +42,8 @@ const ModifyEventManagement = () => {
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
     const [open, setOpen] = useState(false);
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     const [errorMessages, setErrorMessages] = useState([]);
     const [singleErrorMessage, setSingleErrorMessage] = useState([]);
 
@@ -107,8 +111,11 @@ const ModifyEventManagement = () => {
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
-            toast.error("Controllers not loaded");
+            toast.error("Error loading controllers");
             setAllControllers([]);
+            if (controllersRes.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             return;
         }
         const controllersJson = await controllersRes.json();
@@ -121,12 +128,18 @@ const ModifyEventManagement = () => {
         const inputEventsRes = await eventsManagementApi.getInputEvents(forController);
         const outputEventsRes = await eventsManagementApi.getOutputEvents(forController);
         if (inputEventsRes.status !== 200) {
-            toast.error("Trigger options failed to load");
+            toast.error("Error loading trigger options");
             setInputEvents([]);
+            if (inputEventsRes.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
         }
         if (outputEventsRes.status !== 200) {
-            toast.error("Action options failed to load");
+            toast.error("Error loading action options");
             setOutputEvents([]);
+            if (outputEventsRes.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             return;
         }
         const inputEventsJson = await inputEventsRes.json();
@@ -140,8 +153,11 @@ const ModifyEventManagement = () => {
     const getAllEntrances = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
-            toast.error("Entrances failed to load");
+            toast.error("Error loading entrances");
             setAllEntrances([]);
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             return;
         }
         const data = await res.json();
@@ -851,6 +867,10 @@ const ModifyEventManagement = () => {
                 />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                            open={serverDownOpen}
+                            handleDialogClose={() => setServerDownOpen(false)}
+                        />
                         <NextLink
                             href={`/dashboard/events-management`}
                             passHref

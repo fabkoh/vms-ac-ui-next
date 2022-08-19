@@ -38,6 +38,8 @@ import videoRecorderApi from "../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
 import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../utils/video-recorder";
 import {VideoRecorderCameras} from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const VideoRecorderDetails = () => {
     const isMounted = useMounted();
@@ -52,6 +54,8 @@ const VideoRecorderDetails = () => {
     const [loadedSDK, setLoadedSDK] = useState(false)
     const [authStatus, setAuthStatus] = useState({})
     const [sdkHandle, setSDKHandle] = useState(null)
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -217,7 +221,10 @@ const VideoRecorderDetails = () => {
                     }
                     
                     //setControllerInfo(data)
-                } else{
+                } else {
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
                     toast.error("Video Recorder info not found")
                     //router.replace(getControllerListLink())
                 }
@@ -268,7 +275,6 @@ const VideoRecorderDetails = () => {
             }
             else{                                           
                 toast.success('Delete success');
-                videoRecorderApi.uniconUpdater();
                 //router.replace(getVideoRecorderListLink());
             }
         })
@@ -284,6 +290,10 @@ const VideoRecorderDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleCloseDialog={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>
@@ -419,7 +429,8 @@ VideoRecorderDetails.getLayout = (page) => (
                 <script src="/static/sdk/codebase/encryption/AES.js"></script>
                 <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
                 <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-                <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+                <script id="videonode"
+                        src="/static/sdk/codebase/webVideoCtrl.js"></script>
             </Head>
         <DashboardLayout>
             { page }

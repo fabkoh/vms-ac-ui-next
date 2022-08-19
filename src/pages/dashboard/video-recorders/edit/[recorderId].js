@@ -19,6 +19,8 @@ import AssignAuthDevice from "../../../../components/dashboard/controllers/assig
 import { videoRecorderApi } from "../../../../api/videorecorder";
 import { getVideoRecorderEditLink, getVideoRecorderListLink, getVideoRecorderDetailsLink } from "../../../../utils/video-recorder";
 import { authDeviceApi } from "../../../../api/auth-devices";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 const EditController = () => {
     const isMounted = useMounted();
@@ -31,6 +33,7 @@ const EditController = () => {
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
     const [authStatus, setAuthStatus] = useState({})
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getVideoRecorder = async(recorderId) => {
         try{
@@ -41,8 +44,11 @@ const EditController = () => {
                     setVideoRecorderInfo(data)
                     //getPairs(data)
                 }
-                else{
-                    toast.error("Video Recorder info not found")
+                else {
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    toast.error("Video recorder info not found")
                     //router.replace(getControllerListLink())
                 }
             })
@@ -210,14 +216,7 @@ const EditController = () => {
             }
             else(toast.error("Failed to update entrance E2"))
         })
-        ).then(
-            Promise.resolve(authDeviceApi.updateUnicon())
-            .then(res=>{
-                if(res.status==200){
-                    toast.success("Updated Controllers")
-                }
-                else(toast.error("Failed to update controllers"))
-            }))
+        )
     }
     return(
         <>
@@ -233,6 +232,10 @@ const EditController = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                       
@@ -285,7 +288,8 @@ const EditController = () => {
                                 controllerValidations={controllerValidations}
                                 />
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+                                marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

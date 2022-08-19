@@ -22,7 +22,8 @@ import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-d
 import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
-
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
@@ -37,6 +38,8 @@ const EntranceList = () => {
     
     // get entrances and access groups
     const [entrances, setEntrances] = useState([]);
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     const isMounted = useMounted();
     const getAccessGroupsLocal = useCallback(async(entrances) => {
         const newEntrances = [ ...entrances ]
@@ -46,8 +49,22 @@ const EntranceList = () => {
             )
         );
         const successArr = resArr.map(res => res.status == 200);
+        const serverDownFailArr = resArr.map(res => res.status == serverDownCode);
+        if (serverDownFailArr.length > 0) {
+            setServerDownOpen(true);
+            toast.error("Error loading access groups info");
+            return;
+        }
+        if (successArr.length == 0) {
+            toast.error("Error loading access groups info");
+            newEntrances.forEach((entrance, i) => entrance.accessGroups = []);
+            if (isMounted()) {
+                setEntrances(newEntrances);
+            }
+            return;
+        }
         if(successArr.some(success => !success)) { // some res fail
-            toast.error("Access groups info failed to load");
+            toast.error("Error loading access groups info");
         }
         const jsonArr = await Promise.all(resArr.map(res => res.json()));
         newEntrances.forEach((entrance, i) => entrance.accessGroups = successArr[i] ? jsonArr[i] : []);
@@ -58,7 +75,11 @@ const EntranceList = () => {
     const getEntrancesLocal = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
-            toast.error("Entrances info failed to load");
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrances info");
+            setEntrances([]);
             return [];
         }
         const data = await res.json();
@@ -71,7 +92,12 @@ const EntranceList = () => {
     const getEntranceSchedules = async() => {
         try {
             const res = await entranceScheduleApi.getEntranceSchedules();
-            if(res.status != 200) throw 'cannot load entrance schedules';
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw 'cannot load entrance schedules'
+            };
             const body = await res.json();
             const temp = {};
             body.forEach(sch => {
@@ -80,14 +106,19 @@ const EntranceList = () => {
             setEntranceSchedules(temp);
         } catch(e) {
             console.error(e);
-            toast.error("Entrance schedules failed to load");
+            toast.error("Error loading entrance schedules");
         }
     }
     const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
     const getControllers = async() => {
         try {
             const res = await controllerApi.getControllers();
-            if(res.status != 200) throw 'cannot load controllers';
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw 'cannot load controllers'
+            };
             const body = await res.json();
             const temp = {};
             body.forEach(con => {
@@ -202,6 +233,7 @@ const EntranceList = () => {
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
             if (entranceIds.includes(entrance.entranceId)) {
+                //TODO: look into this logic again, I believe regardless of whether this is successful or not, it will be updated
                 entrance.isActive = updatedStatus;
             }
         })
@@ -271,6 +303,10 @@ const EntranceList = () => {
                 updateStatus={updateStatus}
                 handleStatusUpdate={handleStatusUpdate}
             />
+            <ServerDownError
+                open={serverDownOpen}
+                handleDialogClose={() => setServerDownOpen(false)}
+            />
             <Box
                 component="main"
                 sx={{
@@ -280,8 +316,11 @@ const EntranceList = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
-                        <Grid container justifyContent="space-between" spacing={3}>
-                            <Grid item sx={{ m: 2.5 }}>
+                        <Grid container
+                                justifyContent="space-between"
+                                spacing={3}>
+                            <Grid item
+                                sx={{ m: 2.5 }}>
                                 <Typography variant="h4">Entrances</Typography>    
                             </Grid>    
                             <Grid item>
@@ -298,14 +337,17 @@ const EntranceList = () => {
                                     open={open}
                                     onClose={handleActionClose}
                                 >
-                                    <NextLink href={entranceCreateLink} passHref>
+                                    <NextLink href={entranceCreateLink}
+                                        passHref>
                                         <MenuItem disableRipple>
                                             <Add />
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href={getEntranceIdsEditLink(selectedEntrances)} passHref>    
-                                        <MenuItem disableRipple disabled={actionDisabled}>
+                                    <NextLink href={getEntranceIdsEditLink(selectedEntrances)}
+                                        passHref>    
+                                        <MenuItem disableRipple
+                                            disabled={actionDisabled}>
                                             <Edit />
                                             &#8288;Edit
                                         </MenuItem>
@@ -351,8 +393,10 @@ const EntranceList = () => {
                                 mt: 3
                             }}
                         >
-                            <Button startIcon={<Upload fontSize="small" />} sx={{ m: 1 }}>Import</Button>    
-                            <Button startIcon={<Download fontSize="small" />} sx={{ m: 1 }}>Export</Button>
+                            <Button startIcon={<Upload fontSize="small" />}
+                                sx={{ m: 1 }}>Import</Button>    
+                            <Button startIcon={<Download fontSize="small" />}
+                                sx={{ m: 1 }}>Export</Button>
                             <Tooltip
                                 title="Excel template can be found at {}"
                                 enterTouchDelay={0}

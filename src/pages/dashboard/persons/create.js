@@ -19,6 +19,8 @@ import { saveCredentialApi, checkCredentialApi } from "../../../api/credentials"
 import { getPersonName } from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
 import { CredTypePinID } from "../../../utils/constants";
+import {ServerDownError} from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const getNextId = createCounterObject(1);
 
@@ -83,11 +85,17 @@ const CreatePersonsTwo = () => {
     // get info
     const isMounted = useMounted(); 
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     const getCredTypes = async () => {
         try {
             const res = await getCredTypesApi();
             if (res.status != 200) {
-                throw new Error("cred types info not loaded");
+                toast.error("Error loading credential types");
+                setCredTypes([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setCredTypes(body);
@@ -101,7 +109,14 @@ const CreatePersonsTwo = () => {
         try {
             const res = await personApi.getPersons();
             if (res.status != 200) {
-                throw new Error("person info not loaded");
+                setPersonUids([]);
+                setPersonMobileNumbers([]);
+                setPersonEmails([]);
+                toast.error("Error loading persons");
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setPersonUids(body.map(p => p.personUid));
@@ -116,13 +131,18 @@ const CreatePersonsTwo = () => {
         try {
             const res = await accessGroupApi.getAccessGroups();
             if (res.status != 200) {
-                throw new Error("access group info not loaded");
+                toast.error("Error loading access groups");
+                setAccessGroups([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setAccessGroups(body);
         } catch(e) {
             console.error(e);
-            toast.error("Access groups failed to load");
+            toast.error("Error loading access groups");
         }
     };
 
@@ -170,6 +190,15 @@ const CreatePersonsTwo = () => {
         const person = newPersons.find(p => p.personId == personId);
         person.credentials = person.credentials.filter(c => c.credId != credId);
         setPersonsInfo(newPersons);
+
+        const newValidations = [...personsValidation];
+
+        newPersons.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
 
         const b1 = checkCredRepeatedHelper(newPersons, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
@@ -357,6 +386,15 @@ const CreatePersonsTwo = () => {
         newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
         setPersonsInfo(newInfo);
 
+        const newValidations = [...personsValidation];
+
+        newInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
+
         const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
@@ -364,7 +402,14 @@ const CreatePersonsTwo = () => {
 
     const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
-        
+        const newValidations = [...personsValidation];
+
+        personsInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
         const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
@@ -396,21 +441,18 @@ const CreatePersonsTwo = () => {
         const personValidation = newValidations.find(p => p.personId == person.personId);
         personValidation.credentialCheckFailed = {} // reset check failed error
 
-        let hasAnyCredErrors = false;
-
-        const credResArr = await Promise.all(person.credentials.map(cred => checkCredentialApi(cred, personId)));
+        const credResArr = await Promise.all(person.credentials.map(cred => checkCredentialApi(cred, person.personId)));
         
         let failedCredArr = credResArr.filter(res => res.status > 201);
         let credCheckFailed = {};
         if (failedCredArr.length > 0) { // some failed
-            hasAnyCredErrors = true;
             for (let i = 0; i < failedCredArr.length; i++) {
                 const failedCred = await failedCredArr[i].json();
                 console.log(failedCred, "failedCred");
                 credCheckFailed = { ...credCheckFailed, ... failedCred };
             }
-            personValidation.credentialCheckFailed = credentialCheckFailed; // return error format { [credId]: "Error message" }
-            toast.error("Credential check failed for " + getPersonName(body));
+            personValidation.credentialCheckFailed = credCheckFailed; // return error format { [credId]: "Error message" }
+            toast.error("Credential check failed for " + person.personFirstName + " " + person.personLastName);
             return false;
         }
 
@@ -462,7 +504,8 @@ const CreatePersonsTwo = () => {
                 // all success
                 router.replace(personListLink);
             }
-        } catch {
+        } catch (e) {
+            console.log("error", e);
             toast.error("Unable to submit form");
         }        
         setDisableSubmit(false);
@@ -482,6 +525,10 @@ const CreatePersonsTwo = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                            open={serverDownOpen} 
+                            handleDialogClose={() => setServerDownOpen(false)}
+					    />
                         <NextLink
                             href={personListLink}
                             passHref

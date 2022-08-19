@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { entranceListLink } from "../../../utils/entrance";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const CreateRecorders = () => {
 
@@ -68,7 +70,9 @@ const CreateRecorders = () => {
     const [recorderNames, setRecorderNames] = useState({});
     const [recorderIpAddresses, setRecorderIpAddresses] = useState({});
     const [recorderSerialNumbers, setRecorderSerialNumbers] = useState({});
-    const [recorderPortNumbers, setRecorderPortNumbers] = useState({})
+    const [recorderPortNumbers, setRecorderPortNumbers] = useState({});
+
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     useEffect(() => {
         videoRecorderApi.getRecorders()
@@ -89,6 +93,8 @@ const CreateRecorders = () => {
                     setRecorderIpAddresses(newRecorderIpAddresses);
                     setRecorderSerialNumbers(newRecorderSerialNumbers);
                     setRecorderPortNumbers(newRecorderPortNumbers);
+                } else if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
                 }
             })
     }, []);
@@ -383,6 +389,10 @@ const CreateRecorders = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
