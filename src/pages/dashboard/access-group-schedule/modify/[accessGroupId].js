@@ -16,6 +16,7 @@ import MultipleSelectInput from "../../../../components/dashboard/shared/multi-s
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../../api/controllers";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -27,11 +28,17 @@ const ModifyAccessGroupSchedule = () => {
     const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
     const [allEntrances, setAllEntrances] = useState([])
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     const getEntrance = async () => {
         const res = await accessGroupEntranceNtoNApi.getEntranceWhereAccessGroupId(accessGroupId);
-          if(res.status != 200) { // accgrp not found
-            toast.error("Access Group not found");
+        if (res.status != 200) { // accgrp not found
+            if (res.status == serverDownCode) {
+                toast.error("Error loading entrances due to server is down");
+            } else {
+                toast.error("Entrances not found");
+            }
             router.replace("/dashboard");
+            return;
         }
         const data = await res.json();
         setGrpToEnt(data);
@@ -42,9 +49,14 @@ const ModifyAccessGroupSchedule = () => {
     }
     const getAccGrp = async() => {
         const res = await accessGroupApi.getAccessGroup(accessGroupId);
-        if(res.status != 200) { // accgrp not found
-            toast.error("Access Group not found");
+        if (res.status != 200) { // accgrp not found
+            if (res.status == serverDownCode) {
+                toast.error("Error loading access group due to server is down");
+            } else {
+                toast.error("Access Group not found");
+            }
             router.replace("/dashboard");
+            return;
         }
         const data = await res.json();
         setAccGrp(data);
@@ -306,13 +318,17 @@ const ModifyAccessGroupSchedule = () => {
                             Modify Access Group Schedule
                         </Typography>
                         <Grid container>
-                            <Grid item mr={1}>
-                        <Typography variant="body2" color="neutral.500">
+                            <Grid item
+mr={1}>
+                        <Typography variant="body2"
+color="neutral.500">
                         {"Modifying for Access Group: "}
                         </Typography>
                         </Grid>
                         <Grid item>
-                        <Typography variant="body2" color="neutral.500" fontWeight="bold">
+                        <Typography variant="body2"
+color="neutral.500"
+fontWeight="bold">
                         {accGrp?accGrp.accessGroupName:"undefined"}
                         </Typography>
                         </Grid>
@@ -320,13 +336,19 @@ const ModifyAccessGroupSchedule = () => {
                         {/* <Typography variant="body2" color="neutral.500">
                         {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
                         </Typography> */}
-                        <Alert severity="info"variant="outlined">Quick tip : You may select more than one entrance to apply these schedules to multiple entrances </Alert>
+                        <Alert severity="info"
+variant="outlined">Quick tip : You may select more than one entrance to apply these schedules to multiple entrances </Alert>
                     </Box>
-                    <Grid container alignItems="center" mb={3}>
-                        <Grid item mr={2}>
+                    <Grid container
+alignItems="center"
+mb={3}>
+                        <Grid item
+mr={2}>
                             <Typography fontWeight="bold">Entrance :</Typography>
                         </Grid>
-                        <Grid item xs={11} md={7}>
+                        <Grid item
+xs={11}
+md={7}>
                             <MultipleSelectInput
                                 options={allEntrances}
                                 setSelected={changeEntrance}
@@ -374,7 +396,9 @@ const ModifyAccessGroupSchedule = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+marginRight={3}
+mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
@@ -400,7 +424,9 @@ const ModifyAccessGroupSchedule = () => {
                                         Replace all
                                     </Button>
                                 </Grid>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+marginRight={3}
+mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"

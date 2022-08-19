@@ -18,77 +18,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import toast from "react-hot-toast";
 import SingleSelect from "../../../components/dashboard/shared/single-select-input";
-
-
-
-
-const logs=[
-    {
-        "eventId": 1,
-        "direction": "IN",
-        "eventTime": (new Date()).toISOString(),
-        "deleted": false,
-        "person": {
-            "personId": 1,
-            "personFirstName": "Paul",
-            "personLastName": "Atreides",
-            "deleted": false
-        },
-        "entrance": {
-            "entranceId": 1,
-            "entranceName": "Main Entrance",
-            "deleted": false
-        },
-        "accessGroup": {
-            "accessGroupId": 1,
-            "accessGroupName": "Dune",
-            "deleted": false
-        },
-        "eventActionType": {
-            "eventActionTypeId": 1,
-            "eventActionTypeName": "Authenticated Scans",
-            "isTimerEnabled": false
-        },
-        "controller": {
-            "controllerId": 1,
-            "controllerName": "5e86805e2bafd54f66cc95c3",
-            "deleted": false
-        }
-    },
-    {
-        "eventId": 2,
-        "direction": "OUT",
-        "eventTime": (new Date()).toISOString(),
-        "deleted": false,
-        "person": {
-            "personId": 2,
-            "personFirstName": "Leto",
-            "personLastName": "Atreides",
-            "deleted": false
-        },
-        "entrance": {
-            "entranceId": 2,
-            "entranceName": "Side Entrance",
-            "deleted": true
-        },
-        "accessGroup": {
-            "accessGroupId": 2,
-            "accessGroupName": "Not dune",
-            "deleted": false
-        },
-        "eventActionType": {
-            "eventActionTypeId": 2,
-            "eventActionTypeName": "Masterpassword used",
-            "isTimerEnabled": false
-        },
-        "controller": {
-            "controllerId": 1,
-            "controllerName": "5e86805e2bafd54f66cc95c3",
-            "deleted": false
-        }
-    }
-]
-
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 
 // fix filter, check if can import utils 
@@ -172,7 +103,9 @@ const [rowsPerPage, setRowsPerPage] = useState(10);
 const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
 const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
 const eventsCount = filteredEvents.length;
-
+const [serverDownOpen, setServerDownOpen] = useState(false);
+const [firstTimeCall, setFirstTimeCall] = useState(true);
+    
 // for polling 
 const [pollingTime, setPollingTime] = useState(1000);
 const pollingOptions = [
@@ -192,22 +125,51 @@ const onPollingTimeChange = (e) => {
 
 const getEvents = useCallback(async () => {
     try {
-  //const data = await personApi.getFakePersons() 
-    const res = await eventslogsApi.getEvents()
-
-    const data = await res.json()
-        if (isMounted()) {
-            setEvents(data);
+        //const data = await personApi.getFakePersons() 
+        const res = await eventslogsApi.getEvents()
+        
+        if (res.status === 200) {
+            const data = await res.json()
+            if (isMounted()) {
+                setEvents(data);
+            }
+        } else {
+            setEvents([]);
         }
     } catch (err) {
-        console.error(err);
+        toast.error("Some error has occurred");
+    }
+}, [isMounted]);
+    
+const getEventsWithErrorPopUps = useCallback(async () => {
+    try {
+        //const data = await personApi.getFakePersons() 
+        const res = await eventslogsApi.getEvents()
+        
+        if (res.status === 200) {
+            const data = await res.json()
+            if (isMounted()) {
+                setEvents(data);
+            }
+        } else {
+            if (firstTimeCall) {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading event logs");
+                setFirstTimeCall(false);
+            }
+            setEvents([]);
+        }
+    } catch (err) {
+        toast.error("Some error has occurred");
     }
 }, [isMounted]);
 
 
 useEffect(
     () => {
-        getEvents()
+        getEventsWithErrorPopUps()
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -249,13 +211,21 @@ const getInfo = useCallback(async() => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen} 
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{mb: 4}}>
-                        <Grid container justifyContent="space-between" spacing={3}>
-                            <Grid item sx={{m:2.5}}>
+                        <Grid container
+                            justifyContent="space-between"
+                            spacing={3}>
+                            <Grid item
+                                sx={{m:2.5}}>
                                 <Typography variant="h4">Event Logs</Typography>
                             </Grid>
-                            <Grid item sx={{m:2.5}}>
+                            <Grid item
+                                sx={{m:2.5}}>
                                 <Button
                                     variant="contained"
                                     sx={{ m: 1 , mr : 5 }}
@@ -267,15 +237,19 @@ const getInfo = useCallback(async() => {
                             </Grid>
                             </Grid>
                         
-                        <Grid container justifyContent="space-between" spacing={3}>
+                        <Grid container
+                            justifyContent="space-between"
+                            spacing={3}>
                         <Box
                             sx={{
                                 m: 2.5,
                                 mt: 3
                             }}
                         >
-                            <Button startIcon={<Upload fontSize="small" />} sx={{m: 1}}>Import</Button>
-                            <Button startIcon={<Download fontSize="small" />} sx={{m: 1}}>Export</Button>
+                            <Button startIcon={<Upload fontSize="small" />}
+                            sx={{m: 1}}>Import</Button>
+                            <Button startIcon={<Download fontSize="small" />}
+                            sx={{m: 1}}>Export</Button>
                             <Tooltip
                                 title="Excel template can be found at {}"
                                 enterTouchDelay={0}

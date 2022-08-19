@@ -40,6 +40,8 @@ import toast from "react-hot-toast";
 import { createFilter } from "../../../utils/list-utils";
 import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink } from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const tabs = [
 	{
@@ -145,19 +147,27 @@ const PersonList = () => {
 
 	const getPersonsLocal = useCallback(async () => {
 		try {
-      //const data = await personApi.getFakePersons() 
-        const res = await personApi.getPersons()
-		const data = await res.json()
-			if (isMounted()) {
-				setPersons(data);
-				const newAccessGroupNames = {};
-				data.forEach(p => {
-					if(p.accessGroup) {
-						newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
-					}
-				})
-				setAccessGroupNames(Object.keys(newAccessGroupNames));
-			}
+      		//const data = await personApi.getFakePersons() 
+			const res = await personApi.getPersons()
+			if (res.status == 200) {
+				const data = await res.json();
+				if (isMounted()) {
+					setPersons(data);
+					const newAccessGroupNames = {};
+					data.forEach(p => {
+						if(p.accessGroup) {
+							newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
+						}
+					})
+					setAccessGroupNames(Object.keys(newAccessGroupNames));
+				}
+            }
+			else {
+				if (res.status == serverDownCode) {
+					setServerDownOpen(true);
+				}
+                setPersons([]);
+            }
 		} catch (err) {
 			console.error(err);
 		}
@@ -261,7 +271,8 @@ const PersonList = () => {
 	);
 
 	//for delete action button: opens the delete form
-	const [deleteOpen, setDeleteOpen] = React.useState(false);  
+	const [deleteOpen, setDeleteOpen] = React.useState(false);
+	const [serverDownOpen, setServerDownOpen] = React.useState(false);
 	
 	//Set to true if multiple people are selected. controls form input visibility.
 	const [selectedState, setselectedState] = useState(false);
@@ -345,9 +356,16 @@ const PersonList = () => {
 				}}
 			>
 				<Container maxWidth="xl">
+					<ServerDownError
+						open={serverDownOpen} 
+						handleDialogClose={() => setServerDownOpen(false)}
+					/>
 					<Box sx={{ mb: 4 }}>
-						<Grid container justifyContent="space-between" spacing={3}>
-							<Grid item sx={{m:2.5}}>
+						<Grid container
+								justifyContent="space-between"
+								spacing={3}>
+							<Grid item
+									sx={{m:2.5}}>
 								<Typography variant="h4">Persons</Typography>
 							</Grid>
 							<Grid item>
@@ -364,20 +382,25 @@ const PersonList = () => {
 									open={open}
 									onClose={handleClose}
 								>
-									<NextLink href={personCreateLink} passHref>
+									<NextLink href={personCreateLink}
+										passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
 											&#8288;Create
 										</MenuItem>
 									</NextLink>
-									<NextLink href={getPersonIdsEditLink(selectedPersons)} passHref>
-										<MenuItem disableRipple disabled={buttonBlock}>
+									<NextLink href={getPersonIdsEditLink(selectedPersons)}
+										passHref>
+										<MenuItem disableRipple
+											disabled={buttonBlock}>
 											<EditIcon />
 											&#8288;Edit
 										</MenuItem>
 									</NextLink>
 									
-									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
+									<MenuItem disableRipple
+										onClick={handleDeleteOpen}
+										disabled={buttonBlock}>
 										<DeleteIcon />
 										&#8288;Delete
 									</MenuItem>
@@ -397,7 +420,8 @@ const PersonList = () => {
 								mt: 3,
 							}}
 						>
-							<Button startIcon={<UploadIcon fontSize="small" />} sx={{ m: 1 }}>
+							<Button startIcon={<UploadIcon fontSize="small" />}
+								sx={{ m: 1 }}>
 								Import
 							</Button>
 							<Button
@@ -408,7 +432,8 @@ const PersonList = () => {
 							</Button>
 							<Tooltip  title='Excel template can be found at {}'
 							enterTouchDelay={0}
-								placement ='top' sx={{
+								placement ='top'
+								sx={{
 									m: -0.5,
 									mt: 3,
 								}}>

@@ -17,6 +17,8 @@ import { controllerApi } from "../../../api/controllers";
 import toast from "react-hot-toast";
 import { Confirmdelete } from "../../../components/dashboard/controllers/confirm-delete";
 import { ConfirmReset } from "../../../components/dashboard/controllers/confirm-reset";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const applyFilter = createFilter({
     query: filterControllerByString
@@ -24,6 +26,7 @@ const applyFilter = createFilter({
 
 const ControllerList = () => {
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     // copied
     useEffect(() => {
         gtm.push({ event: "page_view" });
@@ -42,7 +45,10 @@ const ControllerList = () => {
     const getInfo = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
         if (controllersRes.status !== 200) {
-            toast.error("Controllers not loaded");
+            if (controllersRes.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading controllers");
             return;
         }
         const controllersJson = await controllersRes.json();
@@ -183,6 +189,10 @@ const ControllerList = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <Grid

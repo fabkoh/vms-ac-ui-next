@@ -42,6 +42,8 @@ import { authDeviceApi } from "../../../../api/auth-devices";
 import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
 import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../../api/events-management";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 const ControllerDetails = () => {
 
@@ -52,6 +54,7 @@ const ControllerDetails = () => {
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const [controllerInfo, setControllerInfo] = useState(null)
     const [controllerEventManagements, setControllerEventManagements] = useState([]);
@@ -70,9 +73,14 @@ const ControllerDetails = () => {
                     // console.log("getController",data)
                     getPairs(data)
                 }
-                else{
-                    toast.error("Controller info not found")
-                    router.replace(getControllerListLink())
+                else {
+                    if (res.status == serverDownCode) {
+                        toast.error("Error loading controller info due to server is down");
+                    } else {
+                        toast.error("Controller info not found")
+                    }
+                    router.replace(getControllerListLink());
+                    return;
                 }
             })
         }catch(err){console.log(err)}
@@ -89,7 +97,10 @@ const ControllerDetails = () => {
                 }
             }
             else {
-                toast.error("Controller Event Managements Not Loaded");
+                if (eventManagements.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading controller event managements");
                 setControllerEventManagements([]);
             }
         }
@@ -118,7 +129,10 @@ const ControllerDetails = () => {
                 toast.dismiss()
                 if(res.status!=200){
                     setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    toast.error("Failed to fetch status");
                 }
                 else{
                     setStatusLoaded(true)
@@ -400,6 +414,10 @@ const ControllerDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>

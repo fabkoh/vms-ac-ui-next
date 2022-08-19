@@ -45,6 +45,8 @@ import videoRecorderApi from "../../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
 import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../../utils/video-recorder";
 import {VideoRecorderCameras} from "../../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
+import { ServerDownError } from "../../../../../components/errors/server-down-error";
+import {serverDownCode} from "../../../../../api/api-helpers";
 
 function formatDate(date) {
   var d = new Date(date),
@@ -82,6 +84,8 @@ const VideoCameraDetails = () => {
     const [download_start_time, setDownloadStartTime] = useState(new Date());
     const [download_end_time, setDownloadEndTime] = useState(new Date());
     const [playback_files, setPlaybackFiles] = useState([]);
+    
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const get_sdk_handle = async function() {
         while (true) {
@@ -694,8 +698,11 @@ const VideoCameraDetails = () => {
 
                         setLoadedSDK(true);
                     }
-                } else{
-                    toast.error("Video Recorder camera info not found")
+                } else {
+                  if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                  }
+                    toast.error("Video recorder info not found")
                 }
             })
         } catch(err){ }
@@ -732,6 +739,10 @@ const VideoCameraDetails = () => {
               flexGrow: 1,
               py: 8
           }}>
+          <ServerDownError
+            open={serverDownOpen}
+            handleDialogClose={() => { setServerDownOpen(false) }}
+          />
           <Container maxWidth="lg">
             <div>
               <Box sx={{ mb: 4 }}>         
@@ -750,7 +761,9 @@ const VideoCameraDetails = () => {
                 </Link>
                         
               </Box>
-              <Grid container justifyContent="space-between" spacing={3}>
+              <Grid container
+                justifyContent="space-between"
+                spacing={3}>
                 <Grid item
                   sx={{
                     alignItems: 'center',
@@ -766,8 +779,10 @@ const VideoCameraDetails = () => {
             </Grid>
           </div>
           <Box sx={{ mt: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
+            <Grid container
+              spacing={3}>
+              <Grid item
+                xs={12}>
                 <div
                   key = "plugin_div"
                   style = {{justifyContent: 'center', display: 'flex'}}
@@ -775,7 +790,8 @@ const VideoCameraDetails = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item
+                xs={12}>
                 <div>
                   <div>
                     
@@ -938,7 +954,8 @@ const VideoCameraDetails = () => {
                               value={ptz_speed}
                               label="Speed">
                               {
-                                [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value} value = {value}>{value}</MenuItem>))
+                                [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value}
+value = {value}>{value}</MenuItem>))
                               }
                             </Select>
                           </div>
@@ -1158,7 +1175,8 @@ const VideoCameraDetails = () => {
                             value={preset_view}
                             label="Preset View">
                             {
-                              [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value} value = {value}>{value}</MenuItem>))
+                              [1, 2, 3, 4, 5, 6, 7].map((value)  => (<MenuItem key = {value}
+                              value = {value}>{value}</MenuItem>))
                             }
                           </Select>
                         </div>
@@ -1208,7 +1226,8 @@ const VideoCameraDetails = () => {
                                 [
                                   {"name": "Main stream", "value": 1},
                                   {"name": "Sub stream", "value": 2}
-                                ].map(({name, value})  => (<MenuItem key = {value} value = {value}>{name}</MenuItem>))
+                                ].map(({name, value})  => (<MenuItem key = {value}
+                                value = {value}>{name}</MenuItem>))
                               }
                             </Select>
                           </div>
@@ -1487,7 +1506,8 @@ VideoCameraDetails.getLayout = (page) => (
       <script src="/static/sdk/codebase/encryption/AES.js"></script>
       <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
       <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-      <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+      <script id="videonode"
+              src="/static/sdk/codebase/webVideoCtrl.js"></script>
     </Head>
     <DashboardLayout>
       { page }

@@ -112,11 +112,6 @@ class AuthDeviceApi {
 
     }
 
-    updateUnicon() {
-        if (useApi) { return sendApi(`/api/uniconUpdater`, { method: 'POST' }); }
-
-    }
-
     getAuthenticationSchedules(authDeviceId) {
         
         if (useApi) { return sendApi(`/api/authentication-schedule/${authDeviceId}`, { method: 'GET' }); }

@@ -18,6 +18,8 @@ import { deleteCredentialApi, saveCredentialApi, getCredentialWherePersonIdApi} 
 import { getCredTypesApi } from "../../../../api/credential-types";
 import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 // const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
@@ -51,6 +53,8 @@ const EditPersonsTwo = () => {
     // credTypes
     const [credTypes, setCredTypes] = useState([]);
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+
     // get info
     const isMounted = useMounted(); 
     useEffect(() => {
@@ -61,7 +65,12 @@ const EditPersonsTwo = () => {
         try {
             const res = await getCredTypesApi();
             if (res.status != 200) {
-                throw new Error("cred types info not loaded");
+                toast.error("Error loading credential types");
+                setCredTypes([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setCredTypes(body);
@@ -151,7 +160,14 @@ const EditPersonsTwo = () => {
         try {
             const res = await personApi.getPersons();
             if (res.status != 200) {
-                throw new Error("person info not loaded");
+                toast.error("Error loading person info");
+                setPersonUids([]);
+                setPersonMobileNumbers([]);
+                setPersonEmails([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setPersonUids(body.map(p => p.personUid));
@@ -167,13 +183,18 @@ const EditPersonsTwo = () => {
         try {
             const res = await accessGroupApi.getAccessGroups();
             if (res.status != 200) {
-                throw new Error("access group info not loaded");
+                toast.error("Error loading access groups");
+                setAccessGroups([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setAccessGroups(body);
         } catch(e) {
             console.error(e);
-            toast.error("Access groups failed to load");
+            toast.error("Error loading access groups");
         }
     };
 
@@ -221,6 +242,14 @@ const EditPersonsTwo = () => {
         const person = newPersons.find(p => p.personId == personId);
         person.credentials = person.credentials.filter(c => c.credId != credId);
         setPersonsInfo(newPersons);
+        const newValidations = [...personsValidation];
+
+        newPersons.forEach(
+            (person, i) => {
+                newValidations[i].credentialSubmitFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
 
         const b1 = checkCredRepeatedHelper(newPersons, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
@@ -391,6 +420,14 @@ const EditPersonsTwo = () => {
         newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
         // console.log("credtypechange",newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId))
         setPersonsInfo(newInfo);
+        const newValidations = [...personsValidation];
+
+        newInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialSubmitFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
         const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
         if(b1 || b2 ) { setPersonsValidation([ ...personsValidation ]); }
@@ -400,6 +437,16 @@ const EditPersonsTwo = () => {
         // personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref;
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
         // console.log("uidchange,originalcreds?",personsInfo.find(p => p.personId == personId).originalCreds)
+        
+        const newValidations = [...personsValidation];
+
+        personsInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialSubmitFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
+
         const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
         const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
         if(b1 || b2 ) { setPersonsValidation([ ...personsValidation ]); }
@@ -551,6 +598,10 @@ const EditPersonsTwo = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                            open={serverDownOpen} 
+                            handleDialogClose={() => setServerDownOpen(false)}
+					    />
                         <NextLink
                             href={personListLink}
                             passHref

@@ -12,6 +12,8 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { getCredentialsApi } from "../../../api/credentials";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import NextLink from "next/link";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const applyFilter = createFilter({
     query: filterPersonByCredential
@@ -22,11 +24,17 @@ const AddCredentials = () => {
     // fetch info 
     const isMounted = useMounted();
     const [persons, setPersons] = useState([]);
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     const getInfo = useCallback(async() => {
         try {
             const res = await Promise.all([personApi.getPersons(), getCredentialsApi()]);
             const [personRes,credsRes] = res;
-            if(personRes.status != 200) throw "Error loading persons info";
+            if (personRes.status != 200) {
+                if (personRes.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw "Error loading persons info";
+            };
             const personData = await personRes.json();
             if(credsRes.status != 200) {
                 setPersons(personData); // at least have persons if credRes fails
@@ -105,6 +113,10 @@ const AddCredentials = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <Grid sx={{ m: 2.5 }}>

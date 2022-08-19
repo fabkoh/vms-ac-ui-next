@@ -16,9 +16,12 @@ import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { entranceListLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const CreateEntrances = () => {
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     // empty objects for initialisation of new card
     const getEmptyEntranceInfo = (entranceId) => ({
         entranceId,
@@ -63,11 +66,15 @@ const CreateEntrances = () => {
                 const body = await res.json();
                 setAllAccessGroups(body);
             } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                setAllAccessGroups([]);
                 throw new Error("Access Groups not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Access Groups info not loaded")
+            toast.error("Error loading access groups info");
         }
     }, [isAccessGroupMounted]);
 
@@ -91,6 +98,8 @@ const CreateEntrances = () => {
                     const body = await res.json();
                     body.forEach(group => newEntranceNames[group.entranceName] = true); 
                     setEntranceNames(newEntranceNames);
+                } else {
+                    setEntranceNames({});
                 }
             })
     }, []);
@@ -331,6 +340,10 @@ const CreateEntrances = () => {
                     py: 8
                 }}
             >
+                <ServerDownError 
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -389,7 +402,8 @@ const CreateEntrances = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

@@ -14,6 +14,8 @@ import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import router from "next/router";
 import { controllerApi } from "../../../api/controllers";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const EditEntrances = () => {
 
@@ -30,6 +32,13 @@ const EditEntrances = () => {
         // map each id to a fetch req for that entrance
         const resArr = await Promise.all(ids.map(id => entranceApi.getEntrance(id)));
         const successfulRes = resArr.filter(res => res.status == 200);
+        const serverDownRes = resArr.filter(res => res.status == serverDownCode);
+
+        if (serverDownRes.length > 0) {
+            toast.error("Error loading entrances as server is down");
+            router.replace('/dashboard/entrances');
+            return;
+        }
 
         // no entrances to edit
         if (successfulRes.length == 0) {
@@ -421,7 +430,8 @@ const EditEntrances = () => {
                                 )
                             })}
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+                                    marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"
