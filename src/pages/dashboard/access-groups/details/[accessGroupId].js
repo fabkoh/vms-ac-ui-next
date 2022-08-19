@@ -33,12 +33,15 @@ import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { getAccessGroupScheduleEditLink } from "../../../../utils/access-group-schedule";
 import { accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink } from "../../../../utils/access-group";
 import { controllerApi } from "../../../../api/controllers";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 const AccessGroupDetails = () => {
 
     // load access group details
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     const { accessGroupId }  = router.query;
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -68,10 +71,18 @@ const AccessGroupDetails = () => {
                         setAccessGroupSchedules(body);
                     }
                 } else {
-                    toast.error("Schedule info not loaded");
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    setAccessGroupSchedules([]);
+                    toast.error("Error loading schedule info");
                 }
             } else {
-                toast.error("Entrance info not loaded");
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                setAccessGroupEntrance([]);
+                toast.error("Error loading entrance info");
             }
         } catch(err) {
             console.error(err);
@@ -81,9 +92,14 @@ const AccessGroupDetails = () => {
     const getAccessGroup = (async() => {
         try {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
-            if(res.status != 200) {
-                toast.error('Access group not found');
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    toast.error("Error loading access group info due to server is down");
+                } else {
+                    toast.error('Access group not found');
+                }
                 router.replace(accessGroupListLink);
+                return;
             }
             const body = await res.json();
 
@@ -183,6 +199,9 @@ const AccessGroupDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)} />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>

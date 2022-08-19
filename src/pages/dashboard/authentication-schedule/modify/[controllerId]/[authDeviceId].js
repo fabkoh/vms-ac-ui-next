@@ -19,6 +19,8 @@ import { authMethodScheduleApi } from "../../../../../api/authentication-schedul
 import EditAuthSchedForm from "../../../../../components/dashboard/authentication-schedule/authentication-schedule-edit-form";
 import { controllerApi } from "../../../../../api/controllers";
 import AuthenticationAddOnError from "../../../../../components/dashboard/authentication-schedule/authentication-add-on-error";
+import { serverDownCode } from "../../../../../api/api-helpers";
+import { ServerDownError } from "../../../../../components/dashboard/errors/server-down-error";
 
 const ModifyauthMethodSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -28,9 +30,7 @@ const ModifyauthMethodSchedule = () => {
     const authDeviceId = temp.authDeviceId;
 
     const [open, setOpen] = useState(false);
-    
-
-    
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     // const [accGrp, setAccGrp] = useState()
     const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
@@ -38,8 +38,13 @@ const ModifyauthMethodSchedule = () => {
 
     const getControllerAuthDevices = async () => {
         const res = await controllerApi.getControllers();
-          if(res.status != 200) { // entrance not found
+        if (res.status != 200) { // entrance not found
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             toast.error("Authentication Devices not found");
+            setAllAuthenticationDevices([]);
+            return;
             // router.replace("/dashboard");
         }
         const data = await res.json()
@@ -461,6 +466,10 @@ const ModifyauthMethodSchedule = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <AuthenticationAddOnError
                     errorMessages={errorMessages}
                     handleClose={handleClose}
@@ -510,13 +519,19 @@ const ModifyauthMethodSchedule = () => {
                         {/* <Typography variant="body2" color="neutral.500">
                         {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
                         </Typography> */}
-                        <Alert severity="info"variant="outlined">Quick tip : You may apply these schedules to multiple authentication devices by selecting more than one authentication device </Alert>
+                        <Alert severity="info"
+                                variant="outlined">Quick tip : You may apply these schedules to multiple authentication devices by selecting more than one authentication device </Alert>
                     </Box>
-                    <Grid container alignItems="center" mb={3}>
-                        <Grid item mr={2}>
+                    <Grid container
+                        alignItems="center"
+                        mb={3}>
+                        <Grid item
+                            mr={2}>
                             <Typography fontWeight="bold">Authentication Device(s) :</Typography>
                         </Grid>
-                        <Grid item xs={11} md={7}>
+                        <Grid item
+                            xs={11}
+                            md={7}>
                             <MultipleSelectInput
                                 options={allAuthenticationDevices}
                                 setSelected={changeAuthDevice}
@@ -565,7 +580,9 @@ const ModifyauthMethodSchedule = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+                                    marginRight={3}
+                                    mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
@@ -592,7 +609,9 @@ const ModifyauthMethodSchedule = () => {
                                         Replace all
                                     </Button>
                                 </Grid>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+                                    marginRight={3}
+                                    mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
