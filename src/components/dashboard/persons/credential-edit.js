@@ -86,11 +86,9 @@ const CredentialEdit = ({
 		endDate != null && endDate < today
 			? "Note: expiry is before today"
 			: "Expiry is end date inclusive";
-	const credentialInUse = validation.credentialInUseIds.includes(credId);
+	const credentialSubmitFailed = validation.credentialSubmitFailed[credId] !== undefined;
 	const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
-	
-	console.log("validation", credentialInUse)
 
 	// const [show, setShow] = useState(true);
 	// const handleShowPasswordClick = () => setShow(!show);
@@ -142,10 +140,9 @@ const CredentialEdit = ({
                     // value={credUidRef.current.value}
                     // value={credUidRef.current.value}  undef
                     // value={credUidRef.current?.value} undef
-                    // error={credentialInUse }
-                    error={credentialInUse || credentialRepeated || credentialUidRepeatedForNotPinTypeCred}
-                    helperText={
-                        (credentialInUse && "Error: credential type and value in use") ||
+                    error={credentialRepeated || credentialSubmitFailed || credentialUidRepeatedForNotPinTypeCred}
+						helperText={
+						(credentialSubmitFailed && "Error: " + validation.credentialSubmitFailed[credId]) ||
 						(credentialRepeated && "Error: repeated type & value in form") ||
 						(credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||' '
                     }

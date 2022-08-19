@@ -351,12 +351,12 @@ const CreateRecorders = () => {
                                 setRecorderInfoArr(failedResIndex.map(i => recorderInfoArr[i])); // set failed recorders to stay
                                 setRecorderValidationsArr(failedResIndex.map((i) => {
                                     let recordValidation = recorderValidationsArr[i]
-                                    recordValidation.recorderNameError = failedResArr[i].recorderName ?? "";
-                                    recordValidation.recorderSerialNumberError = failedResArr[i].recorderSerialNumber ?? "";
-                                    recordValidation.recorderIpAddressError = failedResArr[i].recorderIpAddress ?? "";
-                                    recordValidation.recorderPortNumberError = failedResArr[i].recorderPortNumber ?? "";
-                                    recordValidation.recorderUsernameError = failedResArr[i].recorderUsername ?? "";
-                                    recordValidation.recorderPasswordError = failedResArr[i].recorderPassword ?? "";
+                                    recordValidation.recorderNameError = failedResArr.recorderName ?? "";
+                                    recordValidation.recorderSerialNumberError = failedResArr.recorderSerialNumber ?? "";
+                                    recordValidation.recorderIpAddressError = failedResArr.recorderIpAddress ?? "";
+                                    recordValidation.recorderPortNumberError = failedResArr.recorderPortNumber ?? "";
+                                    recordValidation.recorderUsernameError = failedResArr.recorderUsername ?? "";
+                                    recordValidation.recorderPasswordError = failedResArr.recorderPassword ?? "";
                                     recordValidation.submitFailed = true;
                                     return recordValidation;
                                 })); // set failed recorder validations to stay
