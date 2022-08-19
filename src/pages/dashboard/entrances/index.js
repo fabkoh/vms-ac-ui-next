@@ -55,14 +55,7 @@ const EntranceList = () => {
             toast.error("Error loading access groups info");
             return;
         }
-        if (successArr.length == 0) {
-            toast.error("Error loading access groups info");
-            newEntrances.forEach((entrance, i) => entrance.accessGroups = []);
-            if (isMounted()) {
-                setEntrances(newEntrances);
-            }
-            return;
-        }
+
         if(successArr.some(success => !success)) { // some res fail
             toast.error("Error loading access groups info");
         }

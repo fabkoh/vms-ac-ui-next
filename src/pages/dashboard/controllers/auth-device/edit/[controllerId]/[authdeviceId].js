@@ -16,13 +16,16 @@ import { getAuthdeviceDetailsLink, getControllerDetailsLink, getControllerDetail
 import { controllerApi } from "../../../../../../api/controllers";
 import { authDeviceApi } from "../../../../../../api/auth-devices";
 import AuthdeviceEditForm from "../../../../../../components/dashboard/controllers/auth-device/auth-device-edit-form";
+import { serverDownCode } from "../../../../../../api/api-helpers";
+import { ServerDownError } from "../../../../../../components/dashboard/errors/server-down-error";
 
 const EditAuthDevice = () => {
     const isMounted = useMounted();
     const { authdeviceId }  = router.query; 
     const { controllerId }  = router.query; 
     // console.log(authdeviceId)
-    const [deviceInfo, setDeviceInfo] = useState()
+    const [deviceInfo, setDeviceInfo] = useState();
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getDevice = async(authdeviceId) => {
         try{
@@ -33,19 +36,32 @@ const EditAuthDevice = () => {
                     setDeviceInfo(data)
                     console.log("getDevice",data)
                 }
-                else{
-                    toast.error("Device info not found")
+                else {
+                    if (res.status == serverDownCode) {
+                        toast.error("Error loading auth device info due to server is down");
+                    } else {
+                        toast.error("Device info not found")
+                    }
                     router.replace(getControllerListLink) //maybe go back to controller details?
+                    return;
                 }
             })
-        }catch(err){console.log(err)}
+        }
+        catch (err) { console.log(err) }
     }
 
     const [authMethodList, setAuthMethodList ] = useState([])
     const getAuthMethodList = async () => {
-        authDeviceApi.getAllAuthMethods().then(async(res)=>{
-            setAuthMethodList(await res.json())
-            // console.log('a',authMethodList)
+        authDeviceApi.getAllAuthMethods().then(async (res) => {
+            if (res.status == 200) {
+                setAuthMethodList(await res.json())
+            } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                } 
+                toast.error("Error loading auth methods")
+                setAuthMethodList([]);
+            }
         }
         )
     }
@@ -120,6 +136,10 @@ const EditAuthDevice = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -159,7 +179,8 @@ const EditAuthDevice = () => {
                             authMethodList={authMethodList}
                             />
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+                                    marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"
