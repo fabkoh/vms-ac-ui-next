@@ -49,7 +49,7 @@ const EntranceList = () => {
             )
         );
         const successArr = resArr.map(res => res.status == 200);
-        const serverDownFailArr = resArr.map(res => res.status == serverDownCode);
+        const serverDownFailArr = resArr.filter(res => res.status == serverDownCode);
         if (serverDownFailArr.length > 0) {
             setServerDownOpen(true);
             toast.error("Error loading access groups info");

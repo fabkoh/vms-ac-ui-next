@@ -145,15 +145,15 @@ const PersonDetails = () => {
 	  >
 		<Container maxWidth="md">
 		  <div>
-			<Box sx={{ mb: 4 }}>
-			  <NextLink
-				href={personListLink}
-				passHref
-              >
+        <Box sx={{ mb: 4 }}>
         <ServerDownError
           open={serverDownOpen} 
           handleDialogClose={() => setServerDownOpen(false)}
 				/>
+			  <NextLink
+				href={personListLink}
+				passHref
+              >
 				<Link
 				  color="textPrimary"
 				  component="a"
