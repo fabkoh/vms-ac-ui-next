@@ -45,7 +45,7 @@ import videoRecorderApi from "../../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
 import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../../utils/video-recorder";
 import {VideoRecorderCameras} from "../../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
-import { ServerDownError } from "../../../../../components/errors/server-down-error";
+import { ServerDownError } from "../../../../../components/dashboard/errors/server-down-error";
 import {serverDownCode} from "../../../../../api/api-helpers";
 
 function formatDate(date) {
