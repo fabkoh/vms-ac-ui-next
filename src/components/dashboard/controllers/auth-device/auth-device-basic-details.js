@@ -13,7 +13,7 @@ import WarningChip from "../../shared/warning-chip";
 import BasicDetailsCard from "../../shared/basic-details-card";
 
 
-export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus}) => {
+export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus,getCurrentAuthMethod}) => {
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
@@ -99,6 +99,21 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                                 style={{color:'rgb(101, 116, 139)' ,fontSize:'12px'}}
                             >
                                 {"Default Auth Method will be used when no auth schedule is detected"}
+                            </Typography>
+                        </div>
+                    </PropertyListItem>
+
+                    <PropertyListItem
+                    align={align}
+                    divider
+                    label="Current Auth Method"
+                    >
+                        <div>
+                            <Typography
+                                color="textSecondary"
+                                variant="body2"
+                            >
+                                {getCurrentAuthMethod(deviceInfo.authDeviceId)}
                             </Typography>
                         </div>
                     </PropertyListItem>

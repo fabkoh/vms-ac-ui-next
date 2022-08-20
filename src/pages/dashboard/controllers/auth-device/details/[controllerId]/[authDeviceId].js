@@ -42,6 +42,7 @@ const AuthDeviceDetails = () => {
     const { authDeviceId }  = router.query; //change to auth device id
     const { controllerId }  = router.query; //change to auth device id
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [currentAuth,setCurrentAuth] = useState()
 
     const link = getAuthenticationScheduleEditLink(controllerId,authDeviceId);
     const [authenticationSchedules, setauthenticationSchedules] = useState([]);
@@ -88,6 +89,36 @@ const AuthDeviceDetails = () => {
         )
     }
     
+    const getAllCurrentAuthMethod = async(controllerId) => {
+        var authmethod = {}
+        try{
+            Promise.resolve(controllerApi.getAllCurrentAuthMethod(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    // console.log(data)
+                    setCurrentAuth(data)
+                }
+                else{
+                    console.log("ERROR")
+                }
+            })
+        }catch(err){console.log(err)}
+    }
+
+    const getCurrentAuthMethod = (authdeviceId) => {
+        if (currentAuth){
+            // console.log(typeof(currentAuth))
+            // console.log()
+            // current = currentAuth.authDeviceId
+            console.log(currentAuth)
+            console.log(authdeviceId,currentAuth[authdeviceId])
+            return currentAuth[authdeviceId]
+            // return currentAuth[authdeviceId]
+        }
+
+
+    }
 
     const [authStatus, setAuthStatus] = useState({})
     const [statusLoaded, setStatusLoaded] = useState(false)
@@ -149,6 +180,7 @@ const AuthDeviceDetails = () => {
         //get authDevice info and controller status
         getStatus()
         getAuthDevice()
+        getAllCurrentAuthMethod(controllerId)
         getAuthenticationSchedules()
     }, [isMounted])
 
@@ -391,6 +423,7 @@ const AuthDeviceDetails = () => {
                                 deviceInfo={deviceInfo}
                                 statusLoaded={statusLoaded}
                                 authStatus={authStatus}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpin}
                                 />
                             </Grid>   
