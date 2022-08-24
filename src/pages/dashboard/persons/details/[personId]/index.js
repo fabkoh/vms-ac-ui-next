@@ -75,7 +75,7 @@ const PersonDetails = () => {
         return;
       }
       const body = await res.json();
-      if(isMounted()) {
+      if(isMounted) {
         setPerson(body);
       }
     } catch(err) {
@@ -121,7 +121,8 @@ const PersonDetails = () => {
         router.replace(personListLink);
       }
       else{
-        toast.error('Delete unsuccessful')
+        toast.error('Delete unsuccessful');
+        res.json().then(json => toast.info(json))
       }
     })
 	};
