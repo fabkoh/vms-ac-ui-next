@@ -289,7 +289,7 @@ const CreateAccessGroups = () => {
 
         setSubmitted(true);
         Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.createAccessGroup(accessGroup)))
-               .then(resArr => {
+               .then((resArr) => {
                     const failedResIndex = []; // stores the index of the failed creations
                     const successResIndex = []; // stores the index of success creations
                     const originalAccessGroupInfoArr = [ ...accessGroupInfoArr ] // store first in case set access group info arr is executed before assignment
@@ -320,7 +320,7 @@ const CreateAccessGroups = () => {
                                 accessGroupToEntrance.map(
                                     groupToEntrance => accessGroupEntranceApi.assignEntrancesToAccessGroup(groupToEntrance[1], groupToEntrance[0])
                                 )
-                            ).then(
+                            ).then( () => {
                                 resArr => {
                                     resArr.forEach((res, i) => {
                                         if (res.status != 204) { // failed to assign
@@ -329,7 +329,8 @@ const CreateAccessGroups = () => {
                                         }
                                     })
                                 }
-                            )
+                                router.replace('/dashboard/access-groups');
+                            })
                         })
 
                     const numCreated = accessGroupInfoArr.length - failedResIndex.length;
@@ -346,9 +347,6 @@ const CreateAccessGroups = () => {
                                 setAccessGroupInfoArr(failedResIndex.map(i => accessGroupInfoArr[i])); // set failed access groups to stay
                                 setAccessGroupValidationsArr(failedResIndex.map(i => accessGroupValidationsArr[i])); // set failed access group validations to stay
                             });
-                    } else {
-                        // all passed
-                        router.replace('/dashboard/access-groups')
                     }
                })
     }
