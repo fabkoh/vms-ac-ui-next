@@ -59,6 +59,34 @@ const EntranceDetails = () => {
     const [entranceEventManagements, setEntranceEventManagements] = useState([]);
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
+    const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
+
+    const getControllers = async() => {
+        try {
+            const res = await controllerApi.getControllers();
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw 'cannot load controllers'
+            };
+            const body = await res.json();
+            const temp = {};
+            body.forEach(con => {
+                const authArr = con.authDevices;
+                if (Array.isArray(authArr)) {
+                    authArr.forEach(auth => {
+                        const entranceId = auth.entrance?.entranceId;
+                        if (entranceId) temp[entranceId] = con;
+                    });
+                }
+            });
+            setEntranceController(temp);
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrance controllers failed to load");
+        }
+    };
 
     const getAccessGroups = async () => {
         try {
@@ -161,6 +189,7 @@ const getEntranceEventsManagement = useCallback(async () => {
         getAccessGroups();
         getEntranceSchedules();
         getEntranceEventsManagement();
+        getControllers();
     }, [isMounted])
 
     useEffect(() => {
@@ -438,7 +467,8 @@ const getEntranceEventsManagement = useCallback(async () => {
                                 item
                                 xs={12}
                             >
-                                <EntranceBasicDetails entrance={entrance} />
+                                <EntranceBasicDetails entrance={entrance}
+                                    entranceController={entranceController} />
                             </Grid>
                             <Grid
                                 item
