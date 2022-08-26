@@ -469,7 +469,7 @@ const CreatePersonsTwo = () => {
             // credentialfailures will not be shown as error in the form
 
             const credResArr = await Promise.all(person.credentials.map(cred => saveCredentialApi(cred, personId, true)));
-            if (credResArr.some(res => res.status != 201 && res.status != 200)) { // some failed
+            if (credResArr.some(res => res.status > 201)) { // some failed
                 toast.error("Unable to create credential for " + getPersonName(body));
             }
             setPersonsValidation(newValidations);

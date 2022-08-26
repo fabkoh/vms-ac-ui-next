@@ -517,6 +517,7 @@ const EditPersonsTwo = () => {
             const credResArr = await Promise.all(person.credentials.map((cred, i) => saveCredentialApi(cred, personId, cred.credId < 0)));
             let successfulCredArr = credResArr.filter(res => res.status == 201 || res.status == 200);
             let failedCredArr = credResArr.filter(res => res.status > 201);
+            console.log(failedCredArr, "failedCredArr");
             let newCredsToStay = [];
             let credSubmitFailed = {};
             if (failedCredArr.length > 0) { // some failed
