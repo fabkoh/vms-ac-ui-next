@@ -19,6 +19,8 @@ import entranceApi from "../../../../api/entrance";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import EditEntSchedForm from "../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form";
 import { controllerApi } from "../../../../api/controllers";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 const ModifyEntranceSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -29,11 +31,18 @@ const ModifyEntranceSchedule = () => {
     // const [accGrp, setAccGrp] = useState()
     const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
     const [allEntrances, setAllEntrances] = useState([])
+    
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getEntrance = async () => {
         const res = await entranceApi.getEntrances();
-          if(res.status != 200) { // entrance not found
-            toast.error("Entrance not found");
+        if (res.status != 200) { // entrance not found
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+              }
+              toast.error("Error loading entrances");
+              setAllEntrances([]);
+              return;
             // router.replace("/dashboard");
         }
         const data = await res.json();
@@ -151,7 +160,7 @@ const ModifyEntranceSchedule = () => {
             // console.log(newValidations)
         }
         
-        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<tempStartTime);
+        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<=tempStartTime);
         // validation.timeEndInvalid = formUtils.checkBlank(endTime);
         // console.log(validation)
         setEntranceScheduleValidationsArr(newValidations)
@@ -214,7 +223,6 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })
@@ -231,7 +239,6 @@ const ModifyEntranceSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
-                controllerApi.uniconUpdater();
                 router.replace(`/dashboard/entrances/details/${entranceId}`)
             }
         })
@@ -272,6 +279,10 @@ const ModifyEntranceSchedule = () => {
                     Etlas: Modify Entrance Schedule
                 </title>
             </Head>
+            <ServerDownError
+                open={serverDownOpen}
+                handleDialogClose={() => setServerDownOpen(false)}
+            />
             <Box
                 component="main"
                 sx={{
@@ -322,13 +333,19 @@ const ModifyEntranceSchedule = () => {
                         {/* <Typography variant="body2" color="neutral.500">
                         {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
                         </Typography> */}
-                        <Alert severity="info"variant="outlined">Quick tip : You may apply these schedules to multiple entrances by selecting more than one entrance</Alert>
+                        <Alert severity="info"
+                                variant="outlined">Quick tip : You may apply these schedules to multiple entrances by selecting more than one entrance</Alert>
                     </Box>
-                    <Grid container alignItems="center" mb={3}>
-                        <Grid item mr={2}>
+                    <Grid container
+                        alignItems="center"
+                        mb={3}>
+                        <Grid item
+                            mr={2}>
                             <Typography fontWeight="bold">Entrance(s) :</Typography>
                         </Grid>
-                        <Grid item xs={11} md={7}>
+                        <Grid item
+                            xs={11}
+                            md={7}>
                             <MultipleSelectInput
                                 options={allEntrances}
                                 setSelected={changeEntrance}
@@ -376,7 +393,9 @@ const ModifyEntranceSchedule = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+                                    marginRight={3}
+                                    mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"
@@ -402,7 +421,9 @@ const ModifyEntranceSchedule = () => {
                                         Replace all
                                     </Button>
                                 </Grid>
-                                <Grid item marginRight={3} mb={2}>
+                                <Grid item
+                                    marginRight={3}
+                                    mb={2}>
                                     <Button
                                         type="submit"
                                         size="large"

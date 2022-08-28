@@ -41,6 +41,8 @@ import { Confirmdelete } from "../../../components/dashboard/access-groups/confi
 import { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, accessGroupCreateLink, getAccessGroupEditLink } from "../../../utils/access-group";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { controllerApi } from "../../../api/controllers";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const tabs = [
 	{
@@ -166,6 +168,8 @@ const AccessGroupList = () => {
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [sort, setSort] = useState(sortOptions[0].value);
+	const [serverDownOpen, setServerDownOpen] = useState(false);
+
 	const [filters, setFilters] = useState({
 		query: "",
 		// hasAcceptedMarketing: null,
@@ -183,6 +187,13 @@ const AccessGroupList = () => {
 			const res = await accessGroupApi.getAccessGroups();
 			const data = await res.json();
 			const entrancesRes = await Promise.all(data.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
+			const serverDownRes = entrancesRes.filter(res => res.status === serverDownCode);
+			if (serverDownRes.length > 0) {
+				setServerDownOpen(true);
+				toast.error("Error loading entrances data");
+				setAccessGroup([]);
+				return;
+			}
 			const entrancesData = await Promise.all(entrancesRes.map(res => res.json()));
 			if (isMounted()) {
 				data.forEach((group, i) => group.entrances = entrancesData[i]);
@@ -322,7 +333,8 @@ const AccessGroupList = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteAccessGroups = async() => {
+	const deleteAccessGroups = async(e) => {
+		e.preventDefault();
 		Promise.all(selectedAccessGroup.map(id=>{
 			return accessGroupApi.deleteAccessGroup(id)
 		})).then( resArr => {
@@ -334,7 +346,6 @@ const AccessGroupList = () => {
 					toast.error('Delete unsuccessful' )
 				}
 			});
-			controllerApi.uniconUpdater();
 			getAccessGroupLocal();
 		})
 		setDeleteOpen(false);
@@ -366,10 +377,17 @@ const AccessGroupList = () => {
 					py: 8,
 				}}
 			>
+				<ServerDownError
+					open={serverDownOpen}
+					handleDialogClose={() => setServerDownOpen(false)}
+				/>
 				<Container maxWidth="xl">
 					<Box sx={{ mb: 4 }}>
-						<Grid container justifyContent="space-between" spacing={3}>
-							<Grid item sx={{m:2.5}}>
+						<Grid container
+							justifyContent="space-between"
+							spacing={3}>
+							<Grid item
+								sx={{m:2.5}}>
 								<Typography variant="h4">Access Groups</Typography>
 							</Grid>
 							<Grid item>
@@ -386,7 +404,8 @@ const AccessGroupList = () => {
 									open={open}
 									onClose={handleClose}
 								>
-									<NextLink href={"/dashboard/access-groups/create"} passHref>
+									<NextLink href={"/dashboard/access-groups/create"}
+										passHref>
 										<MenuItem disableRipple>
 											<AddIcon />
 											&#8288;Create
@@ -395,14 +414,18 @@ const AccessGroupList = () => {
 									<NextLink href={{
 										pathname: '/dashboard/access-groups/edit',
 										query: { ids: encodeURIComponent(JSON.stringify(selectedAccessGroup)) }
-									}} passHref>
-										<MenuItem disableRipple disabled={buttonBlock}>
+									}}
+										passHref>
+										<MenuItem disableRipple
+											disabled={buttonBlock}>
 											<EditIcon />
 											&#8288;Edit
 										</MenuItem>
 									</NextLink>
 									
-									<MenuItem disableRipple onClick={handleDeleteOpen} disabled={buttonBlock}>
+									<MenuItem disableRipple
+										onClick={handleDeleteOpen}
+										disabled={buttonBlock}>
 										<DeleteIcon />
 										&#8288;Delete
 									</MenuItem>
@@ -420,7 +443,8 @@ const AccessGroupList = () => {
 								mt: 3,
 							}}
 						>
-							<Button startIcon={<UploadIcon fontSize="small" />} sx={{ m: 1 }}>
+							<Button startIcon={<UploadIcon fontSize="small" />}
+								sx={{ m: 1 }}>
 								Import
 							</Button>
 							<Button
@@ -431,7 +455,8 @@ const AccessGroupList = () => {
 							</Button>
 							<Tooltip  title='Excel template can be found at {}'
 							enterTouchDelay={0}
-								placement ='top' sx={{
+								placement ='top'
+								sx={{
 									m: -0.5,
 									mt: 3,
 								}}>

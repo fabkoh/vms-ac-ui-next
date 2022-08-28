@@ -28,7 +28,7 @@ const EntranceScheduleDelete = ({
     const [selected, setSelected] = useState([])
     const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
     const selectedSome = selected.length > 0 && !selectedAll;
-    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.accessGroupScheduleId) : []);
+    const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.entranceScheduleId ) : []);
     const handleSelectFactory = (id) => () => {
         if (selected.includes(id)) {
             setSelected(selected.filter(i => i != id));
@@ -179,7 +179,9 @@ const EntranceScheduleDelete = ({
                                     <strong>{"\nDeleting all schedules would remove this entrance from the access group"}</strong>
                                 */}
                             </DialogContentText>
-                            <form onSubmit={handleDeleteSchedules}>
+                            <form onSubmit={handleDeleteSchedules}
+                            autoComplete="off"
+                            >
                                 <TextField
                                     variant="filled"
                                     fullWidth

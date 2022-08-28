@@ -14,6 +14,8 @@ import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import router from "next/router";
 import { controllerApi } from "../../../api/controllers";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const EditEntrances = () => {
 
@@ -30,6 +32,13 @@ const EditEntrances = () => {
         // map each id to a fetch req for that entrance
         const resArr = await Promise.all(ids.map(id => entranceApi.getEntrance(id)));
         const successfulRes = resArr.filter(res => res.status == 200);
+        const serverDownRes = resArr.filter(res => res.status == serverDownCode);
+
+        if (serverDownRes.length > 0) {
+            toast.error("Error loading entrances as server is down");
+            router.replace('/dashboard/entrances');
+            return;
+        }
 
         // no entrances to edit
         if (successfulRes.length == 0) {
@@ -49,8 +58,10 @@ const EditEntrances = () => {
                 entranceId: body.entranceId,
                 entranceName: body.entranceName,
                 entranceDesc: body.entranceDesc,
+                used: body.used,
                 originalName: body.entranceName, // fields for validation
                 accessGroups: [], // for now
+                thirdPartyOption: body.thirdPartyOption
             });
             validations.push({
                 entranceId: body.entranceId,
@@ -292,7 +303,17 @@ const EditEntrances = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
+
+    const changeThirdPartyOption = (e, id) => {
+        const updatedInfo = [ ...entranceInfoArr ];
+        // this method is reliant on text field having a name field == key in info object ie entranceName, entranceDesc
+        console.log(e.target.value)
+        updatedInfo.find(info => info.entranceId == id).thirdPartyOption = e.target.value;
+        setEntranceInfoArr(updatedInfo);
+    }
+
     const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onThirdPartyOptionsChange = (id) => (e) => changeThirdPartyOption(e, id);
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -333,7 +354,6 @@ const EditEntrances = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
-            controllerApi.uniconUpdater();
             toast.success(`${numEdited} entrances edited`);
             if (numEdited == resArr.length) { // all success
                 router.replace('/dashboard/entrances');
@@ -404,12 +424,14 @@ const EditEntrances = () => {
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
                                         allAccessGroups={allAccessGroups}
                                         onAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                        onThirdPartyOptionsChange={onThirdPartyOptionsChange(id)}
                                         edit
                                     />
                                 )
                             })}
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+                                    marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

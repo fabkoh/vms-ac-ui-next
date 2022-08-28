@@ -17,9 +17,12 @@ import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { accessGroupListLink } from "../../../utils/access-group";
 import { controllerApi } from "../../../api/controllers";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const CreateAccessGroups = () => {
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     // empty objects for initialisation of new card
     const getEmptyAccessGroupInfo = (accessGroupId) => ({
         accessGroupId,
@@ -65,11 +68,15 @@ const CreateAccessGroups = () => {
                 const body = await res.json();
                 setAllPersons(body);
             } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                setAllPersons([]);
                 throw new Error("persons not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Persons info not loaded");
+            toast.error("Error loading persons info");
         }
     }, [isMounted]);
 
@@ -89,11 +96,15 @@ const CreateAccessGroups = () => {
                 const body = await res.json();
                 setAllEntrances(body);
             } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                setAllEntrances([]);
                 throw new Error("entrances not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Entrances info not loaded")
+            toast.error("Error loading entrances info")
         }
     }, [isEntranceMounted]);
 
@@ -117,6 +128,12 @@ const CreateAccessGroups = () => {
                     const body = await res.json();
                     body.forEach(group => newAccessGroupNames[group.accessGroupName] = true); 
                     setAccessGroupNames(newAccessGroupNames);
+                } else {
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    } 
+                    setAccessGroupNames({});
+                    toast.error("Error loading access groups info");
                 }
             })
     }, []);
@@ -272,7 +289,7 @@ const CreateAccessGroups = () => {
 
         setSubmitted(true);
         Promise.all(accessGroupInfoArr.map(accessGroup => accessGroupApi.createAccessGroup(accessGroup)))
-               .then(resArr => {
+               .then((resArr) => {
                     const failedResIndex = []; // stores the index of the failed creations
                     const successResIndex = []; // stores the index of success creations
                     const originalAccessGroupInfoArr = [ ...accessGroupInfoArr ] // store first in case set access group info arr is executed before assignment
@@ -303,7 +320,7 @@ const CreateAccessGroups = () => {
                                 accessGroupToEntrance.map(
                                     groupToEntrance => accessGroupEntranceApi.assignEntrancesToAccessGroup(groupToEntrance[1], groupToEntrance[0])
                                 )
-                            ).then(
+                            ).then( () => {
                                 resArr => {
                                     resArr.forEach((res, i) => {
                                         if (res.status != 204) { // failed to assign
@@ -312,12 +329,12 @@ const CreateAccessGroups = () => {
                                         }
                                     })
                                 }
-                            )
+                                router.replace('/dashboard/access-groups');
+                            })
                         })
 
-                    const numCreated = accessGroupInfoArr.length - failedResIndex.length
+                    const numCreated = accessGroupInfoArr.length - failedResIndex.length;
                     if (numCreated) {
-                        controllerApi.uniconUpdater();
                         toast.success(`${numCreated} access groups created`); 
                     }
 
@@ -330,9 +347,6 @@ const CreateAccessGroups = () => {
                                 setAccessGroupInfoArr(failedResIndex.map(i => accessGroupInfoArr[i])); // set failed access groups to stay
                                 setAccessGroupValidationsArr(failedResIndex.map(i => accessGroupValidationsArr[i])); // set failed access group validations to stay
                             });
-                    } else {
-                        // all passed
-                        router.replace('/dashboard/access-groups')
                     }
                })
     }
@@ -351,6 +365,10 @@ const CreateAccessGroups = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -411,7 +429,8 @@ const CreateAccessGroups = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+                                    marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

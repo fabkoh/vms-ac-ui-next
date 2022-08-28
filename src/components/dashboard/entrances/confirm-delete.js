@@ -16,26 +16,6 @@ import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
 	const { open, handleDialogClose, deleteEntrances } = props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
-
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
-
-	//move text state here
 
 	//text field
 	const [value, setValue] = useState("");
@@ -49,8 +29,8 @@ export const Confirmdelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteEntrances = () => {
-		deleteEntrances();
+	const handleDeleteEntrances = (e) => {
+		deleteEntrances(e);
 		handleClose();
 	}
 
@@ -64,13 +44,13 @@ export const Confirmdelete = (props) => {
 				<DialogTitle>
 					{" "}
 					<WarningAmberOutlinedIcon
-						sx={{ color: "#F44336", m: -0.5, width: 50 }}
+						sx={{ color: "#F44336", m: -0.7, width: 50 }}
 					/>{" "}
 					&#8288;Confirm Delete?
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Are you sure you want to delete entrance(s)? This action cannot
+						Are you sure you want to delete selected entrance(s)? This action cannot
 						be undone.
 					</DialogContentText>
 
@@ -83,16 +63,15 @@ export const Confirmdelete = (props) => {
 							autoFocus
 						/>
 
-						<Box display="flex" justifyContent="flex-end" mt={1}>
+						<Box display="flex"
+							justifyContent="flex-end"
+							mt={1}>
 							<Button
+								type="submit"
 								color="error"
 								disabled={deleteDisabled}
 								variant="contained"
 								sx={{ borderRadius: 8, marginRight: 1}}
-								onClick={() => {
-									deleteEntrances();
-									props.setActionAnchor(null);
-								}}
 							>
 							Delete	
 							</Button>

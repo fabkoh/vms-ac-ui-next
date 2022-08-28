@@ -1,12 +1,16 @@
 import Warning from "@mui/icons-material/Warning";
-import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
+import { Card, useMediaQuery, CardHeader, Divider, Link, Typography } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCard from "../../shared/basic-details-card";
+import WarningChip from "../../shared/warning-chip";
+import NextLink from "next/link";
+import { getControllerDetailsLink } from "../../../../utils/controller";
 
 export const EntranceBasicDetails = (props) => {
-    const { entranceName, entranceDesc, isActive } = props.entrance;
+    const { entranceId, entranceName, entranceDesc, isActive, thirdPartyOption } = props.entrance;
+    const controller = props.entranceController[entranceId];
     
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
@@ -27,6 +31,7 @@ export const EntranceBasicDetails = (props) => {
                     label="Description"
                     value={entranceDesc}
                 >
+                    
                     {
                         // if no entranceDesc, render warning
                         !entranceDesc && (
@@ -40,6 +45,12 @@ export const EntranceBasicDetails = (props) => {
                         )
                     }
                 </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Third Party Option"
+                    value={thirdPartyOption}
+                />
                 <PropertyListItem
                     align={align}
                     divider
@@ -57,6 +68,24 @@ export const EntranceBasicDetails = (props) => {
                             </SeverityPill>
                         )
                     }
+                </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Controller"
+                    value={
+                        controller ? ( // TODO make this into link
+                            <NextLink href={getControllerDetailsLink(controller)}
+                                passHref>
+                                <Link color="inherit">
+                                    <Typography noWrap>{ controller.controllerName }</Typography>
+                                </Link>
+                            </NextLink>
+                        ) : (
+                            <WarningChip text="No controller" />
+                        )
+                    }>
+                
                 </PropertyListItem>
             </PropertyList>
         </BasicDetailsCard>

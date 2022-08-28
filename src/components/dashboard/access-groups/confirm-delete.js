@@ -47,8 +47,8 @@ export const Confirmdelete = (props) => {
     }
 
     // delete action
-    const handleDeleteAccessGroups = () => {
-        deleteAccessGroups();
+    const handleDeleteAccessGroups = (e) => {
+        deleteAccessGroups(e);
         handleClose();
     }
 	

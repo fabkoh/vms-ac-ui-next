@@ -2,7 +2,7 @@
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
-const useApi = process.env.NEXT_PUBLIC_USE_API || true;
+const useApi = process.env.NEXT_PUBLIC_USE_API || false;
 
 // fake data
 const fakePersons = [
@@ -192,4 +192,44 @@ const fakeAuthDevices = [
 
 ]
 
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers,fakeAuthDevices};
+const fakeVideoRecorders = [
+    {
+        "recorderId": 1,
+        "recorderName": "Video Recorder 1",
+        "recorderSerialNumber": "123ABC",
+        "recorderIpAddress": "192.168.34.23",
+        "recorderPortNumber": 81,
+        "recorderUsername": "demo",
+        "recorderPassword": "password",
+        "created": "2022-06-24T10:31:35.126183"
+    }, 
+    {
+        "recorderId": 2,
+        "recorderName": "Video Recorder 2",
+        "recorderSerialNumber": "123ABCD",
+        "recorderIpAddress": "192.168.34.22",
+        "recorderPortNumber": 80,
+        "recorderUsername": "demo",
+        "recorderPassword": "password",
+        "created": "2022-06-24T10:31:35.126183"
+    }, 
+    {
+        "recorderId": 3,
+        "isActive": true,
+        "recorderName": "Real Video Recorder",
+        "recorderSerialNumber": "DS-7616NI-I21620210923CCRRG74241239WCVU",
+        "recorderIpAddress": "128.106.80.68",
+        "recorderPortNumber": 8085,
+        "recorderChannels": [
+            "IPdome"
+        ],
+        "recorderCameras": [
+            "IPdome"
+        ],
+        "recorderUsername": "admin",
+        "recorderPassword": "ISSNVRTest01",
+        "created": "2022-07-22T07:21:00.172114"
+    }
+]
+
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders};

@@ -39,17 +39,15 @@ const WeeklyRrule = (props) => {
 	const [rule, setRule] = useState({
 		//rule object use to create the string and text description
         freq:RRule.WEEKLY,
-		interval,
-		byweekday, //[0,1,2,3,4,5,6]
-
-
+		interval: null,
+		byweekday: null, //[0,1,2,3,4,5,6]
 	});
 	const [nonChangingRule, setNonChangingRule] = useState({
-		dtstart,
-		until,
-		count,
-		timeStart,
-		timeEnd,
+		dtstart: null,
+		until: null,
+		count: null,
+		timeStart: null,
+		timeEnd: null,
 	})
 
 
@@ -111,7 +109,7 @@ const WeeklyRrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"23:59"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
 
 	// const AllDayRenderer = (allDay) => {
@@ -172,11 +170,19 @@ const WeeklyRrule = (props) => {
 	const AllDayRenderer = (allDay) => {
 		if (allDay) {
 			return (
-				<Grid container alignItems="center" >
-					<Grid item ml={2} mr={2} >
-						<Typography mr={2} fontWeight="bold">From</Typography>
+				<Grid container
+alignItems="center" >
+					<Grid item
+ml={2}
+mr={2} >
+						<Typography mr={2}
+fontWeight="bold">From</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} minWidth={150} >
+					<Grid item
+ml={2}
+mr={2}
+mt={1}
+minWidth={150} >
 						<TextField
 							type="time"
 							onChange={handleTimeStart}
@@ -187,10 +193,16 @@ const WeeklyRrule = (props) => {
 							value={nonChangingRule.timeStart}
 							></TextField>
 					</Grid>
-					<Grid item ml={2} minWidth={50}>
-						<Typography mr={2} fontWeight="bold">to</Typography>
+					<Grid item
+ml={2}
+minWidth={50}>
+						<Typography mr={2}
+fontWeight="bold">to</Typography>
 					</Grid>
-					<Grid item ml={2} mr={2} mt={1} >
+					<Grid item
+ml={2}
+mr={2}
+mt={1} >
 						<TextField
 							type="time"
 							onChange={handleTimeEnd}
@@ -285,8 +297,12 @@ const WeeklyRrule = (props) => {
 	
 	const FreqRender = () => {  //need to initialise ALL rule values except interval and freq.
 				return (
-					<Grid container alignItems="center" flexwrap="wrap">
-						<Grid item justifyContent="flex-start" required>
+					<Grid container
+alignItems="center"
+flexwrap="wrap">
+						<Grid item
+justifyContent="flex-start"
+required>
 							<ToggleButtonGroup
 								color="info"
 								// flexwrap="wrap"
@@ -368,16 +384,24 @@ const WeeklyRrule = (props) => {
 	//checkers before submit(lift state to form)
 	//if freq=RRule.WEEKLY, byweekday must not be empty
 	return (
-		<Grid container justifyContent="space-between" sx={{ width: "100%" }}>
+		<Grid container
+justifyContent="space-between"
+sx={{ width: "100%" }}>
 				
 			<Divider style={{width:'100%'}}/>
 			<Grid container>
 				{repeatToggle && (
-					<Grid container mt={2} mb={2} alignItems="center">
-						<Grid item mr={2} mt={1}>
+					<Grid container
+mt={2}
+mb={2}
+alignItems="center">
+						<Grid item
+mr={2}
+mt={1}>
 							<Typography fontWeight="bold">Repeats every week on</Typography>
 						</Grid>
-						<Grid item alignItems="center">
+						<Grid item
+alignItems="center">
 							{FreqRender(rule.freq)}
 						</Grid>
 					</Grid>
@@ -385,8 +409,12 @@ const WeeklyRrule = (props) => {
 			</Grid>
 			<Divider width={repeatToggle?"100%":"0"}/>
 
-			<Grid container mt={2} ml={-2} alignItems="center">
-				<Grid item mr={3}>
+			<Grid container
+mt={2}
+ml={-2}
+alignItems="center">
+				<Grid item
+mr={3}>
 					<FormControl>
 						<FormGroup>
 							<FormControlLabel

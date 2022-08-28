@@ -19,7 +19,7 @@ const AuthDeviceDelete = (props) => {
 	//text field
 	const [value, setValue] = useState("");
 	const handleTextChange = (e) => setValue(e.target.value);
-	const deleteDisabled = value != 'REMOVE';
+	const deleteDisabled = value != 'DELETE';
 
 	// closing actions
 	const handleClose = () => { 
@@ -45,15 +45,15 @@ const AuthDeviceDelete = (props) => {
 					<WarningAmberOutlinedIcon
 						sx={{ color: "#F44336", m: -0.5, width: 50 }}
 					/>{" "}
-					&#8288;Confirm Remove?
+					&#8288;Confirm Delete?
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Are you sure you want to remove authentication device(s)? This action cannot
+						Are you sure you want to delete selected authentication device(s)? This action cannot
 						be undone.
 					</DialogContentText>
 					<DialogContentText>
-						Selected authentication devices will be removed.
+						Selected authentication devices will be deleted.
 					</DialogContentText>
 					<DialogContentText>
 						Please ensure that the authentication device(s) is physically disconnected.
@@ -63,12 +63,14 @@ const AuthDeviceDelete = (props) => {
 						<TextField
 							variant="filled"
 							fullWidth
-							helperText="Please type in REMOVE to continue"
+							helperText="Please type in DELETE to continue"
 							onChange={handleTextChange}
 							autoFocus
 						/>
 
-						<Box display="flex" justifyContent="flex-end" mt={1}>
+						<Box display="flex"
+							justifyContent="flex-end"
+							mt={1}>
 							<Button
 								color="error"
 								disabled={deleteDisabled}
@@ -79,7 +81,7 @@ const AuthDeviceDelete = (props) => {
 									props.setActionAnchor(null);
 								}}
 							>
-							Remove	
+							Delete	
 							</Button>
 
 							<Button

@@ -16,15 +16,19 @@ import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import { entranceListLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const CreateEntrances = () => {
 
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     // empty objects for initialisation of new card
     const getEmptyEntranceInfo = (entranceId) => ({
         entranceId,
         entranceName: '',
         entranceDesc: '',
-        accessGroups: []
+        accessGroups: [],
+        thirdPartyOption:'N.A.'
     });
     const getEmptyEntranceValidations = (entranceId) => ({
         entranceId,
@@ -62,11 +66,15 @@ const CreateEntrances = () => {
                 const body = await res.json();
                 setAllAccessGroups(body);
             } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                setAllAccessGroups([]);
                 throw new Error("Access Groups not loaded");
             }
         } catch(e) {
             console.error(e);
-            toast.error("Access Groups info not loaded")
+            toast.error("Error loading access groups info");
         }
     }, [isAccessGroupMounted]);
 
@@ -90,6 +98,8 @@ const CreateEntrances = () => {
                     const body = await res.json();
                     body.forEach(group => newEntranceNames[group.entranceName] = true); 
                     setEntranceNames(newEntranceNames);
+                } else {
+                    setEntranceNames({});
                 }
             })
     }, []);
@@ -232,7 +242,17 @@ const CreateEntrances = () => {
         changeTextField(e, id);
         changeNameCheck(e, id);
     }
+
+    const changeThirdPartyOption = (e, id) => {
+        const updatedInfo = [ ...entranceInfoArr ];
+        updatedInfo.find(info => info.entranceId == id).thirdPartyOption = e.target.value;
+        setEntranceInfoArr(updatedInfo);
+    }
+
     const onDescriptionChangeFactory = (id) => (e) => changeTextField(e, id);
+    const onThirdPartyOptionsChange = (id) => (e) => changeThirdPartyOption(e, id);
+
+    
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -287,7 +307,6 @@ const CreateEntrances = () => {
 
                     const numCreated = entranceInfoArr.length - failedResIndex.length
                     if (numCreated) {
-                        controllerApi.uniconUpdater();
                         toast.success(`${numCreated} entrances created`); 
                     }
 
@@ -321,6 +340,10 @@ const CreateEntrances = () => {
                     py: 8
                 }}
             >
+                <ServerDownError 
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -364,6 +387,7 @@ const CreateEntrances = () => {
                                         onDescriptionChange={onDescriptionChangeFactory(id)}
                                         allAccessGroups={allAccessGroups}
                                         onAccessGroupChange={onAccessGroupChangeFactory(id)}
+                                        onThirdPartyOptionsChange={onThirdPartyOptionsChange(id)}
                                     />
                                 )
                             })}
@@ -378,7 +402,8 @@ const CreateEntrances = () => {
                                 </Button>
                             </div>
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

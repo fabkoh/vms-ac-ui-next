@@ -86,14 +86,15 @@ const CredentialEdit = ({
 		endDate != null && endDate < today
 			? "Note: expiry is before today"
 			: "Expiry is end date inclusive";
-	const credentialInUse = validation.credentialInUseIds.includes(credId);
+	const credentialSubmitFailed = validation.credentialSubmitFailed[credId] !== undefined;
 	const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
-	console.log("validation",credentialInUse)
+	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
 
 	// const [show, setShow] = useState(true);
 	// const handleShowPasswordClick = () => setShow(!show);
 	return (
-		<Grid item container>
+		<Grid item
+			container>
 			<Grid 
 				container
 				item
@@ -139,16 +140,17 @@ const CredentialEdit = ({
                     // value={credUidRef.current.value}
                     // value={credUidRef.current.value}  undef
                     // value={credUidRef.current?.value} undef
-                    // error={credentialInUse }
-                    error={credentialInUse || credentialRepeated}
-                    helperText={
-                        (credentialInUse && "credential type and value in use") ||
-                        (credentialRepeated && "Repeated type & value in form") || ' '
+                    error={credentialRepeated || credentialSubmitFailed || credentialUidRepeatedForNotPinTypeCred}
+						helperText={
+						(credentialSubmitFailed && "Error: " + validation.credentialSubmitFailed[credId]) ||
+						(credentialRepeated && "Error: repeated type & value in form") ||
+						(credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||' '
                     }
                     defaultValue={credUid}
                 />
 			</Grid>
-			<Grid item md={4}>
+			<Grid item
+				md={4}>
 				<Toggle
 					checked={valid}
 					handleChange={handleCredValidChange}
@@ -177,7 +179,8 @@ const CredentialEdit = ({
 					label="Permanent"
 				/>
 				</Grid>
-			<Grid item md={5}>
+			<Grid item
+				md={5}>
 				{!isPerm && (
 					<TextField // ref does not work as removing and re rendering it removes the date, even though ref.current?.value still has the prev date
 						fullWidth
@@ -195,7 +198,9 @@ const CredentialEdit = ({
 			<Grid
 			item
 			md={2}>
-				<Button variant="outlined" color="error" onClick={removeCredential}>
+				<Button variant="outlined"
+					color="error"
+					onClick={removeCredential}>
 					Clear
 				</Button>
 		</Grid>

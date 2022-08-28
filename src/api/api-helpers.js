@@ -5,6 +5,13 @@ export function encodeArrayForSpring(array) {
     return encodeURIComponent(arrString.substring(1, arrString.length - 1));
 }
 
+export const serverDownCode = 599;
+
 export function sendApi(path, init={}) {
-    return fetch(apiUri + path, init);
+    return fetch(apiUri + path, init)
+        .catch((error) => {
+            console.error('Error:', error);
+            console.log("server is down!!");
+            return Promise.resolve(new Response({}, { status: serverDownCode }));
+    });;
 }

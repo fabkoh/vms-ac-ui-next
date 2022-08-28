@@ -3,7 +3,7 @@ import { Box, Button, Card, Container, Grid, InputAdornment, TextField, Typograp
 import { AuthGuard } from "../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
 import { Search } from "../../../icons/search";
-import { filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink } from "../../../utils/persons";
+import { filterPersonByCredential, filterPersonByStringPlaceholder, getPersonIdsEditLink } from "../../../utils/persons";
 import PersonsListTable from "../../../components/dashboard/credentials/create/persons-list-table";
 import { useMounted } from "../../../hooks/use-mounted";
 import { personApi } from "../../../api/person";
@@ -12,9 +12,11 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { getCredentialsApi } from "../../../api/credentials";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import NextLink from "next/link";
+import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 
 const applyFilter = createFilter({
-    query: filterPersonByString
+    query: filterPersonByCredential
 })
 
 const AddCredentials = () => {
@@ -22,40 +24,44 @@ const AddCredentials = () => {
     // fetch info 
     const isMounted = useMounted();
     const [persons, setPersons] = useState([]);
-    const [credentialNumbers, setCredentialNumbers] = useState({});
-
-    const getCredentialsInfo = async () => {
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+    const getInfo = useCallback(async() => {
         try {
-            const res = await getCredentialsApi();
-            if (res.status != 200) throw new Error("Credential info not loaded");
-            const data = await res.json();
-            const info = {}; // map personId to number of credentials;
-            data.forEach(cred => {
+            const res = await Promise.all([personApi.getPersons(), getCredentialsApi()]);
+            const [personRes,credsRes] = res;
+            if (personRes.status != 200) {
+                if (personRes.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw "Error loading persons info";
+            };
+            const personData = await personRes.json();
+            if(credsRes.status != 200) {
+                setPersons(personData); // at least have persons if credRes fails
+                throw "Error loading person credentials";
+            }
+            const temp = {}; // map personId = { numCredentials: number, cardCredentials: [list of uids] }
+            const credData = await credsRes.json();
+            Array.isArray(credData) && credData.forEach(cred => {
                 const personId = cred.person.personId;
-                info[personId] = (info[personId] || 0) + 1
-            })
-            setCredentialNumbers(info);
-        } catch(err) {
-            console.error(err);
-            toast.error("Credential info not loaded");
+                if(!(personId in temp)) temp[personId] = { numCredentials: 0, cardCredentials: [] };
+                const person = temp[personId];
+                person.numCredentials = (person.numCredentials || 0) + 1;
+                if(cred.credType?.credTypeName === 'Card') person.cardCredentials.push(cred.credUid);
+            });
+            Array.isArray(personData) && personData.forEach(person => { // transfer info to persons
+                const credentials = temp[person.personId];
+                if (credentials) {
+                    person.numCredentials = credentials.numCredentials;
+                    person.cardCredentials = credentials.cardCredentials;
+                }
+            });
+            console.log(personData);
+            setPersons(personData);
+        } catch(e) {
+            console.error(e);
+            toast.error(e);
         }
-    };
-
-    const getPersonsInfo = async () => {
-        try {
-            const res = await personApi.getPersons();
-            if (res.status != 200) throw new Error("Persons info not loaded");
-            const data = await res.json();
-            setPersons(data);
-        } catch(err) {
-            console.error(err);
-            toast.error("Persons info not loaded");
-        }
-    }
-
-    const getInfo = useCallback(() => {
-        getPersonsInfo();
-        getCredentialsInfo();
     }, [isMounted]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +113,10 @@ const AddCredentials = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <Grid container justifyContent="space-between" spacing={3}>
@@ -170,7 +180,6 @@ const AddCredentials = () => {
                         </Box>
                         <PersonsListTable 
                             persons={paginatedPersons}
-                            credentialNumbers={credentialNumbers}
                             selectedAllPersons={selectedAllPersons}
                             selectedSomePersons={selectedSomePersons}
                             handleSelectAllPersons={handleSelectAllPersons}

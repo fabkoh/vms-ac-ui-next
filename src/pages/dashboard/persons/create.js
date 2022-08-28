@@ -15,9 +15,12 @@ import { getCredTypesApi } from "../../../api/credential-types";
 import { arraySameContents, isObject } from "../../../utils/utils";
 import toast from "react-hot-toast";
 import router from "next/router";
-import { getCredentialsApi, saveCredentialApi } from "../../../api/credentials";
+import { saveCredentialApi, checkCredentialApi } from "../../../api/credentials";
 import { getPersonName } from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
+import { CredTypePinID } from "../../../utils/constants";
+import {ServerDownError} from "../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const getNextId = createCounterObject(1);
 
@@ -39,8 +42,9 @@ const getNewPersonValidation = (id) => ({
     lastNameBlank: false,
     uidInUse: false,
     uidRepeated: false,
-    credentialInUseIds: [],
     credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
+    credentialUidRepeatedIds: [],
+    credentialCheckFailed: {},
     // note
     numberInUse: false,
     numberRepeated: false,
@@ -57,7 +61,9 @@ const getNewCredential = (id) => ({
     isPerm: false
 });
 
-const cardError = (v) => isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialInUseIds.length > 0 || v.credentialRepeatedIds.length > 0);
+const cardError = (v) => {
+    return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0 || Object.keys(v.credentialCheckFailed).length > 0)
+};
 
 const CreatePersonsTwo = () => {
 
@@ -75,38 +81,21 @@ const CreatePersonsTwo = () => {
 
     // credTypes
     const [credTypes, setCredTypes] = useState([]);
-    const [credentials, setCredentials] = useState({}); // maps credTypeId to an array of credUids
 
     // get info
     const isMounted = useMounted(); 
 
-    const getCredentials = async() => {
-        try {
-            const res = await getCredentialsApi();
-            if (res.status != 200) {
-                throw new Error("credentials not loaded");
-            }
-            const body = await res.json();
-            const newCredentials = {};
-            body.forEach(cred => {
-                const credTypeId = cred.credType?.credTypeId;
-                if (!(credTypeId in newCredentials)) {
-                    newCredentials[credTypeId] = [];
-                }
-                newCredentials[credTypeId].push(cred.credUid);
-            })
-            setCredentials(newCredentials);
-        } catch(e) {
-            console.error(e);
-            toast.error("Error loading credentials");
-        }
-    }
-
+    const [serverDownOpen, setServerDownOpen] = useState(false);
     const getCredTypes = async () => {
         try {
             const res = await getCredTypesApi();
             if (res.status != 200) {
-                throw new Error("cred types info not loaded");
+                toast.error("Error loading credential types");
+                setCredTypes([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setCredTypes(body);
@@ -120,7 +109,14 @@ const CreatePersonsTwo = () => {
         try {
             const res = await personApi.getPersons();
             if (res.status != 200) {
-                throw new Error("person info not loaded");
+                setPersonUids([]);
+                setPersonMobileNumbers([]);
+                setPersonEmails([]);
+                toast.error("Error loading persons");
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setPersonUids(body.map(p => p.personUid));
@@ -135,19 +131,23 @@ const CreatePersonsTwo = () => {
         try {
             const res = await accessGroupApi.getAccessGroups();
             if (res.status != 200) {
-                throw new Error("access group info not loaded");
+                toast.error("Error loading access groups");
+                setAccessGroups([]);
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                return;
             }
             const body = await res.json();
             setAccessGroups(body);
         } catch(e) {
             console.error(e);
-            toast.error("Access groups failed to load");
+            toast.error("Error loading access groups");
         }
     };
 
     const getInfo = useCallback(() => {
         // put methods here
-        getCredentials();
         getCredTypes();
         getAccessGroups();
         getPersons();
@@ -191,8 +191,17 @@ const CreatePersonsTwo = () => {
         person.credentials = person.credentials.filter(c => c.credId != credId);
         setPersonsInfo(newPersons);
 
-        const b1 = checkCredInUseHelper(newPersons, personsValidation);
-        const b2 = checkCredRepeatedHelper(newPersons, personsValidation);
+        const newValidations = [...personsValidation];
+
+        newPersons.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
+
+        const b1 = checkCredRepeatedHelper(newPersons, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(newPersons, personsValidation);
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     };
 
@@ -244,29 +253,6 @@ const CreatePersonsTwo = () => {
     }
 
     // returns if validArr is changed
-    const checkCredInUseHelper = (infoArr, validArr) => {
-        let toChange = false;
-
-        infoArr.forEach((person, i) => {
-            const newCredentialsInUse = []
-            person.credentials.forEach(cred => { // populate the above array
-                if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
-                    const inUseValues = credentials[cred.credTypeId];
-                    if (inUseValues.includes(cred.credUid)) {
-                        newCredentialsInUse.push(cred.credId);
-                    }
-                }
-            });
-            if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
-                toChange = true;
-                validArr[i].credentialInUseIds = newCredentialsInUse;
-            }
-        });
-
-        return toChange
-    }
-
-    // returns if validArr is changed
     const checkCredRepeatedHelper = (infoArr, validArr) => {
         let toChange = false;
 
@@ -308,6 +294,37 @@ const CreatePersonsTwo = () => {
                 }
             }
         );
+
+        return toChange;
+    }
+
+    // to check if same credUid for not pin is being repeated
+    const checkCredUidRepeatedForNotPinTypeCred = (infoArr, validArr) => {
+        let toChange = false;
+
+        const credMap = {}; // maps credUidto array of a list of [persons id, cred id]
+        const repeatedCredUidCredIds = []
+        infoArr.forEach((person, i) => {
+            person.credentials.forEach(
+                cred => {
+                    const credTypeId = cred.credTypeId;
+                    const uid = cred.credUid;
+                    if (credTypeId != '' && uid != '' && credTypeId != CredTypePinID) {
+                        if (!(uid in credMap)) {
+                            credMap[uid] = [person.personUid, cred.credId];
+                        } else {
+                            credMap[uid].push([person.personUid, cred.credId]);
+                            repeatedCredUidCredIds.push(cred.credId);
+                        }
+                    }
+                }
+            )
+        
+            if (!arraySameContents(repeatedCredUidCredIds, validArr[i].credentialUidRepeatedIds)) {
+                toChange = true;
+                validArr[i].credentialUidRepeatedIds = repeatedCredUidCredIds;
+            }
+        });
 
         return toChange;
     }
@@ -369,16 +386,32 @@ const CreatePersonsTwo = () => {
         newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credTypeId = e.target.value;
         setPersonsInfo(newInfo);
 
-        const b1 = checkCredInUseHelper(newInfo, personsValidation);
-        const b2 = checkCredRepeatedHelper(newInfo, personsValidation);
+        const newValidations = [...personsValidation];
+
+        newInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
+
+        const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onCredUidChangeFactory = (personId) => (credId) => (ref) => {
         personsInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId).credUid = ref.current?.value;
-        
-        const b1 = checkCredInUseHelper(personsInfo, personsValidation);
-        const b2 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        const newValidations = [...personsValidation];
+
+        personsInfo.forEach(
+            (person, i) => {
+                newValidations[i].credentialCheckFailed = {}
+            }
+        );
+        setPersonsValidation(newValidations);
+        const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
+        const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
         if(b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
     }
 
@@ -404,6 +437,25 @@ const CreatePersonsTwo = () => {
 
     // return true if the person creation was successful
     const createPerson = async (person) => {
+        const newValidations = [...personsValidation];
+        const personValidation = newValidations.find(p => p.personId == person.personId);
+        personValidation.credentialCheckFailed = {} // reset check failed error
+
+        const credResArr = await Promise.all(person.credentials.map(cred => checkCredentialApi(cred, person.personId)));
+        
+        let failedCredArr = credResArr.filter(res => res.status > 201);
+        let credCheckFailed = {};
+        if (failedCredArr.length > 0) { // some failed
+            for (let i = 0; i < failedCredArr.length; i++) {
+                const failedCred = await failedCredArr[i].json();
+                console.log(failedCred, "failedCred");
+                credCheckFailed = { ...credCheckFailed, ... failedCred };
+            }
+            personValidation.credentialCheckFailed = credCheckFailed; // return error format { [credId]: "Error message" }
+            toast.error("Credential check failed for " + person.personFirstName + " " + person.personLastName);
+            return false;
+        }
+
         try {
             const res = await personApi.createPerson(person);
             if (res.status != 201) {
@@ -412,11 +464,15 @@ const CreatePersonsTwo = () => {
             const body = await res.json();
             const personId = body.personId;
 
+            // As the user will be redirected to the list page for creation (you can't redo a creation otherwise you are making multiple of the same thing)
+            // and we cannot fail a person's creation due to faulty credentials either as the api call are different and you couldn't make the creds first before the person
+            // credentialfailures will not be shown as error in the form
+
             const credResArr = await Promise.all(person.credentials.map(cred => saveCredentialApi(cred, personId, true)));
-            if (credResArr.some(res => res.status != 201)) { // some failed
+            if (credResArr.some(res => res.status > 201)) { // some failed
                 toast.error("Unable to create credential for " + getPersonName(body));
             }
-
+            setPersonsValidation(newValidations);
             return true;
         } catch(e) {
             console.error(e);
@@ -435,7 +491,6 @@ const CreatePersonsTwo = () => {
             // success toast
             const numSuccess = boolArr.filter(b => b).length;
             if (numSuccess) {
-                controllerApi.uniconUpdater();
                 toast.success(`Successfully created ${numSuccess} persons`); 
             }
 
@@ -444,12 +499,13 @@ const CreatePersonsTwo = () => {
                 toast.error("Unable to create persons below");    
                 // filter failed personsInfo and personsValidation
                 setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
-                setPersonsValidation(personsInfo.filter((p, i) => !boolArr[i]));
+                setPersonsValidation(personsValidation.filter((v, i) => !boolArr[i]));
             } else {
                 // all success
                 router.replace(personListLink);
             }
-        } catch {
+        } catch (e) {
+            console.log("error", e);
             toast.error("Unable to submit form");
         }        
         setDisableSubmit(false);
@@ -469,6 +525,10 @@ const CreatePersonsTwo = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                            open={serverDownOpen} 
+                            handleDialogClose={() => setServerDownOpen(false)}
+					    />
                         <NextLink
                             href={personListLink}
                             passHref

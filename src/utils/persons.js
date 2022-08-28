@@ -23,7 +23,14 @@ const stringFilterHelper = (person, query) => (
   stringIn(query, person.personEmail)
 )
 
+const credentialFilterHelper = (person, query) => {
+  if(stringFilterHelper(person,query)) return true;
+  const cardCredentials = person.cardCredentials;
+  return Array.isArray(cardCredentials) && cardCredentials.map(s => s && s.toLowerCase()).some(s => stringIn(query, s));
+}
+
 const filterPersonByString = (person, queryString) => stringFilterHelper(person, queryString.toLowerCase());
+const filterPersonByCredential = (person, queryString) => credentialFilterHelper(person, queryString.toLowerCase());
 
 const filterPersonsByString = (persons, queryString) => {
   const query = queryString.toLowerCase();
@@ -40,4 +47,4 @@ const filterPersonsByState = filterByState(filterPersonsByString);
 
 const isPersonEqual = (p1, p2) => isObject(p1) && isObject(p2) && p1.personId != null && p1.personId == p2.personId
 
-export { personListLink, getPersonsEditLink, getPersonName, getPersonDetailsLink, filterPersonByString, filterPersonsByString, filterPersonByStringPlaceholder, filterPersonByAccessGroupName, personCreateLink, getPersonIdsEditLink, filterPersonsByState, isPersonEqual }
+export { personListLink, getPersonsEditLink, getPersonName, getPersonDetailsLink, filterPersonByString, filterPersonsByString, filterPersonByStringPlaceholder, filterPersonByAccessGroupName, personCreateLink, getPersonIdsEditLink, filterPersonsByState, isPersonEqual, filterPersonByCredential }

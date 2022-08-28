@@ -28,7 +28,8 @@ import toast from 'react-hot-toast';
 import { getPersonName, getPersonsEditLink, personListLink } from '../../../../../utils/persons';
 import PersonCredentials from '../../../../../components/dashboard/persons/person-credentials';
 import { getCredentialWherePersonIdApi } from '../../../../../api/credentials';
-import { controllerApi } from '../../../../../api/controllers';
+import { ServerDownError } from '../../../../../components/dashboard/errors/server-down-error';
+import { serverDownCode } from '../../../../../api/api-helpers';
 
 const PersonDetails = () => {
 
@@ -38,6 +39,7 @@ const PersonDetails = () => {
   const [credentials, setCredentials] = useState([]);
   const router = useRouter();
   const { personId } = router.query;
+	const [serverDownOpen, setServerDownOpen] = useState(false);
 
   useEffect(() => {
 	gtm.push({ event: 'page_view' });
@@ -47,7 +49,12 @@ const PersonDetails = () => {
     try {
       const res = await getCredentialWherePersonIdApi(personId);
       if (res.status != 200) { // credentials not found
-        throw new Error("Credentials not loaded");
+        toast.error("Error loading credentials");
+        setCredentials([]);
+        if (res.status == serverDownCode) {
+          setServerDownOpen(true);
+        }
+        return;
       }
       const body = await res.json();
       if (isMounted()) {
@@ -65,9 +72,10 @@ const PersonDetails = () => {
       if(res.status != 200) { // person not found
         toast.error("Person not found");
         router.replace(personListLink);
+        return;
       }
       const body = await res.json();
-      if(isMounted()) {
+      if(isMounted) {
         setPerson(body);
       }
     } catch(err) {
@@ -110,11 +118,11 @@ const PersonDetails = () => {
     ).then((res)=>{
       if (res.status == 204){
         toast.success('Delete success');
-        controllerApi.uniconUpdater();
         router.replace(personListLink);
       }
       else{
-        toast.error('Delete unsuccessful')
+        toast.error('Delete unsuccessful');
+        res.json().then(json => toast.info(json))
       }
     })
 	};
@@ -138,11 +146,15 @@ const PersonDetails = () => {
 	  >
 		<Container maxWidth="md">
 		  <div>
-			<Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4 }}>
+        <ServerDownError
+          open={serverDownOpen} 
+          handleDialogClose={() => setServerDownOpen(false)}
+				/>
 			  <NextLink
 				href={personListLink}
 				passHref
-			  >
+              >
 				<Link
 				  color="textPrimary"
 				  component="a"
@@ -217,7 +229,8 @@ const PersonDetails = () => {
                 Edit
               </MenuItem>
             </NextLink>           
-            <MenuItem disableRipple onClick={handleDeleteOpen}>
+            <MenuItem disableRipple
+onClick={handleDeleteOpen}>
               <DeleteIcon />
               Delete
             </MenuItem>

@@ -13,7 +13,7 @@ import WarningChip from "../../shared/warning-chip";
 import BasicDetailsCard from "../../shared/basic-details-card";
 
 
-export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus}) => {
+export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus,getCurrentAuthMethod}) => {
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
@@ -54,11 +54,6 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     value={	statusLoaded?
                         (authStatus[deviceInfo.authDeviceDirection]?"Online":(deviceInfo.lastOnline?toDisplayDateString(deviceInfo.lastOnline):"Never")):
                     (<CircularProgress size='1rem'/>)}
-                    // value={	statusLoaded?
-                    //     (authStatus?(authStatus[deviceInfo.authDeviceDirection]?"Online":deviceInfo.lastOnline):(deviceInfo.lastOnline?deviceInfo.lastOnline:"Never")):
-                    // (<CircularProgress size='1rem'/>)}
-                    // value={deviceInfo?.lastOnline?deviceInfo.lastOnline:"never"}
-                    // value={controllerMAC}
                 />
                 <PropertyListItem
                     align={align}
@@ -71,16 +66,21 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     align={align}
                     divider
                     label="Entrance"
-                    value={deviceInfo.entrance?<NextLink
-                    href={getEntranceDetailsLink(deviceInfo.entrance)}
-                    passHref
-                    >
-                        <Link>
-                        <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
-                        </Link>
-                    </NextLink> :
-                    <WarningChip text="No entrance assigned"/>}
-                    // value={lastOnline}
+                    value={
+                        deviceInfo.entrance ? (
+                            <NextLink
+                                href={getEntranceDetailsLink(deviceInfo.entrance)}
+                                passHref
+                            >
+                                <Link>
+                                <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
+                                </Link>
+                            </NextLink>
+                        ) : (
+                            <WarningChip text="No entrance assigned"/>
+                        )
+                        // value={lastOnline}
+                    }
                 />
                 <PropertyListItem
                     align={align}
@@ -99,6 +99,21 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                                 style={{color:'rgb(101, 116, 139)' ,fontSize:'12px'}}
                             >
                                 {"Default Auth Method will be used when no auth schedule is detected"}
+                            </Typography>
+                        </div>
+                    </PropertyListItem>
+
+                    <PropertyListItem
+                    align={align}
+                    divider
+                    label="Current Auth Method"
+                    >
+                        <div>
+                            <Typography
+                                color="textSecondary"
+                                variant="body2"
+                            >
+                                {getCurrentAuthMethod(deviceInfo.authDeviceId)}
                             </Typography>
                         </div>
                     </PropertyListItem>

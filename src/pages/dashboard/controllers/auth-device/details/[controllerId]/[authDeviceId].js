@@ -31,6 +31,8 @@ import { controllerApi } from "../../../../../../api/controllers";
 import  AuthenticationSchedules  from "../../../../../../components/dashboard/controllers/auth-device/auth-device-authentication-schedule"
 import { getAuthenticationScheduleEditLink } from "../../../../../../utils/authentication-schedule";
 import { authMethodScheduleApi } from "../../../../../../api/authentication-schedule";
+import { serverDownCode } from "../../../../../../api/api-helpers";
+import { ServerDownError } from "../../../../../../components/dashboard/errors/server-down-error";
 
 const AuthDeviceDetails = () => {
 
@@ -39,6 +41,8 @@ const AuthDeviceDetails = () => {
     const isMounted = useMounted();
     const { authDeviceId }  = router.query; //change to auth device id
     const { controllerId }  = router.query; //change to auth device id
+    const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [currentAuth,setCurrentAuth] = useState()
 
     const link = getAuthenticationScheduleEditLink(controllerId,authDeviceId);
     const [authenticationSchedules, setauthenticationSchedules] = useState([]);
@@ -52,9 +56,14 @@ const AuthDeviceDetails = () => {
     const getAuthDevice = async() => {
         try{
             const res = await authDeviceApi.getAuthDevice(authDeviceId)
-            if(res.status!=200){
-                toast.error("Device not found")
-                router.replace(getControllerListLink())
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    toast.error("Error loading auth devices due to server is down");
+                } else {
+                    toast.error("Device not found");
+                }
+                router.replace(getControllerListLink());
+                return;
             }
             const data = await res.json()
             if(isMounted()){
@@ -65,13 +74,51 @@ const AuthDeviceDetails = () => {
     }
 
     const getAuthenticationSchedules = async () => {
-        authDeviceApi.getAuthenticationSchedules(authDeviceId).then(async(res)=>{
-            setauthenticationSchedules(await res.json())
+        authDeviceApi.getAuthenticationSchedules(authDeviceId).then(async (res) => {
+            if (res.status == 200) {
+                setauthenticationSchedules(await res.json())
+            } else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading authentication schedules");
+                setauthenticationSchedules([]);
+            }
             // console.log('a',authMethodList)
         }
         )
     }
     
+    const getAllCurrentAuthMethod = async(controllerId) => {
+        var authmethod = {}
+        try{
+            Promise.resolve(controllerApi.getAllCurrentAuthMethod(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    // console.log(data)
+                    setCurrentAuth(data)
+                }
+                else{
+                    console.log("ERROR")
+                }
+            })
+        }catch(err){console.log(err)}
+    }
+
+    const getCurrentAuthMethod = (authdeviceId) => {
+        if (currentAuth){
+            // console.log(typeof(currentAuth))
+            // console.log()
+            // current = currentAuth.authDeviceId
+            console.log(currentAuth)
+            console.log(authdeviceId,currentAuth[authdeviceId])
+            return currentAuth[authdeviceId]
+            // return currentAuth[authdeviceId]
+        }
+
+
+    }
 
     const [authStatus, setAuthStatus] = useState({})
     const [statusLoaded, setStatusLoaded] = useState(false)
@@ -80,7 +127,10 @@ const AuthDeviceDetails = () => {
             Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
             .then(async res=>{
                 toast.dismiss()
-                if(res.status!=200){
+                if (res.status != 200) {
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
                     setStatusLoaded(true)
                     toast.error("Failed to fetch status")
                 }
@@ -120,7 +170,6 @@ const AuthDeviceDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} authentication schedules`);
         }
 
@@ -131,6 +180,7 @@ const AuthDeviceDetails = () => {
         //get authDevice info and controller status
         getStatus()
         getAuthDevice()
+        getAllCurrentAuthMethod(controllerId)
         getAuthenticationSchedules()
     }, [isMounted])
 
@@ -177,7 +227,6 @@ const AuthDeviceDetails = () => {
             if(res.status != 200) {
                 toast.error("Remove unsuccessful");
             } else {
-                controllerApi.uniconUpdater();
                 toast.success("Successfully removed Authentication Device");
                 router.replace(getControllerDetailsLinkWithId(controllerId));
             }
@@ -203,7 +252,6 @@ const AuthDeviceDetails = () => {
                 toast.error('Reset unsuccessful');
             } else {
                 toast.success("Reset Authentication Device success");
-                controllerApi.uniconUpdater();
                 getInfo();
             }
         });
@@ -218,7 +266,6 @@ const AuthDeviceDetails = () => {
             if (res.status != 200) throw new Error("Failed to send req");
             toast.success(`Successfully ${verb} masterpin`);
             setDeviceInfo(prevState=>({...prevState,masterpin:bool}));
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -248,6 +295,10 @@ const AuthDeviceDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => { setServerDownOpen(false) }}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>
@@ -372,6 +423,7 @@ const AuthDeviceDetails = () => {
                                 deviceInfo={deviceInfo}
                                 statusLoaded={statusLoaded}
                                 authStatus={authStatus}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpin}
                                 />
                             </Grid>   

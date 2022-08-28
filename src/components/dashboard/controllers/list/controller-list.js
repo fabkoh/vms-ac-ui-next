@@ -20,9 +20,11 @@ const ControllerListTable = ({ controllers, selectedAllControllers, selectedSome
                             <TableCell>Controller Name</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Ip Address</TableCell>
-                            <TableCell>Entrances</TableCell>
+                            <TableCell>Entrance1</TableCell>
+                            <TableCell>Entrance2</TableCell>
                             <TableCell>Readers status</TableCell>
                             <TableCell>Created</TableCell>
+                            <TableCell>Last Sync</TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>
                     </TableHead>

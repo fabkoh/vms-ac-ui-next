@@ -26,6 +26,7 @@ const saveCredentialApi = (
                         'Content-type': 'application/json'
                     },
                     body: JSON.stringify({
+                        credId,
                         credUid,
                         credTTL,
                         isValid,
@@ -51,7 +52,39 @@ const saveCredentialApi = (
                 })
             });
         }
+}
+    
+const checkCredentialApi =
+    ({
+        credId,
+        credUid,
+        credTTL,
+        isValid,
+        isPerm,
+        credTypeId
+
+    }, personId) => {
+    if(credTTL == null) {
+        credTTL = new Date();
     }
+    if (useApi) {
+        return sendApi('/api/credential/check', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                credId,
+                credUid,
+                credTTL,
+                isValid,
+                isPerm,
+                personId,
+                credTypeId
+            })
+        });
+    }
+}
 
 const getCredentialWherePersonIdApi = (personId) => {
     if (useApi) {
@@ -71,4 +104,4 @@ const deleteCredentialApi = (credId) => {
     if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}`, { method: 'DELETE' })
 }
 
-export { getCredentialsApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi,deleteCredentialApi }
+export { getCredentialsApi, checkCredentialApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi,deleteCredentialApi }

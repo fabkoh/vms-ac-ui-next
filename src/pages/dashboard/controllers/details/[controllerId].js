@@ -23,7 +23,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/controllers/confirm-delete';
 import { ConfirmReset } from '../../../../components/dashboard/controllers/confirm-reset';
@@ -40,21 +39,28 @@ import { ControllerBasicDetails } from "../../../../components/dashboard/control
 import AuthDevicePair from "../../../../components/dashboard/controllers/details/controller-auth-device-pair";
 import { getControllerEditLink, getControllerListLink } from "../../../../utils/controller";
 import { authDeviceApi } from "../../../../api/auth-devices";
+import ControllerEventsManagement from "../../../../components/dashboard/controllers/details/controller-event-management";
+import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
+import { eventsManagementApi } from "../../../../api/events-management";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
 const ControllerDetails = () => {
 
     // load entrance details
     const isMounted = useMounted();
-    const [entrance, setEntrance] = useState(null);
     const { controllerId }  = router.query; //change to controller Id
     // console.log("controllerId",controllerId)
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
     }, [])
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const [controllerInfo, setControllerInfo] = useState(null)
+    const [controllerEventManagements, setControllerEventManagements] = useState([]);
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
+    const [currentAuth,setCurrentAuth] = useState()
     const [authStatus, setAuthStatus] = useState({})
 
     const getController = async(controllerId) => {
@@ -67,13 +73,42 @@ const ControllerDetails = () => {
                     // console.log("getController",data)
                     getPairs(data)
                 }
-                else{
-                    toast.error("Controller info not found")
-                    router.replace(getControllerListLink())
+                else {
+                    if (res.status == serverDownCode) {
+                        toast.error("Error loading controller info due to server is down");
+                    } else {
+                        toast.error("Controller info not found")
+                    }
+                    router.replace(getControllerListLink());
+                    return;
                 }
             })
         }catch(err){console.log(err)}
     }
+
+    const getControllerEventManagements = async() => {
+        try {
+            const eventManagements = await eventsManagementApi.getControllerEventsManagement(controllerId);
+
+            if (eventManagements.status == 200) {
+                const body = await eventManagements.json();
+                if (isMounted()) {
+                    setControllerEventManagements(body);
+                }
+            }
+            else {
+                if (eventManagements.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading controller event managements");
+                setControllerEventManagements([]);
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
     const getPairs = (controllerInfo) => {
         const E1=[]
         const E2=[]
@@ -88,12 +123,16 @@ const ControllerDetails = () => {
     }
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status...")
+            toast.loading("Fetching status...")
+            controllerApi.getAuthStatus(controllerId)
             .then(async res=>{
                 toast.dismiss()
                 if(res.status!=200){
                     setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    toast.error("Failed to fetch status");
                 }
                 else{
                     setStatusLoaded(true)
@@ -108,12 +147,45 @@ const ControllerDetails = () => {
         // }catch(err){console.log(err)}
         // setStatusLoaded(true)
     }
-    
+
+    const getAllCurrentAuthMethod = async(controllerId) => {
+        var authmethod = {}
+        try{
+            Promise.resolve(controllerApi.getAllCurrentAuthMethod(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    // console.log(data)
+                    setCurrentAuth(data)
+                }
+                else{
+                    console.log("ERROR")
+                }
+            })
+        }catch(err){console.log(err)}
+    }
+
+    const getCurrentAuthMethod = (authdeviceId) => {
+        if (currentAuth){
+            // console.log(typeof(currentAuth))
+            // console.log()
+            // current = currentAuth.authDeviceId
+            console.log(currentAuth)
+            console.log(authdeviceId,currentAuth[authdeviceId])
+            return currentAuth[authdeviceId]
+            // return currentAuth[authdeviceId]
+        }
+
+
+    }
+
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
         getController(controllerId)
+        getAllCurrentAuthMethod(controllerId)
         getStatus()
+        getControllerEventManagements();
     }, [isMounted])
 
     useEffect(() => {
@@ -165,7 +237,6 @@ const ControllerDetails = () => {
             }
             else{                                           
                 toast.success('Delete success');
-                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -210,7 +281,6 @@ const ControllerDetails = () => {
             }
             else{
                 toast.success('Reset success');
-                controllerApi.uniconUpdater();
                 router.replace(getControllerListLink());
             }
         })
@@ -271,7 +341,6 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE1(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -293,7 +362,6 @@ const ControllerDetails = () => {
             newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] = bool
             setE2(newInfo)
             console.log(newInfo.filter(dev => dev.authDeviceId==id)[0]['masterpin'] ) 
-            controllerApi.uniconUpdater();
             return true
         } catch(e) {
             console.error(e);
@@ -303,23 +371,34 @@ const ControllerDetails = () => {
         }
     }
 
-	const removeEntranceButton = (authPair) => async() => {
-		Promise.resolve(authDeviceApi.removeEntrance(authPair))
-		.then(res=>{
-			if(res.status!=200){
-				toast.error("Error removing entrance")
-			}
-			else {
-                toast.success("Successfully removed entrance"); 
-                getInfo();
-                controllerApi.uniconUpdater();
-            }
-            
-        })
-        
-        
+	const removeEntranceButton = (authPair) => async(e) => {
+        //e.preventDefault();
+        authDeviceApi.removeEntrance(authPair)
+                     .then(res => {
+                         if(res.status!=200) { toast.success("Error removing entrance"); }
+                         else {
+                            toast.success("Successfully removed entrance");
+                            getInfo();
+                         }
+                     });
 	}
 
+    //delete entrance event managements 
+    const deleteEventManagements = async(ids) => {
+        console.log(ids)
+        const resArr = await Promise.all(ids.map(eventsManagementApi.deleteEventsManagement));
+    
+        if (resArr.some(res => res.status != 200)) {
+            toast.error('Failed to delete some Events Managements')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 200).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} Events Managements`)
+        }
+
+        getInfo();
+    }
     // render view
     return (
         <>
@@ -335,6 +414,10 @@ const ControllerDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>
@@ -470,8 +553,9 @@ const ControllerDetails = () => {
                                 controllerId={controllerId}
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
-                                removeEntrance={removeEntranceButton}
+                                removeEntrance={() => removeEntranceButton(E1)}
                                 />
                             </Grid>                         
                             <Grid
@@ -479,15 +563,27 @@ const ControllerDetails = () => {
                                 xs={12}
                             >
                                 <AuthDevicePair
-                                removeEntrance={removeEntranceButton}
+                                removeEntrance={() => removeEntranceButton(E2)}
                                 authPair={E2}
                                 controllerId={controllerId}
                                 status={authStatus}
                                 statusLoaded={statusLoaded}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE2}
                                 />
                             </Grid>                         
-                        </Grid>
+                       
+                            <Grid
+                                    item
+                                    xs={12}
+                                >
+                                    <ControllerEventsManagement  
+                                        controllerEventManagements={controllerEventManagements}
+                                        deleteEventManagements={deleteEventManagements}
+                                        eventsManagementCreateLink={eventsManagementCreateLink} 
+                                    />
+                            </Grid>
+                            </Grid>
                     </Box>
                 </Container>
             </Box>

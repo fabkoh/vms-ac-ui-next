@@ -35,13 +35,19 @@ import EntranceSchedules from "../../../../components/dashboard/entrances/detail
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
 import { controllerApi } from "../../../../api/controllers";
+import EntranceEventsManagement from "../../../../components/dashboard/entrances/details/entrance-event-management";
+import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
+import { eventsManagementApi } from "../../../../api/events-management";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const EntranceDetails = () => {
 
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    const { entranceId }  = router.query;
+    const { entranceId } = router.query;
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -50,9 +56,37 @@ const EntranceDetails = () => {
     const link = getEntranceScheduleEditLink(entranceId);
 
     const [entranceSchedules, setEntranceSchedules] = useState([]);
-
+    const [entranceEventManagements, setEntranceEventManagements] = useState([]);
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
+    const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
+
+    const getControllers = async() => {
+        try {
+            const res = await controllerApi.getControllers();
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                throw 'cannot load controllers'
+            };
+            const body = await res.json();
+            const temp = {};
+            body.forEach(con => {
+                const authArr = con.authDevices;
+                if (Array.isArray(authArr)) {
+                    authArr.forEach(auth => {
+                        const entranceId = auth.entrance?.entranceId;
+                        if (entranceId) temp[entranceId] = con;
+                    });
+                }
+            });
+            setEntranceController(temp);
+        } catch(e) {
+            console.error(e);
+            toast.error("Entrance controllers failed to load");
+        }
+    };
 
     const getAccessGroups = async () => {
         try {
@@ -63,7 +97,11 @@ const EntranceDetails = () => {
                     setAccessGroup(body);
                 }
             } else {
-                toast.error('Access Group info not loaded');
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error('Error loading access group info');
+                setAccessGroup([]);
                 throw new Error('Access Group info not loaded');
             }
         } catch(err) {
@@ -71,12 +109,18 @@ const EntranceDetails = () => {
         }
     }
 
+
     const getEntrance = useCallback(async() => {
         try {
             const res = await entranceApi.getEntrance(entranceId);
-            if(res.status != 200) {
-                toast.error('Entrance not found');
+            if (res.status != 200) {
+                if (res.status == serverDownCode) {
+                    toast.error("Entrance not found due to server is down. Please try again later")
+                } else {
+                    toast.error('Entrance not found');
+                }
                 router.replace(entranceListLink);
+                return;
             }
             const body = await res.json();
 
@@ -101,7 +145,11 @@ const EntranceDetails = () => {
                 }
             }
             else {
-                toast.error("Entrance Schedule Info Not Loaded");
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Error loading entrance schedule info");
+                setEntranceSchedules([]);
             }
         }
         catch (err) {
@@ -110,12 +158,38 @@ const EntranceDetails = () => {
     }
 
     
+const getEntranceEventsManagement = useCallback(async () => {
+    try {
+        //const data = await personApi.getFakePersons() 
+        const res = await eventsManagementApi.getEntranceEventsManagement(entranceId);
+
+        if (res.status == 200) {
+            const data = await res.json()
+            if (isMounted()) {
+                console.log(data)
+                setEntranceEventManagements(data);
+            }
+        } else {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrance events management info");
+            setEntranceEventManagements([]);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}, [isMounted]);
+
+
 
     const getInfo = useCallback(async() => {
         //get entrance and access group entrance
         getEntrance();
         getAccessGroups();
         getEntranceSchedules();
+        getEntranceEventsManagement();
+        getControllers();
     }, [isMounted])
 
     useEffect(() => {
@@ -159,7 +233,6 @@ const EntranceDetails = () => {
         ).then((res)=>{
         if (res.status == 204){
             toast.success('Delete success');
-            controllerApi.uniconUpdater();
             router.replace(entranceListLink);
         }
         else{
@@ -168,9 +241,9 @@ const EntranceDetails = () => {
         })
         setDeleteOpen(false);
     }; 
-
-    //delete entrance schedules
-    const deleteSchedules = async(ids) => {
+    
+    //delete entrance schedule 
+     const deleteSchedules = async(ids) => {
         const resArr = await Promise.all(ids.map(entranceScheduleApi.deleteEntranceSchedule));
     
         if (resArr.some(res => res.status != 204)) {
@@ -179,8 +252,24 @@ const EntranceDetails = () => {
 
         const numSuccess = resArr.filter(res => res.status == 204).length
         if (numSuccess) {
-            controllerApi.uniconUpdater();
             toast.success(`Deleted ${numSuccess} entrance schedules`)
+        }
+
+        getInfo();
+    }
+
+    // delete entrance Event Managements
+    const deleteEventManagements = async(ids) => {
+        console.log(ids)
+        const resArr = await Promise.all(ids.map(eventsManagementApi.deleteEventsManagement));
+    
+        if (resArr.some(res => res.status != 200)) {
+            toast.error('Failed to delete some Events Managements')
+        }
+
+        const numSuccess = resArr.filter(res => res.status == 200).length
+        if (numSuccess) {
+            toast.success(`Deleted ${numSuccess} Events Managements`)
         }
 
         getInfo();
@@ -212,7 +301,6 @@ const EntranceDetails = () => {
             entranceApi.updateEntranceStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                controllerApi.uniconUpdater();
                 toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
             } else {
                 toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
@@ -253,6 +341,10 @@ const EntranceDetails = () => {
                     py: 8
                 }}
             >
+                <ServerDownError
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="md">
                     <div>
                         <Box sx={{ mb: 4 }}>
@@ -352,7 +444,7 @@ const EntranceDetails = () => {
                                         disabled={entranceActive}
                                     >
                                         <DoorFront />
-                                        &#8288;Enable
+                                        &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
@@ -375,7 +467,8 @@ const EntranceDetails = () => {
                                 item
                                 xs={12}
                             >
-                                <EntranceBasicDetails entrance={entrance} />
+                                <EntranceBasicDetails entrance={entrance}
+                                    entranceController={entranceController} />
                             </Grid>
                             <Grid
                                 item
@@ -392,6 +485,17 @@ const EntranceDetails = () => {
                                     entranceSchedules={entranceSchedules}
                                     deleteSchedules={deleteSchedules}
                                     link={link} 
+                                />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <EntranceEventsManagement  
+                                    entrance={entrance}
+                                    entranceEventManagements={entranceEventManagements}
+                                    deleteEventManagements={deleteEventManagements}
+                                    eventsManagementCreatelink={eventsManagementCreateLink} 
                                 />
                             </Grid>
                         </Grid>

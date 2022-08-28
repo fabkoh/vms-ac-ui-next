@@ -33,8 +33,14 @@ import { OrganizationPopover } from './organization-popover';
 import etlasname from '../etlas_logo_name.png';
 import Image from 'next/image';
 import { LockClosed } from '../../icons/lock-closed';
-import { DoorFront, SelectAll } from '@mui/icons-material';
+import { DoorFront, SelectAll, Videocam } from '@mui/icons-material';
 import { controllerApi } from '../../api/controllers';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant'
+import DescriptionIcon from '@mui/icons-material/Description';
+import SyncUniconError from './errors/sync-unicon-error';
+import { serverDownCode } from '../../api/api-helpers';
+import toast from 'react-hot-toast';
+import AuthenticationAddOnError from './authentication-schedule/authentication-add-on-error';
 
 const getSections = (t) => [
   
@@ -77,9 +83,25 @@ const getSections = (t) => [
             path: '/dashboard/controllers/'
           }
         ]
+      },
+      {
+        title: t('Video Recorders'),
+        path: '/dashboard/video-recorders/',
+        icon: <Videocam fontSize="small" />,
+        children: [
+          {
+            title: 'List',
+            path: '/dashboard/video-recorders/'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/video-recorders/create'
+          }
+        ]
       }
     ]
   },
+      
   {
     title: t('People'),
     items: [
@@ -110,6 +132,37 @@ const getSections = (t) => [
           {
             title: t('Add'),
             path: '/dashboard/jobs/companies/1'
+          }
+        ]
+      },
+    ]
+  },
+  {
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/events-management',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/events-management'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/events-management/modify'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/logs'
           }
         ]
       },
@@ -370,9 +423,23 @@ export const DashboardSidebar = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'), {
     noSsr: true
   });
+  const [syncErrorMessages, setSyncErrorMessages] = useState([]);
+  const [syncErrorOpen, setSyncErrorOpen] = useState(false);
   const sections = useMemo(() => getSections(t), [t]);
   const organizationsRef = useRef(null);
   const [openOrganizationsPopover, setOpenOrganizationsPopover] = useState(false);
+
+  const handleOpenSyncError = () => {
+      setSyncErrorOpen(true);
+  };
+  const handleCloseSyncError = () => {
+      setSyncErrorOpen(false);
+      setSyncErrorMessages([]);
+  };
+
+  const handleSyncErrorMessages = (res) => {
+      setSyncErrorMessages(res);
+  }
 
   const handlePathChange = () => {
     if (!router.isReady) {
@@ -413,6 +480,11 @@ export const DashboardSidebar = (props) => {
             height: '100%'
           }}
         >
+          <SyncUniconError
+            errorMessages={syncErrorMessages}
+            open={syncErrorOpen}
+            handleClose={handleCloseSyncError}
+          />
           <div>
             <Box sx={{ p: 3 }}>
               <NextLink
@@ -474,8 +546,35 @@ export const DashboardSidebar = (props) => {
             
           <Box sx={{ p: 2 }}>
               <Button
-                onClick={
-                  controllerApi.uniconUpdater
+              onClick={
+                () =>
+                {
+                  controllerApi.uniconUpdater()
+                    .then(res => {
+                      if (res.status == 200) {
+                        toast.success('Synced successfully', { duration: 2000 },);
+                      }
+                      else {
+                        if (res.status == serverDownCode) {
+                          toast.error("Synced unsuccessfully due to server is down", { duration: 2000 });
+                        } else {
+                          const array = [];
+                          res.json().then(data => {
+                                Object.entries(data).map(([key,value]) => {
+                                  array.push([key,value])
+                                })
+                                handleSyncErrorMessages(array)
+                          })
+                          console.log(array, "errorArr");
+                          console.log(syncErrorOpen, "syncOpen");
+                          handleOpenSyncError();
+                          toast.error('Synced unsuccessfully');
+                        }
+                      }
+                    }).catch(err => {
+                      toast.error('Synced unsuccessfully', { duration: 2000 });
+                    });
+                  }
                 }
                 color="info"
                 component="a"

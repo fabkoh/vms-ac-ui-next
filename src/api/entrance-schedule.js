@@ -3,6 +3,12 @@ import { encodeArrayForSpring, sendApi } from './api-helpers';
 
 class EntranceScheduleApi {
 
+    getEntranceSchedules() {
+        if (useApi) {
+            return sendApi('/api/entrance-schedule');
+        }
+    }
+
     getEntranceSchedulesWhereEntranceIdsIn(entranceIds) {
         if (useApi) { 
             return sendApi(`/api/entrance-schedule?entranceids=${encodeArrayForSpring(entranceIds)}`);

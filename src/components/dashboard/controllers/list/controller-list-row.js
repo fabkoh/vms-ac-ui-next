@@ -29,7 +29,8 @@ const EntranceComponent = ({ entrance, ...props }) => {
         )
     }
     
-    return <WarningChip text="No entrance" { ...props }/>;
+    return <WarningChip text="No entrance"
+{ ...props }/>;
 }
 
 const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) => {
@@ -38,6 +39,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
         controllerName,
         controllerIP,
         created,
+        lastSync,
         authDevices=[]
     } = controller;
 
@@ -110,15 +112,10 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                 <Typography>{ controllerIP }</Typography>
             </TableCell>
             <TableCell>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                    }}
-                >
-                    <EntranceComponent entrance={entrance1} sx={{ mr: 1 }} />
-                    <EntranceComponent entrance={entrance2} />
-                </Box>
+                <EntranceComponent entrance={entrance1} />
+            </TableCell>
+            <TableCell>
+                <EntranceComponent entrance={entrance2} />
             </TableCell>
             <TableCell>
                 {
@@ -141,6 +138,9 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
             <TableCell>
                     { toDisplayDateString(created) }
             </TableCell>
+            <TableCell>
+                    { lastSync ? toDisplayDateString(lastSync) : "Never" }
+            </TableCell>         
             <TableCell>
                 <NextLink
                     href={ getControllerEditLink(controller) }

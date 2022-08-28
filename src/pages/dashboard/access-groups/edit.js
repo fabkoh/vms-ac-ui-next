@@ -15,6 +15,7 @@ import router from "next/router";
 import formUtils from "../../../utils/form-utils";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import { controllerApi } from "../../../api/controllers";
+import { serverDownCode } from "../../../api/api-helpers";
 
 const EditAccessGroups = () => {
 
@@ -31,6 +32,13 @@ const EditAccessGroups = () => {
         // map each id to a fetch req for that access group
         const resArr = await Promise.all(ids.map(id => accessGroupApi.getAccessGroup(id)));
         const successfulRes = resArr.filter(res => res.status == 200);
+        const serverDownRes = resArr.filter(res => res.status == serverDownCode);
+
+        if (serverDownRes.length > 0) {
+            toast.error("Error editing access groups due to server is down. Please try again");
+            router.replace('/dashboard/access-groups');
+            return;
+        }
 
         // no access groups to edit
         if (successfulRes.length == 0) {
@@ -86,6 +94,14 @@ const EditAccessGroups = () => {
     const getGroupEntrances = async (groups) => {
         const accessGroups = [ ...groups ];
         const resArr = await Promise.all(accessGroups.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
+        const serverDownArr = resArr.filter(res => res.status == serverDownCode);
+
+        if (serverDownArr.length > 0) {
+            toast.error("Error getting entrances due to server is down. Please try again");
+            router.replace('/dashboard/access-groups');
+            return;
+        }
+
         const successfulResIndex = [];
         resArr.forEach((res, i) => {
             if (res.status == 200) {
@@ -363,7 +379,6 @@ const EditAccessGroups = () => {
 
         const numEdited = successStatus.filter(status => status).length;
         if (numEdited) {
-            controllerApi.uniconUpdater();
             toast.success(`${numEdited} access groups edited`);
             if (numEdited == resArr.length) { // all success
                 router.replace('/dashboard/access-groups');
@@ -442,7 +457,8 @@ const EditAccessGroups = () => {
                                 )
                             })}
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"

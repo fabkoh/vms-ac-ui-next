@@ -19,10 +19,14 @@ import AssignAuthDevice from "../../../../components/dashboard/controllers/assig
 import { getControllerDetailsLink, getControllerListLink } from "../../../../utils/controller";
 import { controllerApi } from "../../../../api/controllers";
 import { authDeviceApi } from "../../../../api/auth-devices";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
 
 const EditController = () => {
     const isMounted = useMounted();
     const { controllerId }  = router.query; 
+
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const [controllerInfo, setControllerInfo] = useState()
     const [controllerValidations, setControllerValidations] = useState({
@@ -31,6 +35,7 @@ const EditController = () => {
     })
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
+    const [currentAuth,setCurrentAuth] = useState()
     const [authStatus, setAuthStatus] = useState({})
 
     const getController = async(controllerId) => {
@@ -43,9 +48,14 @@ const EditController = () => {
                     // console.log("getController",data)
                     getPairs(data)
                 }
-                else{
-                    toast.error("Controller info not found")
+                else {
+                    if (res.status == serverDownCode) {
+                        toast.error("Error loading controller info due to server is down");
+                    } else {
+                        toast.error("Controller info not found")
+                    }
                     router.replace(getControllerListLink)
+                    return;
                 }
             })
         }catch(err){console.log(err)}
@@ -71,7 +81,10 @@ const EditController = () => {
                 toast.dismiss()
                 if(res.status!=200){
                     setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
+                    if (res.status == serverDownCode) {
+                        setServerDownOpen(true);
+                    }
+                    toast.error("Failed to fetch status");
                 }
                 else{
                     setStatusLoaded(true)
@@ -87,10 +100,40 @@ const EditController = () => {
         // setStatusLoaded(true)
     }
 
+    const getAllCurrentAuthMethod = async(controllerId) => {
+        var authmethod = {}
+        try{
+            Promise.resolve(controllerApi.getAllCurrentAuthMethod(controllerId)) 
+            .then( async res=>{
+                if(res.status==200){
+                    const data = await res.json()
+                    // console.log(data)
+                    setCurrentAuth(data)
+                }
+                else{
+                    console.log("ERROR")
+                }
+            })
+        }catch(err){console.log(err)}
+    }
+
+    const getCurrentAuthMethod = (authdeviceId) => {
+        if (currentAuth){
+            // console.log(typeof(currentAuth))
+            // console.log()
+            // current = currentAuth.authDeviceId
+            // console.log(current)
+            return currentAuth[authdeviceId]
+            // return currentAuth[authdeviceId]
+        }
+
+
+    }
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
         getController(controllerId)
+        getAllCurrentAuthMethod(controllerId)
         getStatus()
     }, [isMounted])
 
@@ -113,7 +156,14 @@ const EditController = () => {
                 E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false
                 E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false
             }
-            else{toast.error("Failed to fetch entrance data")}
+            else {
+                if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+                toast.error("Failed to fetch entrance data");
+                setAllEntrances([]);
+                return;
+            }
         })        
        
         setAllEntrances(toUpdate)
@@ -218,31 +268,31 @@ const EditController = () => {
             }
             else{
                 toast.success("Controller info updated")
-                router.replace(getControllerListLink())
             }
-        }).then(
+        })
+        .then(
+            () => Promise.resolve(authDeviceApi.removeEntrance(E1))
+        )
+        .then(
+            () => Promise.resolve(authDeviceApi.removeEntrance(E2))
+        )
+        .then( () =>
         Promise.resolve(authDeviceApi.assignEntrance(E1))
         .then(res=>{
             if(res.status==200){
                 toast.success("Entrance E1 updated")
             }
             else(toast.error("Failed to update entrance E1"))
-        }),
+        }))
+        .then( () =>
         Promise.resolve(authDeviceApi.assignEntrance(E2))
         .then(res=>{
             if(res.status==200){
                 toast.success("Entrance E2 updated")
+                router.replace(getControllerListLink())
             }
             else(toast.error("Failed to update entrance E2"))
-        })
-        ).then(
-            Promise.resolve(authDeviceApi.updateUnicon())
-            .then(res=>{
-                if(res.status==200){
-                    toast.success("Updated Controllers")
-                }
-                else(toast.error("Failed to update controllers"))
-            }))
+        }))
     }
     return(
         <>
@@ -258,6 +308,10 @@ const EditController = () => {
                     py: 8
                 }}
             >
+                <ServerDownError 
+                    open={serverDownOpen}
+                    handleDialogClose={() => setServerDownOpen(false)}
+                />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
@@ -300,6 +354,7 @@ const EditController = () => {
                                 authPair={E1}      
                                 statusLoaded={statusLoaded}
                                 status={authStatus}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 allEntrances={allEntrances}
                                 changeEntrance={e1Handler}
                                 controllerValidations={controllerValidations}
@@ -308,12 +363,14 @@ const EditController = () => {
                                 authPair={E2}    
                                 statusLoaded={statusLoaded}
                                 status={authStatus}
+                                getCurrentAuthMethod={getCurrentAuthMethod}
                                 allEntrances={allEntrances}
                                 changeEntrance={e2Handler}
                                 controllerValidations={controllerValidations}
                                 />
                             <Grid container>
-                                <Grid item marginRight={3}>
+                                <Grid item
+marginRight={3}>
                                     <Button
                                         type="submit"
                                         size="large"
