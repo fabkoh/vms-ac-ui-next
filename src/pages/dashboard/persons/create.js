@@ -45,6 +45,7 @@ const getNewPersonValidation = (id) => ({
     credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
     credentialUidRepeatedIds: [],
     credentialCheckFailed: {},
+    numberInvalid: false,
     // note
     numberInUse: false,
     numberRepeated: false,
@@ -62,7 +63,8 @@ const getNewCredential = (id) => ({
 });
 
 const cardError = (v) => {
-    return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0 || Object.keys(v.credentialCheckFailed).length > 0)
+    return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0 || Object.keys(v.credentialCheckFailed).length > 0
+    || v.numberInvalid)
 };
 
 const CreatePersonsTwo = () => {
@@ -329,6 +331,21 @@ const CreatePersonsTwo = () => {
         return toChange;
     }
 
+    // check if phone number is a valid Singapore phone numnber
+    const checkInvalidNumberHelper = (personId, number, key, validArr) => {
+
+        const personValidation = validArr.find(p => p.personId === personId);
+        const invalid = number.startsWith("+65 ") && number.length !== 13;
+        console.log("invalid phone number is " + invalid);
+
+        if (isObject(personValidation) && personValidation[key] != invalid) {
+            personValidation[key] = invalid;
+            return true;
+        }
+
+        return false;
+    }
+
     const onPersonFirstNameChangeFactory = (id) => (ref) => {
         changeTextField("personFirstName", id, ref);
         const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value, personsValidation);
@@ -357,8 +374,9 @@ const CreatePersonsTwo = () => {
 
         const b1 = checkDuplicateHelper("personMobileNumber", "numberRepeated", personsValidation, personsInfo);
         const b2 = checkInUseHelper(id, ref.current?.value, personMobileNumbers, "numberInUse", personsValidation);
+        const b3 = checkInvalidNumberHelper(id, ref.current?.value, "numberInvalid", personsValidation);
 
-        if (b1 || b2) { setPersonsValidation([ ...personsValidation ]); }
+        if (b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     }
 
     const onPersonEmailChangeFactory = (id) => (ref) => {
