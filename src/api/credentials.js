@@ -92,6 +92,12 @@ const getCredentialWherePersonIdApi = (personId) => {
     }
 }
 
+const getCredentialWhereCredUidApi = (credUid) => {
+    if (useApi) {
+        return sendApi('/api/credentials?creduid=' + encodeURIComponent(credUid));
+    }
+}
+
 const enableCredentialWithIdApi = (credId) => {
     if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}/enable`, { method: 'PUT' })
 }

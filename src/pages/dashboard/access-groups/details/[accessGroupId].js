@@ -28,6 +28,7 @@ import { AccessGroupPersons } from "../../../../components/dashboard/access-grou
 import AccessGroupSchedules from "../../../../components/dashboard/access-groups/details/access-group-schedules";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/access-groups/confirm-delete';
+import ConfirmStatusUpdate from "../../../../components/dashboard/access-groups/confirm-status-update";
 import EntranceDetails from "../../../../components/dashboard/access-groups/details/entrance-details";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { getAccessGroupScheduleEditLink } from "../../../../utils/access-group-schedule";
@@ -35,6 +36,10 @@ import { accessGroupListLink, accessGroupCreateLink, getAccessGroupEditLink } fr
 import { controllerApi } from "../../../../api/controllers";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 
 const AccessGroupDetails = () => {
 
@@ -42,6 +47,7 @@ const AccessGroupDetails = () => {
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [accessGroupIsActive, setAccessGroupIsActive] = useState(true);
     const { accessGroupId }  = router.query;
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -121,7 +127,7 @@ const AccessGroupDetails = () => {
         getInfo();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
-    [])
+    [accessGroupIsActive])
 
     // actions menu open/close
   /*  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null) // which component to anchor action menu to
@@ -181,6 +187,42 @@ const AccessGroupDetails = () => {
         getInfo();
     }
 
+        // for updating status
+    const [statusUpdateId, setStatusUpdateId] = useState(0);
+    const [updateStatus, setUpdateStatus] = useState(null);
+    const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+    const openStatusUpdateDialog = (accessGroupId, updatedStatus) => {
+        setStatusUpdateId(accessGroupId);
+        setUpdateStatus(updatedStatus);
+        setStatusUpdateDialogOpen(true);
+    }
+    const handleStatusUpdateDialogClose = () => {
+        setStatusUpdateDialogOpen(false);
+    }
+
+    const handleMultiEnable = () => openStatusUpdateDialog(accessGroupId, true);
+    const handleMultiUnlock = () => openStatusUpdateDialog(accessGroupId, false);
+    const handleStatusUpdate = async (accessGroupId, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        Promise.resolve(
+            accessGroupApi.updateAccessGroupStatus(accessGroupId, updatedStatus)
+        ).then((res)=>{
+            if (res.status == 200) {
+                toast.success("Successfully " + (updatedStatus ? "activated" : "deactivated") + " access group");
+            } else {
+                toast.error("Failed to " + (updatedStatus ? "activate" : "deactivated") + " access group");
+            }
+        })
+
+        const newAccessGroup = {
+            ...accessGroup,
+            isActive: updatedStatus
+        };
+        setAccessGroupIsActive(updatedStatus);
+        setAccessGroup(newAccessGroup);
+    }
+
     // render view
     if (!accessGroup) {
         return null;
@@ -192,6 +234,13 @@ const AccessGroupDetails = () => {
                     Etlas: Access Group Details
                 </title>
             </Head>
+            <ConfirmStatusUpdate
+                accessGroupIds={[statusUpdateId]}
+                open={statusUpdateDialogOpen}
+                handleDialogClose={handleStatusUpdateDialogClose}
+                updateStatus={updateStatus}
+                handleStatusUpdate={handleStatusUpdate}
+            />
             <Box
                 component="main"
                 sx={{
@@ -281,6 +330,22 @@ const AccessGroupDetails = () => {
                                             &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiEnable}
+                                        disabled={accessGroupIsActive}
+                                    >
+                                        <CloudDone />
+                                        &#8288;Activate
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiUnlock}
+                                        disabled={!accessGroupIsActive}
+                                    >
+                                        <CloudOff />
+                                        &#8288;De-Activate
+                                    </MenuItem>
                                     <MenuItem
                                         disableRipple
                                         onClick={handleDeleteOpen}

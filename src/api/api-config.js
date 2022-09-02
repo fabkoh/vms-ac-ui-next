@@ -43,15 +43,18 @@ const fakeAccessGroups = [
     {
         "accessGroupId": 1,
         "accessGroupName": "Dune",
-        "accessGroupDesc": "the characters from Dune"
+        "accessGroupDesc": "the characters from Dune",
+        "isActive": true,
     },
     {
         "accessGroupId": 2,
-        "accessGroupName": "Not dune"
+        "accessGroupName": "Not dune",
+        "isActive": true,
     },
     {
         "accessGroupId": 3,
-        "accessGroupName": "Empty group"
+        "accessGroupName": "Empty group",
+        "isActive": true,
     }
 ]
 

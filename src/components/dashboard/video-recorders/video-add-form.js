@@ -86,20 +86,20 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations, removeCard, o
                     (
                         <Grid item
                             container>
-                            { edit && (
+                            {/* { edit && (
                                 <Grid item
                                  sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
                                 onClick={() => removeCard(recorderId)}
                             >
-                                Remove
+                                Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -109,7 +109,7 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations, removeCard, o
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }

@@ -15,6 +15,7 @@ class AccessGroupApi {
                     'Content-type': 'application/json'
                 },
                 body: JSON.stringify({
+                    isActive: true,
                     accessGroupName,
                     accessGroupDesc,
                     persons
@@ -23,7 +24,8 @@ class AccessGroupApi {
         }
         const newAccessGroup = {
             accessGroupId: fakeAccessGroups.map(group => group.accessGroupId)
-                                           .reduce((a, b) => Math.max(a, b), 0) + 1,
+                .reduce((a, b) => Math.max(a, b), 0) + 1,
+            isActive: true,
             accessGroupName,
             accessGroupDesc
         }
@@ -77,6 +79,7 @@ class AccessGroupApi {
         accessGroupId,
         accessGroupName,
         accessGroupDesc,
+        isActive,
         persons
     }) {
         if (useApi) {
@@ -89,6 +92,7 @@ class AccessGroupApi {
                     accessGroupId,
                     accessGroupName,
                     accessGroupDesc,
+                    isActive,
                     persons
                 })
             });
@@ -136,7 +140,19 @@ class AccessGroupApi {
         
         return Promise.resolve(new Response(null, { status: 204 }));
     }
+    updateAccessGroupStatus(accessGroupId, isActive) {
+        if (useApi) {
+            if (isActive) {
+                return sendApi(`/api/accessgroup/${accessGroupId}/activate`, { method: 'PUT' })
+            } else {
+                return sendApi(`/api/accessgroup/${accessGroupId}/deactivate`, { method: 'PUT' })
+            }
+        }
 
+        fakeAccessGroups.find(accessGroup => accessGroup.accessGroupId == accessGroupId).isActive = isActive;
+
+        return Promise.resolve(new Response(isActive, { status: 200 }));
+    }
     // nameExists(name) {
     //     // if (useApi) { return sendApi(PATH); }
 

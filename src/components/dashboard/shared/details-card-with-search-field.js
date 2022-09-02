@@ -48,6 +48,9 @@ export default function DetailsCardWithSearchField({
     searchFilter,
     placeholder = "",
     noneFoundText = "",
+    showErr = false,
+    // boolean function that takes in the entity, true means it will be default color else it will be error color
+    errFunction = (e) => {return true},
     icon = false
 }) {
 
@@ -81,7 +84,10 @@ export default function DetailsCardWithSearchField({
                                 passHref
                             >
                                 <Link component="a">
-                                    <Chip icon={icon} label={getLabel(e)} clickable />
+                                    <Chip color={showErr ? errFunction(e) ? "default" : "error" : "default"}
+                                        icon={icon}
+                                        label={getLabel(e)}
+                                        clickable />
                                 </Link>
                             </NextLink>
                         </Grid>

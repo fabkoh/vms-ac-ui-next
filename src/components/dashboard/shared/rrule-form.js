@@ -77,7 +77,6 @@ const Rrule = (props) => {
 			const { timeStart, timeEnd, ...newrule1} = nonChangingRule;
 			const newRule2 = { ...rule, ...newrule1 };
 			const rule2 = new RRule(newRule2);
-			console.log(rule2.toText()); // DELETE THIS
 			handleRrule(rule2);
 		} catch(e) { console.log(e); };
 	}
@@ -397,7 +396,7 @@ const Rrule = (props) => {
 	const monthMenuSetter1 = () => {
 		let date;
 		try {
-			date = nonChangingRule.dtstart.getDate()
+			date = nonChangingRule.dtstart?.getDate()
 		} catch (err) {
 			console.log(err);
 			return;
@@ -411,7 +410,7 @@ const Rrule = (props) => {
 		let newtempday;
 		let tempday;
 		try {
-			tempday = nonChangingRule.dtstart.getDay();
+			tempday = nonChangingRule.dtstart?.getDay();
 			newtempday = tempday-1;
 			newtempday ==-1? newtempday=6:false
 		} catch (err) {

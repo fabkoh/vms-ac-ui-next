@@ -316,7 +316,7 @@ const EditPersonsTwo = () => {
                 cred => {
                     const credTypeId = cred.credTypeId;
                     const uid = cred.credUid;
-                    if (credTypeId != '' && uid != '') {
+                    if (credTypeId != '' && uid != '' && credTypeId != CredTypePinID) {
                         if (!(credTypeId in credMap)) {
                             credMap[credTypeId] = [];
                         }

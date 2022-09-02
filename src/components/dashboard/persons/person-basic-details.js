@@ -54,7 +54,8 @@ export const PersonBasicDetails = (props) => {
             <SeverityPill
               color='warning'
             >
-              <WarningIcon fontSize="small" sx={{ mr: 1 }} />
+              <WarningIcon fontSize="small"
+sx={{ mr: 1 }} />
               No mobile number
             </SeverityPill>
           )}
@@ -69,7 +70,8 @@ export const PersonBasicDetails = (props) => {
             <SeverityPill
               color='warning'
             >
-              <WarningIcon fontSize="small" sx={{ mr: 1 }} />
+              <WarningIcon fontSize="small"
+sx={{ mr: 1 }} />
               No email
             </SeverityPill>
           )}
@@ -82,13 +84,17 @@ export const PersonBasicDetails = (props) => {
           {
             accessGroup ? (
               <Link component="a">
-                <NextLink href={getAccessGroupDetailsLink(accessGroup)} passHref>                
-                  <Chip label={getAccessGroupLabel(accessGroup)} icon={<LockClosed />}/>
+                <NextLink href={getAccessGroupDetailsLink(accessGroup)}
+                  passHref>                
+                  <Chip color={accessGroup.isActive ? "default" : "error"}
+                        label={getAccessGroupLabel(accessGroup)}
+                        icon={<LockClosed />}/>
                 </NextLink>
               </Link>
             ) : (
               <SeverityPill color="warning">
-                <WarningIcon fontSize="small" sx={{ mr: 1 }} />
+                <WarningIcon fontSize="small"
+                sx={{ mr: 1 }} />
                 No access group
               </SeverityPill>
             )

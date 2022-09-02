@@ -2,12 +2,12 @@ import { InfoOutlined } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { useState } from "react";
 
-export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, handleDialogClose, handleStatusUpdate}) {
-    const action = updateStatus ? "Activate" : "Unlock";
+export default function ConfirmStatusUpdate({ accessGroupIds, updateStatus, open, handleDialogClose, handleStatusUpdate}) {
+    const action = updateStatus ? "Activate" : "De-Activate";
     const helperText = `Type in ${action.toUpperCase()} to proceed`;
 
     // for text field
-    const requireTextField = entranceIds.length > 1;
+    const requireTextField = accessGroupIds.length > 1;
     const [text, setText] = useState("");
     const [buttonDisabled, setButtonDisabled] = useState(true);
     const handleTextChange = (e) => {
@@ -21,7 +21,7 @@ export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, ha
     const handleAction = (e) => { 
         e.preventDefault();
         handleClose(); 
-        handleStatusUpdate(entranceIds, updateStatus); 
+        handleStatusUpdate(accessGroupIds, updateStatus); 
     }
 
     return(
@@ -38,7 +38,7 @@ export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, ha
             <form onSubmit={handleAction}>
                 <DialogContent>
                     <DialogContentText>
-                        { "Are you sure you want to " + action.toLowerCase() + ` ${requireTextField ? "these" :"this"} entrance${requireTextField ? "s" :""}?\n` }
+                        { "Are you sure you want to " + action.toLowerCase() + ` ${requireTextField ? "these" :"this"} access group${requireTextField ? "s" :""}?\n` }
                         { requireTextField && 
                             <TextField 
                                 sx={{marginTop: 2}}
