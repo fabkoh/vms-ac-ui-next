@@ -552,6 +552,7 @@ export const DashboardSidebar = (props) => {
                   controllerApi.uniconUpdater()
                     .then(res => {
                       if (res.status == 200) {
+                        window.location.reload(true);
                         toast.success('Synced successfully', { duration: 2000 },);
                       }
                       else {
