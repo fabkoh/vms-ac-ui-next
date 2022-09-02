@@ -52,6 +52,7 @@ const ModifyauthMethodSchedule = () => {
         // for each controller, 
         data.forEach(c => {
             const authDeviceArr = c.authDevices;
+            authDeviceArr.sort((a, b) => a.authDeviceDirection.localeCompare(b.authDeviceDirection));
             authDeviceArr.forEach(a => a.controllerName = c.controllerName);
             authdevices.push( ...authDeviceArr );
         })

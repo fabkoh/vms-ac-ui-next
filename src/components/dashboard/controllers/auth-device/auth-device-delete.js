@@ -28,7 +28,8 @@ const AuthDeviceDelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteAuthDevices = () => {
+	const handleDeleteAuthDevices = (e) => {
+		e.preventDefault();
 		deleteAuthDevices();
 		handleClose();
 	}
@@ -59,7 +60,7 @@ const AuthDeviceDelete = (props) => {
 						Please ensure that the authentication device(s) is physically disconnected.
 					</DialogContentText>
 
-					<form onSubmit={handleDeleteAuthDevices}>
+					<form onSubmit={e => handleDeleteAuthDevices(e)}>
 						<TextField
 							variant="filled"
 							fullWidth

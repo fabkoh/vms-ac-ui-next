@@ -75,7 +75,7 @@ const PersonDetails = () => {
         return;
       }
       const body = await res.json();
-      if(isMounted) {
+      if(isMounted()) {
         setPerson(body);
       }
     } catch(err) {
@@ -104,7 +104,7 @@ const PersonDetails = () => {
   const editLink = getPersonsEditLink([person]);
 
   // handle delete action. put this in parent component
-	const [deleteOpen, setDeleteOpen] = React.useState(false);  
+	const [deleteOpen, setDeleteOpen] = useState(false);  
 
 	const handleDeleteOpen = () => {        
 		setDeleteOpen(true);                        
@@ -112,10 +112,11 @@ const PersonDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deletePersons = async() => {
+	const deletePersons = (e) => {
+    e.preventDefault();
     Promise.resolve(
       personApi.deletePerson(person.personId)
-    ).then((res)=>{
+    ).then(res => {
       if (res.status == 204){
         toast.success('Delete success');
         router.replace(personListLink);

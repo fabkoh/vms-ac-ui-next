@@ -37,7 +37,7 @@ export const Confirmdelete = (props) => {
 
     // delete action
     const handleDeletePersons = (e) => {
-		console.log(e);
+		//console.log(e);
         deletePersons(e);
         handleClose();
     }
@@ -61,7 +61,7 @@ export const Confirmdelete = (props) => {
 						Are you sure you want to delete person(s)? This action cannot be
 						undone.
 					</DialogContentText>
-					<form onSubmit={handleDeletePersons}>
+					<form onSubmit={e => handleDeletePersons(e)}>
 						{selectedState && <TextField 
 							variant="filled"
 							fullWidth 

@@ -114,7 +114,7 @@ const EditAuthDevice = () => {
         .then(res => {
             if(res.status == 200) {
                 toast.success("Update success");
-                router.replace(getControllerDetailsLinkWithId(controllerId));   
+                router.replace(getAuthdeviceDetailsLink(controllerId, authdeviceId));   
             } else {
                 toast.error("Failed to update authentication device");
                 setSubmitted(false);
@@ -204,7 +204,7 @@ const EditAuthDevice = () => {
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={getAuthdeviceDetailsLink(authdeviceId)} 
+                                        href={getAuthdeviceDetailsLink(controllerId, authdeviceId)} 
                                         passHref
                                     >
                                         <Button
