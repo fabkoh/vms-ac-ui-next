@@ -86,6 +86,7 @@ export default function AuthenticationAddOnError({
                         <TableCell>New Schedule(s)</TableCell>
                         <TableCell>Auth Device with Existing Schedule(s)</TableCell>
                         <TableCell>Description</TableCell>
+                        <TableCell>Auth Method</TableCell>
                         <TableCell padding="checkbox">
                             <Checkbox
                                 checked={selectedAllSchedules}
@@ -112,9 +113,10 @@ export default function AuthenticationAddOnError({
                                 <TableRow key={`row${j}`}>
                                   <TableCell> ID {clash.authMethodSchedule.authMethodScheduleId} : Existing Authentication Schedule 
                                     "{clash.authMethodSchedule.authMethodScheduleName}" for {clash.controller} 
-                                    {clash.authDevice.entrance==null?"( No Entrance ) ":clash.authDevice.entrance}
+                                    {clash.authDevice.entrance==null?" (No Entrance) ":clash.authDevice.entrance}
                                     {clash.authDevice.authDeviceName} ({clash.authDevice.authDeviceDirection}) </TableCell>
                                   <TableCell> {rruleDescriptionWithBr(rrulestr(clash.authMethodSchedule.rrule), clash.authMethodSchedule.timeStart, clash.authMethodSchedule.timeEnd)} </TableCell>
+                                  <TableCell> {clash.authMethodSchedule.authMethod.authMethodDesc} </TableCell>
                                   <TableCell padding="checkbox">
                                     <Checkbox
                                       checked={isAuthMethodScheduleSelected}
