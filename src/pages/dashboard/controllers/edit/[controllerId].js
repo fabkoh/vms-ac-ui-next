@@ -396,7 +396,7 @@ marginRight={3}>
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={getControllerDetailsLink(controllerId)} 
+                                        href={getControllerDetailsLink(controllerInfo)} 
                                         passHref
                                     >
                                         <Button
