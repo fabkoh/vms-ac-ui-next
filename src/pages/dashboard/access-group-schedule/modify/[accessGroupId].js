@@ -17,6 +17,7 @@ import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../../api/controllers";
 import { serverDownCode } from "../../../../api/api-helpers";
+import { getAccessGroupDetailsLink, accessGroupListLink } from "../../../../utils/access-group";
 
 const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -454,7 +455,7 @@ mb={2}>
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href="/dashboard/access-groups/"
+                                        href={accGrp? getAccessGroupDetailsLink(accGrp) : accessGroupListLink}
                                         passHref
                                     >
                                         <Button

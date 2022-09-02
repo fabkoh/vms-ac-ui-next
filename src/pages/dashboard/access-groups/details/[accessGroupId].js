@@ -158,7 +158,8 @@ const AccessGroupDetails = () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteAccessGroup = async() => {
+	const deleteAccessGroup = async(e) => {
+        e.preventDefault();
         accessGroupApi.deleteAccessGroup(accessGroup.accessGroupId)
         .then(res => {
             if (res.status == 204) {

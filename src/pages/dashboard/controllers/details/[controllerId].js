@@ -226,7 +226,8 @@ const ControllerDetails = () => {
 		setDeleteOpen(false);
 	}
 
-    const deleteController = async() => {
+    const deleteController = async(e) => {
+        e.preventDefault();
         toast.loading("Deleting Controller...");
         controllerApi.deleteController(controllerId)
         .then(async res =>{
