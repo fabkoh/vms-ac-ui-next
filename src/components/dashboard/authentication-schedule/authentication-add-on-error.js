@@ -7,7 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
-
+import { rruleDescriptionWithBr } from '../../../utils/rrule-desc';
+import { rrulestr } from "rrule";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -52,12 +53,12 @@ export default function AuthenticationAddOnError({
   errorMessages,
   handleClose,
   open,
-  // selectedSchedules,
-  // handleSelectFactory,
-  // selectedSomeSchedules, 
-  // selectedAllSchedules,
-  // handleSelectAllSchedules,
-  // deleteSchedules,
+  selectedSchedules,
+  handleSelectFactory,
+  selectedSomeSchedules, 
+  selectedAllSchedules,
+  handleSelectAllSchedules,
+  deleteSchedules,
   ...rest }) {
   
 
@@ -84,49 +85,62 @@ export default function AuthenticationAddOnError({
                     <TableRow>
                         <TableCell>New Schedule(s)</TableCell>
                         <TableCell>Auth Device with Existing Schedule(s)</TableCell>
-                        {/* <TableCell padding="checkbox">
+                        <TableCell>Description</TableCell>
+                        <TableCell padding="checkbox">
                             <Checkbox
                                 checked={selectedAllSchedules}
                                 indeterminate={selectedSomeSchedules}
                                 onChange={handleSelectAllSchedules}
                             />  
-                        </TableCell> */}
+                        </TableCell>
                     </TableRow> 
                 </TableHead>
                 <TableBody>
-                    {errorMessages.map(([key,clashes],i) => {
-                      console.log(clashes);
-                        // const IsScheduleSelected = selectedSchedules.includes(clash.authMethodScheduleId);
-                        // const handleSelect = handleSelectFactory(clash.authMethodScheduleId);
-                        return ( 
-                            <TableRow key={`row${i}`}>
-                                <TableCell>{key}</TableCell>
-                                <TableCell> {clashes.controller} {clashes.entrance==null?"( No Entrance ) ":clashes.entrance}
-                              {clashes.authDevice.authDeviceName} ({clashes.authDevice.authDeviceDirection}) </TableCell>
-                                {/* <TableCell padding="checkbox">
-                                    <Checkbox
-                                      checked={IsScheduleSelected}
-                                      onChange={handleSelect}
-                                      value={IsScheduleSelected}
-                                    />
-                                </TableCell> */}
+                {/* {console.log("ERROR   ",errorMessages)} */}
+                {errorMessages.map(singleError => { return Object.entries(singleError).map(([newScheduleName,clashes],i) => {
+                      console.log(newScheduleName,clashes);
+                        return (
+                          <React.Fragment key={`row${i}`}>
+                            <TableRow>
+                              <TableCell rowSpan={clashes.length + 1}>{newScheduleName}</TableCell>
                             </TableRow>
+                            {clashes.map((clash, j) => {
+                              console.log(clash)
+                              const isAuthMethodScheduleSelected = selectedSchedules.includes(clash.authMethodSchedule.authMethodScheduleId);
+                              const handleSelect = handleSelectFactory(clash.authMethodSchedule.authMethodScheduleId);
+                              return (
+                                <TableRow key={`row${j}`}>
+                                  <TableCell> ID {clash.authMethodSchedule.authMethodScheduleId} : Existing Authentication Schedule 
+                                    "{clash.authMethodSchedule.authMethodScheduleName}" for {clash.controller} 
+                                    {clash.authDevice.entrance==null?"( No Entrance ) ":clash.authDevice.entrance}
+                                    {clash.authDevice.authDeviceName} ({clash.authDevice.authDeviceDirection}) </TableCell>
+                                  <TableCell> {rruleDescriptionWithBr(rrulestr(clash.authMethodSchedule.rrule), clash.authMethodSchedule.timeStart, clash.authMethodSchedule.timeEnd)} </TableCell>
+                                  <TableCell padding="checkbox">
+                                    <Checkbox
+                                      checked={isAuthMethodScheduleSelected}
+                                      onChange={handleSelect}
+                                      value={isAuthMethodScheduleSelected}
+                                    />
+                                  </TableCell>
+                                </TableRow>)
+                        })}
+                          </React.Fragment>
                         )
-                    })}
+                    })})}
+                  
 
                 </TableBody>
             </Table>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus
-                  onClick={handleClose}>
-            Close
-        </Button>
-        {/* <Button onClick={deleteSchedules}
-                  sx={{ color: "#F44336" }}
-                  autoFocus>
-            Delete Selected
-        </Button> */}
+          <Button onClick={handleClose}>
+              Close
+            </Button>
+          <Button onClick={deleteSchedules}
+                    sx={{ color: "#F44336" }}
+                    autoFocus>
+              Delete Selected
+            </Button>
         </DialogActions>
     </Dialog>
   );

@@ -23,6 +23,7 @@ import { input } from "aws-amplify";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
 
+
 const ModifyEventManagement = () => {
     const router = useRouter();
     const isMounted = useMounted();
@@ -107,6 +108,8 @@ const ModifyEventManagement = () => {
         setDeleteOpen(false);
         setSelectedEventsManagement([])
     };
+
+
     
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
