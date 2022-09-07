@@ -92,7 +92,7 @@ const WeeklyRrule = (props) => {
 		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
 	};
 	
-	const [timeStart, setTimeStart] = useState(""); //timeStart lift up state
+	const [timeStart, setTimeStart] = useState("00:00"); //timeStart lift up state
 	const handleTimeStart = (e) => {
 		if(e.target.value==""){
 			console.warn("START TIME IS EMPTYYYY")
@@ -101,7 +101,7 @@ const WeeklyRrule = (props) => {
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
 	};
-	const [timeEnd, setTimeEnd] = useState(""); //timeEnd lift up state
+	const [timeEnd, setTimeEnd] = useState("00:00"); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
 		if(timeEnd<timeStart){
 			// console.warn("invalid time")
@@ -114,7 +114,7 @@ const WeeklyRrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:timeStart,timeEnd: endOfDay ? timeEnd : "24:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
 
 	useEffect(() => {
