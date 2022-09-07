@@ -86,6 +86,11 @@ const WeeklyRrule = (props) => {
 	const handleAllDay = () => {
 		allDay ? setAllDay(false) : setAllDay(true);
 	};
+
+	const [endOfDay, setEndOfDay] = useState(true);
+	const handleEndOfDay = () => {
+		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
+	};
 	
 	const [timeStart, setTimeStart] = useState(""); //timeStart lift up state
 	const handleTimeStart = (e) => {
@@ -111,6 +116,10 @@ const WeeklyRrule = (props) => {
 		//reset timeStart and timeEnd if allDay is false.
 		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
+
+	useEffect(() => {
+		endOfDay ? (setNonChangingRule(prevState=>({...prevState, timeEnd:timeEnd}))) : (setNonChangingRule(prevState=>({...prevState, timeEnd:"24:00"})));
+	}, [endOfDay]);
 
 	// const AllDayRenderer = (allDay) => {
 	// 	if (allDay) {
@@ -199,6 +208,7 @@ minWidth={50}>
 						<Typography mr={2}
 fontWeight="bold">to</Typography>
 					</Grid>
+				{endOfDay ?
 					<Grid item
 ml={2}
 mr={2}
@@ -216,6 +226,7 @@ mt={1} >
 							value={nonChangingRule.timeEnd}
 						></TextField>
 					</Grid>
+				: null}
 				</Grid>
 			);
 		}
@@ -427,6 +438,18 @@ mr={3}>
 				</Grid>
 				<Grid item>
 					{AllDayRenderer(allDay)}
+				</Grid>
+				<Grid item
+mr={3}>
+					<FormControl>
+						<FormGroup>
+							<FormControlLabel
+								label={<Typography fontWeight="bold">End of day</Typography>}
+								labelPlacement="start"
+								control={<Switch value={endOfDay} disabled={!allDay} onChange={handleEndOfDay}></Switch>}
+							/>
+						</FormGroup>
+					</FormControl>
 				</Grid>
 			</Grid>
 		</Grid>
