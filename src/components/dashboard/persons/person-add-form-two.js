@@ -155,9 +155,11 @@ const PersonAddFormTwo = ({ onClear, person, onPersonFirstNameChange, onPersonLa
                                         inputProps={{ ref: personMobileNumberRef }}
                                         value={person.personMobileNumber} 
                                         variant="outlined"
+                                        error={validation.numberInvalid}
                                         helperText={
                                             (validation.numberInUse && "Note: number taken") ||
-                                            (validation.numberRepeated && "Note: duplicate number in form")
+                                            (validation.numberRepeated && "Note: duplicate number in form") ||
+                                            (validation.numberInvalid && "Error: Invalid Singapore phone number")
                                         }
                                     />
                                 </Grid>

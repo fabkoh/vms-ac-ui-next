@@ -464,19 +464,19 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                     (
                         <Grid item
                             container>
-                            { edit && (
+                            {/* { edit && (
                                 <Grid item
                                     sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
                                 sx={{mt:1}}
                                 onClick={() => removeCard(eventsManagementId)}
                             >
-                                Remove
+                                Clear
                             </Button>
                             {/* { edit && (
                                 <Box ml={2}>

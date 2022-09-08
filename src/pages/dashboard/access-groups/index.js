@@ -37,7 +37,12 @@ import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
 import toast from "react-hot-toast";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 import { Confirmdelete } from "../../../components/dashboard/access-groups/confirm-delete";
+import ConfirmStatusUpdate from "../../../components/dashboard/access-groups/confirm-status-update";
 import { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, accessGroupCreateLink, getAccessGroupEditLink } from "../../../utils/access-group";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { controllerApi } from "../../../api/controllers";
@@ -302,6 +307,49 @@ const AccessGroupList = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[accessGroup]
 	);
+	
+	// for updating status of access group (active/ non-active)
+	const [statusUpdateIds, setStatusUpdateIds] = useState([]);
+	const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+	const [updateStatus, setUpdateStatus] = useState(null);
+    const openStatusUpdateDialog = (accessGroupIds, updatedStatus) => {
+        setStatusUpdateIds(accessGroupIds);
+        setUpdateStatus(updatedStatus);
+        setStatusUpdateDialogOpen(true);
+    }
+    const handleStatusUpdateDialogClose = () => {
+        setStatusUpdateDialogOpen(false);
+    }
+    const handleMultipleUpdate = (updateStatus) => openStatusUpdateDialog([ ...selectedAccessGroup ], updateStatus);
+    const handleMultiActivate = () => handleMultipleUpdate(true);
+    const handleMultiDeactivate = () => handleMultipleUpdate(false);
+    const handleStatusUpdate = async (accessGroupIds, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        const resArr = await Promise.all(accessGroupIds.map(accessGroupId => accessGroupApi.updateAccessGroupStatus(accessGroupId, updatedStatus)));
+        
+        let successCount = 0;
+        const someFailed = false;
+        resArr.forEach(res => {
+            if (res.status == 200) {
+                successCount++;
+            } else {
+                someFailed = true;
+            }
+        })
+
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "deactivate") + " some access groups"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "deactivate") + " " + (successCount > 1 ? successCount + " access groups" : "1 access group")); }
+
+        const newAccessGroups = [ ...accessGroup ];
+        newAccessGroups.forEach(acc => {
+            if (accessGroupIds.includes(acc.accessGroupId)) {
+                //TODO: look into this logic again, I believe regardless of whether this is successful or not, it will be updated
+                acc.isActive = updatedStatus;
+            }
+        })
+        setAccessGroup(newAccessGroups);
+    }
 
 	//for delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
@@ -370,6 +418,13 @@ const AccessGroupList = () => {
 			<Head>
 				<title>Etlas : Access-Group List</title>
 			</Head>
+            <ConfirmStatusUpdate
+                accessGroupIds={statusUpdateIds}
+                open={statusUpdateDialogOpen}
+                handleDialogClose={handleStatusUpdateDialogClose}
+                updateStatus={updateStatus}
+                handleStatusUpdate={handleStatusUpdate}
+            />
 			<Box
 				component="main"
 				sx={{
@@ -422,7 +477,18 @@ const AccessGroupList = () => {
 											&#8288;Edit
 										</MenuItem>
 									</NextLink>
-									
+									<MenuItem disableRipple
+										onClick={handleMultiActivate}
+										disabled={buttonBlock}>
+										<CloudDone />
+										&#8288;Activate
+									</MenuItem>
+									<MenuItem disableRipple
+										onClick={handleMultiDeactivate}
+										disabled={buttonBlock}>
+										<CloudOff />
+										&#8288;De-Activate
+									</MenuItem>
 									<MenuItem disableRipple
 										onClick={handleDeleteOpen}
 										disabled={buttonBlock}>

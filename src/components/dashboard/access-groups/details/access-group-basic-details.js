@@ -6,7 +6,7 @@ import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const AccessGroupBasicDetails = (props) => {
-    const { accessGroupName, accessGroupDesc } = props.accessGroup;
+    const { accessGroupName, accessGroupDesc, isActive } = props.accessGroup;
     
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
@@ -36,6 +36,24 @@ export const AccessGroupBasicDetails = (props) => {
                                     sx={{ mr: 1 }}
                                 />
                                 No descriptions
+                            </SeverityPill>
+                        )
+                    }
+                </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Status"
+                    value={isActive}
+                >
+                    {
+                        !isActive && (
+                            <SeverityPill color="error">
+                                NOT ACTIVE
+                            </SeverityPill>
+                        ) || (
+                            <SeverityPill color="success">
+                                ACTIVE
                             </SeverityPill>
                         )
                     }

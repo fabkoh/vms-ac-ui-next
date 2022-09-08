@@ -306,55 +306,51 @@ const EditPersonsTwo = () => {
     }
 
     // returns if validArr is changed
-
-    const checkCredInUseHelper = (infoArr, validArr) => {
+    const checkCredRepeatedHelper = (infoArr, validArr) => {
         let toChange = false;
 
-        infoArr.forEach((person, i) => {
-            const newCredentialsInUse = [] //stores cred Ids currently used. 
-            person.credentials.forEach(cred => { // populate the above array
-                if (cred.credTypeId != '' && cred.credUid != '') { // ignore incomplete fields
-                    const inUseValues = credentials[cred.credTypeId] ?? []; //credentials is from db. stores credUid for the credIds of form person. doesnt add when new cred added?
-                    // console.log("inusevalues",inUseValues)
-                    // console.log("cred",cred) created creds are in person.credentials array. correct behaviour.
-                    // person.originalCreds.forEach(oCred=>{
-                    //     // console.log("ocred",oCred)
-                    //     // console.log("ocred",person.originalCreds)
-                    // if (inUseValues.includes(cred.credUid)&& (cred.credTypeId == oCred.credTypeId) && (cred.credUid == oCred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                    //     newCredentialsInUse.push(cred.credId);
-                    // }
-                    // })
-                    // const orig={1:[],2:[]}
-                    const origUids = []
-                    const origIds = []
-                    person.originalCreds.forEach(oCred=>{
-                        origUids.push(oCred.credUid)
-                        origIds.push(oCred.credId)
-                    })
-                    // person.originalCreds.forEach(oCred=>{
-                    //     orig[oCred.credTypeId].push(oCred.credUid)
-                    // })
-                    // !credentials[credtypeid].includes(orig[credtypeid].map(uid=>return uid)) means u reuse so not in use? 
-                    // console.log("orig",orig)
-                    // console.log("origUids",origUids)
-                    // if (inUseValues.includes(cred.credUid)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                    //     newCredentialsInUse.push(cred.credId);
-                    // }
-                    if (inUseValues.includes(cred.credUid)&& !origIds.includes(cred.credId)) { // && cred.credTypeId == cred.oldCredTypeId && cred.credUid == cred.oldCredUid
-                        newCredentialsInUse.push(cred.credId);
+        const credMap = {}; // maps credTypeId to array of credUid
+        const repeatedCred = []; // array of [credTypeId, credUid]
+        infoArr.forEach(person => 
+            person.credentials.forEach(
+                cred => {
+                    const credTypeId = cred.credTypeId;
+                    const uid = cred.credUid;
+                    if (credTypeId != '' && uid != '' && credTypeId != CredTypePinID) {
+                        if (!(credTypeId in credMap)) {
+                            credMap[credTypeId] = [];
+                        }
+                        const arr = credMap[credTypeId];
+                        if (arr.some(e => e == uid)) {
+                            repeatedCred.push([credTypeId, uid]);
+                        } else {
+                            arr.push(uid);
+                        }
                     }
                 }
-                // console.log("newCredentialsInUse",newCredentialsInUse)
-            });
-            if (!arraySameContents(newCredentialsInUse, validArr[i].credentialInUseIds)) {
-                toChange = true;
-                validArr[i].credentialInUseIds = newCredentialsInUse;
+            )
+        );
+
+        infoArr.forEach(
+            (person, i) => {
+                const repeatedCredIds = [];
+                // console.log("repeatedCredIds",repeatedCredIds)
+                person.credentials.forEach(
+                    cred => {
+                        if (repeatedCred.some(c => c[0] == cred.credTypeId && c[1] == cred.credUid)) {
+                            repeatedCredIds.push(cred.credId);
+                        }
+                    }
+                );
+                if (!arraySameContents(repeatedCredIds, validArr[i].credentialRepeatedIds)) {
+                    toChange = true;
+                    validArr[i].credentialRepeatedIds = repeatedCredIds;
+                }
             }
-        });
+        );
 
-        return toChange
+        return toChange;
     }
-
 
     // to check if same credUid for not pin is being repeated
     const checkCredUidRepeatedForNotPinTypeCred = (infoArr, validArr) => {

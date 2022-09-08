@@ -126,13 +126,6 @@ export const PersonsListTable = (props) => {
 							<TableCell>Mobile number</TableCell>
 							<TableCell>email</TableCell>
 							<TableCell>
-								<Buttonfilter
-									//pass org group into array prop. should store somewhere first
-									array={["ISS", "ORG/DEPT", "GRABFOOD"]}
-									sx={{}}
-								/>
-							</TableCell>
-							<TableCell>
 								<ListFilter
 									array={accessGroupNames}
 									onSelect={onSelect}
@@ -154,7 +147,8 @@ export const PersonsListTable = (props) => {
 									key={person.personId}
 									selected={isPersonselected}
 								>
-									<TableCell padding="checkbox">
+									<TableCell padding="checkbox"
+										width="10%">
 										<Checkbox
 											checked={isPersonselected}
 											onChange={(event) =>
@@ -163,10 +157,11 @@ export const PersonsListTable = (props) => {
 											value={isPersonselected}
 										/>
 									</TableCell>
-									<TableCell width="10%">
+									<TableCell >
 										<Box
 											sx={{
-												m: 1,
+												marginBottom: 1, 
+												marginTop: 1,
 												alignItems: "center",
 												display: "flex",
 											}}
@@ -185,7 +180,8 @@ export const PersonsListTable = (props) => {
 													href={getPersonDetailsLink(person)}
 													passHref
 												>
-													<Link color="inherit" variant="subtitle2">
+													<Link color="inherit"
+														variant="subtitle2">
 														<Typography noWrap>
 														{getPersonName(person)}
 														</Typography>
@@ -202,36 +198,42 @@ export const PersonsListTable = (props) => {
 										</Box>
 									</TableCell>
 									<TableCell width="20%">
-										<Typography width={180} noWrap>
+										<Typography width={180}
+noWrap>
 											{person.personMobileNumber || (
 												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+													<WarningIcon fontSize="small"
+sx={{ mr: 1 }} />
 													No mobile number
 												</SeverityPill>
 											)}
 										</Typography>
 									</TableCell>
 									<TableCell width="20%">
-										<Typography width={190} noWrap>
+										<Typography width={190}
+noWrap>
 										{person.personEmail || (
 											<SeverityPill color="warning">
-												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+												<WarningIcon fontSize="small"
+sx={{ mr: 1 }} />
 												No email
 											</SeverityPill>
 										)}
 										</Typography>
 									</TableCell>
-									<TableCell width="20%">{person.personOrgGroup}</TableCell>
 									<TableCell width="20%">
 										{ person.accessGroup ? (
-											<NextLink href={`/dashboard/access-groups/details/${person.accessGroup.accessGroupId}`} passHref>
+											<NextLink href={`/dashboard/access-groups/details/${person.accessGroup.accessGroupId}`}
+passHref>
 												<Link>
-													<Typography width={190} noWrap>{person.accessGroup.accessGroupName}</Typography>
+													<Typography width={190}
+noWrap>{person.accessGroup.accessGroupName}</Typography>
 												</Link>
 											</NextLink>
 										) : (
 											<SeverityPill color="warning">
-												<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+												<WarningIcon fontSize="small"
+sx={{ mr: 1 }} />
 												No access Group
 											</SeverityPill>
 										) }
@@ -245,7 +247,8 @@ export const PersonsListTable = (props) => {
                       {numeral(person.totalAmountSpent).format(`${person.currency}0,0.00`)}
                     </Typography>
                   </TableCell> */}
-									<TableCell width="10%" align="left">
+									<TableCell width="10%"
+align="left">
 										<NextLink
 											href={getPersonsEditLink([person])}
 											passHref

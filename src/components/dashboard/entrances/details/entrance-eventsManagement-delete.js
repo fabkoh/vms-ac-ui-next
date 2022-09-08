@@ -175,7 +175,7 @@ const EntranceEventsManagementDelete = ({
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText sx={{ whiteSpace: "pre-line", mb: 1}}>
-                                Are you sure you want to delete schedule(s)? This action cannot be undone.
+                                Are you sure you want to delete event management(s)? This action cannot be undone.
                                 {/*
                                     selectedAll && 
                                     <strong>{"\nDeleting all eventManagements would remove this entrance from the access group"}</strong>

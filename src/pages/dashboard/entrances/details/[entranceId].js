@@ -227,7 +227,8 @@ const getEntranceEventsManagement = useCallback(async () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrance = async() => {
+	const deleteEntrance = async(e) => {
+        e.preventDefault();
         Promise.resolve(
             entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{

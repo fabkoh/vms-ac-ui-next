@@ -114,12 +114,13 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                 action={
                     // action are children flushed to the right
                     (
-                        <Grid item container>
-                            { edit && (
+                        <Grid item
+                            container>
+                            {/* { edit && (
                                 <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
@@ -128,7 +129,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                             >
                                 Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -138,7 +139,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }

@@ -58,6 +58,7 @@ const EditAccessGroups = () => {
                 accessGroupId: body.accessGroupId,
                 accessGroupName: body.accessGroupName,
                 accessGroupDesc: body.accessGroupDesc,
+                isActive: body.isActive,
                 persons: body.persons,
                 entrances: [], // for now
                 originalName: body.accessGroupName, // fields for validation

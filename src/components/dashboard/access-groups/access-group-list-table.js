@@ -7,6 +7,7 @@ import {
 	Box,
 	Button,
 	Checkbox,
+	Chip,
 	IconButton,
 	Link,
 	Menu,
@@ -120,6 +121,7 @@ export const AccessGroupListTable = (props) => {
 							</TableCell>
 							<TableCell>Access Group</TableCell>
 							<TableCell>Description</TableCell>
+							<TableCell sx={{paddingLeft: 2.5}}> Status</TableCell>
 							<TableCell>No. Of Persons</TableCell>
 							<TableCell>No. Of Entrances</TableCell>
 							<TableCell align="center">Actions</TableCell>
@@ -158,7 +160,8 @@ export const AccessGroupListTable = (props) => {
 													href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
 													passHref
 												>
-													<Link color="inherit" variant="headline5">
+													<Link color="inherit"
+														variant="headline5">
 														<Typography noWrap>
 														{accGroup.accessGroupName}
 														</Typography>
@@ -179,35 +182,52 @@ export const AccessGroupListTable = (props) => {
 											</NextLink>
 										) : (
 											<SeverityPill color="warning">
-												<WarningIcon fontSize="small" sx={{ mr: 1 }}/>
+												<WarningIcon fontSize="small"
+												sx={{ mr: 1 }}/>
 												No Descriptions
 											</SeverityPill>
 										) }
 									</TableCell>
-									<TableCell width="20%">
-										<Typography width={130} noWrap>
+									<TableCell width="15%">
+										<Chip
+											label={accGroup.isActive ? "ACTIVE" : "NOT ACTIVE"}
+											onClick={() => {}}
+											color={accGroup.isActive? "success" : "error"}
+											sx={{
+												fontSize: "12px",
+												fontWeight: 600
+											}}
+											size="small"
+										/>
+									</TableCell>
+									<TableCell width="15%">
+										<Typography width={130}
+											noWrap>
 											{(Array.isArray(accGroup.persons) && accGroup.persons.length) || (
 												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+													<WarningIcon fontSize="small"
+													sx={{ mr: 1 }} />
 													No Persons
 												</SeverityPill>
 											)}
 										</Typography>
 									</TableCell>
-									<TableCell width="20%">
+									<TableCell width="15%">
 										{
 											(Array.isArray(accGroup.entrances) && accGroup.entrances.length > 0) ? (
 												<Typography>{accGroup.entrances.length}</Typography>
 											) : (
 												<SeverityPill color="warning">
-													<WarningIcon fontSize="small" sx={{ mr: 1 }} />
+													<WarningIcon fontSize="small"
+													sx={{ mr: 1 }} />
 													No entrances
 												</SeverityPill>
 											)
 										}
 									</TableCell>
 
-									<TableCell width="20%" align="center">
+									<TableCell width="20%"
+										align="center">
 										<NextLink
 											href={{
 												pathname: "/dashboard/access-groups/edit",
