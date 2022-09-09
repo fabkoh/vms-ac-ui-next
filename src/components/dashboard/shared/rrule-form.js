@@ -103,8 +103,14 @@ const Rrule = (props) => {
 	const handleAllDay = () => {
 		allDay ? setAllDay(false) : setAllDay(true);
 	};
+
+	// handle "end of day" time end mode (24:00)
+	const [endOfDay, setEndOfDay] = useState(true);
+	const handleEndOfDay = () => {
+		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
+	};
 	
-	const [timeStart, setTimeStart] = useState(); //timeStart lift up state
+	const [timeStart, setTimeStart] = useState("00:00"); //timeStart lift up state
 	const handleTimeStart = (e) => {
 		if(e.target.value==""){
 			console.warn("START TIME IS EMPTYYYY")
@@ -113,7 +119,7 @@ const Rrule = (props) => {
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
 	};
-	const [timeEnd, setTimeEnd] = useState(); //timeEnd lift up state
+	const [timeEnd, setTimeEnd] = useState("00:00"); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
 		if(timeEnd<timeStart){
 			// console.warn("invalid time")
@@ -126,8 +132,12 @@ const Rrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart: timeStart,timeEnd: endOfDay ? timeEnd : "24:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
+
+	useEffect(() => {
+		endOfDay ? (setNonChangingRule(prevState=>({...prevState, timeEnd:timeEnd}))) : (setNonChangingRule(prevState=>({...prevState, timeEnd:"24:00"})));
+	}, [endOfDay]);
 
 	// const AllDayRenderer = (allDay) => {
 	// 	if (allDay) {
@@ -209,6 +219,7 @@ const Rrule = (props) => {
 						<Typography mr={2}
 						fontWeight="bold">to</Typography>
 					</Grid>
+					{endOfDay ?
 					<Grid item
 						ml={2}
 						mr={2}
@@ -226,6 +237,7 @@ const Rrule = (props) => {
 							value={nonChangingRule.timeEnd}
 						></TextField>
 					</Grid>
+				: null}
 				</Grid>
 			);
 		}
@@ -791,6 +803,7 @@ const Rrule = (props) => {
 				ml={-2}
 				alignItems="center"
 				xs={12}>
+					
 				<Grid item
 					mr={3}>
 					<FormControl>
@@ -803,9 +816,24 @@ const Rrule = (props) => {
 						</FormGroup>
 					</FormControl>
 				</Grid>
+
 				<Grid item>
 					{AllDayRenderer(allDay)}
 				</Grid>
+
+				<Grid item
+mr={3}>
+					<FormControl>
+						<FormGroup>
+							<FormControlLabel
+								label={<Typography fontWeight="bold">End of day</Typography>}
+								labelPlacement="start"
+								control={<Switch value={endOfDay} disabled={!allDay} onChange={handleEndOfDay}></Switch>}
+							/>
+						</FormGroup>
+					</FormControl>
+				</Grid>
+				
 			</Grid>
 		</Grid>
 	);
