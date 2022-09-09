@@ -19,7 +19,7 @@ import EntranceListTable from "../../../components/dashboard/entrances/list/entr
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
-import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
+import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByCurrStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
 import { serverDownCode } from "../../../api/api-helpers";
@@ -27,7 +27,8 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
-    status: filterEntranceByStatus
+    status: filterEntranceByStatus,
+    currStatus: filterEntranceByCurrStatus,
 })
 
 const EntranceList = () => {
@@ -61,10 +62,29 @@ const EntranceList = () => {
         }
         const jsonArr = await Promise.all(resArr.map(res => res.json()));
         newEntrances.forEach((entrance, i) => entrance.accessGroups = successArr[i] ? jsonArr[i] : []);
+        const entranceCurrentStatus = await getEntranceCurrentStatus();
+        const dataWithCurrentStatus = newEntrances.map(entrance => {
+            return {
+                ... entrance,
+                isLocked: !entranceCurrentStatus[entrance.entranceId]
+            }
+        });
         if (isMounted()) {
-            setEntrances(newEntrances);
+            setEntrances(dataWithCurrentStatus);
         }
     }, [isMounted]);
+    const getEntranceCurrentStatus = async () => {
+        const res = await entranceScheduleApi.getCurrentEntranceStatus();
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrance current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    };
     const getEntrancesLocal = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
@@ -76,8 +96,15 @@ const EntranceList = () => {
             return [];
         }
         const data = await res.json();
+        const entranceCurrentStatus = await getEntranceCurrentStatus();
+        const dataWithCurrentStatus = data.map(entrance => {
+            return {
+                ... entrance,
+                isLocked: !entranceCurrentStatus[entrance.entranceId]
+            }
+        });
         if (isMounted()) {
-            setEntrances(data);
+            setEntrances(dataWithCurrentStatus);
         }
         return data;
     }, [isMounted]);
@@ -159,7 +186,8 @@ const EntranceList = () => {
     // for filtering
     const [filters, setFilters] = useState({
         query: "",
-        status: null
+        status: null,
+        currStatus: null
     })
     // query filter
     const queryRef = useRef(null);
@@ -176,6 +204,15 @@ const EntranceList = () => {
         setFilters((prevState) => ({
             ...prevState,
             status: status
+        }));
+    }
+
+    // status filter
+    const handleCurrentStatusSelect = (i) => {
+        const currStatus = i == -1 ? null : i == 1;
+        setFilters((prevState) => ({
+            ...prevState,
+            currStatus: currStatus
         }));
     }
     const filteredEntrances = applyFilter(entrances, filters);
@@ -450,6 +487,7 @@ const EntranceList = () => {
                             page={page}
                             rowsPerPage={rowsPerPage}
                             handleStatusSelect={handleStatusSelect}
+                            handleCurrentStatusSelect={handleCurrentStatusSelect}
                             openStatusUpdateDialog={openStatusUpdateDialog}
                             entranceSchedules={entranceSchedules}
                             entranceController={entranceController}

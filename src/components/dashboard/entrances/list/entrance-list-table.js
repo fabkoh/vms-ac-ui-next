@@ -3,6 +3,7 @@ import { Scrollbar } from "../../../scrollbar";
 import WarningChip from "../../shared/warning-chip";
 import NextLink from "next/link";
 import { PencilAlt } from "../../../../icons/pencil-alt";
+import { LockOpen, Lock } from "@mui/icons-material";
 import { ArrowRight } from "../../../../icons/arrow-right";
 import { ListFilter } from "../../shared/list-filter";
 import { getEntranceDetailsLink, getEntranceIdsEditLink } from "../../../../utils/entrance";
@@ -10,9 +11,10 @@ import { getControllerDetailsLink } from "../../../../utils/controller";
 
 
 // for status options
-const statusOptions = ['Unlocked', 'Active'];
+const statusOptions = ['Inactive', 'Active'];
+const currentOptions = ['Locked', 'Unlocked'];
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, openStatusUpdateDialog, entranceSchedules, entranceController, ...other }) {   
+export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, handleCurrentStatusSelect, openStatusUpdateDialog, entranceSchedules, entranceController, ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
@@ -32,6 +34,13 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                             <TableCell>Controller</TableCell>
                             <TableCell>
                                 <ListFilter
+                                    array={currentOptions}
+                                    onSelect={handleCurrentStatusSelect}
+                                    defaultLabel="Current"
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <ListFilter
                                     array={statusOptions}
                                     onSelect={handleStatusSelect}
                                     defaultLabel="Status"
@@ -47,12 +56,14 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                     entranceId,
                                     entranceName,
                                     accessGroups,
-                                    isActive
+                                    isActive,
+                                    isLocked
                                 } = entrance
                                 const isEntranceSelected = selectedEntrances.includes(entranceId);
                                 const handleSelect = handleSelectFactory(entranceId);
                                 const detailsLink = getEntranceDetailsLink(entrance);
                                 const editLink = getEntranceIdsEditLink([entranceId]);
+                                const handleOpenUnlockedDialog = () => openStatusUpdateDialog(entranceId, false);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
                                 const numberOfSchedules = entranceSchedules[entranceId];
                                 const controller = entranceController[entranceId];
@@ -100,7 +111,8 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                         <TableCell>
                                             {
                                                 controller ? ( // TODO make this into link
-                                                    <NextLink href={getControllerDetailsLink(controller)} passHref>
+                                                    <NextLink href={getControllerDetailsLink(controller)}
+                                                        passHref>
                                                         <Link color="inherit">
                                                             <Typography noWrap>{ controller.controllerName }</Typography>
                                                         </Link>
@@ -111,8 +123,21 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                             }
                                         </TableCell>
                                         <TableCell>
+                                            {console.log(isLocked, "isLocked")}
                                             <Chip
-                                                label={isActive ? "ACTIVE" : "UNLOCKED"}
+                                                label={isLocked ? "LOCKED" : "UNLOCKED"}
+                                                onClick={handleOpenUnlockedDialog}
+                                                icon={isLocked ? <Lock /> : <LockOpen />}
+                                                sx={{
+                                                    fontSize: "12px",
+                                                    fontWeight: 600
+                                                }}
+                                                size="small"
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={isActive ? "ACTIVE" : "INACTIVE"}
                                                 onClick={handleOpenStatusUpdateDialog}
                                                 color={isActive? "success" : "error"}
                                                 sx={{
@@ -123,6 +148,10 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                             />
                                         </TableCell>
                                         <TableCell>
+                                            <IconButton component="a"
+                                                onClick={handleOpenUnlockedDialog}>
+                                                    <LockOpen fontSize="small" />    
+                                            </IconButton>
                                             <NextLink
                                                 href={ editLink }
                                                 passHref

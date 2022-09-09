@@ -59,6 +59,7 @@ const EntranceDetails = () => {
     const [entranceEventManagements, setEntranceEventManagements] = useState([]);
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
+    const [entranceIsLocked, setEntranceIsLocked] = useState(true);
     const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
 
     const getControllers = async() => {
@@ -108,7 +109,19 @@ const EntranceDetails = () => {
             console.error(err);
         }
     }
-
+    const getEntranceCurrentStatus = async () => {
+        const res = await entranceScheduleApi.getCurrentEntranceStatusForOneEntrance(entranceId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrance current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        setEntranceIsLocked(!data);
+        return data;
+    };
 
     const getEntrance = useCallback(async() => {
         try {
@@ -123,9 +136,13 @@ const EntranceDetails = () => {
                 return;
             }
             const body = await res.json();
-
+            const entranceCurrentStatus = await getEntranceCurrentStatus();
+            const dataWithCurrentStatus = {
+                    ... body,
+                    isLocked: !entranceCurrentStatus
+                };
             if (isMounted()) {
-                setEntrance(body);
+                setEntrance(dataWithCurrentStatus);
                 getAccessGroups(body.entranceId);
                 setEntranceIsActive(body.isActive);
             }
@@ -450,7 +467,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiUnlock}
-                                        disabled={!entranceActive}
+                                        disabled={!entranceIsLocked}
                                     >
                                         <LockOpen />
                                         &#8288;Unlock
