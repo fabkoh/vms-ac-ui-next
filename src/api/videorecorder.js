@@ -120,3 +120,4 @@ class VideoRecorderApi {
 const videoRecorderApi = new VideoRecorderApi();
 
 export default videoRecorderApi;
+

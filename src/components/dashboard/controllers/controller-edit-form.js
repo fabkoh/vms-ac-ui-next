@@ -119,9 +119,9 @@ const ControllerEditForm = ({controllerInfo,changeText,changeIPStatic,changeIPHa
                                         required={controllerInfo.controllerIPStatic}
 										// disabled={controller.controllerIpStatic}
 										value={controllerInfo.controllerIP}
-										helperText={controllerValidations.invalidIP? "Invalid IP address":""}
+										helperText={controllerValidations.invalidIP ? "Invalid IP address": controllerValidations.takenIP ? "IP address taken":""}
 										onChange={changeIPHandler}
-										error={controllerValidations.invalidIP}
+										error={controllerValidations.invalidIP || controllerValidations.takenIP}
 										// error={controllerInfo.controllerIPStatic?
 										// 	!/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(controllerInfo.controllerIP):false}
 									/>
