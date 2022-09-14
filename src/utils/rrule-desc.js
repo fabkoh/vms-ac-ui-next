@@ -66,6 +66,10 @@ const time = (timeString) => {
     const num = Number(timeString.substring(0, 2));
     const rest = timeString.substring(2);
 
+    if (timeString == "24:00") {
+        return "End of Day"
+    }
+
     if (num == 0) {
         return '12' + rest + ' am'
     }

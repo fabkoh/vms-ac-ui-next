@@ -58,11 +58,13 @@ const Logs=()=>{
     const [filterEnd, setfilterEnd] = useState(null);
 
     const handleStartDate = (e) => {
-        setfilterStart(e)
+        setfilterStart(e);
+        console.log(filterStart);
     }
 
     const handleEndDate = (value) => {
-        setfilterEnd(value)
+        setfilterEnd(value);
+        console.log(filterEnd);
     }
     
     function onClear() {
@@ -107,6 +109,7 @@ const [serverDownOpen, setServerDownOpen] = useState(false);
 const [firstTimeCall, setFirstTimeCall] = useState(true);
     
 // for polling 
+const [isPolling, setIsPolling] = useState(true);
 const [pollingTime, setPollingTime] = useState(1000);
 const pollingOptions = [
     { "pollingDisplay" : 1, "pollingTime" : 1000},
@@ -177,12 +180,14 @@ useEffect(
 
 useEffect(
     () => {
-        console.log(pollingTime)
-        const timer = setInterval(getEvents, pollingTime);
-        return () => clearInterval(timer)
+        if (isPolling) {
+            console.log(pollingTime)
+            const timer = setInterval(getEvents, pollingTime);
+            return () => clearInterval(timer)
+        }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pollingTime]
+    [isPolling, pollingTime]
 );
 
 const getInfo = useCallback(async() => {
@@ -196,8 +201,23 @@ const getInfo = useCallback(async() => {
 
     if (isMounted()){
         setEvents(eventsJson);
+        setIsPolling(true);
     }
 }, [isMounted]);
+
+const search = async() => {
+    const start = filterStart ? new Date(filterStart.getTime() - filterStart.getTimezoneOffset() * 60000).toISOString() : null;
+    const end = filterEnd ? new Date(filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000).toISOString() : null;
+    const eventsRes = await eventslogsApi.searchEvent(filters.query, start, end);
+    if (eventsRes.status !== 200) {
+        toast.error("Failed To Search");
+        return;
+    }
+    const eventsJson = await eventsRes.json();
+    toast.success("Search Successfully");
+    setIsPolling(false);
+    setEvents(eventsJson);
+}
 
     return (
         <>
@@ -357,6 +377,13 @@ const getInfo = useCallback(async() => {
                                 onClick={onClear}
                             >
                                 Clear Dates
+                            </Button>
+                            <Button
+                                    variant="contained"
+                                    sx={{ m: 1 , mr : 5 }}
+                                    onClick={search}
+                                >
+                                    Search
                             </Button>
                         
                         </Box>
