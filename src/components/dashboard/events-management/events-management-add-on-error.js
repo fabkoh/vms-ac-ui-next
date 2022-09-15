@@ -105,7 +105,7 @@ export default function EventsManagementAddOnError({
                               const handleSelect = handleSelectFactory(clash.eventsManagementId);
                               return (
                                 <TableRow key={`row${j}`}>
-                                  <TableCell> ID {clash.eventsManagementId} : Event Management {clash.eventsManagementName} for {clash.entrance?.entranceName || clash.controller?.controllerName || "(linked to unknown entity)"}{" "}
+                                  <TableCell> ID {clash.eventsManagementId} : Event Management "{clash.eventsManagementName}" for {clash.entrance?.entranceName || clash.controller?.controllerName || "(linked to unknown entity)"}{" "}
                                     with the following triggers: {eventActionInputText(clash.inputEvents)} and the following output actions: {eventActionOutputText(clash.outputActions)} </TableCell>
                                   <TableCell padding="checkbox">
                                     <Checkbox

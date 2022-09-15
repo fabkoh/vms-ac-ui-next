@@ -21,6 +21,7 @@ import { controllerApi } from "../../../../../api/controllers";
 import AuthenticationAddOnError from "../../../../../components/dashboard/authentication-schedule/authentication-add-on-error";
 import { serverDownCode } from "../../../../../api/api-helpers";
 import { ServerDownError } from "../../../../../components/dashboard/errors/server-down-error";
+import { ConfirmDeleteAuthMethodSchedules } from "../../../../../components/dashboard/authentication-schedule/authentication-confirm-delete";
 
 const ModifyauthMethodSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -78,8 +79,53 @@ const ModifyauthMethodSchedule = () => {
             console.log(error)
         }
     }, [])
+
+    const [singleErrorMessage, setSingleErrorMessage] = useState([]);
       
-    //
+    // for selection of checkboxes
+    const [selectedSchedules, setSelectedSchedules] = useState([]);
+    const selectedAllSchedules = selectedSchedules.length === [...new Set(singleErrorMessage.map(e => e.authMethodSchedule.authMethodScheduleId))].length;
+    const selectedSomeSchedules = selectedSchedules.length > 0 && !selectedAllSchedules;
+    const handleSelectAllSchedules = (e) => setSelectedSchedules(e.target.checked ? [...new Set(singleErrorMessage.map(e => e.authMethodSchedule.authMethodScheduleId))] : []);
+    const handleSelectFactory = (authMethodScheduleId) => () => {
+        console.log(authMethodScheduleId, "the authMethodScheduleId getting passed");
+        console.log(singleErrorMessage, "singleErrorMessage");
+        if (selectedSchedules.includes(authMethodScheduleId)) {
+            setSelectedSchedules(selectedSchedules.filter(id => id !== authMethodScheduleId));
+        } else {
+            setSelectedSchedules([ ...selectedSchedules, authMethodScheduleId ]);
+        }
+    }
+
+    //for delete action button
+	const [deleteOpen, setDeleteOpen] = useState(false); 
+
+    const handleDeleteOpen = () => {        
+		setDeleteOpen(true);           
+	};
+    const handleDeleteClose = () => {
+        handleClose();
+		setDeleteOpen(false);
+    }
+
+    const deleteSchedules = async (e) => {
+        e.preventDefault();
+		Promise.all(selectedSchedules.map(id=>{
+			return authMethodScheduleApi.deleteAuthDeviceSchedule(id)
+		})).then( resArr => {
+			resArr.filter(res=>{
+				if(res.status == 200){
+					toast.success('Delete success',{duration:2000},);
+				}
+				else{
+					toast.error('Delete unsuccessful' )
+				}
+			})
+		})
+        setDeleteOpen(false);
+        setSelectedSchedules([])
+        setSingleErrorMessage([])
+    };
 
     // empty objects for initialisation of new card
     
@@ -120,6 +166,7 @@ const ModifyauthMethodSchedule = () => {
     const handleClose = () => {
         setOpen(false);
         setErrorMessages([]);
+        setSelectedSchedules([]);
     };
 
     const handleErrorMessages = (res) => {
@@ -378,22 +425,21 @@ const ModifyauthMethodSchedule = () => {
 
                 
                 (res.json()).then(data => {
-                    // console.log(data);
-                    // console.log(data[0])
-                    
                     const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
-                            // console.log(key, singleData))
-                            array.push([key,singleData]))
-
-
-                    })
-
-                    handleErrorMessages(array)
+                    data.map(singleError => { 
+                        Object.entries(singleError).map(([newScheduleName,clashes],i) => {
+                            clashes.map((clash, j) => {
+                            array.push(clash)})
+                    
+                        })})
+                    setSingleErrorMessage(array)
+                    handleErrorMessages(data)
+                    // console.log(array)
                     // getClashingAuthDeviceSchedule
 
                 })
+                
+                
                 handleClickOpen();
                     // handleErrorMessages(data))
                 
@@ -471,10 +517,22 @@ const ModifyauthMethodSchedule = () => {
                     open={serverDownOpen}
                     handleDialogClose={() => setServerDownOpen(false)}
                 />
+                <ConfirmDeleteAuthMethodSchedules
+                    open={deleteOpen} 
+                    handleDialogClose={handleDeleteClose}
+                    selectedSchedules={selectedSchedules}
+                    deleteSchedules={deleteSchedules}
+                />
                 <AuthenticationAddOnError
                     errorMessages={errorMessages}
                     handleClose={handleClose}
                     open={open}
+                    selectedSchedules={selectedSchedules}
+                    handleSelectFactory={handleSelectFactory}
+                    selectedSomeSchedules={selectedSomeSchedules}
+                    selectedAllSchedules={selectedAllSchedules}
+                    handleSelectAllSchedules={handleSelectAllSchedules}
+                    deleteSchedules={handleDeleteOpen}
                 />
 
                 <Container maxWidth="xl">

@@ -62,6 +62,14 @@ class EntranceScheduleApi {
     deleteEntranceSchedule(entranceScheduleId) {
         if (useApi) { return sendApi(`/api/entrance-schedule/delete/${entranceScheduleId}`, { method: 'DELETE' }); }
     }
+
+    getCurrentEntranceStatus() {
+        if (useApi) { return sendApi('/api/entrance-schedule/current'); }
+    }
+
+    getCurrentEntranceStatusForOneEntrance(entranceId) {
+        if (useApi) { return sendApi(`/api/entrance-schedule/current/${entranceId}`); }
+    }
 }
 
 export const entranceScheduleApi = new EntranceScheduleApi();

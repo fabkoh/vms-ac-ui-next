@@ -4,6 +4,7 @@ import { useState } from "react";
 import { rrulestr } from "rrule";
 import rruleDescription from "../../../utils/rrule-desc";
 import { Scrollbar } from "../../scrollbar";
+import { ConfirmDeleteAuthMethodSchedules } from "./authentication-confirm-delete";
 
 const steps = ['Select Schedules to Delete', 'Confirm Delete'];
 
@@ -158,56 +159,11 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
                     </>
                 ) : (
                     // render delete confirm
-                    <>
-                        <DialogTitle>
-                            {" "}
-                            <WarningAmberOutlined
-                                color="error"
-                                sx={{
-                                    color: "F44336",
-                                    m: -0.5, 
-                                    width: 50
-                                }}
-                            />
-                            {" "}
-                            &#8288;Confirm delete?
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText sx={{ whiteSpace: "pre-line", mb: 1}}>
-                                Are you sure you want to delete schedule(s)? This action cannot be undone.
-                            </DialogContentText>
-                            <form onSubmit={handleDeleteSchedules}
-                            autoComplete="off"
-                            >
-                                <TextField
-                                    variant="filled"
-                                    fullWidth
-                                    onChange={handleTextChange}
-                                    helperText="Type in DELETE to proceed"
-                                    value={value}
-                                    autoFocus
-                                />
-                                <Box display="flex" justifyContent="space-between" mt={1}>
-                                    <Button 
-                                        onClick={handlePrevStep}
-                                        variant="outlined"
-                                        sx={{ borderRadius: 8 }}
-                                    >
-                                        Back
-                                    </Button>
-                                    <Button 
-                                        type="submit"
-                                        color="error" 
-                                        disabled={deleteDisabled}
-                                        variant="contained"
-                                        sx={{ borderRadius: 8 }}
-                                    >
-                                        Delete
-                                    </Button>
-                                </Box>
-                            </form>
-                        </DialogContent>                                    
-                    </>
+                    <ConfirmDeleteAuthMethodSchedules>
+                        open = {open}
+                        handleDialogClose = {handleClose}
+                        deleteSchedules = {deleteSchedules}
+                    </ConfirmDeleteAuthMethodSchedules>
                 )
             }
         </Dialog>

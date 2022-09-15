@@ -14,7 +14,7 @@
 import { MeetingRoom, SelectAll } from "@mui/icons-material";
 import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
-import rruleDescription from "./rrule-desc";
+import { rruleDescriptionWithBr } from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
 import {Grid} from "@mui/material";
 
@@ -148,14 +148,14 @@ const listDescription = eventManagement =>
     if(i<eventManagement.triggerSchedules.length-1)
         return(
             <div key={i} >
-                {rruleDescription(rrulestr(trigger.rrule), 
+                {rruleDescriptionWithBr(rrulestr(trigger.rrule), 
                 trigger.timeStart, 
                 trigger.timeEnd)}
                 <br /><br />
             </div>)
         else return(
             <div key={i}>
-                {rruleDescription(rrulestr(trigger.rrule), 
+                {rruleDescriptionWithBr(rrulestr(trigger.rrule), 
                 trigger.timeStart, 
                 trigger.timeEnd)}
             </div>
