@@ -488,7 +488,7 @@ export const DashboardSidebar = (props) => {
           <div>
             <Box sx={{ p: 3 }}>
               <NextLink
-                href="/"
+                href="/dashboard"
                 passHref
               >
                 <a>
@@ -500,7 +500,14 @@ export const DashboardSidebar = (props) => {
                   />
                 </a>
               </NextLink>
+              <NextLink
+                href="/dashboard"
+                passHref
+              >
+                <a>
                 <Image src ={etlasname}/>
+                </a>
+              </NextLink>
             </Box>
             {/* <Box sx={{ px: 2 }}>
               <Box
