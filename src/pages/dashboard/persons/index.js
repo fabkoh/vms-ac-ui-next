@@ -38,7 +38,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
 import toast from "react-hot-toast";
 import { createFilter } from "../../../utils/list-utils";
-import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink } from "../../../utils/persons";
+import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink, personLostAndFoundLink } from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
@@ -342,7 +342,7 @@ const PersonList = () => {
 		}
 		setFilters(newFilters);
 	}
-	
+
 	return (
 		<>
 			<Head>
@@ -414,32 +414,43 @@ const PersonList = () => {
 								</StyledMenu>
 							</Grid>
 						</Grid>
-						<Box
-							sx={{
-								m: -1,
-								mt: 3,
-							}}
-						>
-							<Button startIcon={<UploadIcon fontSize="small" />}
-								sx={{ m: 1 }}>
-								Import
-							</Button>
-							<Button
-								startIcon={<DownloadIcon fontSize="small" />}
-								sx={{ m: 1 }}
-							>
-								Export
-							</Button>
-							<Tooltip  title='Excel template can be found at {}'
-							enterTouchDelay={0}
-								placement ='top'
-								sx={{
-									m: -0.5,
-									mt: 3,
-								}}>
-								<HelpOutlineIcon />
-							</Tooltip>
-						</Box>
+						<Grid container
+								justifyContent="space-between"
+								spacing={3}>
+							<Grid item>
+								<Button startIcon={<UploadIcon fontSize="small" />}
+									sx={{ m: 1 }}>
+									Import
+								</Button>
+								<Button
+									startIcon={<DownloadIcon fontSize="small" />}
+									sx={{ m: 1 }}
+								>
+									Export
+								</Button>
+								<Tooltip  title='Excel template can be found at {}'
+								enterTouchDelay={0}
+									placement ='top'
+									sx={{
+										m: -0.5,
+										mt: 3,
+									}}>
+									<HelpOutlineIcon />
+								</Tooltip>
+							</Grid>
+							<Grid item>
+								<NextLink href={personLostAndFoundLink}
+										passHref>
+											<Button
+												sx={{ m: 2 }}
+												variant="contained"
+												color = "error"
+											>
+												Lost & Found
+											</Button>
+										</NextLink>
+							</Grid>
+						</Grid>
 					</Box>
 					<Card>
 						{/* <Tabs

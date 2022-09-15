@@ -47,4 +47,8 @@ const filterPersonsByState = filterByState(filterPersonsByString);
 
 const isPersonEqual = (p1, p2) => isObject(p1) && isObject(p2) && p1.personId != null && p1.personId == p2.personId
 
-export { personListLink, getPersonsEditLink, getPersonName, getPersonDetailsLink, filterPersonByString, filterPersonsByString, filterPersonByStringPlaceholder, filterPersonByAccessGroupName, personCreateLink, getPersonIdsEditLink, filterPersonsByState, isPersonEqual, filterPersonByCredential }
+const filterPersonByCredentialsPlaceholder = "Search for Owner of Lost Card";
+
+const personLostAndFoundLink = "/dashboard/persons/lost-and-found";
+
+export { personListLink, getPersonsEditLink, getPersonName, getPersonDetailsLink, filterPersonByString, filterPersonsByString, filterPersonByStringPlaceholder, filterPersonByAccessGroupName, personCreateLink, getPersonIdsEditLink, filterPersonsByState, isPersonEqual, filterPersonByCredential, filterPersonByCredentialsPlaceholder, personLostAndFoundLink}
