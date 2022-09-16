@@ -3,13 +3,18 @@ import { sendApi } from './api-helpers';
 
 class EventslogsApi {
 
-    getEvents() {
-        if (useApi) { return sendApi('/api/events'); }
+    getEventsCount() {
+        if (useApi) { return sendApi(`/api/events/count`); }
         return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
 
-    searchEvent(queryString, start, end) {
-        if (useApi) { return sendApi(`/api/events?queryString=${queryString}` + (start ? `&start=${start}` : ``) + (end ? `&end=${end}` : ``))}
+    getEvents(batchNo) {
+        if (useApi) { return sendApi(`/api/events?batchNo=${batchNo}`); }
+        return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
+    }
+
+    searchEvent(batchNo, queryString, start, end) {
+        if (useApi) { return sendApi(`/api/events?batchNo=${batchNo}&queryString=${queryString}` + (start ? `&start=${start}` : ``) + (end ? `&end=${end}` : ``))}
         return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
 }

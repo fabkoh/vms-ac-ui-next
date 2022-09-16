@@ -96,21 +96,34 @@ const handleQueryChange = (e) => {
 const [Events, setEvents] = useState([]);
 
 console.log(filters)
-const filteredEvents = applyDateTimeFilter(applyFilter(Events, filters),filterStart,filterEnd)
+const [searchedEvents, setSearchedEvents] = useState([]);
+const filteredEvents = searchedEvents.length <= 0 ? applyDateTimeFilter(applyFilter(Events, filters),filterStart,filterEnd) : searchedEvents;
 
 // for pagination
 const [page, setPage] = useState(0);
-const handlePageChange = (e, newPage) => setPage(newPage);
+const handlePageChange = async (e, newPage) => {
+    setPage(newPage);
+    if ((newPage + 1) * rowsPerPage >= filteredEvents.length && Events.length < eventsCount) {
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
+
+        if (res.status == 200) {
+            const data = await res.json();
+            if (isMounted())
+                setEvents(Events.concat(data));
+        } else
+            toast.error("Some error has occurred");
+    }
+}
 const [rowsPerPage, setRowsPerPage] = useState(10);
 const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
 const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
-const eventsCount = filteredEvents.length;
+const [eventsCount, setEventsCount] = useState(0);
 const [serverDownOpen, setServerDownOpen] = useState(false);
 const [firstTimeCall, setFirstTimeCall] = useState(true);
     
 // for polling 
 const [isPolling, setIsPolling] = useState(true);
-const [pollingTime, setPollingTime] = useState(1000);
+const [pollingTime, setPollingTime] = useState(5000);
 const pollingOptions = [
     { "pollingDisplay" : 1, "pollingTime" : 1000},
     { "pollingDisplay" : 2, "pollingTime" : 2000},
@@ -129,7 +142,7 @@ const onPollingTimeChange = (e) => {
 const getEvents = useCallback(async () => {
     try {
         //const data = await personApi.getFakePersons() 
-        const res = await eventslogsApi.getEvents()
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -147,7 +160,7 @@ const getEvents = useCallback(async () => {
 const getEventsWithErrorPopUps = useCallback(async () => {
     try {
         //const data = await personApi.getFakePersons() 
-        const res = await eventslogsApi.getEvents()
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -182,7 +195,10 @@ useEffect(
     () => {
         if (isPolling) {
             console.log(pollingTime)
-            const timer = setInterval(getEvents, pollingTime);
+            const timer = setInterval(() => {
+                getInfo();
+                
+            }    , pollingTime);
             return () => clearInterval(timer)
         }
     },
@@ -191,24 +207,34 @@ useEffect(
 );
 
 const getInfo = useCallback(async() => {
-    const eventsRes = await eventslogsApi.getEvents();
-    if (eventsRes.status !== 200) {
-        toast.error("Failed To Refresh");
+    const eventsCountRes = await eventslogsApi.getEventsCount();
+    if (eventsCountRes.status !== 200) {
+        toast.error("Failed To Get Total Events Count");
         return;
     }
-    const eventsJson = await eventsRes.json();
-    toast.success("Refresh Successfully");
-
-    if (isMounted()){
-        setEvents(eventsJson);
-        setIsPolling(true);
+    const eventsCountJson = await eventsCountRes.json();
+    setEventsCount(eventsCountJson);
+    if (Events.length < eventsCountRes) {
+        const eventsRes = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
+        if (eventsRes.status !== 200) {
+            toast.error("Failed To Refresh");
+            return;
+        }
+        const eventsJson = await eventsRes.json();
+        toast.success("Refresh Successfully");
+    
+        if (isMounted()){
+            setEvents(eventsJson);
+            console.log("Events Arr length is " + Events.length);
+            setIsPolling(true);
+        }
     }
 }, [isMounted]);
 
 const search = async() => {
     const start = filterStart ? new Date(filterStart.getTime() - filterStart.getTimezoneOffset() * 60000).toISOString() : null;
     const end = filterEnd ? new Date(filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000).toISOString() : null;
-    const eventsRes = await eventslogsApi.searchEvent(filters.query, start, end);
+    const eventsRes = await eventslogsApi.searchEvent(Math.floor(searchedEvents.length / 500), filters.query, start, end);
     if (eventsRes.status !== 200) {
         toast.error("Failed To Search");
         return;
@@ -216,7 +242,7 @@ const search = async() => {
     const eventsJson = await eventsRes.json();
     toast.success("Search Successfully");
     setIsPolling(false);
-    setEvents(eventsJson);
+    setSearchedEvents(eventsJson);
 }
 
     return (

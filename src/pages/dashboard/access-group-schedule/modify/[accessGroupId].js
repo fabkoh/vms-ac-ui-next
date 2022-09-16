@@ -213,7 +213,6 @@ const ModifyAccessGroupSchedule = () => {
     }
     const [submitted, setSubmitted] = useState(false);
 
-
     const replaceAll = (e) => {
         e.preventDefault();
 
@@ -227,7 +226,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
-                router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
+                router.back()
             }
         })
         
@@ -244,7 +243,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
-                router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
+                router.back()
             }
         })
 
