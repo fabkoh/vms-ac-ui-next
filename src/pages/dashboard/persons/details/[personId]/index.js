@@ -30,6 +30,7 @@ import PersonCredentials from '../../../../../components/dashboard/persons/perso
 import { getCredentialWherePersonIdApi } from '../../../../../api/credentials';
 import { ServerDownError } from '../../../../../components/dashboard/errors/server-down-error';
 import { serverDownCode } from '../../../../../api/api-helpers';
+import { accessGroupScheduleApi } from '../../../../../api/access-group-schedules';
 
 const PersonDetails = () => {
 
@@ -44,7 +45,18 @@ const PersonDetails = () => {
   useEffect(() => {
 	gtm.push({ event: 'page_view' });
   }, []);
-
+  const getPersonAccessGroupCurrentStatus = async (accGroupId) => {
+      const res = await accessGroupScheduleApi.getAccessGroupStatusForSingleAccessGroup(accGroupId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    };
   const getCredentials = async() => {
     try {
       const res = await getCredentialWherePersonIdApi(personId);
@@ -75,8 +87,11 @@ const PersonDetails = () => {
         return;
       }
       const body = await res.json();
-      if(isMounted()) {
-        setPerson(body);
+      const accessGroupStatus = await getPersonAccessGroupCurrentStatus(body.accessGroup.accessGroupId);
+      if (isMounted()) {
+        const personWithAccGroupStatus = { ...body, accessGroupInSchedule: accessGroupStatus }
+        console.log(personWithAccGroupStatus, "personWithAccGroupStatus")
+        setPerson(personWithAccGroupStatus);
       }
     } catch(err) {
       console.log(err);

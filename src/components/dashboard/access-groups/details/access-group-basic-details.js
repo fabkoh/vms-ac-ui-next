@@ -4,9 +4,11 @@ import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCard from "../../shared/basic-details-card";
+import { Circle } from "@mui/icons-material";
 
 export const AccessGroupBasicDetails = (props) => {
-    const { accessGroupName, accessGroupDesc, isActive } = props.accessGroup;
+    console.log(props.accessGroup, "accessGroup")
+    const { accessGroupName, accessGroupDesc, isActive, isInSchedule } = props.accessGroup;
     
     // copied from template
     const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
@@ -57,6 +59,13 @@ export const AccessGroupBasicDetails = (props) => {
                             </SeverityPill>
                         )
                     }
+                </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="In Schedule"
+                    value={isInSchedule && isActive ? "Yes" : "No"}
+                >
                 </PropertyListItem>
             </PropertyList>
         </BasicDetailsCard>

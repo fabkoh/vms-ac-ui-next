@@ -16,7 +16,8 @@ export const PersonBasicDetails = (props) => {
     personUid, 
     personMobileNumber, 
     personEmail,
-    accessGroup
+    accessGroup,
+    accessGroupInSchedule,
   } = props.person;
   
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
@@ -86,7 +87,7 @@ sx={{ mr: 1 }} />
               <Link component="a">
                 <NextLink href={getAccessGroupDetailsLink(accessGroup)}
                   passHref>                
-                  <Chip color={accessGroup.isActive ? "default" : "error"}
+                  <Chip color={accessGroup.isActive &&  accessGroupInSchedule? "success" : "default"}
                         label={getAccessGroupLabel(accessGroup)}
                         icon={<LockClosed />}/>
                 </NextLink>

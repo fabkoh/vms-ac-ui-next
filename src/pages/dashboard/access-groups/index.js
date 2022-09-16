@@ -33,6 +33,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { accessGroupApi } from "../../../api/access-groups";
+import { accessGroupScheduleApi } from "../../../api/access-group-schedules";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
@@ -48,6 +49,7 @@ import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { controllerApi } from "../../../api/controllers";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { _ } from "numeral";
 
 const tabs = [
 	{
@@ -186,9 +188,22 @@ const AccessGroupList = () => {
 		gtm.push({ event: "page_view" });
 	}, []);
 
+	const getAccessGroupInScheduleStatus = async () => {
+        const res = await accessGroupScheduleApi.getAllAccessGroupStatus();
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    }
+
 	const getAccessGroupLocal = useCallback(async () => {
 		try {
-      		//const data = await personApi.getFakePersons() 
+			//const data = await personApi.getFakePersons() 
 			const res = await accessGroupApi.getAccessGroups();
 			const data = await res.json();
 			const entrancesRes = await Promise.all(data.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
@@ -199,11 +214,18 @@ const AccessGroupList = () => {
 				setAccessGroup([]);
 				return;
 			}
+			const accessGroupWithScheduleStatus = await getAccessGroupInScheduleStatus();
+			const accGroupWithSchedStatus = data.map(accessGroup=> {
+                    return {
+                        ...accessGroup,
+                        isInSchedule: accessGroupWithScheduleStatus[accessGroup.accessGroupId]
+                    }
+                });
 			const entrancesData = await Promise.all(entrancesRes.map(res => res.json()));
 			if (isMounted()) {
-				data.forEach((group, i) => group.entrances = entrancesData[i]);
-				console.log(data);
-				setAccessGroup(data);
+				accGroupWithSchedStatus.forEach((group, i) => group.entrances = entrancesData[i]);
+				console.log(accGroupWithSchedStatus, "accessGroupWithScheduleStatus");
+				setAccessGroup(accGroupWithSchedStatus);
 			}
 		} catch (err) {
 			console.error(err);

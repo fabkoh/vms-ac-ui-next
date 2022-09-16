@@ -19,7 +19,7 @@ import {
 	TableHead,
 	TablePagination,
 	TableRow,
-	Typography,
+	Typography
 } from "@mui/material";
 import { ArrowRight as ArrowRightIcon } from "../../../icons/arrow-right";
 import { PencilAlt as PencilAltIcon } from "../../../icons/pencil-alt";
@@ -121,7 +121,8 @@ export const AccessGroupListTable = (props) => {
 							</TableCell>
 							<TableCell>Access Group</TableCell>
 							<TableCell>Description</TableCell>
-							<TableCell sx={{paddingLeft: 2.5}}> Status</TableCell>
+							<TableCell sx={{ paddingLeft: 2.5 }}> Status</TableCell>
+							<TableCell align="center"> In Schedule</TableCell>
 							<TableCell>No. Of Persons</TableCell>
 							<TableCell>No. Of Entrances</TableCell>
 							<TableCell align="center">Actions</TableCell>
@@ -148,7 +149,7 @@ export const AccessGroupListTable = (props) => {
 											value={isAccessGroupselected}
 										/>
 									</TableCell>
-									<TableCell width="20%">
+									<TableCell width="15%">
 										<Box
 											sx={{
 												//alignItems: "center",
@@ -170,7 +171,7 @@ export const AccessGroupListTable = (props) => {
 											
 										</Box>
 									</TableCell>
-                                    <TableCell width="25%">
+                                    <TableCell width="20%">
 										{accGroup.accessGroupDesc ? (
 											<NextLink
 												href={"/dashboard/access-groups/details/" + accGroup.accessGroupId}
@@ -188,7 +189,7 @@ export const AccessGroupListTable = (props) => {
 											</SeverityPill>
 										) }
 									</TableCell>
-									<TableCell width="15%">
+									<TableCell width="10%">
 										<Chip
 											label={accGroup.isActive ? "ACTIVE" : "NOT ACTIVE"}
 											onClick={() => {}}
@@ -199,6 +200,10 @@ export const AccessGroupListTable = (props) => {
 											}}
 											size="small"
 										/>
+									</TableCell>
+									<TableCell width="15%"
+										align="center">
+										{accGroup.isInSchedule && accGroup.isActive ? "Yes" : "No"}
 									</TableCell>
 									<TableCell width="15%">
 										<Typography width={130}

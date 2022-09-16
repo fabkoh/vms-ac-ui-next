@@ -7,9 +7,14 @@ export default function AccessGroupDetails({ accessGroupEntrance }){
         <DetailsCard 
             title="Access Groups"
             showErr={true}
+            showSucc={true}
             errFunction={(e) => {
                 if (e.isActive == undefined) return true;
                 return e.isActive;
+            }}
+            succFunction={(e) => {
+                if (e.isInSchedule == undefined) return false;
+                return e.isInSchedule && e.isActive;
             }}
             subheader="Click on access group name below to go to access group details page"
             entities={ accessGroupEntrance.map(entranceGroup => entranceGroup.accessGroup) }

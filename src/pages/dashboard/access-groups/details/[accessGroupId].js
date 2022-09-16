@@ -95,9 +95,28 @@ const AccessGroupDetails = () => {
         }
     }
 
+    const getAccessGroupInSchedule = async () => {
+        const res = await accessGroupScheduleApi.getAccessGroupStatusForSingleAccessGroup(accessGroupId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group current in schedule info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    };
+
     const getAccessGroup = (async() => {
         try {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
+            const body = await res.json();
+            const accessGroupCurrentStatus = await getAccessGroupInSchedule();
+            const accessGroupWithScheduleStatus = {
+                ...body,
+                isInSchedule: accessGroupCurrentStatus,
+            };
             if (res.status != 200) {
                 if (res.status == serverDownCode) {
                     toast.error("Error loading access group info due to server is down");
@@ -107,10 +126,9 @@ const AccessGroupDetails = () => {
                 router.replace(accessGroupListLink);
                 return;
             }
-            const body = await res.json();
 
             if (isMounted()) {
-                setAccessGroup(body);
+                setAccessGroup(accessGroupWithScheduleStatus);
             }
         } catch(err) {
             console.error(err);
@@ -216,8 +234,10 @@ const AccessGroupDetails = () => {
             }
         })
 
+        const accessGroupCurrentStatus = await getAccessGroupInSchedule();
         const newAccessGroup = {
             ...accessGroup,
+            isInSchedule: accessGroupCurrentStatus,
             isActive: updatedStatus
         };
         setAccessGroupIsActive(updatedStatus);
@@ -372,6 +392,7 @@ const AccessGroupDetails = () => {
                                 item
                                 xs={12}
                             >
+                                {console.log(accessGroup, "accessGroup")}
                                 <AccessGroupBasicDetails accessGroup={accessGroup} />
                             </Grid>
                             <Grid

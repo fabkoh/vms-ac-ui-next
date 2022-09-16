@@ -49,8 +49,11 @@ export default function DetailsCardWithSearchField({
     placeholder = "",
     noneFoundText = "",
     showErr = false,
+    showSucc = false,
     // boolean function that takes in the entity, true means it will be default color else it will be error color
-    errFunction = (e) => {return true},
+    errFunction = (e) => { return true },
+    // boolean function that takes in the entity, true means it will be success color else it will be default color
+    succFunction = (e) => {return true},
     icon = false
 }) {
 
@@ -84,7 +87,11 @@ export default function DetailsCardWithSearchField({
                                 passHref
                             >
                                 <Link component="a">
-                                    <Chip color={showErr ? errFunction(e) ? "default" : "error" : "default"}
+                                    <Chip color={
+                                        // don't show error color apparently, just groups that are in use currently
+                                        // showErr ? errFunction(e) ? "default" : "error" : "default"
+                                        showSucc ? succFunction(e) ? "success" : "default" : "default"
+                                    }
                                         icon={icon}
                                         label={getLabel(e)}
                                         clickable />

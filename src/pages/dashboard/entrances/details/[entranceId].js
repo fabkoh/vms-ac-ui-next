@@ -40,6 +40,7 @@ import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../../api/events-management";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../../api/api-helpers";
+import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 
 const EntranceDetails = () => {
 
@@ -94,8 +95,20 @@ const EntranceDetails = () => {
             const res = await accessGroupEntranceApi.getAccessGroupWhereEntranceId(entranceId);
             if (res.status == 200) {
                 const body = await res.json();
+                const accessGroupCurrentStatus = await getAccessGroupStatusForOneEntrance();
+                const accessGroupDataWithCurrentStatus = body.map(accessGroupEntrance=> {
+                    console.log(accessGroupCurrentStatus[accessGroupEntrance.accessGroup.accessGroupId], "status")
+                    return {
+                        ...accessGroupEntrance,
+                        accessGroup: {
+                            ...accessGroupEntrance.accessGroup,
+                            isInSchedule: accessGroupCurrentStatus[accessGroupEntrance.accessGroup.accessGroupId]
+                        }
+                    }
+                });
                 if (isMounted()) {
-                    setAccessGroup(body);
+                    console.log(accessGroupDataWithCurrentStatus, "accessGroupWithCurrentStatus")
+                    setAccessGroup(accessGroupDataWithCurrentStatus);
                 }
             } else {
                 if (res.status == serverDownCode) {
@@ -109,6 +122,20 @@ const EntranceDetails = () => {
             console.error(err);
         }
     }
+
+    const getAccessGroupStatusForOneEntrance = async () => {
+        const res = await accessGroupScheduleApi.getAccessGroupStatusForOneEntrance(entranceId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    }
+
     const getEntranceCurrentStatus = async () => {
         const res = await entranceScheduleApi.getCurrentEntranceStatusForOneEntrance(entranceId);
         if (res.status != 200) {
