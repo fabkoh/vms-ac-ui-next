@@ -18,12 +18,17 @@ import { Search } from "../../../icons/search";
 import EntranceListTable from "../../../components/dashboard/entrances/list/entrance-list-table";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/confirm-status-update";
+import ConfirmUnlock from "../../../components/dashboard/entrances/list/confirm-unlock";
 import { Confirmdelete } from "../../../components/dashboard/entrances/confirm-delete";
 import { filterEntranceByStringPlaceholder, filterEntranceByStatus, filterEntranceByCurrStatus, filterEntranceByString, entranceCreateLink, getEntranceIdsEditLink } from "../../../utils/entrance";
 import { controllerApi } from "../../../api/controllers";
 import { entranceScheduleApi } from "../../../api/entrance-schedule";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 
 const applyFilter = createFilter({
     query: filterEntranceByString,
@@ -229,23 +234,34 @@ const EntranceList = () => {
     // for updating status
     const [statusUpdateIds, setStatusUpdateIds] = useState([]);
     const [updateStatus, setUpdateStatus] = useState(null);
+    const [openUnlockDialog, setOpenUnlockDialog] = useState(false);
     const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
     const openStatusUpdateDialog = (entranceIds, updatedStatus) => {
         setStatusUpdateIds(entranceIds);
         setUpdateStatus(updatedStatus);
         setStatusUpdateDialogOpen(true);
     }
+    const openUnlockDialogFunc = (entranceIds) => {
+        setStatusUpdateIds(entranceIds);
+        setOpenUnlockDialog(true);
+    }
+    const handleUnlockDialogClose = () => {
+        setOpenUnlockDialog(false);
+        handleActionClose();
+    }
     const handleStatusUpdateDialogClose = () => {
         setStatusUpdateDialogOpen(false);
         handleActionClose();
     }
-    const handleMultipleUpdate = (updateStatus) => openStatusUpdateDialog([ ...selectedEntrances ], updateStatus);
-    const handleMultiEnable = () => handleMultipleUpdate(true);
-    const handleMultiUnlock = () => handleMultipleUpdate(false);
-    const handleStatusUpdate = async (entranceIds, updatedStatus) => {
+    const handleMultipleActivationUpdate = (updateStatus) => openStatusUpdateDialog([...selectedEntrances], updateStatus);
+    const handleMultipleUnlock = () => openUnlockDialogFunc([...selectedEntrances]);
+    const handleMultiEnable = () => handleMultipleActivationUpdate(true);
+    const handleMultiDisable = () => handleMultipleActivationUpdate(false);
+    const handleMultiUnlock = () => handleMultipleUnlock();
+    const handleUnlockApiCall= async (entranceIds) => {
         handleStatusUpdateDialogClose();
 
-        const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceStatus(entranceId, updatedStatus)));
+        const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.manuallyUnlockEntrance(entranceId)));
         
         let successCount = 0;
         const someFailed = false;
@@ -257,8 +273,27 @@ const EntranceList = () => {
             }
         })
 
-        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " some entrances"); }
-        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+        if (someFailed) { toast.error("Failed to unlock some entrances"); }
+        if (successCount) { toast.success("Successfully unlock " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
+    }
+
+    const handleStatusUpdate = async (entranceIds, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        const resArr = await Promise.all(entranceIds.map(entranceId => entranceApi.updateEntranceActiveStatus(entranceId, updatedStatus)));
+        
+        let successCount = 0;
+        const someFailed = false;
+        resArr.forEach(res => {
+            if (res.status == 200) {
+                successCount++;
+            } else {
+                someFailed = true;
+            }
+        })
+
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "deactivate") + " some entrances"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "deactivate") + " " + (successCount > 1 ? successCount + " entrances" : "1 entrance")); }
 
         const newEntrances = [ ...entrances ];
         newEntrances.forEach(entrance => {
@@ -333,6 +368,12 @@ const EntranceList = () => {
                 updateStatus={updateStatus}
                 handleStatusUpdate={handleStatusUpdate}
             />
+            <ConfirmUnlock
+                entranceIds={statusUpdateIds}
+                open={openUnlockDialog}
+                handleDialogClose={handleUnlockDialogClose}
+                handleStatusUpdate={handleUnlockApiCall}
+            />
             <ServerDownError
                 open={serverDownOpen}
                 handleDialogClose={() => setServerDownOpen(false)}
@@ -403,8 +444,16 @@ const EntranceList = () => {
                                         onClick={handleMultiEnable}
                                         disabled={actionDisabled}
                                     >
-                                        <DoorFront />
+                                        <CloudDone />
                                         &#8288;Activate
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiDisable}
+                                        disabled={actionDisabled}
+                                    >
+                                        <CloudOff />
+                                        &#8288;De-Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
@@ -412,7 +461,7 @@ const EntranceList = () => {
                                         disabled={actionDisabled}
                                     >
                                         <LockOpen />
-                                        &#8288;Unlock
+                                        &#8288;Manually Unlock
                                     </MenuItem>
                                 </StyledMenu>
                             </Grid> 

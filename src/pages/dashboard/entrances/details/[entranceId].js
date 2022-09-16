@@ -30,6 +30,7 @@ import { set } from "date-fns";
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
+import ConfirmUnlock from "../../../../components/dashboard/entrances/list/confirm-unlock";
 import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
 import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
@@ -41,6 +42,10 @@ import { eventsManagementApi } from "../../../../api/events-management";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 
 const EntranceDetails = () => {
 
@@ -324,11 +329,23 @@ const getEntranceEventsManagement = useCallback(async () => {
     const [statusUpdateId, setStatusUpdateId] = useState([]);
     const [updateStatus, setUpdateStatus] = useState(null);
     const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+    const [unlockDialogOpen, setUnlockDialogOpen] = useState(false);
     const openStatusUpdateDialog = (entranceId, updatedStatus) => {
         setStatusUpdateId(entranceId);
         setUpdateStatus(updatedStatus);
         setStatusUpdateDialogOpen(true);
     }
+
+    const openUnlockDialog = (entranceId) => {
+        setStatusUpdateId(entranceId);
+        setUnlockDialogOpen(true);
+    }
+
+    const handleUnlockDialogClose = () => {
+        setUnlockDialogOpen(false);
+        handleActionClose();
+    }
+
     const handleStatusUpdateDialogClose = () => {
         setStatusUpdateDialogOpen(false);
         handleActionClose();
@@ -338,17 +355,26 @@ const getEntranceEventsManagement = useCallback(async () => {
     const entranceActive = entranceIsActive == true;
 
     const handleMultiEnable = () => openStatusUpdateDialog(entranceId, true);
-    const handleMultiUnlock = () => openStatusUpdateDialog(entranceId, false);
+    const handleMultiDisable = () => openStatusUpdateDialog(entranceId, false);
+    const handleMultiUnlock = () => openUnlockDialog(entranceId);
+    const handleUnlockApiCall= async (entranceId) => {
+        handleStatusUpdateDialogClose();
+
+        const res = await Promise.resolve(entranceApi.manuallyUnlockEntrance(entranceId));
+    
+        if (res.status !== 200) { toast.error("Failed to unlock entrance"); }
+        else { toast.success("Successfully unlock entrance"); }
+    }
     const handleStatusUpdate = async (entranceId, updatedStatus) => {
         handleStatusUpdateDialogClose();
 
         Promise.resolve(
-            entranceApi.updateEntranceStatus(entranceId, updatedStatus)
+            entranceApi.updateEntranceActiveStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
+                toast.success("Successfully " + (updatedStatus ? "activated" : "deactivated") + " entrance");
             } else {
-                toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
+                toast.error("Failed to " + (updatedStatus ? "activate" : "deactivate") + " entrance");
             }
         })
 
@@ -378,6 +404,12 @@ const getEntranceEventsManagement = useCallback(async () => {
                 handleDialogClose={handleStatusUpdateDialogClose}
                 updateStatus={updateStatus}
                 handleStatusUpdate={handleStatusUpdate}
+            />
+            <ConfirmUnlock
+                entranceIds={statusUpdateId}
+                open={unlockDialogOpen}
+                handleDialogClose={handleUnlockDialogClose}
+                handleStatusUpdate={handleUnlockApiCall}
             />
             <Box
                 component="main"
@@ -490,6 +522,14 @@ const getEntranceEventsManagement = useCallback(async () => {
                                     >
                                         <DoorFront />
                                         &#8288;Activate
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiDisable}
+                                        disabled={!entranceActive}
+                                    >
+                                        <DoorFront />
+                                        &#8288;De-Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
