@@ -538,6 +538,7 @@ const EntranceList = () => {
                             handleStatusSelect={handleStatusSelect}
                             handleCurrentStatusSelect={handleCurrentStatusSelect}
                             openStatusUpdateDialog={openStatusUpdateDialog}
+                            openUnlockDialog={openUnlockDialogFunc}
                             entranceSchedules={entranceSchedules}
                             entranceController={entranceController}
                         />

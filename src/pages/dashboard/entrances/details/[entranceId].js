@@ -520,7 +520,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                         onClick={handleMultiEnable}
                                         disabled={entranceActive}
                                     >
-                                        <DoorFront />
+                                        <CloudDone />
                                         &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
@@ -528,7 +528,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                         onClick={handleMultiDisable}
                                         disabled={!entranceActive}
                                     >
-                                        <DoorFront />
+                                        <CloudOff />
                                         &#8288;De-Activate
                                     </MenuItem>
                                     <MenuItem 
