@@ -224,6 +224,17 @@ const ModifyEventManagement = () => {
     useEffect(() => {
         try {
             getAllInputOutputEvents(controllers.length > 0);
+            const newValidations = [...eventsManagementValidationsArr];
+            for (let i = 0; i < newValidations.length; i++) {
+                const eventsManagementValidation = newValidations[i];
+                eventsManagementValidation.eventsManagementInputEventsInvalidId = false;
+                eventsManagementValidation.eventsManagementInputEventsConflict = false;
+                eventsManagementValidation.eventsManagementInputEventsEmpty = false;
+                eventsManagementValidation.eventsManagementOutputActionsEmpty = false;
+                eventsManagementValidation.eventsManagementOutputActionsInvalidId = false;
+                eventsManagementValidation.eventsManagementOutputActionsConflict = false;
+            }
+            setEventsManagementValidationsArr(newValidations);
         } catch (error) {
             console.log(error)
         }
@@ -315,8 +326,7 @@ const ModifyEventManagement = () => {
 
     }
 
-    const replaceAll = (e) => {
-        e.preventDefault();
+    const replaceAll = () => {
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=201){ 
@@ -339,8 +349,7 @@ const ModifyEventManagement = () => {
         })
         
     }
-    const addOn = (e) => {
-        e.preventDefault();
+    const addOn = () => {
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=201){ 
@@ -558,6 +567,8 @@ const ModifyEventManagement = () => {
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (!newValue) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+            validation.eventsManagementInputEventsInvalidId = false;
         }
 
         // else {
@@ -676,15 +687,20 @@ const ModifyEventManagement = () => {
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValueMapped.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
+        } else {
+            validation.eventsManagementOutputActionsInvalidId = false;
         }
         if (!hasNotificationEmailsOutput) {
             validation.eventsManagementInvalidEmailRecipients = false;
             validation.eventsManagementEmailRecipientsEmpty = false;
+        } else {
+            validation.eventsManagementEmailRecipientsEmpty = notificationEmails[id]?.eventsManagementEmailRecipients.length === 0 || notificationEmails[id] === undefined;
         }
         if (!hasNotificationSMSsOutput) {
             validation.eventsManagementInvalidSMSRecipients = false;
             validation.eventsManagementSMSRecipientsEmpty = false;
-
+        } else {
+            validation.eventsManagementSMSRecipientsEmpty = notificationSMSs[id]?.eventsManagementSMSRecipients.length === 0 || notificationSMSs[id] === undefined;
         }
         setEventsManagementValidationsArr(newValidations);
     }
@@ -710,6 +726,8 @@ const ModifyEventManagement = () => {
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (newValue.filter(i => i.eventActionInputType.eventActionInputId == null || i.eventActionInputType.eventActionInputId == undefined).length > 0) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+            validation.eventsManagementInputEventsInvalidId = false;
         }
         setEventsManagementValidationsArr(newValidations);
     }
@@ -862,6 +880,8 @@ const ModifyEventManagement = () => {
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
+        } else {
+            validation.eventsManagementOutputActionsInvalidId = false;
         }
 
         // validation.eventsManagementOutputActionsConflict = false;
@@ -906,7 +926,6 @@ const ModifyEventManagement = () => {
     }
  
     const changeNotificationEmails = (newValue, id) => {
-        console.log(newValue, "changeNotificationEmails")
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementEmailRecipients;
@@ -1073,7 +1092,6 @@ const ModifyEventManagement = () => {
                             />
                         </Grid>
                     </Grid>
-                    <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
                         <Stack spacing={3}>
                             {eventsManagementInfoArr.map((eventsManagementInfo, i) => {
                                 return (
@@ -1126,7 +1144,7 @@ const ModifyEventManagement = () => {
                                         variant="contained"
                                         name="replace"
                                         id="replace all"
-                                        // onClick={replaceAll}
+                                        onClick={replaceAll}
                                         disabled={
                                             entrancesControllers.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail
@@ -1140,7 +1158,11 @@ const ModifyEventManagement = () => {
                                                 validation.eventsManagementOutputActionsEmpty ||
                                                 validation.eventsManagementOutputActionsInvalidId ||
                                                 validation.eventsManagementOutputActionsConflict ||
-                                                validation.eventsManagementTriggerSchedulesEmpty
+                                                validation.eventsManagementTriggerSchedulesEmpty ||
+                                                validation.eventsManagementInvalidEmailRecipients ||
+                                                validation.eventsManagementInvalidSMSRecipients ||
+                                                validation.eventsManagementEmailRecipientsEmpty ||
+                                                validation.eventsManagementSMSRecipientsEmpty
                                             )
                                         }
                                     >
@@ -1156,7 +1178,7 @@ const ModifyEventManagement = () => {
                                         variant="contained"
                                         name="add"
                                         value="add button"
-                                        // onClick={addOn}
+                                        onClick={addOn}
                                         disabled={
                                             entrancesControllers.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail
@@ -1193,7 +1215,6 @@ const ModifyEventManagement = () => {
                                 </Grid>                              
                             </Grid>
                         </Stack>
-                    </form>
                 </Container>
             </Box>
         </>
