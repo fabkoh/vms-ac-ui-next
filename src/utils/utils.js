@@ -1,3 +1,5 @@
+import parsePhoneNumber from 'libphonenumber-js'
+
 const isObject = (e) => typeof e === 'object' && e !== null
 
 // converts filter by string to filter by state (uses state.inputValue)
@@ -42,5 +44,22 @@ const toDisplayEventsDateString = (str) => {
 
 };
 
-export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString,toDisplayEventsDateString }
+// return some object if valid, else return null
+const validateEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
+
+const validatePhoneNumber = (phoneNumber) => {
+    const possiblePhoneNumber = parsePhoneNumber(phoneNumber);
+    if (possiblePhoneNumber) {
+        return possiblePhoneNumber.isValid();
+    }
+    return false;
+}
+
+export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString,toDisplayEventsDateString, validateEmail, validatePhoneNumber }
 

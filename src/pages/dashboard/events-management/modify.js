@@ -22,13 +22,14 @@ import { Confirmdelete } from "../../../components/dashboard/events-management/c
 import { input } from "aws-amplify";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
-
+import { validatePhoneNumber, validateEmail } from "../../../utils/utils";
+import { ConfirmNotificationDisabledSubmit } from "../../../components/dashboard/events-management/confirm-notification-disabled-submit";
 
 const ModifyEventManagement = () => {
     const router = useRouter();
     const isMounted = useMounted();
     const temp = router.query;
-    const accessGroupId = temp.accessGroupId;
+    // const eventsManagementId = temp.eventsManagementId;
 
     const [allEntrances, setAllEntrances] = useState([]);
     const [allControllers, setAllControllers] = useState([]);
@@ -42,8 +43,14 @@ const ModifyEventManagement = () => {
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
+    // dictionary, key is event management ID, value is the email {recipient (an array), content}
+    const [notificationEmails, setNotificationEmails] = useState({});
+    // dictionary, key is event management ID, value is the SMS {recipient (an array), content}
+    const [notificationSMSs, setNotificationSMSs] = useState({});
+
     const [open, setOpen] = useState(false);
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [notificationDisabledOpen, setNotificationDisabledOpen] = useState(false);
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [singleErrorMessage, setSingleErrorMessage] = useState([]);
@@ -186,6 +193,8 @@ const ModifyEventManagement = () => {
         triggerSchedules: [],
         inputEvents: [],
         outputActions: [],
+        eventsManagementEmail: null,
+        eventsManagementSMS: null,
     });
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
@@ -197,6 +206,10 @@ const ModifyEventManagement = () => {
         eventsManagementOutputActionsInvalidId: false,
         eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
+        eventsManagementInvalidEmailRecipients: false,
+        eventsManagementInvalidSMSRecipients: false,
+        eventsManagementEmailRecipientsEmpty: false,
+        eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,
         timeStartInvalid:false,
         untilInvalid:false,
@@ -592,7 +605,14 @@ const ModifyEventManagement = () => {
         const updatedInfo = [...eventsManagementInfoArr];
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
+        let hasNotificationEmailsOutput = false;
+        let hasNotificationSMSsOutput = false;
         const newValueMapped = newValue.map(i => {
+            if (i.eventActionOutputName === 'NOTIFICATION (EMAIL)') {
+                hasNotificationEmailsOutput = true;
+            } else if (i.eventActionOutputName === 'NOTIFICATION (SMS)') {
+                hasNotificationSMSsOutput = true;
+            }
             return {
                 timerDuration: null,
                 eventActionOutputType: {
@@ -608,6 +628,45 @@ const ModifyEventManagement = () => {
         }
         newOutputActions.push(...newValueMapped);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
+        if (!hasNotificationEmailsOutput) {
+            eventManagementToBeUpdated['eventsManagementEmail'] = null;
+            let newNotificationEmails = { ...notificationEmails };
+            delete newNotificationEmails[id];
+            setNotificationEmails(newNotificationEmails);
+        } else {
+            if (eventManagementToBeUpdated['eventsManagementEmail'] === null) {
+                eventManagementToBeUpdated['eventsManagementEmail'] = '';
+                eventManagementToBeUpdated['eventsManagementEmail'] = {
+                    eventsManagementEmailRecipients: "",
+                    eventsManagementEmailContent: "An Event Management has been triggered."
+                };
+                let newNotificationEmails = { ...notificationEmails };
+                newNotificationEmails[id] = {
+                    eventsManagementEmailRecipients: [],
+                    eventsManagementEmailContent: "An Event Management has been triggered."
+                };
+                setNotificationEmails(newNotificationEmails);
+            }
+        }
+        if (!hasNotificationSMSsOutput) {
+            eventManagementToBeUpdated['eventsManagementSMS'] = null;
+            let newNotificationSMSs = { ...notificationSMSs };
+            delete newNotificationSMSs[id];
+            setNotificationSMSs(newNotificationSMSs);
+        } else {
+            if (eventManagementToBeUpdated['eventsManagementSMS'] === null) {
+                eventManagementToBeUpdated['eventsManagementSMS'] = {
+                    eventsManagementSMSRecipients: "",
+                    eventsManagementSMSContent: "An Event Management has been triggered."
+                };
+                let newNotificationSMSs = { ...notificationSMSs };
+                newNotificationSMSs[id] = {
+                    eventsManagementSMSRecipients: [],
+                    eventsManagementSMSContent: "An Event Management has been triggered."
+                };
+                setNotificationSMSs(newNotificationSMSs);
+            }
+        }
         setEventsManagementInfoArr(updatedInfo);
         setOutputActionsWithoutTimer({ ...outputActionsWithoutTimer, [id]: newValue });
         
@@ -617,6 +676,15 @@ const ModifyEventManagement = () => {
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValueMapped.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
+        }
+        if (!hasNotificationEmailsOutput) {
+            validation.eventsManagementInvalidEmailRecipients = false;
+            validation.eventsManagementEmailRecipientsEmpty = false;
+        }
+        if (!hasNotificationSMSsOutput) {
+            validation.eventsManagementInvalidSMSRecipients = false;
+            validation.eventsManagementSMSRecipientsEmpty = false;
+
         }
         setEventsManagementValidationsArr(newValidations);
     }
@@ -837,6 +905,53 @@ const ModifyEventManagement = () => {
         setEventsManagementValidationsArr(newValidations);
     }
  
+    const changeNotificationEmails = (newValue, id) => {
+        console.log(newValue, "changeNotificationEmails")
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const newRecipients = newValue.eventsManagementEmailRecipients;
+        const newRecipientsCSV = newRecipients.join(',');
+        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent };
+        eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
+        setEventsManagementInfoArr(updatedInfo);
+        setNotificationEmails({ ...notificationEmails, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementEmailRecipientsEmpty = newRecipients.length === 0 && eventManagementToBeUpdated['eventsManagementEmail'];
+        validation.eventsManagementInvalidEmailRecipients = false;
+        for (let j = 0; j < newRecipients.length; j++) {
+            if (validateEmail(newRecipients[j]) === null) {
+                validation.eventsManagementInvalidEmailRecipients = true;
+            }
+        }
+        setEventsManagementValidationsArr(newValidations);
+    }
+
+    const changeNotificationSMSs = (newValue, id) => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const newRecipients = newValue.eventsManagementSMSRecipients;
+        const newRecipientsCSV = newRecipients.join(',');
+        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent };
+        eventManagementToBeUpdated['eventsManagementSMS'] = newSMSValue;
+        setEventsManagementInfoArr(updatedInfo);
+        setNotificationSMSs({ ...notificationEmails, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementSMSRecipientsEmpty = newRecipients.length === 0 && eventManagementToBeUpdated['eventsManagementSMS'];
+        validation.eventsManagementInvalidSMSRecipients = false;
+        for (let j = 0; j < newRecipients.length; j++) {
+            if (!validatePhoneNumber(newRecipients[j])) {
+                validation.eventsManagementInvalidSMSRecipients = true;
+            }
+        }
+        setEventsManagementValidationsArr(newValidations);
+    }
+    
     return(
         <>
             <Head>
@@ -873,6 +988,10 @@ const ModifyEventManagement = () => {
                         <ServerDownError
                             open={serverDownOpen}
                             handleDialogClose={() => setServerDownOpen(false)}
+                        />
+                        <ConfirmNotificationDisabledSubmit
+                            open={notificationDisabledOpen}
+                            handleDialogClose={() => setNotificationDisabledOpen(false)}
                         />
                         <NextLink
                             href={`/dashboard/events-management`}
@@ -976,8 +1095,12 @@ const ModifyEventManagement = () => {
                                         getEventActionOutputName={getEventActionOutputName}
                                         changeInputEventsWithTimer={changeInputEventsWithTimer}
                                         changeOutputActionsWithTimer={changeOutputActionsWithTimer}
+                                        changeNotificationEmails={changeNotificationEmails}
+                                        changeNotificationSMSs={changeNotificationSMSs}
                                         inputEventsValueWithoutTimer={inputEventsWithoutTimer}
                                         outputActionsValueWithoutTimer={outputActionsWithoutTimer}
+                                        notificationEmails={notificationEmails}
+                                        notificationSMSs={notificationSMSs}
                                         allInputEvents={inputEvents}
                                         allOutputEvents={outputEvents}
                                     />
