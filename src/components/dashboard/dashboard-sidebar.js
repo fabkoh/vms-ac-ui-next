@@ -161,8 +161,12 @@ const getSections = (t) => [
         icon: <DescriptionIcon fontSize="small" />,
         children: [
           {
-            title: t('List'),
-            path: '/dashboard/logs'
+            title: t('Event Log'),
+            path: '/dashboard/logs/eventlog'
+          },
+          {
+            title: t('Notification Log'),
+            path: '/dashboard/logs/notificationlog'
           }
         ]
       },
