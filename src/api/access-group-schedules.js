@@ -95,6 +95,14 @@ class AccessGroupScheduleApi {
     getAllAccessGroupStatus() {
         if (useApi) { return sendApi(`/api/access-group-schedule/current`); }
     }
+
+    activateAccessGroupSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/enable/${scheduleId}`, {method: 'PUT'}); }
+    }
+
+    deactivateAccessGroupSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/disable/${scheduleId}`, {method: 'PUT'}); }
+    }
 }
 
 export const accessGroupScheduleApi = new AccessGroupScheduleApi();

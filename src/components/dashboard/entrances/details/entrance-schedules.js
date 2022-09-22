@@ -12,6 +12,7 @@ import {
 	TableCell,
 	TableHead,
 	TableRow,
+	Switch
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "../../shared/expand-more";
@@ -25,6 +26,8 @@ import EntranceScheduleDelete from "./entrance-schedule-delete";
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
+import {entranceScheduleApi} from "../../../../api/entrance-schedule";
+import toast from 'react-hot-toast';
 
 
 export default function EntranceSchedules({
@@ -33,6 +36,23 @@ export default function EntranceSchedules({
 	entranceSchedules,
 	deleteSchedules,
 }) {
+
+	const handleToggleFactory = (entranceSchedId) => async (e) => {
+        const bool = e.target.checked;
+        const verb = bool ? 'activated' : 'deactivated';
+        try {
+            const res = await (bool ? entranceScheduleApi.activateEntranceSchedule(entranceSchedId) : entranceScheduleApi.deactivateEntranceSchedule(entranceSchedId));
+            if (res.status != 200) throw new Error("Failed to send req");
+            toast.success(`Successfully ${verb} entrance schedule`);
+            return true
+        } catch(e) {
+            console.error(e);
+            const errorVerb = bool ? 'activate' : 'deactivate';
+            toast.error(`Failed to ${errorVerb} entrance schedule`);
+            return false
+        }
+	}
+	
 	// expanding card
 	const [expanded, setExpanded] = useState(true);
 	const handleExpandClick = () => setExpanded(!expanded);
@@ -85,7 +105,8 @@ export default function EntranceSchedules({
 						title="Entrance Unlock Schedules"
 						subheader="The schedules below show when the entrance is normally unlocked"
 						avatar={
-							<ExpandMore expand={expanded} onClick={handleExpandClick}>
+							<ExpandMore expand={expanded}
+								onClick={handleExpandClick}>
 								<ExpandMoreIcon />
 							</ExpandMore>
 						}
@@ -139,13 +160,21 @@ export default function EntranceSchedules({
 								<TableRow>
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>
+									<TableCell>Active</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								{schedules.map((schedule, i) => (
-									<TableRow hover key={i}>
+									<TableRow hover
+										key={i}>
 										<TableCell>{schedule.entranceScheduleName}</TableCell>
-										<TableCell>{ rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd) }</TableCell>
+										<TableCell>{rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd)}</TableCell>
+										<TableCell>
+											{console.log(schedule)}
+											<Switch onChange={handleToggleFactory(schedule.entranceScheduleId)}
+												defaultChecked={schedule.active}
+												size="small" ></Switch>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

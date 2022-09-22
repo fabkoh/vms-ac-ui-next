@@ -269,14 +269,12 @@ const EditController = () => {
                 setControllerValidations(prevState=>({...prevState,takenIP:true}))
             }
             else{
-                toast.success("Controller info updated")
+                
+                Promise.resolve(authDeviceApi.removeEntrance(E1))
                 .then(
-                    () => Promise.resolve(authDeviceApi.removeEntrance(E1))
+                    (res) => Promise.resolve(authDeviceApi.removeEntrance(E2))
                 )
-                .then(
-                    () => Promise.resolve(authDeviceApi.removeEntrance(E2))
-                )
-                .then( () =>
+                .then( (res) =>
                 Promise.resolve(authDeviceApi.assignEntrance(E1))
                 .then(res=>{
                     if(res.status==200){
@@ -292,7 +290,9 @@ const EditController = () => {
                         router.replace(getControllerListLink())
                     }
                     else(toast.error("Failed to update entrance E2"))
-                }))
+                })).then(() => {
+                    toast.success("Controller info updated")
+                })
             }
         })
         

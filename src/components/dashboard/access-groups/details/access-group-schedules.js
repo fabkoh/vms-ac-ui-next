@@ -14,6 +14,7 @@ import {
 	TableCell,
 	TableHead,
 	TableRow,
+	Switch
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "../../shared/expand-more";
@@ -26,7 +27,8 @@ import { rrulestr } from "rrule";
 import AccessGroupScheduleDelete from "./access-group-schedule-delete";
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
-
+import {accessGroupScheduleApi} from "../../../../api/access-group-schedules";
+import toast from 'react-hot-toast';
 
 export default function AccessGroupSchedules({
 	link,
@@ -70,6 +72,21 @@ export default function AccessGroupSchedules({
 		deleteSchedules(ids);
 	};
 
+    const handleToggleFactory = (accGroupSchedId) => async (e) => {
+        const bool = e.target.checked;
+        const verb = bool ? 'activated' : 'deactivated';
+        try {
+            const res = await (bool ? accessGroupScheduleApi.activateAccessGroupSchedule(accGroupSchedId) : accessGroupScheduleApi.deactivateAccessGroupSchedule(accGroupSchedId));
+            if (res.status != 200) throw new Error("Failed to send req");
+            toast.success(`Successfully ${verb} access group schedule`);
+            return true
+        } catch(e) {
+            console.error(e);
+            const errorVerb = bool ? 'activate' : 'deactivate';
+            toast.error(`Failed to ${errorVerb} access group schedule`);
+            return false
+        }
+    }
 	return (
 		<Card>
 			<AccessGroupScheduleDelete
@@ -89,7 +106,8 @@ export default function AccessGroupSchedules({
 						title="Access Group Schedules"
 						subheader="Select entrance below to see schedules for selected entrance"
 						avatar={
-							<ExpandMore expand={expanded} onClick={handleExpandClick}>
+							<ExpandMore expand={expanded}
+onClick={handleExpandClick}>
 								<ExpandMoreIcon />
 							</ExpandMore>
 						}
@@ -117,7 +135,8 @@ export default function AccessGroupSchedules({
 					}
 					passHref
 				>
-					<MenuItem disableRipple disabled={actionDisabled}>
+					<MenuItem disableRipple
+disabled={actionDisabled}>
 						<Edit />
 						&#8288;Modify
 					</MenuItem>
@@ -148,12 +167,14 @@ export default function AccessGroupSchedules({
 							fullWidth
 							value={groupToEntranceId}
 						>
-							<MenuItem value="" sx={{ fontStyle: "italic" }}>
+							<MenuItem value=""
+								sx={{ fontStyle: "italic" }}>
 								clear
 							</MenuItem>
 							{Array.isArray(accessGroupEntrance) &&
 								accessGroupEntrance.map((groupEntrance, i) => (
-									<MenuItem key={i} value={groupEntrance.groupToEntranceId}>
+									<MenuItem key={i}
+											value={groupEntrance.groupToEntranceId}>
 										{groupEntrance.entrance.entranceName}
 									</MenuItem>
 								))}
@@ -168,13 +189,19 @@ export default function AccessGroupSchedules({
 								<TableRow>
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>
+									<TableCell>Active</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								{schedules.map((schedule, i) => (
-									<TableRow hover key={i}>
+									<TableRow hover
+										key={i}>
 										<TableCell>{schedule.accessGroupScheduleName}</TableCell>
-										<TableCell>{ rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd) }</TableCell>
+										<TableCell>{rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd)}</TableCell>
+										<TableCell>
+											<Switch onChange={handleToggleFactory(schedule.accessGroupScheduleId)}
+												defaultChecked={schedule.isActive} />    
+                                        </TableCell>
 									</TableRow>
 								))}
 							</TableBody>
