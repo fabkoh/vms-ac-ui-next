@@ -9,6 +9,9 @@ import {
 	Input,
 	Chip,
 	Typography,
+	FormControlLabel,
+	Switch
+
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { validatePhoneNumber } from "../../../utils/utils";
@@ -16,16 +19,12 @@ import { validatePhoneNumber } from "../../../utils/utils";
 export const SMSEdit = (props) => {
 	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue } = props;
 
-	// closing actions
-	const handleClose = () => { 
-		handleDialogClose();
-	}
-
 	// submit action
-	const handleChangeSMS = (recipients, content) => {
+	const handleChangeSMS = (recipients, content, defaultSMS) => {
 		const newValue = {
 			eventsManagementSMSRecipients: recipients,
-			eventsManagementSMSContent: content
+			eventsManagementSMSContent: content,
+			useDefaultSMS: defaultSMS
 		}
 		changeSMS(newValue);
 		handleClose();
@@ -34,20 +33,31 @@ export const SMSEdit = (props) => {
 	const [notificationSMSsInputValue, setNotificationSMSsInputValue] = useState("");
     const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(smsRecipients);
 	const [notificationSMSContent, setNotificationSMSContent] = useState(smsValue?.eventsManagementSMSContent);
+	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS ?? false);
 	const [isInvalidSMSs, setIsInvalidSMSs] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
+	// closing actions
+	const handleClose = () => { 
+		setNotificationSMSsRecipients(smsRecipients);
+		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
+		handleDialogClose();
+	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
 	}, [smsRecipients, smsValue])
 
 	return (
 		<>
 			<Dialog
+				fullWidth
+    			maxWidth='lg'
 				open={open}
-				onClose={handleClose}
-				onBackdropClick={handleClose}
+				onClose={() => {/* do nothing */}}
+				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
                            <div style={{display: "flex", flexDirection: "row"}}>
@@ -57,7 +67,7 @@ export const SMSEdit = (props) => {
                                     <Typography fontWeight="bold"
                                         width={150}>SMS Recipient(s):</Typography>
                                 </Grid>
-                                <div>
+                                <div style={{width: "80%"}}>
                                     {notificationSMSsRecipients.map((item, index) => (
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
@@ -88,9 +98,8 @@ export const SMSEdit = (props) => {
                                             setNotificationSMSsInputValue(e.target.value);
                                         }}
                                         onKeyDown={(e) => {
-                                            console.log(e.key);
-                                            if (e.key == "Enter") {
-												const newNotificationSMSRecipients = [...notificationSMSsRecipients, e.target.value];
+											if (e.key == "Enter") {
+												const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
 												let isInvalid = false;
 												for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
 													if (!validatePhoneNumber(newNotificationSMSRecipients[j])) {
@@ -105,6 +114,18 @@ export const SMSEdit = (props) => {
                                         }}
                                     />
 						</div>
+						<div style={{width: "13.1%"}}>
+							<FormControlLabel checked={useDefaultSMS}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setNotificationSMSContent("An Event Management has been triggered.")
+									}
+									setUseDefaultSMS(e.target.checked)
+								}}
+								control={<Switch defaultChecked />}
+								sx={{marginRight: 0}}
+								label="Use Default" />
+						</div>
 					</div>
 					<TextField
 						sx={{ mt: 2 }}
@@ -113,6 +134,7 @@ export const SMSEdit = (props) => {
 						value={notificationSMSContent}
 						onChange={(e) => {setNotificationSMSContent(e.target.value)}}
 						placeholder="Enter SMS Content"
+						disabled={useDefaultSMS}
 						fullWidth
 					/>
 						<Box display="flex"
@@ -124,10 +146,9 @@ export const SMSEdit = (props) => {
 							}
 							<Button
 								disabled={isInvalidSMSs || isEmptyRecipients}
-								type="submit"
 								variant="contained"
 							sx={{ borderRadius: 8, marginRight: 1 }}
-							onClick={() => handleChangeSMS(notificationSMSsRecipients, notificationSMSContent)}
+							onClick={() => handleChangeSMS(notificationSMSsRecipients, notificationSMSContent, useDefaultSMS)}
 							>
 							Save	
 							</Button>

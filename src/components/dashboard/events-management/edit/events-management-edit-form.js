@@ -745,7 +745,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 setNotificationEmailsRecipients(arr)
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: arr,
-                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                             }}
@@ -762,11 +763,12 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         onKeyDown={(e) => {
                                             console.log(e.key);
                                             if (e.key == "Enter") {
-                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, e.target.value];
+                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
                                                 setNotificationEmailsRecipients(newNotificationEmailRecipients);
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: newNotificationEmailRecipients,
-                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                                 setNotificationEmailsInputValue("");
@@ -821,9 +823,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                             setNotificationSMSsInputValue(e.target.value);
                                         }}
                                         onKeyDown={(e) => {
-                                            console.log(e.key);
                                             if (e.key == "Enter") {
-                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, e.target.value];
+                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
                                                 setNotificationSMSsRecipients(newNotificationSMSRecipients);
                                                 const newValue = {
                                                     eventsManagementSMSRecipients: newNotificationSMSRecipients,
