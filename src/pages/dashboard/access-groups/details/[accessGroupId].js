@@ -47,7 +47,7 @@ const AccessGroupDetails = () => {
     const isMounted = useMounted();
     const [accessGroup, setAccessGroup] = useState(null);
     const [serverDownOpen, setServerDownOpen] = useState(false);
-    const [accessGroupIsActive, setAccessGroupIsActive] = useState(true);
+    const [accessGroupIsActive, setAccessGroupIsActive] = useState(null);
     const { accessGroupId }  = router.query;
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });

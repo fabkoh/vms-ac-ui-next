@@ -14,7 +14,7 @@ import { getControllerDetailsLink } from "../../../../utils/controller";
 const statusOptions = ['Inactive', 'Active'];
 const currentOptions = ['Locked', 'Unlocked'];
 
-export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, handleCurrentStatusSelect, openStatusUpdateDialog, entranceSchedules, entranceController, ...other }) {   
+export default function EntranceListTable({ selectedAllEntrances, selectedSomeEntrances, handleSelectAllEntrances, entrances, selectedEntrances, handleSelectFactory, entranceCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, handleStatusSelect, handleCurrentStatusSelect, openStatusUpdateDialog, openUnlockDialog, entranceSchedules, entranceController, ...other }) {   
     return(
         <div {...other}>
             <Scrollbar>
@@ -63,7 +63,7 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                 const handleSelect = handleSelectFactory(entranceId);
                                 const detailsLink = getEntranceDetailsLink(entrance);
                                 const editLink = getEntranceIdsEditLink([entranceId]);
-                                const handleOpenUnlockedDialog = () => openStatusUpdateDialog(entranceId, false);
+                                const handleOpenUnlockedDialog = () => openUnlockDialog([entranceId]);
                                 const handleOpenStatusUpdateDialog = () => openStatusUpdateDialog([entranceId], !isActive);
                                 const numberOfSchedules = entranceSchedules[entranceId];
                                 const controller = entranceController[entranceId];

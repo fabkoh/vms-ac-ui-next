@@ -10,7 +10,9 @@ import {
     Stack,
     Typography,
     Select,
-	MenuItem,
+    Input,
+    MenuItem,
+    Chip
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ExpandMore from "../../shared/expand-more";
@@ -21,9 +23,11 @@ import Rrule from "../../shared/rrule-form";
 import rruleDescription from "../../../../utils/rrule-desc";
 import Add from "@mui/icons-material/Add";
 import formUtils from "../../../../utils/form-utils";
-import { ContactSupportOutlined } from "@mui/icons-material";
+import { ContactSupportOutlined, Edit } from "@mui/icons-material";
+import { EmailEdit } from "../email-edit";
+import { SMSEdit } from "../sms-edit";
 
-const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer}) => {
+const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer, notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
     const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
     const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
     const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
@@ -300,12 +304,28 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         eventsManagementOutputActionsInvalidId,
         eventsManagementOutputActionsConflict,
         eventsManagementTriggerSchedulesEmpty,
+        eventsManagementInvalidEmailRecipients,
+        eventsManagementInvalidSMSRecipients,
+        eventsManagementEmailRecipientsEmpty,
+        eventsManagementSMSRecipientsEmpty,
     } = eventsManagementValidations;
    
     const inputEventsValueForWithoutTimer = inputEventsValueWithoutTimer[eventsManagementId];
     const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
     const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
     const [outputActionsValueWithoutTimerState, setOutputActionsValueWithoutTimerState] = useState(outputActionsValueForWithoutTimer);
+
+    const notificationEmailsValue = notificationEmails[eventsManagementId]
+    const notificationSMSsValue = notificationSMSs[eventsManagementId]
+
+    const [notificationEmailsInputValue, setNotificationEmailsInputValue] = useState("");
+    const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(notificationEmailsValue?.eventsManagementEmailRecipients ?? []);
+
+    const [notificationSMSsInputValue, setNotificationSMSsInputValue] = useState("");
+    const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(notificationSMSsValue?.eventsManagementSMSRecipients ?? []);
+
+    const [notificationEmailEditOpen, setNotificationEmailEditOpen] = useState(false);
+    const [notificationSMSEditOpen, setNotificationSMSEditOpen] = useState(false);
 
     useEffect(() => { 
         setInputEventsValueWithoutTimerState(inputEventsValueForWithoutTimer);
@@ -448,7 +468,11 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
             eventsManagementOutputActionsEmpty ||
             eventsManagementOutputActionsInvalidId ||
             eventsManagementOutputActionsConflict ||
-            eventsManagementTriggerSchedulesEmpty
+            eventsManagementTriggerSchedulesEmpty ||
+            eventsManagementInvalidEmailRecipients ||
+            eventsManagementInvalidSMSRecipients ||
+            eventsManagementEmailRecipientsEmpty ||
+            eventsManagementSMSRecipientsEmpty
         }>
             <CardHeader
                 avatar={
@@ -496,6 +520,26 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
             />
             <Divider />
             <CardContent>
+                <EmailEdit
+                    open={notificationEmailEditOpen}
+                    handleDialogClose={() => setNotificationEmailEditOpen(false)}
+                    emailValue={notificationEmailsValue}
+                    emailRecipients={notificationEmailsRecipients}
+                    changeEmail={(newValue) => {
+                        setNotificationEmailsRecipients(newValue.eventsManagementEmailRecipients);
+                        changeNotificationEmails(newValue, eventsManagementId);
+                    }}
+                />
+                <SMSEdit
+                    open={notificationSMSEditOpen}
+                    handleDialogClose={() => setNotificationSMSEditOpen(false)}
+                    smsValue={notificationSMSsValue}
+                    smsRecipients={notificationSMSsRecipients}
+                    changeSMS={(newValue) => {
+                        setNotificationSMSsRecipients(newValue.eventsManagementSMSRecipients);
+                        changeNotificationSMSs(newValue, eventsManagementId);
+                    }}
+                />
                 <Stack
                     spacing={3}
                 >
@@ -648,7 +692,25 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     {console.log(outputActionsValueWithoutTimerState)}
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
-                                        setSelected={(e) => changeOutputActionsWithoutTimer(e,eventsManagementId)}
+                                        setSelected={(e) => {
+                                            let hasNotificationEmailsOutput = false;
+                                            let hasNotificationSMSsOutput = false;
+                                            for (let j = 0; j < e.length; j++) {
+                                                if (e[j].eventActionOutputName === "NOTIFICATION (EMAIL)") {
+                                                    hasNotificationEmailsOutput = true;
+                                                }
+                                                if (e[j].eventActionOutputName === "NOTIFICATION (SMS)") {
+                                                    hasNotificationSMSsOutput = true;
+                                                }
+                                            }
+                                            if (!hasNotificationEmailsOutput) {
+                                                setNotificationEmailsRecipients([]);
+                                            }
+                                            if (!hasNotificationSMSsOutput) {
+                                                setNotificationSMSsRecipients([]);
+                                            }
+                                            changeOutputActionsWithoutTimer(e, eventsManagementId)
+                                        }}
                                         getOptionLabel={getEventActionOutputName}
                                         label="Action (without timer)"
                                         noOptionsText="No action (without timer) found"
@@ -665,6 +727,128 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     />
                                 </Grid>
                             </Grid>
+                            {notificationEmailsValue && <div style={{display: "flex", flexDirection: "row"}}>
+                                    <Grid item
+                                            mr={2}
+                                            mb={1}>
+                                    <Typography fontWeight="bold"
+                                        width={150}>Email Recipient(s):</Typography>
+                                </Grid>
+                                <div>
+                                    {notificationEmailsRecipients.map((item, index) => (
+                                        <Chip key={index}
+                                            sx={{ mr: 1, mb: 1 }}
+                                            size="small"
+                                            onDelete={() => {
+                                                let arr = [...notificationEmailsRecipients]
+                                                arr.splice(index, 1)
+                                                setNotificationEmailsRecipients(arr)
+                                                const newValue = {
+                                                    eventsManagementEmailRecipients: arr,
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                }
+                                                changeNotificationEmails(newValue, eventsManagementId);
+                                            }}
+                                            label={item} />
+                                    ))}
+                                <Input
+                                        sx={{mr: 2}}
+                                        variant="standard"
+                                        label="Email Recipients"
+                                        value={notificationEmailsInputValue}
+                                        onChange={(e) => {
+                                            setNotificationEmailsInputValue(e.target.value);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            console.log(e.key);
+                                            if (e.key == "Enter") {
+                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, e.target.value];
+                                                setNotificationEmailsRecipients(newNotificationEmailRecipients);
+                                                const newValue = {
+                                                    eventsManagementEmailRecipients: newNotificationEmailRecipients,
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                }
+                                                changeNotificationEmails(newValue, eventsManagementId);
+                                                setNotificationEmailsInputValue("");
+                                            }
+                                        }}
+                                    />
+                                    <Button
+                                            size="small"
+                                            variant="text"
+                                            startIcon={<Edit />}
+                                            onClick={() => {setNotificationEmailEditOpen(true)}}
+                                        >
+                                            Edit Email Content
+                                    </Button>
+                                </div>
+                            </div>
+                            }
+                            {(Boolean(eventsManagementEmailRecipientsEmpty) || Boolean(eventsManagementInvalidEmailRecipients)) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px" }}>
+                                {Boolean(eventsManagementEmailRecipientsEmpty) && "Error: empty email recipients is not allowed" || Boolean(eventsManagementInvalidEmailRecipients) && "Error: invalid email recipient(s)"}
+                            </Grid>
+                            }
+                            {notificationSMSsValue && <div style={{display: "flex", flexDirection: "row"}}>
+                                    <Grid item
+                                            mr={2}
+                                            mb={1}>
+                                    <Typography fontWeight="bold"
+                                        width={150}>SMS Recipient(s):</Typography>
+                                </Grid>
+                                <div>
+                                    {notificationSMSsRecipients.map((item, index) => (
+                                        <Chip key={index}
+                                            sx={{ mr: 1, mb: 1 }}
+                                            size="small"
+                                            onDelete={() => {
+                                                let arr = [...notificationSMSsRecipients]
+                                                arr.splice(index, 1)
+                                                setNotificationSMSsRecipients(arr)
+                                                const newValue = {
+                                                    eventsManagementSMSRecipients: arr,
+                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent
+                                                }
+                                                changeNotificationSMSs(newValue, eventsManagementId);
+                                            }}
+                                            label={item} />
+                                    ))}
+                                    <Input
+                                        sx={{mr: 2}}
+                                        variant="standard"
+                                        label="SMS Recipients"
+                                        value={notificationSMSsInputValue}
+                                        onChange={(e) => {
+                                            setNotificationSMSsInputValue(e.target.value);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            console.log(e.key);
+                                            if (e.key == "Enter") {
+                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, e.target.value];
+                                                setNotificationSMSsRecipients(newNotificationSMSRecipients);
+                                                const newValue = {
+                                                    eventsManagementSMSRecipients: newNotificationSMSRecipients,
+                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent
+                                                }
+                                                changeNotificationSMSs(newValue, eventsManagementId);
+                                                setNotificationSMSsInputValue("");
+                                            }
+                                        }}
+                                    />
+                                    <Button
+                                        size="small"
+                                        variant="text"
+                                        startIcon={<Edit />}
+                                        onClick={() => {setNotificationSMSEditOpen(true)}}
+                                    >
+                                        Edit SMS Content
+                                    </Button>
+                                </div>
+                            </div>
+                            }
+                            {(Boolean(eventsManagementSMSRecipientsEmpty) || Boolean(eventsManagementInvalidSMSRecipients)) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px" }}>
+                                {Boolean(eventsManagementSMSRecipientsEmpty) && "Error: empty SMS recipients is not allowed" || Boolean(eventsManagementInvalidSMSRecipients) && "Error: invalid SMS recipient(s)"}
+                            </Grid>
+                            }
                             {outputWithTimerEventsManagementArr.map((info, i) => (
                                 <Grid container
                                     key={info.outputId}>
