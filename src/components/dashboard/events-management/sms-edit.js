@@ -95,8 +95,8 @@ export const SMSEdit = (props) => {
                                         }}
                                         onKeyDown={(e) => {
                                             console.log(e.key);
-                                            if (e.key == "Enter") {
-												const newNotificationSMSRecipients = [...notificationSMSsRecipients, e.target.value];
+											if (e.key == "Enter") {
+												const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
 												let isInvalid = false;
 												for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
 													if (!validatePhoneNumber(newNotificationSMSRecipients[j])) {

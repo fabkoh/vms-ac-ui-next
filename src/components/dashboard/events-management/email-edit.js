@@ -99,7 +99,7 @@ export const EmailEdit = (props) => {
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key == "Enter") {
-												const newNotificationEmailRecipients = [...notificationEmailsRecipients, e.target.value];
+												const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
 												let isInvalid = false;
 												for (let j = 0; j < newNotificationEmailRecipients.length; j++) {
 													if (validateEmail(newNotificationEmailRecipients[j]) === null) {

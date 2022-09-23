@@ -763,7 +763,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         onKeyDown={(e) => {
                                             console.log(e.key);
                                             if (e.key == "Enter") {
-                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, e.target.value];
+                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
                                                 setNotificationEmailsRecipients(newNotificationEmailRecipients);
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: newNotificationEmailRecipients,
@@ -823,9 +823,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                             setNotificationSMSsInputValue(e.target.value);
                                         }}
                                         onKeyDown={(e) => {
-                                            console.log(e.key);
                                             if (e.key == "Enter") {
-                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, e.target.value];
+                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
                                                 setNotificationSMSsRecipients(newNotificationSMSRecipients);
                                                 const newValue = {
                                                     eventsManagementSMSRecipients: newNotificationSMSRecipients,
