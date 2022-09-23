@@ -22,10 +22,11 @@ export const EmailEdit = (props) => {
 	}
 
 	// submit action
-	const handleChangeEmail = (recipients, content) => {
+	const handleChangeEmail = (recipients, content, title) => {
 		const newValue = {
 			eventsManagementEmailRecipients: recipients,
-			eventsManagementEmailContent: content
+			eventsManagementEmailContent: content,
+			eventsManagementEmailTitle: title
 		}
 		changeEmail(newValue);
 		handleClose();
@@ -34,12 +35,14 @@ export const EmailEdit = (props) => {
 	const [notificationEmailsInputValue, setNotificationEmailsInputValue] = useState("");
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
 	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
+	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
 	const [isInvalidEmails, setIsInvalidEmails] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
 	useEffect(() => {
 		setNotificationEmailsRecipients(emailRecipients);
 		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
+		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
 	}, [emailRecipients, emailValue])
 
 	return (
@@ -88,7 +91,6 @@ export const EmailEdit = (props) => {
                                             setNotificationEmailsInputValue(e.target.value);
                                         }}
                                         onKeyDown={(e) => {
-                                            console.log(e.key);
                                             if (e.key == "Enter") {
 												const newNotificationEmailRecipients = [...notificationEmailsRecipients, e.target.value];
 												let isInvalid = false;
@@ -106,6 +108,13 @@ export const EmailEdit = (props) => {
                                     />
 						</div>
 					</div>
+					<TextField
+						sx={{ mt: 2 }}
+						value={notificationEmailTitle}
+						onChange={(e) => {setNotificationEmailTitle(e.target.value)}}
+						placeholder="Enter Email Title"
+						fullWidth
+					/>
 					<TextField
 						sx={{ mt: 2 }}
 						multiline
@@ -127,7 +136,7 @@ export const EmailEdit = (props) => {
 								type="submit"
 								variant="contained"
 							sx={{ borderRadius: 8, marginRight: 1 }}
-							onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent)}
+							onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent, notificationEmailTitle)}
 							>
 							Save	
 							</Button>

@@ -745,7 +745,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 setNotificationEmailsRecipients(arr)
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: arr,
-                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                             }}
@@ -766,7 +767,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 setNotificationEmailsRecipients(newNotificationEmailRecipients);
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: newNotificationEmailRecipients,
-                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent
+                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                                 setNotificationEmailsInputValue("");

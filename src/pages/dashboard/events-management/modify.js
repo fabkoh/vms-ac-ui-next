@@ -224,17 +224,6 @@ const ModifyEventManagement = () => {
     useEffect(() => {
         try {
             getAllInputOutputEvents(controllers.length > 0);
-            const newValidations = [...eventsManagementValidationsArr];
-            for (let i = 0; i < newValidations.length; i++) {
-                const eventsManagementValidation = newValidations[i];
-                eventsManagementValidation.eventsManagementInputEventsInvalidId = false;
-                eventsManagementValidation.eventsManagementInputEventsConflict = false;
-                eventsManagementValidation.eventsManagementInputEventsEmpty = false;
-                eventsManagementValidation.eventsManagementOutputActionsEmpty = false;
-                eventsManagementValidation.eventsManagementOutputActionsInvalidId = false;
-                eventsManagementValidation.eventsManagementOutputActionsConflict = false;
-            }
-            setEventsManagementValidationsArr(newValidations);
         } catch (error) {
             console.log(error)
         }
@@ -649,12 +638,14 @@ const ModifyEventManagement = () => {
                 eventManagementToBeUpdated['eventsManagementEmail'] = '';
                 eventManagementToBeUpdated['eventsManagementEmail'] = {
                     eventsManagementEmailRecipients: "",
-                    eventsManagementEmailContent: "An Event Management has been triggered."
+                    eventsManagementEmailContent: "An Event Management has been triggered.",
+                    eventsManagementEmailTitle: "Event Management Triggered"
                 };
                 let newNotificationEmails = { ...notificationEmails };
                 newNotificationEmails[id] = {
                     eventsManagementEmailRecipients: [],
-                    eventsManagementEmailContent: "An Event Management has been triggered."
+                    eventsManagementEmailContent: "An Event Management has been triggered.",
+                    eventsManagementEmailTitle: "Event Management Triggered"
                 };
                 setNotificationEmails(newNotificationEmails);
             }
@@ -668,7 +659,8 @@ const ModifyEventManagement = () => {
             if (eventManagementToBeUpdated['eventsManagementSMS'] === null) {
                 eventManagementToBeUpdated['eventsManagementSMS'] = {
                     eventsManagementSMSRecipients: "",
-                    eventsManagementSMSContent: "An Event Management has been triggered."
+                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    eventsManagementEmailTitle: "Event Management Triggered"
                 };
                 let newNotificationSMSs = { ...notificationSMSs };
                 newNotificationSMSs[id] = {
@@ -930,7 +922,7 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementEmailRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent };
+        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle };
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
