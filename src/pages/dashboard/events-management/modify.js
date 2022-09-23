@@ -645,7 +645,8 @@ const ModifyEventManagement = () => {
                 newNotificationEmails[id] = {
                     eventsManagementEmailRecipients: [],
                     eventsManagementEmailContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered"
+                    eventsManagementEmailTitle: "Event Management Triggered",
+                    useDefaultEmails: true
                 };
                 setNotificationEmails(newNotificationEmails);
             }
@@ -665,7 +666,8 @@ const ModifyEventManagement = () => {
                 let newNotificationSMSs = { ...notificationSMSs };
                 newNotificationSMSs[id] = {
                     eventsManagementSMSRecipients: [],
-                    eventsManagementSMSContent: "An Event Management has been triggered."
+                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    useDefaultSMS: true
                 };
                 setNotificationSMSs(newNotificationSMSs);
             }

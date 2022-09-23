@@ -23,15 +23,17 @@ export const EmailEdit = (props) => {
 		setNotificationEmailsRecipients(emailRecipients);
 		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
 		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		setUseDefaultEmails(emailValue?.useDefaultEmails ?? false);
 		handleDialogClose();
 	}
 
 	// submit action
-	const handleChangeEmail = (recipients, content, title) => {
+	const handleChangeEmail = (recipients, content, title, defaultEmail) => {
 		const newValue = {
 			eventsManagementEmailRecipients: recipients,
 			eventsManagementEmailContent: content,
-			eventsManagementEmailTitle: title
+			eventsManagementEmailTitle: title,
+			useDefaultEmails: defaultEmail
 		}
 		changeEmail(newValue);
 		handleClose();
@@ -41,6 +43,7 @@ export const EmailEdit = (props) => {
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
 	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
 	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
+	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails ?? false);
 	const [isInvalidEmails, setIsInvalidEmails] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
@@ -48,6 +51,7 @@ export const EmailEdit = (props) => {
 		setNotificationEmailsRecipients(emailRecipients);
 		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
 		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		setUseDefaultEmails(emailValue?.useDefaultEmails ?? false);
 	}, [emailRecipients, emailValue])
 
 	return (
@@ -56,8 +60,8 @@ export const EmailEdit = (props) => {
 				fullWidth
     			maxWidth='lg'
 				open={open}
-				onClose={handleClose}
-				onBackdropClick={handleClose}
+				onClose={() => {/* do nothing */}}
+				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
                            <div style={{display: "flex", flexDirection: "row"}}>
@@ -115,7 +119,15 @@ export const EmailEdit = (props) => {
 							/>
 						</div>
 						<div style={{width: "13.1%"}}>
-							<FormControlLabel control={<Switch defaultChecked />}
+							<FormControlLabel checked={useDefaultEmails}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setNotificationEmailTitle("Event Management Triggered")
+										setNotificationEmailContent("An Event Management has been triggered.")
+									}
+									setUseDefaultEmails(e.target.checked)
+								}}
+								control={<Switch defaultChecked />}
 								sx={{marginRight: 0}}
 								label="Use Default" />
 						</div>
@@ -125,6 +137,7 @@ export const EmailEdit = (props) => {
 						value={notificationEmailTitle}
 						onChange={(e) => {setNotificationEmailTitle(e.target.value)}}
 						placeholder="Enter Email Title"
+						disabled={useDefaultEmails}
 						fullWidth
 					/>
 					<TextField
@@ -134,6 +147,7 @@ export const EmailEdit = (props) => {
 						value={notificationEmailContent}
 						onChange={(e) => {setNotificationEmailContent(e.target.value)}}
 						placeholder="Enter Email Content"
+						disabled={useDefaultEmails}
 						fullWidth
 					/>
 						<Box display="flex"
@@ -145,10 +159,9 @@ export const EmailEdit = (props) => {
 						}
 							<Button
 								disabled={isInvalidEmails || isEmptyRecipients}
-								type="submit"
 								variant="contained"
 							sx={{ borderRadius: 8, marginRight: 1 }}
-							onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent, notificationEmailTitle)}
+							onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent, notificationEmailTitle, useDefaultEmails)}
 							>
 							Save	
 							</Button>
