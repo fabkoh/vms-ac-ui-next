@@ -9,17 +9,15 @@ import {
 	Input,
 	Chip,
 	Typography,
+	FormControlLabel,
+	Switch
+
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { validatePhoneNumber } from "../../../utils/utils";
 
 export const SMSEdit = (props) => {
 	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue } = props;
-
-	// closing actions
-	const handleClose = () => { 
-		handleDialogClose();
-	}
 
 	// submit action
 	const handleChangeSMS = (recipients, content) => {
@@ -37,6 +35,12 @@ export const SMSEdit = (props) => {
 	const [isInvalidSMSs, setIsInvalidSMSs] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
+	// closing actions
+	const handleClose = () => { 
+		handleDialogClose();
+		setNotificationSMSsRecipients(smsRecipients);
+		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
@@ -45,6 +49,8 @@ export const SMSEdit = (props) => {
 	return (
 		<>
 			<Dialog
+				fullWidth
+    			maxWidth='lg'
 				open={open}
 				onClose={handleClose}
 				onBackdropClick={handleClose}
@@ -57,7 +63,7 @@ export const SMSEdit = (props) => {
                                     <Typography fontWeight="bold"
                                         width={150}>SMS Recipient(s):</Typography>
                                 </Grid>
-                                <div>
+                                <div style={{width: "80%"}}>
                                     {notificationSMSsRecipients.map((item, index) => (
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
@@ -104,6 +110,11 @@ export const SMSEdit = (props) => {
                                             }
                                         }}
                                     />
+						</div>
+						<div style={{width: "13.1%"}}>
+							<FormControlLabel control={<Switch defaultChecked />}
+								sx={{marginRight: 0}}
+								label="Use Default" />
 						</div>
 					</div>
 					<TextField

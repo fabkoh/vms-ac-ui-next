@@ -9,6 +9,8 @@ import {
 	Input,
 	Chip,
 	Typography,
+	Switch,
+	FormControlLabel
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { validateEmail } from "../../../utils/utils";
@@ -18,6 +20,9 @@ export const EmailEdit = (props) => {
 
 	// closing actions
 	const handleClose = () => { 
+		setNotificationEmailsRecipients(emailRecipients);
+		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
+		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
 		handleDialogClose();
 	}
 
@@ -48,6 +53,8 @@ export const EmailEdit = (props) => {
 	return (
 		<>
 			<Dialog
+				fullWidth
+    			maxWidth='lg'
 				open={open}
 				onClose={handleClose}
 				onBackdropClick={handleClose}
@@ -60,7 +67,7 @@ export const EmailEdit = (props) => {
                                     <Typography fontWeight="bold"
                                         width={150}>Email Recipient(s):</Typography>
                                 </Grid>
-                                <div>
+                                <div style={{width: "80%"}}>
                                     {notificationEmailsRecipients.map((item, index) => (
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
@@ -105,7 +112,12 @@ export const EmailEdit = (props) => {
                                                 setNotificationEmailsInputValue("");
                                             }
                                         }}
-                                    />
+							/>
+						</div>
+						<div style={{width: "13.1%"}}>
+							<FormControlLabel control={<Switch defaultChecked />}
+								sx={{marginRight: 0}}
+								label="Use Default" />
 						</div>
 					</div>
 					<TextField
@@ -130,7 +142,7 @@ export const EmailEdit = (props) => {
 							{(isEmptyRecipients || isInvalidEmails) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginRight: "12px", alignSelf: "center"}}>
 								{isEmptyRecipients && "Error: empty email recipients is not allowed" || isInvalidEmails && "Error: invalid email recipient(s)"}
 							</Grid>
-							}
+						}
 							<Button
 								disabled={isInvalidEmails || isEmptyRecipients}
 								type="submit"
