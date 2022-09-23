@@ -51,6 +51,17 @@ const getSections = (t) => [
         title: t('Overview'),
         path: '/dashboard',
         icon: <HomeIcon fontSize="small" />
+      },
+      {
+        title: t('Settings'),
+        path: '/settings',
+        icon: <HomeIcon fontSize="small" />,
+        children: [
+          {
+            title: 'Notifications',
+            path: '/dashboard/settings/notifications'
+          }
+        ]
       }
     ]
   },
@@ -120,21 +131,56 @@ const getSections = (t) => [
           }
         ]
       },
+      // {
+      //   title: t('Organizations'),
+      //   path: '/dashboard/jobs',
+      //   icon: <OfficeBuildingIcon fontSize="small" />,
+      //   children: [
+      //     {
+      //       title: t('List'),
+      //       path: '/dashboard/jobs'
+      //     },
+      //     {
+      //       title: t('Add'),
+      //       path: '/dashboard/jobs/companies/1'
+      //     }
+      //   ]
+      // },
       {
-        title: t('Organizations'),
-        path: '/dashboard/jobs',
-        icon: <OfficeBuildingIcon fontSize="small" />,
+        title: t('Access Groups'),
+        path: '/dashboard/access-groups',
+        icon: <LockClosed fontSize="small" />,
         children: [
           {
             title: t('List'),
-            path: '/dashboard/jobs'
+            path: '/dashboard/access-groups'
           },
           {
             title: t('Add'),
-            path: '/dashboard/jobs/companies/1'
+            path: '/dashboard/access-groups/create'
           }
         ]
       },
+    ]
+  },
+  {
+    title: t('Facility'),
+    items: [
+      {
+        title: t('Entrances'),
+        path: '/dashboard/entrances',
+        icon: <DoorFront fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/entrances'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/entrances/create'
+          }
+        ]
+      }
     ]
   },
   {
@@ -172,46 +218,7 @@ const getSections = (t) => [
       },
     ]
   },
-  {
-    title: t('Rules'),
-    items: [
-      {
-        title: t('Access Groups'),
-        path: '/dashboard/access-groups',
-        icon: <LockClosed fontSize="small" />,
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/access-groups'
-          },
-          {
-            title: t('Add'),
-            path: '/dashboard/access-groups/create'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    title: t('Facility'),
-    items: [
-      {
-        title: t('Entrances'),
-        path: '/dashboard/entrances',
-        icon: <DoorFront fontSize="small" />,
-        children: [
-          {
-            title: t('List'),
-            path: '/dashboard/entrances'
-          },
-          {
-            title: t('Add'),
-            path: '/dashboard/entrances/create'
-          }
-        ]
-      }
-    ]
-  },
+  
   // {
   //   title: t('Management'),
   //   items: [
