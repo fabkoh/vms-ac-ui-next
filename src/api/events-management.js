@@ -23,7 +23,9 @@ class EventsManagementApi {
                     outputActions,
                     controllerIds,
                     entranceIds,
-                    triggerSchedules
+                    triggerSchedules,
+                    eventsManagementEmail,
+                    eventsManagementSMS
                 })
             })
         }
@@ -39,7 +41,9 @@ class EventsManagementApi {
                     outputActions,
                     controllerId: controllerIds[i],
                     entranceId: null,
-                    triggerSchedules
+                    triggerSchedules,
+                    eventsManagementEmail,
+                    eventsManagementSMS
                 }
                 fakeEventsManagement.push(newEventManagement);
                 newEventsManagementArr.push(newEventManagement);
@@ -91,6 +95,14 @@ class EventsManagementApi {
                 }
             );
         }
+    }
+
+    getEventsManagementNotifications(eventsManagementId) {
+        if (useApi) { return sendApi('api/eventsmanagement/notifications/' + eventsManagementId); }
+    }
+
+    getAllEventsManagementNotifications() {
+        if (useApi) {return sendApi('api/eventsmanagement/notifications');}
     }
 
     getAllEventsManagement() {

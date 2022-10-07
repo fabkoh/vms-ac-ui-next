@@ -235,4 +235,37 @@ const fakeVideoRecorders = [
     }
 ]
 
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders};
+const fakeSMSConfig = {
+    "smsSettingsId": 1,
+    "smsAPI": "ThisIsTheTestingApi",
+    "enabled": true
+}
+
+const fakeEmailConfig = {
+    "emailSettingsId": 1,
+    "username": "Lee Yong Ning",
+    "email": "yongning.lee@iss.security.sg",
+    "emailPassword": "TestingPassword",
+    "hostAddress": "TestingHostAddress",
+    "portNumber": "8080",
+    "enabled": true
+}
+
+const fakeEventsManagement = []
+const fakeInputEvents = [
+  {
+    "eventActionInputId" : 1,
+    "eventActionInputName" : "name",
+    "timerEnabled" : false,
+    "eventActionInputConfig" : null
+  }
+]
+const fakeOutputEvents = [
+  {
+    "eventActionOutputId" : 1,
+    "eventActionOutputName" : "name",
+    "timerEnabled" : false,
+    "eventActionOutputConfig" : null
+  }
+]
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeSMSConfig, fakeEmailConfig, fakeEventsManagement, fakeInputEvents, fakeOutputEvents };

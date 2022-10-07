@@ -126,7 +126,6 @@ export default function EntranceListTable({ selectedAllEntrances, selectedSomeEn
                                             {console.log(isLocked, "isLocked")}
                                             <Chip
                                                 label={isLocked ? "LOCKED" : "UNLOCKED"}
-                                                onClick={handleOpenUnlockedDialog}
                                                 icon={isLocked ? <Lock /> : <LockOpen />}
                                                 sx={{
                                                     fontSize: "12px",

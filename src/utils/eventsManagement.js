@@ -12,11 +12,13 @@
 **/
 
 import { MeetingRoom, SelectAll } from "@mui/icons-material";
+import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
 import { rruleDescriptionWithBr } from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
 import {Grid} from "@mui/material";
+import { bool } from "prop-types";
 
 // for textfield placeholder
 const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Trigger(s) or Action(s)";
@@ -124,20 +126,39 @@ const displayEntranceOrController = eventManagement => {
 }
 
 // takes in outputActions list and return string 
-const eventActionOutputDescription = outputActions => {
+const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig={}) => {
     
     return (outputActions.map(
-        (outputAction,i) =>
+        (outputAction, i) =>
         // check if timer enabled, concatenate to string 
         
-            <div key={i}>
+        {
+            let hasSMS = false;
+            let hasSMSDisabled = false;
+            let hasEmail = false;
+            let hasEmailDisabled = false;
+            if (outputAction.eventActionOutputTypeName === "Notification (SMS)") {
+                hasSMS = true;
+                hasSMSDisabled = !smsConfig.enabled;
+            }
+            if (outputAction.eventActionOutputTypeName === "Notification (EMAIL)") {
+                hasEmail = true;
+                hasEmailDisabled = !emailConfig.enabled;
+            }
+            return <div key={i}
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                }}>
             {`${outputAction.eventActionOutputType.eventActionOutputName}`}
             {outputAction.eventActionOutputType.timerEnabled ?
-                (outputAction.timerDuration?
-                ` (${outputAction.timerDuration} secs)`:
-                ``)
-            :"" }
-            </div>      
+                (outputAction.timerDuration ?
+                    ` (${outputAction.timerDuration} secs)` :
+                    ``)
+                   : ""}
+            {(hasSMS && hasSMSDisabled) || (hasEmail && hasEmailDisabled) ? <WarningAmberOutlined sx={{ color: "#F44336", marginLeft: 0.5, width: 50 }}/> : ""}
+        </div>
+        }
 
     ))
 }
