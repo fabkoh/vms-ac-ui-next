@@ -30,7 +30,34 @@ const EventsManagementList = () => {
     const isMounted = useMounted();
     const [eventsManagement, setEventsManagement] = useState([]);
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [smsConfig, setSMSConfig] = useState({});
+    const [emailConfig, setEmailConfig] = useState({});
 
+    const getSMSEmailConfig = useCallback(async() => {
+        const smsNotificationConfig= await notificationConfigApi.getNotificationSMSConfig();
+        const emailNotificationConfig = await notificationConfigApi.getNotificationEmailConfig();
+        if (smsNotificationConfig.status !== 200) {
+            toast.error("Error loading SMS config");
+            setSMSConfig({});
+            if (smsNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+        }
+        if (emailNotificationConfig.status !== 200) {
+            toast.error("Error loading email config");
+            setEmailConfig({});
+            if (emailNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            return;
+        }
+        const smsConfigJson = await smsNotificationConfig.json();
+        const emailConfigJson = await emailNotificationConfig.json();
+        if (isMounted()){
+            setSMSConfig(smsConfigJson);
+            setEmailConfig(emailConfigJson);
+        }
+    }, [isMounted]);
     const getEventManagements = useCallback(async () => {
         try {
             const eventManagements = await eventsManagementApi.getAllEventsManagement();
@@ -56,6 +83,7 @@ const EventsManagementList = () => {
 
     useEffect(() => {
         getEventManagements();
+        getSMSEmailConfig();
     }, [])
     // copied
     useEffect(() => {
@@ -285,6 +313,8 @@ const EventsManagementList = () => {
                         
                         <EventsManagementTable 
                             eventsManagements={paginatedEventsManagement}
+                            smsConfig={smsConfig}
+                            emailConfig={emailConfig}
                             selectedAllEventsManagement={selectedAllEventsManagement}
                             selectedSomeEventsManagement={selectedSomeEventsManagement}
                             handleSelectAllEventsManagement={handleSelectAllEventsManagement}

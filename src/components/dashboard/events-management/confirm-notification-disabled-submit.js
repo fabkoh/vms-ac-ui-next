@@ -4,46 +4,42 @@ import Dialog from "@mui/material/Dialog";
 import {
 	Button,
 	Box,
-	DialogActions,
 	DialogContent,
 	DialogContentText,
-	TextField,
 	Switch,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import Alert from "@mui/material/Alert";
+import notificationConfigApi from "../../../api/notifications-config";
 
 export const ConfirmNotificationDisabledSubmit = (props) => {
-	const { open, handleDialogClose, submitEventsManagement } = props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
+	const { action, open, handleDialogClose, submitEventsManagement, smsEnable, emailEnable } = props;
 
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
+	const [localSMSEnable, setLocalSMSEnable] = useState(smsEnable);
+	const [localEmailEnable, setLocalEmailEnable] = useState(emailEnable);
 
-	//move text state here
+	const handleEmailToggle = async () => {
+		const res = await notificationConfigApi.changeEmailNotificationEnablementStatus();
+		if (res.status != 200) {
+			throw new Error("Failed to update email notification config");
+		} else {
+			toast.success(`Successfully update email notification config`);
+			setLocalEmailEnable(!localEmailEnable);
+		}
+	}
 
-	//text field
-	const [value, setValue] = useState("");
-
+	const handleSMSToggle = async () => {
+		const res = await notificationConfigApi.changeSMSNotificationEnablementStatus();
+		if (res.status != 200) {
+			throw new Error("Failed to update SMS notification config");
+		} else {
+			toast.success(`Successfully update SMS notification config`);
+			setLocalSMSEnable(!localSMSEnable);
+		}
+	}
 	// closing actions
 	const handleClose = () => { 
 		handleDialogClose();
-		setValue("");
 	}
 
 	// submit action
@@ -79,16 +75,18 @@ export const ConfirmNotificationDisabledSubmit = (props) => {
                         <DialogContentText sx={{alignSelf:"center", width: "200px"}}>
                             Enable Email Notifications
                         </DialogContentText>
-                        <Switch checked={true}
+						<Switch checked={localEmailEnable}
+							onChange={handleEmailToggle}
                             sx={{alignSelf:"center"}}>
-
                         </Switch>
                     </div>
                     <div style={{ display: "flex", flexDirection: "row", marginBottom:"10px" }}>
                         <DialogContentText sx={{alignSelf:"center", width: "200px"}}>
                             Enable SMS Notifications
                         </DialogContentText>
-                        <Switch checked={true}
+						<Switch
+							onChange={handleSMSToggle}
+							checked={localSMSEnable}
                             sx={{alignSelf:"center"}}>
                         </Switch>
                     </div>

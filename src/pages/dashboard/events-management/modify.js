@@ -24,6 +24,7 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 import { serverDownCode } from "../../../api/api-helpers";
 import { validatePhoneNumber, validateEmail } from "../../../utils/utils";
 import { ConfirmNotificationDisabledSubmit } from "../../../components/dashboard/events-management/confirm-notification-disabled-submit";
+import notificationConfigApi from "../../../api/notifications-config";
 
 const ModifyEventManagement = () => {
     const router = useRouter();
@@ -38,6 +39,8 @@ const ModifyEventManagement = () => {
     const [controllers, setControllers] = useState([]);
     const [inputEvents, setInputEvents] = useState([]);
     const [outputEvents, setOutputEvents] = useState([]);
+    const [smsConfig, setSMSConfig] = useState({});
+    const [emailConfig, setEmailConfig] = useState({});
     const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState({});
     const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState({});
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
@@ -69,6 +72,8 @@ const ModifyEventManagement = () => {
             setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
         }
     }
+
+    const [action, setAction] = useState("");
     const handleClose = () => {
         setOpen(false);
         setErrorMessages([]);
@@ -160,6 +165,32 @@ const ModifyEventManagement = () => {
         }
     }, [isMounted]);
 
+    const getSMSEmailConfig = useCallback(async() => {
+        const smsNotificationConfig= await notificationConfigApi.getNotificationSMSConfig();
+        const emailNotificationConfig = await notificationConfigApi.getNotificationEmailConfig();
+        if (smsNotificationConfig.status !== 200) {
+            toast.error("Error loading SMS config");
+            setSMSConfig({});
+            if (smsNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+        }
+        if (emailNotificationConfig.status !== 200) {
+            toast.error("Error loading email config");
+            setEmailConfig({});
+            if (emailNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            return;
+        }
+        const smsConfigJson = await smsNotificationConfig.json();
+        const emailConfigJson = await emailNotificationConfig.json();
+        if (isMounted()){
+            setSMSConfig(smsConfigJson);
+            setEmailConfig(emailConfigJson);
+        }
+    }, [isMounted]);
+
     const getAllEntrances = useCallback(async () => {
         const res = await entranceApi.getEntrances();
         if (res.status != 200) {
@@ -228,6 +259,10 @@ const ModifyEventManagement = () => {
             console.log(error)
         }
     }, [controllers])
+
+    useEffect(() => {
+        getSMSEmailConfig();
+    }, [])
 
     // add card logic
     const getNewId = () => eventsManagementInfoArr.map(info => info.eventsManagementId)
@@ -315,7 +350,7 @@ const ModifyEventManagement = () => {
 
     }
 
-    const replaceAll = () => {
+    const submitReplaceAll = () => {
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=201){ 
@@ -331,14 +366,51 @@ const ModifyEventManagement = () => {
                     // getClashingEventsManagement
                 })     
             }
-            else{
+            else {
+                getSMSEmailConfig();
                 toast.success("Successfully replaced all event managements")
                 router.replace(`/dashboard/events-management`)
             }
-        })
-        
+        }).finally(() => setAction(""))
     }
-    const addOn = () => {
+
+    const replaceAll = (fromNotificationDisabledSubmit) => {
+        setAction("replaceall");
+        let isOpeningNotificationDisabled = false;
+        if (!fromNotificationDisabledSubmit) {
+            getSMSEmailConfig();
+            hasEmailNotif = false;
+            hasSMSNotif = false;
+            for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+                if (i.eventsManagementEmail) {
+                    hasEmailNotif = true;
+                }
+                if (i.eventsManagementSMS) {
+                    hasSMSNotif = true;
+                }
+            }
+            let notifDisabledOpen;
+            if (hasEmailNotif && hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasEmailNotif) {
+                notifDisabledOpen = !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            }
+            if (notifDisabledOpen) {
+                isOpeningNotificationDisabled = true;
+            }
+        }
+        if (!isOpeningNotificationDisabled) {
+        submitReplaceAll();
+        }
+
+    }
+
+        const submitAddAll = () => {
         Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=201){ 
@@ -354,11 +426,49 @@ const ModifyEventManagement = () => {
                     // getClashingEventsManagement
                 })
             }
-            else{
+            else {
+                getSMSEmailConfig();
                 toast.success("Event managements successfully added")
                 router.replace(`/dashboard/events-management`)
             }
-        })
+        }).finally(() => setAction(""))
+
+    }
+    const addOn = (fromNotificationDisabledSubmit) => {
+        setAction("addon");
+        let isOpeningNotificationDisabled = false;
+        if (!fromNotificationDisabledSubmit) {
+            getSMSEmailConfig();
+            console.log("Hello2")
+            console.log("notificationdisabledOpen: ", notificationDisabledOpen, smsConfig.enabled, emailConfig.enabled)
+            hasEmailNotif = false;
+            hasSMSNotif = false;
+            for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+                if (i.eventsManagementEmail) {
+                    hasEmailNotif = true;
+                }
+                if (i.eventsManagementSMS) {
+                    hasSMSNotif = true;
+                }
+            }
+            let notifDisabledOpen;
+            if (hasEmailNotif && hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasEmailNotif) {
+                notifDisabledOpen = !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            }
+            if (notifDisabledOpen) {
+                isOpeningNotificationDisabled = true;
+            }
+        }
+        if (!isOpeningNotificationDisabled) {
+            submitAddAll();
+        }
 
     }
 
@@ -661,7 +771,6 @@ const ModifyEventManagement = () => {
                 eventManagementToBeUpdated['eventsManagementSMS'] = {
                     eventsManagementSMSRecipients: "",
                     eventsManagementSMSContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered"
                 };
                 let newNotificationSMSs = { ...notificationSMSs };
                 newNotificationSMSs[id] = {
@@ -1003,7 +1112,11 @@ const ModifyEventManagement = () => {
                             handleDialogClose={() => setServerDownOpen(false)}
                         />
                         <ConfirmNotificationDisabledSubmit
+                            action={action}
                             open={notificationDisabledOpen}
+                            smsEnable={smsConfig.enabled}
+                            emailEnable={emailConfig.enabled}
+                            submitEventsManagement={action === 'addon' ? () => addOn(true) : () => replaceAll(true)}
                             handleDialogClose={() => setNotificationDisabledOpen(false)}
                         />
                         <NextLink
@@ -1138,7 +1251,7 @@ const ModifyEventManagement = () => {
                                         variant="contained"
                                         name="replace"
                                         id="replace all"
-                                        onClick={replaceAll}
+                                        onClick={() => replaceAll(false)}
                                         disabled={
                                             entrancesControllers.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail
@@ -1172,7 +1285,7 @@ const ModifyEventManagement = () => {
                                         variant="contained"
                                         name="add"
                                         value="add button"
-                                        onClick={addOn}
+                                        onClick={() => addOn(false)}
                                         disabled={
                                             entrancesControllers.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail

@@ -14,6 +14,8 @@ function EventsManagementTable({
     onPageChange, 
     onRowsPerPageChange, 
     page,
+    smsConfig,
+    emailConfig,
     rowsPerPage, 
      }) {  
         
@@ -61,7 +63,7 @@ function EventsManagementTable({
                                                 {listDescription(eventManagement)}
                                             </TableCell>
                                             <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
-                                            <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions)}</TableCell>
+                                            <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions, smsConfig, emailConfig)}</TableCell>
                                         </TableRow>
                                         
                                     )})}
