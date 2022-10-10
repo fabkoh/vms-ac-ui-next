@@ -1,4 +1,5 @@
 import * as React from "react";
+import toast from "react-hot-toast";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import {
@@ -47,6 +48,11 @@ export const ConfirmNotificationDisabledSubmit = (props) => {
 		submitEventsManagement(e);
 		handleClose();
 	}
+
+	useEffect(() => {
+		setLocalEmailEnable(emailEnable);
+		setLocalSMSEnable(smsEnable);
+	}, [emailEnable, smsEnable]);
 
 	return (
 		<>
