@@ -1039,7 +1039,7 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementEmailRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle };
+        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
@@ -1062,7 +1062,7 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementSMSRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent };
+        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent, useDefaultSMS: newValue.useDefaultSMS };
         eventManagementToBeUpdated['eventsManagementSMS'] = newSMSValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationSMSs({ ...notificationEmails, [id]: newValue });

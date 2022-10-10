@@ -10,7 +10,6 @@ import {
 	Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { validatePhoneNumber } from "../../../utils/utils";
 
 export const SMSEdit = (props) => {
 	const { open, handleDialogClose, smsRecipients, smsValue } = props;

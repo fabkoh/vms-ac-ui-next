@@ -10,7 +10,6 @@ import {
 	Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { validateEmail } from "../../../utils/utils";
 
 export const EmailEdit = (props) => {
 	const { open, handleDialogClose, emailRecipients, emailValue } = props;
