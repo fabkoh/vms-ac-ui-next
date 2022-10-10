@@ -761,7 +761,6 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                             setNotificationEmailsInputValue(e.target.value);
                                         }}
                                         onKeyDown={(e) => {
-                                            console.log(e.key);
                                             if (e.key == "Enter") {
                                                 const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
                                                 setNotificationEmailsRecipients(newNotificationEmailRecipients);

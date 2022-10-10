@@ -18,6 +18,7 @@ import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/co
 import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../api/events-management";
+import notificationConfigApi from "../../../api/notifications-config";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
