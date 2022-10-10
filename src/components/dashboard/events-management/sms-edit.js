@@ -48,7 +48,6 @@ export const SMSEdit = (props) => {
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
 		setUseDefaultSMS(smsValue?.useDefaultSMS);
-		console.log(smsValue);
 	}, [smsRecipients, smsValue])
 
 	return (
@@ -129,7 +128,6 @@ export const SMSEdit = (props) => {
 								label="Use Default" />
 						</div>
 					</div>
-					{console.log(useDefaultSMS)}
 					<TextField
 						sx={{ mt: 2 }}
 						multiline
