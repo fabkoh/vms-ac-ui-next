@@ -43,7 +43,7 @@ export const EmailEdit = (props) => {
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
 	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
 	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
-	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails ?? false);
+	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails);
 	const [isInvalidEmails, setIsInvalidEmails] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
@@ -51,7 +51,7 @@ export const EmailEdit = (props) => {
 		setNotificationEmailsRecipients(emailRecipients);
 		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
 		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
-		setUseDefaultEmails(emailValue?.useDefaultEmails ?? false);
+		setUseDefaultEmails(emailValue?.useDefaultEmails);
 	}, [emailRecipients, emailValue])
 
 	return (
@@ -74,6 +74,7 @@ export const EmailEdit = (props) => {
                                 <div style={{width: "80%"}}>
                                     {notificationEmailsRecipients.map((item, index) => (
                                         <Chip key={index}
+											color={(validateEmail(item) === null) ? "error": "default"}
                                             sx={{ mr: 1, mb: 1 }}
                                             size="small"
                                             onDelete={() => {

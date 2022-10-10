@@ -33,7 +33,7 @@ export const SMSEdit = (props) => {
 	const [notificationSMSsInputValue, setNotificationSMSsInputValue] = useState("");
     const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(smsRecipients);
 	const [notificationSMSContent, setNotificationSMSContent] = useState(smsValue?.eventsManagementSMSContent);
-	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS ?? false);
+	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS);
 	const [isInvalidSMSs, setIsInvalidSMSs] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
@@ -41,13 +41,14 @@ export const SMSEdit = (props) => {
 	const handleClose = () => { 
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
-		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
+		setUseDefaultSMS(smsValue?.useDefaultSMS);
 		handleDialogClose();
 	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
-		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
+		setUseDefaultSMS(smsValue?.useDefaultSMS);
+		console.log(smsValue);
 	}, [smsRecipients, smsValue])
 
 	return (
@@ -71,6 +72,7 @@ export const SMSEdit = (props) => {
                                     {notificationSMSsRecipients.map((item, index) => (
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
+											color={(!validatePhoneNumber(item)) ? "error": "default"}
                                             size="small"
                                             onDelete={() => {
                                                 let arr = [...notificationSMSsRecipients]
@@ -127,6 +129,7 @@ export const SMSEdit = (props) => {
 								label="Use Default" />
 						</div>
 					</div>
+					{console.log(useDefaultSMS)}
 					<TextField
 						sx={{ mt: 2 }}
 						multiline
