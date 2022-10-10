@@ -356,11 +356,13 @@ const ModifyEventManagement = () => {
             if (res.status!=201){ 
                 (res.json()).then(data => {
                     const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
-                            // console.log(key, singleData))
-                            array.push(singleData))
-                    })
+                    if (data[0]) {
+                        Object.entries(data[0]).map(([key, value]) => {
+                            value.map(singleData =>
+                                // console.log(key, singleData))
+                                array.push(singleData))
+                        })
+                    }
                     setSingleErrorMessage(array)
                     handleErrorMessages(data)
                     // getClashingEventsManagement
@@ -379,8 +381,8 @@ const ModifyEventManagement = () => {
         let isOpeningNotificationDisabled = false;
         if (!fromNotificationDisabledSubmit) {
             getSMSEmailConfig();
-            hasEmailNotif = false;
-            hasSMSNotif = false;
+            let hasEmailNotif = false;
+            let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
                 if (i.eventsManagementEmail) {
                     hasEmailNotif = true;
@@ -410,28 +412,30 @@ const ModifyEventManagement = () => {
 
     }
 
-        const submitAddAll = () => {
-        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
-        .then(res =>{
-            if (res.status!=201){ 
-                (res.json()).then(data => {
-                    const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
+    const submitAddAll = () => {
+    Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
+        .then(res => {
+        if (res.status!=201){ 
+            (res.json()).then(data => {
+                const array = [];
+                if (data[0]) {
+                    Object.entries(data[0]).map(([key, value]) => {
+                        value.map(singleData =>
                             // console.log(key, singleData))
                             array.push(singleData))
-                    })
-                    setSingleErrorMessage(array)
-                    handleErrorMessages(data)
-                    // getClashingEventsManagement
-                })
-            }
-            else {
-                getSMSEmailConfig();
-                toast.success("Event managements successfully added")
-                router.replace(`/dashboard/events-management`)
-            }
-        }).finally(() => setAction(""))
+                    }) 
+                }
+                setSingleErrorMessage(array)
+                handleErrorMessages(data)
+                // getClashingEventsManagement
+            })
+        }
+        else {
+            getSMSEmailConfig();
+            toast.success("Event managements successfully added")
+            router.replace(`/dashboard/events-management`)
+        }
+    }).finally(() => setAction(""))
 
     }
     const addOn = (fromNotificationDisabledSubmit) => {
@@ -439,15 +443,14 @@ const ModifyEventManagement = () => {
         let isOpeningNotificationDisabled = false;
         if (!fromNotificationDisabledSubmit) {
             getSMSEmailConfig();
-            console.log("Hello2")
-            console.log("notificationdisabledOpen: ", notificationDisabledOpen, smsConfig.enabled, emailConfig.enabled)
             let hasEmailNotif = false;
             let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
-                if (i.eventsManagementEmail) {
+                let currEventManagement = eventsManagementInfoArr[i];
+                if (currEventManagement.eventsManagementEmail) {
                     hasEmailNotif = true;
                 }
-                if (i.eventsManagementSMS) {
+                if (currEventManagement.eventsManagementSMS) {
                     hasSMSNotif = true;
                 }
             }
@@ -459,6 +462,9 @@ const ModifyEventManagement = () => {
                 notifDisabledOpen = !emailConfig.enabled;
                 setNotificationDisabledOpen(notifDisabledOpen);
             } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                console.log("smsConfigEnabled: ", smsConfig.enabled, "emailConfigEnabled: ", emailConfig.enabled)
+                console.log("notifDisabledOpen: ", notifDisabledOpen)
                 notifDisabledOpen = !smsConfig.enabled;
                 setNotificationDisabledOpen(notifDisabledOpen);
             }
@@ -1299,7 +1305,11 @@ const ModifyEventManagement = () => {
                                                 validation.eventsManagementOutputActionsEmpty ||
                                                 validation.eventsManagementOutputActionsInvalidId ||
                                                 validation.eventsManagementOutputActionsConflict ||
-                                                validation.eventsManagementTriggerSchedulesEmpty
+                                                validation.eventsManagementTriggerSchedulesEmpty ||
+                                                validation.eventsManagementInvalidEmailRecipients ||
+                                                validation.eventsManagementInvalidSMSRecipients ||
+                                                validation.eventsManagementEmailRecipientsEmpty ||
+                                                validation.eventsManagementSMSRecipientsEmpty
                                             )
                                         }
                                     >

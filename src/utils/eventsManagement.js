@@ -11,13 +11,13 @@
  * users type in the query to filter entrances by (like in entrance list)
 **/
 
-import { MeetingRoom, SelectAll } from "@mui/icons-material";
+import { MeetingRoom, SelectAll, WarningAmber } from "@mui/icons-material";
 import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
 import { rruleDescriptionWithBr } from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
-import {Grid} from "@mui/material";
+import {Grid, Tooltip, IconButton} from "@mui/material";
 import { bool } from "prop-types";
 
 // for textfield placeholder
@@ -137,11 +137,12 @@ const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig=
             let hasSMSDisabled = false;
             let hasEmail = false;
             let hasEmailDisabled = false;
-            if (outputAction.eventActionOutputTypeName === "Notification (SMS)") {
+            if (outputAction.eventActionOutputType.eventActionOutputName === "NOTIFICATION (SMS)") {
                 hasSMS = true;
                 hasSMSDisabled = !smsConfig.enabled;
             }
-            if (outputAction.eventActionOutputTypeName === "Notification (EMAIL)") {
+
+            if (outputAction.eventActionOutputType.eventActionOutputName === "NOTIFICATION (EMAIL)") {
                 hasEmail = true;
                 hasEmailDisabled = !emailConfig.enabled;
             }
@@ -150,13 +151,20 @@ const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig=
                     display: "flex",
                     flexDirection: "row",
                 }}>
-            {`${outputAction.eventActionOutputType.eventActionOutputName}`}
-            {outputAction.eventActionOutputType.timerEnabled ?
-                (outputAction.timerDuration ?
-                    ` (${outputAction.timerDuration} secs)` :
-                    ``)
-                   : ""}
-            {(hasSMS && hasSMSDisabled) || (hasEmail && hasEmailDisabled) ? <WarningAmberOutlined sx={{ color: "#F44336", marginLeft: 0.5, width: 50 }}/> : ""}
+                {(hasSMS && hasSMSDisabled) || (hasEmail && hasEmailDisabled) ?
+                    <Tooltip title={(hasSMS && hasSMSDisabled) ? "SMS Notification is disabled": "Email Notification is disabled"}>
+                        <IconButton sx={{ borderRadius: "50%" }}>
+                            <WarningAmber sx={{ color: "#FFB020", width: 20, marginRight: 0.5 }} />
+                        </IconButton>
+                    </Tooltip> : ""}
+                <div style={{alignSelf: "center"}}>
+                    {`${outputAction.eventActionOutputType.eventActionOutputName}`}
+                    {outputAction.eventActionOutputType.timerEnabled ?
+                        (outputAction.timerDuration ?
+                            ` (${outputAction.timerDuration} secs)` :
+                            ``)
+                            : ""}
+                </div>
         </div>
         }
 
