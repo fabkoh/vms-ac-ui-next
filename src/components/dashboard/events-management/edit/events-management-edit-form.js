@@ -25,6 +25,7 @@ import Add from "@mui/icons-material/Add";
 import formUtils from "../../../../utils/form-utils";
 import { ContactSupportOutlined, Edit } from "@mui/icons-material";
 import { EmailEdit } from "../email-edit";
+import { validatePhoneNumber, validateEmail } from "../../../../utils/utils";
 import { SMSEdit } from "../sms-edit";
 
 const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer, notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
@@ -738,6 +739,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     {notificationEmailsRecipients.map((item, index) => (
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
+                                            color={(validateEmail(item) === null)? "error": "default"}
                                             size="small"
                                             onDelete={() => {
                                                 let arr = [...notificationEmailsRecipients]
@@ -746,7 +748,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: arr,
                                                     eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
-                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle,
+                                                    useDefaultEmails: notificationEmailsValue.useDefaultEmails
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                             }}
@@ -767,7 +770,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: newNotificationEmailRecipients,
                                                     eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
-                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle
+                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle,
+                                                    useDefaultEmails: notificationEmailsValue.useDefaultEmails
                                                 }
                                                 changeNotificationEmails(newValue, eventsManagementId);
                                                 setNotificationEmailsInputValue("");
@@ -801,13 +805,15 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         <Chip key={index}
                                             sx={{ mr: 1, mb: 1 }}
                                             size="small"
+                                            color={(!validatePhoneNumber(item)) ? "error": "default"}
                                             onDelete={() => {
                                                 let arr = [...notificationSMSsRecipients]
                                                 arr.splice(index, 1)
                                                 setNotificationSMSsRecipients(arr)
                                                 const newValue = {
                                                     eventsManagementSMSRecipients: arr,
-                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent
+                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent,
+                                                    useDefaultSMS: notificationSMSsValue.useDefaultSMS
                                                 }
                                                 changeNotificationSMSs(newValue, eventsManagementId);
                                             }}
@@ -827,7 +833,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 setNotificationSMSsRecipients(newNotificationSMSRecipients);
                                                 const newValue = {
                                                     eventsManagementSMSRecipients: newNotificationSMSRecipients,
-                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent
+                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent,
+                                                    useDefaultSMS: notificationSMSsValue.useDefaultSMS
                                                 }
                                                 changeNotificationSMSs(newValue, eventsManagementId);
                                                 setNotificationSMSsInputValue("");
