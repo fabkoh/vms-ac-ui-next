@@ -91,7 +91,6 @@ export default function CheckboxesTags({
             }}
             renderTags={(val, getTagProps) =>
                 val.map((option, index) => {
-                    console.log(getOptionLabel(option));
                     return (<Chip
                         color={
                             (!!isError && isError(option)) ? "error" : // doing this allows isError and isWarning to be optional arguments
