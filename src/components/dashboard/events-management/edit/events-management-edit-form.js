@@ -12,7 +12,8 @@ import {
     Select,
     Input,
     MenuItem,
-    Chip
+    Chip,
+    InputAdornment
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ExpandMore from "../../shared/expand-more";
@@ -728,40 +729,49 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                     />
                                 </Grid>
                             </Grid>
-                            {notificationEmailsValue && <div style={{display: "flex", flexDirection: "row"}}>
-                                    <Grid item
-                                            mr={2}
-                                            mb={1}>
-                                    <Typography fontWeight="bold"
-                                        width={150}>Email Recipient(s):</Typography>
-                                </Grid>
+                            {notificationEmailsValue && <div style={{display: "flex", flexDirection: "column"}}>
                                 <div>
-                                    {notificationEmailsRecipients.map((item, index) => (
-                                        <Chip key={index}
-                                            sx={{ mr: 1, mb: 1 }}
-                                            color={(validateEmail(item) === null)? "error": "default"}
-                                            size="small"
-                                            onDelete={() => {
-                                                let arr = [...notificationEmailsRecipients]
-                                                arr.splice(index, 1)
-                                                setNotificationEmailsRecipients(arr)
-                                                const newValue = {
-                                                    eventsManagementEmailRecipients: arr,
-                                                    eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
-                                                    eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle,
-                                                    useDefaultEmails: notificationEmailsValue.useDefaultEmails
-                                                }
-                                                changeNotificationEmails(newValue, eventsManagementId);
-                                            }}
-                                            label={item} />
-                                    ))}
-                                <Input
-                                        sx={{mr: 2}}
-                                        variant="standard"
+                                    <TextField
+                                        fullWidth
+                                        sx={{mr: 2, mt: 2}}
                                         label="Email Recipients"
                                         value={notificationEmailsInputValue}
                                         onChange={(e) => {
                                             setNotificationEmailsInputValue(e.target.value);
+                                        }}
+                                        helperText={ 
+                                            (Boolean(eventsManagementEmailRecipientsEmpty) && "Error: empty email recipients is not allowed") ||
+                                            (Boolean(eventsManagementInvalidEmailRecipients) && "Error: invalid email recipient(s)")
+                                        }
+                                        error={ Boolean(eventsManagementEmailRecipientsEmpty) || Boolean(eventsManagementInvalidEmailRecipients) }
+                                        InputProps={{
+                                        sx: {height: 80},
+                                        startAdornment: (
+                                            <InputAdornment position="start"
+                                                sx={{ maxWidth: "65%", marginTop: 2, marginBottom: 1, scrollbarColor: "white"}}>
+                                            <div style={{display: "flex", overflowX: "scroll"}}>
+                                            {notificationEmailsRecipients.map((item, index) => (
+                                                <Chip key={index}
+                                                    sx={{ mr: 1, mb: 1 }}
+                                                    color={(validateEmail(item) === null)? "error": "default"}
+                                                    size="small"
+                                                    onDelete={() => {
+                                                        let arr = [...notificationEmailsRecipients]
+                                                        arr.splice(index, 1)
+                                                        setNotificationEmailsRecipients(arr)
+                                                        const newValue = {
+                                                            eventsManagementEmailRecipients: arr,
+                                                            eventsManagementEmailContent: notificationEmailsValue.eventsManagementEmailContent,
+                                                            eventsManagementEmailTitle: notificationEmailsValue.eventsManagementEmailTitle,
+                                                            useDefaultEmails: notificationEmailsValue.useDefaultEmails
+                                                        }
+                                                        changeNotificationEmails(newValue, eventsManagementId);
+                                                    }}
+                                                    label={item} />
+                                            ))}
+                                            </div>
+                                        </InputAdornment>
+                                        ),
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key == "Enter") {
@@ -779,51 +789,57 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         }}
                                     />
                                     <Button
-                                            size="small"
-                                            variant="text"
-                                            startIcon={<Edit />}
-                                            onClick={() => {setNotificationEmailEditOpen(true)}}
+                                        size="small"
+                                        variant="text"
+                                        sx={{verticalAlign:"bottom", marginTop: 2}}
+                                        startIcon={<Edit />}
+                                        onClick={() => {setNotificationEmailEditOpen(true)}}
                                         >
                                             Edit Email Content
                                     </Button>
                                 </div>
                             </div>
                             }
-                            {(Boolean(eventsManagementEmailRecipientsEmpty) || Boolean(eventsManagementInvalidEmailRecipients)) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px" }}>
-                                {Boolean(eventsManagementEmailRecipientsEmpty) && "Error: empty email recipients is not allowed" || Boolean(eventsManagementInvalidEmailRecipients) && "Error: invalid email recipient(s)"}
-                            </Grid>
-                            }
-                            {notificationSMSsValue && <div style={{display: "flex", flexDirection: "row"}}>
-                                    <Grid item
-                                            mr={2}
-                                            mb={1}>
-                                    <Typography fontWeight="bold"
-                                        width={150}>SMS Recipient(s):</Typography>
-                                </Grid>
+                            {notificationSMSsValue && <div style={{display: "flex", flexDirection: "column"}}>
                                 <div>
-                                    {notificationSMSsRecipients.map((item, index) => (
-                                        <Chip key={index}
-                                            sx={{ mr: 1, mb: 1 }}
-                                            size="small"
-                                            color={(!validatePhoneNumber(item)) ? "error": "default"}
-                                            onDelete={() => {
-                                                let arr = [...notificationSMSsRecipients]
-                                                arr.splice(index, 1)
-                                                setNotificationSMSsRecipients(arr)
-                                                const newValue = {
-                                                    eventsManagementSMSRecipients: arr,
-                                                    eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent,
-                                                    useDefaultSMS: notificationSMSsValue.useDefaultSMS
-                                                }
-                                                changeNotificationSMSs(newValue, eventsManagementId);
-                                            }}
-                                            label={item} />
-                                    ))}
-                                    <Input
-                                        sx={{mr: 2}}
-                                        variant="standard"
+                                    <TextField
+                                        fullWidth
+                                        sx={{mr: 2, mt: 2}}
                                         label="SMS Recipients"
                                         value={notificationSMSsInputValue}
+                                        helperText={ 
+                                            (Boolean(eventsManagementSMSRecipientsEmpty) && "Error: empty SMS recipients is not allowed") ||
+                                            (Boolean(eventsManagementInvalidSMSRecipients) && "Error: invalid SMS recipient(s)")
+                                        }
+                                        error={ Boolean(eventsManagementSMSRecipientsEmpty) || Boolean(eventsManagementInvalidSMSRecipients) }
+                                        InputProps={{
+                                        sx: {height: 80},
+                                        startAdornment: (
+                                            <InputAdornment position="start"
+                                                sx={{ maxWidth: "65%", marginTop: 2, marginBottom: 1, scrollbarColor: "white"}}>
+                                            <div style={{display: "flex", overflowX: "scroll"}}>
+                                                {notificationSMSsRecipients.map((item, index) => (
+                                                    <Chip key={index}
+                                                        sx={{ mr: 1, mb: 1 }}
+                                                        size="small"
+                                                        color={(!validatePhoneNumber(item)) ? "error": "default"}
+                                                        onDelete={() => {
+                                                            let arr = [...notificationSMSsRecipients]
+                                                            arr.splice(index, 1)
+                                                            setNotificationSMSsRecipients(arr)
+                                                            const newValue = {
+                                                                eventsManagementSMSRecipients: arr,
+                                                                eventsManagementSMSContent: notificationSMSsValue.eventsManagementSMSContent,
+                                                                useDefaultSMS: notificationSMSsValue.useDefaultSMS
+                                                            }
+                                                            changeNotificationSMSs(newValue, eventsManagementId);
+                                                        }}
+                                                        label={item} />
+                                                ))}
+                                            </div>
+                                        </InputAdornment>
+                                        ),
+                                        }}
                                         onChange={(e) => {
                                             setNotificationSMSsInputValue(e.target.value);
                                         }}
@@ -845,6 +861,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                         size="small"
                                         variant="text"
                                         startIcon={<Edit />}
+                                        sx={{verticalAlign:"bottom", marginTop: 2}}
                                         onClick={() => {setNotificationSMSEditOpen(true)}}
                                     >
                                         Edit SMS Content
