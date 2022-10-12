@@ -1,5 +1,8 @@
-import { Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Checkbox, IconButton, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import { Scrollbar } from "../../../scrollbar";
+import NextLink from "next/link";
+import { ArrowRight as ArrowRightIcon } from "../../../../icons/arrow-right";
+import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription, getEventsManagementDetailsLink} from "../../../../utils/eventsManagement";
 import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription} from "../../../../utils/eventsManagement";
 
 
@@ -17,7 +20,7 @@ function EventsManagementTable({
     smsConfig,
     emailConfig,
     rowsPerPage, 
-     }) {  
+    }) {  
         
         
         return (
@@ -41,6 +44,7 @@ function EventsManagementTable({
                                         <TableCell>Description(s)</TableCell>
                                         <TableCell>Trigger(s)</TableCell>
                                         <TableCell>Action(s)</TableCell>
+                                        <TableCell> </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -50,20 +54,30 @@ function EventsManagementTable({
                                         return(
                                         <TableRow hover
                                             key={i}>
-                                            <TableCell padding="checkbox">
+                                            <TableCell padding="checkbox" width="5%">
                                                 <Checkbox
                                                     checked={IsEventsManagementSelected}
                                                     onChange={handleSelect}
                                                     value={IsEventsManagementSelected}
                                                 /> 
                                             </TableCell> 
-                                            <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
-                                            <TableCell sx={{minWidth: 200}}>{eventManagement.eventsManagementName}</TableCell>
-                                            <TableCell sx={{minWidth: 300}}>
+                                            <TableCell width="15%">{displayEntranceOrController(eventManagement)}</TableCell>
+                                            <TableCell width="15%">{eventManagement.eventsManagementName}</TableCell>
+                                            <TableCell width="30%">
                                                 {listDescription(eventManagement)}
                                             </TableCell>
-                                            <TableCell sx={{minWidth: 300}} >{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
-                                            <TableCell  sx={{minWidth: 300}}>{ eventActionOutputDescription(eventManagement.outputActions, smsConfig, emailConfig)}</TableCell>
+                                            <TableCell width="15%">{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
+                                            <TableCell width="15%">{ eventActionOutputDescription(eventManagement.outputActions, smsConfig, emailConfig)}</TableCell>
+                                            <TableCell width="5%">
+                                                <NextLink
+                                                    href={getEventsManagementDetailsLink(eventManagement.eventsManagementId)}
+                                                    passHref
+                                                >
+                                                    <IconButton component="a">
+                                                        <ArrowRightIcon fontSize="small" />
+                                                    </IconButton>
+                                                </NextLink>
+                                            </TableCell>
                                         </TableRow>
                                         
                                     )})}

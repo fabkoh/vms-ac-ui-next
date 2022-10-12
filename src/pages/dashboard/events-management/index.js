@@ -66,6 +66,7 @@ const EventsManagementList = () => {
                 const body = await eventManagements.json();
                 if (isMounted()) {
                     setEventsManagement(body);
+                    console.log(body)
                 }
             }
             else {
