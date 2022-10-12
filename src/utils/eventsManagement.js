@@ -104,7 +104,7 @@ const eventActionOutputText = outputActions => {
 
 const displayEntranceOrController = eventManagement => {
     return (
-        eventManagement.controller  ?
+        eventManagement.controller ?
             <RenderTableCell
                 exist={eventManagement.controller ? true : false}
                 deleted={false}

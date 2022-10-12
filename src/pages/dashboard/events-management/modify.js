@@ -441,8 +441,8 @@ const ModifyEventManagement = () => {
             getSMSEmailConfig();
             console.log("Hello2")
             console.log("notificationdisabledOpen: ", notificationDisabledOpen, smsConfig.enabled, emailConfig.enabled)
-            hasEmailNotif = false;
-            hasSMSNotif = false;
+            let hasEmailNotif = false;
+            let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
                 if (i.eventsManagementEmail) {
                     hasEmailNotif = true;

@@ -21,6 +21,7 @@ import { eventsManagementApi } from "../../../api/events-management";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { notificationsApi } from "../../../api/notifications";
 
 const applyFilter = createFilter({
     query: filterEventsManagementByString,
@@ -34,8 +35,8 @@ const EventsManagementList = () => {
     const [emailConfig, setEmailConfig] = useState({});
 
     const getSMSEmailConfig = useCallback(async() => {
-        const smsNotificationConfig= await notificationConfigApi.getNotificationSMSConfig();
-        const emailNotificationConfig = await notificationConfigApi.getNotificationEmailConfig();
+        const smsNotificationConfig= await notificationsApi.getSMSSettings();
+        const emailNotificationConfig = await notificationsApi.getEmailSettings();
         if (smsNotificationConfig.status !== 200) {
             toast.error("Error loading SMS config");
             setSMSConfig({});

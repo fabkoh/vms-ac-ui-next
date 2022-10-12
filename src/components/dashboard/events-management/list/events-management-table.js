@@ -3,8 +3,6 @@ import { Scrollbar } from "../../../scrollbar";
 import NextLink from "next/link";
 import { ArrowRight as ArrowRightIcon } from "../../../../icons/arrow-right";
 import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription, getEventsManagementDetailsLink} from "../../../../utils/eventsManagement";
-import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription} from "../../../../utils/eventsManagement";
-
 
 function EventsManagementTable({ 
     selectedEventsManagement, 
