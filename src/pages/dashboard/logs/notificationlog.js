@@ -5,11 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AuthGuard } from "../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
 import NotificationLogTable from "../../../components/dashboard/logs/notification-log-table";
-import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
-import { Upload } from "../../../icons/upload";
 import { gtm } from "../../../lib/gtm"
-import { eventslogsApi } from "../../../api/events";
 import { useMounted } from "../../../hooks/use-mounted";
 import { stringIn } from "../../../utils/utils";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
@@ -17,19 +14,19 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import toast from "react-hot-toast";
-import SingleSelect from "../../../components/dashboard/shared/single-select-input";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
+import { notificationLogsApi } from "../../../api/notifications-log";
 
 const FakeNotif = {
-    notificationTime: 1200,
-    eventsManagementId: 123,
-    eventsManagementName: "enter door",
-    notificationType: "email",
-    notificationStatus: "sucessful",
-    title: "test",
-    message: "test2",
-    recipients: "999"
+    notificationTime: "10-14-2022 11:52:02",
+    eventsManagementId: 1,
+    eventsManagementName: "Enter door",
+    notificationType: "EMAIL",
+    notificationStatus: "Success",
+    title: "Test",
+    message: "Test2",
+    recipients: "random@gmail.com,random2@gmail.com"
 }
 
 // fix filter, check if can import utils 
@@ -114,7 +111,7 @@ const [page, setPage] = useState(0);
 const handlePageChange = async (e, newPage) => {
     setPage(newPage);
     if ((newPage + 1) * rowsPerPage >= filteredNotifications.length && Notifications.length < notifsCount) {
-        const res = await eventslogsApi.getEvents(Math.floor(Notifications.length / 500));
+        const res = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
 
         if (res.status == 200) {
             const data = await res.json();
@@ -132,7 +129,7 @@ const [serverDownOpen, setServerDownOpen] = useState(false);
 
 const getNotifications = useCallback(async () => {
     try {
-        const res = await eventslogsApi.getEvents(Math.floor(Notifications.length / 500))
+        const res = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -161,7 +158,7 @@ useEffect(
 );
 
 const getInfo = useCallback(async() => {
-    const notifsCountRes = await eventslogsApi.getEventsCount();
+    const notifsCountRes = await notificationLogsApi.getNotifsCount();
     if (notifsCountRes.status !== 200) {
         toast.error("Failed to get total notifs count");
         return;
@@ -169,7 +166,7 @@ const getInfo = useCallback(async() => {
     const notifsCountJson = await notifsCountRes.json();
     setNotifsCount(notifsCountJson);
     if (Notifications.length < notifsCountRes) {
-        const notifsRes = await eventslogsApi.getEvents(Math.floor(Notifications.length / 500));
+        const notifsRes = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
         if (notifsRes.status !== 200) {
             toast.error("Failed To fetch the next 500 notifications");
             return;
@@ -187,7 +184,7 @@ const getInfo = useCallback(async() => {
 const search = async() => {
     const start = filterStart ? new Date(filterStart.getTime() - filterStart.getTimezoneOffset() * 60000).toISOString() : null;
     const end = filterEnd ? new Date(filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000).toISOString() : null;
-    const notifsRes = await eventslogsApi.searchEvent(Math.floor(searchedNotifications.length / 500), filters.query, start, end);
+    const notifsRes = await notificationLogsApi.searchNotifLogs(Math.floor(searchedNotifications.length / 500), filters.query, start, end);
     if (notifsRes.status !== 200) {
         toast.error("Failed To Search");
         return;
@@ -331,7 +328,7 @@ const search = async() => {
                             onRowsPerPageChange={handleRowsPerPageChange}
                             eventsCount={notifsCount}
                             // paginatedEvents
-                            logs={FakeNotif}
+                            logs={[FakeNotif]}
                         />
                     </Card>
                 </Container>

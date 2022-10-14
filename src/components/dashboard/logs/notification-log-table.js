@@ -38,24 +38,33 @@ const NotificationLogTable = ({
 
                             {/* // insert icon for different types of eventtype  */}
                                 <TableCell>
-                                    <Chip label={
-                                        log.eventsManagementName
-                                    } />
+                                    {log.eventsManagementName}
                                 </TableCell>
                                 <TableCell>
                                 { log.notificationType }
                                 </TableCell>
                                 <TableCell>
-                                {log.notification ?
-                                <Button
-                                    variant="contained"
-                                    sx={{ m: 1 , mr : 5 }}
-                                    onClick={() => { }}
-                                    >
-                                    See Details
-                                </Button>
-                                : 'N.A.'
-                                }
+                                    {log.recipients ?
+                                        <div>
+                                            {log.recipients.split(",").map((recipient, i) => (
+                                                <Chip
+                                                    sx={{marginRight:1}}
+                                                    key={`recipient${i}`}
+                                                    label={
+                                                    recipient
+                                                } />
+                                            ))}
+                                            <Button
+                                                size="small"
+                                                variant="text"
+                                                sx={{ m: 1 , mr : 5 }}
+                                                onClick={() => { }}
+                                            >
+                                            See Details
+                                        </Button>
+                                        </div>
+                                        : 'N.A.'
+                                    }
                                 </TableCell>
                                 <TableCell>
                                     { toDisplayEventsDateString(log.notificationTime) }
