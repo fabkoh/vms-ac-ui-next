@@ -24,7 +24,7 @@ const NotificationLogTable = ({
                     <TableRow>
                         <TableCell style={{width:"25%"}}>Event</TableCell>
                         <TableCell style={{width:"25%"}}>Notification Type</TableCell>
-                        <TableCell style={{ width: "35%" }}>Recipients</TableCell>
+                        <TableCell style={{ width:"35%" }}>Recipients</TableCell>
                         <TableCell style={{width:"20%"}}>Timestamp</TableCell>
                     </TableRow>
                 </TableHead>
@@ -41,7 +41,7 @@ const NotificationLogTable = ({
                                     {log.eventsManagementName}
                                 </TableCell>
                                 <TableCell>
-                                { log.notificationType }
+                                    <Chip label={log.notificationType} />
                                 </TableCell>
                                 <TableCell>
                                     {log.recipients ?
