@@ -134,6 +134,12 @@ class EventsManagementApi {
         if (useApi) { return sendApi(`/api/event/output/types?forController=${forController}`); }
         return Promise.resolve(new Response(JSON.stringify(fakeOutputEvents), { status: 200 }));
     }
+
+    getIndividualEventsManagement(emId) {
+        if (useApi) { return sendApi(`/api/eventsmanagement/${emId}`); }
+        console.log("apitest")
+        return Promise.resolve(new Response(JSON.stringify(eventManagement), { status: 200 }));
+    }
 }
 
 export const eventsManagementApi = new EventsManagementApi();

@@ -268,4 +268,17 @@ const fakeOutputEvents = [
     "eventActionOutputConfig" : null
   }
 ]
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeSMSConfig, fakeEmailConfig, fakeEventsManagement, fakeInputEvents, fakeOutputEvents };
+
+const fakeNotifLogs = [
+    {
+        notificationTime: "10-14-2022 11:52:02",
+        eventsManagementId: 1,
+        eventsManagementName: "Enter door",
+        notificationType: "EMAIL",
+        notificationStatus: "Success",
+        title: "Test",
+        message: "Test2",
+        recipients: "random@gmail.com,random2@gmail.com"
+    }
+]
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeSMSConfig, fakeEmailConfig, fakeEventsManagement, fakeInputEvents, fakeOutputEvents, fakeNotifLogs};

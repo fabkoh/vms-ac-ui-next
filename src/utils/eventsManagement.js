@@ -104,7 +104,7 @@ const eventActionOutputText = outputActions => {
 
 const displayEntranceOrController = eventManagement => {
     return (
-        eventManagement.controller  ?
+        eventManagement.controller ?
             <RenderTableCell
                 exist={eventManagement.controller ? true : false}
                 deleted={false}
@@ -190,6 +190,9 @@ const listDescription = eventManagement =>
             </div>
         )}))}
 
+const getEventsManagementDetailsLink = (emId) =>  ('/dashboard/events-management/details/' + emId)
+
+
 export { 
     filterEventsManagementByStringPlaceholder, 
     filterEventsManagementByString,
@@ -202,5 +205,6 @@ export {
     eventActionOutputDescription,
     eventActionOutputText,
     eventActionInputText,
-    listDescription
+    listDescription,
+    getEventsManagementDetailsLink
  }
