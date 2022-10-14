@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Button } from "@mui/material";
 import { Scrollbar } from "../../scrollbar";
 import { toDisplayEventsDateString } from "../../../utils/utils";
 import NextLink from "next/link";
@@ -8,7 +8,7 @@ import WarningChip from "../shared/warning-chip";
 import RenderTableCell from "../shared/renderTableCell";
 import { Person, SelectAll } from "@mui/icons-material";
 import { LockClosed } from "../../../icons/lock-closed";
-import { NotificationDetails } from "./see-notification-details";
+// import { NotificationDetails } from "./see-notification-details";
 
 const NotificationLogTable = ({
     page,
@@ -22,15 +22,13 @@ const NotificationLogTable = ({
             <Table sx={{minWidth: 700}}>
                 <TableHead sx={{backgroundColor:"neutral.200"}}>
                     <TableRow>
-                        <TableCell style={{width:"20%"}}>Timestamp</TableCell>
-                        <TableCell style={{width:"40%"}}>Event</TableCell>
+                        <TableCell style={{width:"25%"}}>Event</TableCell>
                         <TableCell style={{width:"25%"}}>Notification Type</TableCell>
-                        <TableCell style={{width:"15%"}}> </TableCell>
+                        <TableCell style={{ width: "35%" }}>Recipients</TableCell>
+                        <TableCell style={{width:"20%"}}>Timestamp</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-
-                
                     {
                         Array.isArray(logs) && logs.map((log,i) => (
                             <TableRow
@@ -38,39 +36,30 @@ const NotificationLogTable = ({
                                 key={`logtablerow${i}`}
                             >
 
-                                <TableCell>
-                                    { toDisplayEventsDateString(log.notificationTime) }
-                                </TableCell>
-
                             {/* // insert icon for different types of eventtype  */}
                                 <TableCell>
                                     <Chip label={
                                         log.eventsManagementName
                                     } />
-
                                 </TableCell>
-
-
                                 <TableCell>
                                 { log.notificationType }
                                 </TableCell>
-
-
                                 <TableCell>
                                 {log.notification ?
                                 <Button
                                     variant="contained"
                                     sx={{ m: 1 , mr : 5 }}
-                                    onClick={openDetails}
+                                    onClick={() => { }}
                                     >
                                     See Details
                                 </Button>
                                 : 'N.A.'
                                 }
                                 </TableCell>
-
-                                
-                                
+                                <TableCell>
+                                    { toDisplayEventsDateString(log.notificationTime) }
+                                </TableCell>
                             </TableRow>
                         ))
                     }
