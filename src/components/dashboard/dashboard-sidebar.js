@@ -12,6 +12,7 @@ import { ChatAlt2 as ChatAlt2Icon } from '../../icons/chat-alt2';
 import { ClipboardList as ClipboardListIcon } from '../../icons/clipboard-list';
 import { CreditCard as CreditCardIcon } from '../../icons/credit-card';
 import { Home as HomeIcon } from '../../icons/home';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { LockClosed as LockClosedIcon } from '../../icons/lock-closed';
 import { Mail as MailIcon } from '../../icons/mail';
 import { MailOpen as MailOpenIcon } from '../../icons/mail-open';
@@ -55,7 +56,7 @@ const getSections = (t) => [
       {
         title: t('Settings'),
         path: '/settings',
-        icon: <HomeIcon fontSize="small" />,
+        icon: <SettingsIcon fontSize="small" />,
         children: [
           {
             title: 'Notifications',

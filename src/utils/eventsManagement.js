@@ -163,7 +163,7 @@ const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig=
                         (outputAction.timerDuration ?
                             ` (${outputAction.timerDuration} secs)` :
                             ``)
-                            : ""}
+                        : ""}
                 </div>
         </div>
         }
