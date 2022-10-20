@@ -7,9 +7,12 @@ import { notificationsApi } from "../../../api/notifications";
 import toast from "react-hot-toast";
 
 
-const SMTPForm = ({SMTPInfo}) => {
+const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings}) => {
 
     const [disableSubmit, setDisableSubmit] = useState(false);
+    //change back later
+    const [isDisabled, setIsDisabled] = useState(!isEnableCustom)
+
 
     const onUsernameChange = (e) => {
         SMTPInfo.username = e.target.value;
@@ -39,12 +42,16 @@ const SMTPForm = ({SMTPInfo}) => {
             const res = await notificationsApi.updateEmail(SMTPInfo);
             if (res) { 
                 toast.success("Successfully saved Notification Settings");
+                getEmailSettings();
             }
         } catch {
             toast.error("Unable to save settings");
         }        
         setDisableSubmit(false);
     }
+
+
+
 
 
     return (
@@ -63,6 +70,7 @@ const SMTPForm = ({SMTPInfo}) => {
                             required
                             defaultValue={SMTPInfo.username}
                             onChange={onUsernameChange}
+                            disabled={isDisabled}
                             // helperText={ 
                             //     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
@@ -82,6 +90,7 @@ const SMTPForm = ({SMTPInfo}) => {
                             required
                             defaultValue={SMTPInfo.email}
                             onChange={onEmailChange}
+                            disabled={isDisabled}
                             // helperText={ 
                             //     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
@@ -101,6 +110,7 @@ const SMTPForm = ({SMTPInfo}) => {
                             required
                             defaultValue={SMTPInfo.emailPassword}
                             onChange={onEmailPasswordChange}
+                            disabled={isDisabled}
                             // helperText={ 
                             //     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
@@ -120,6 +130,7 @@ const SMTPForm = ({SMTPInfo}) => {
                             required
                             defaultValue={SMTPInfo.hostAddress}
                             onChange={onHostAddressChange}
+                            disabled={isDisabled}
                             // helperText={ 
                             //     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
@@ -139,6 +150,7 @@ const SMTPForm = ({SMTPInfo}) => {
                             required
                             defaultValue={SMTPInfo.portNumber}
                             onChange={onPortNumberChange}
+                            disabled={isDisabled}
                             // helperText={ 
                             //     (accessGroupNameBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
@@ -152,10 +164,13 @@ const SMTPForm = ({SMTPInfo}) => {
                         xs={8}>
                         <Grid container alignItems="center" justifyContent="flex-start">
                             <Grid item>
-                                <Button variant="contained" onClick={onSubmit}>Save Settings</Button>
+                                <Button variant="contained" onClick={onSubmit} disabled={isDisabled}>Save Settings</Button>
                             </Grid>
                             <Grid item sx={{mx:2}}>
                                 <Button variant="outlined">Test SMTP Email</Button>
+                            </Grid>
+                            <Grid>
+                            <Button variant="outlined" color="error" onClick={setToDefault} sx={{mr:3}}>Set to Default</Button>
                             </Grid>
                         </Grid>
                     </Grid>

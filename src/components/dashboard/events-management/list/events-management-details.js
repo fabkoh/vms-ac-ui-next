@@ -8,7 +8,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import BasicDetailsCard from '../../shared/basic-details-card';
 import { getAccessGroupDetailsLink, getAccessGroupLabel } from "../../../../utils/access-group";
 import { LockClosed } from '../../../../icons/lock-closed';
-import { displayEntranceOrController, eventActionInputText, eventActionOutputText } from '../../../../utils/eventsManagement';
+import { displayEntranceOrController, eventActionInputText, eventActionOutputText, listDescription } from '../../../../utils/eventsManagement';
 
 export const EventManagementDetails = (props) => {
   const { 
@@ -26,7 +26,6 @@ export const EventManagementDetails = (props) => {
 
   const align = mdUp ? 'horizontal' : 'vertical';
 
-  console.log(inputEvents)
   return (
     <BasicDetailsCard>
       <PropertyList>
@@ -54,6 +53,12 @@ export const EventManagementDetails = (props) => {
           label="Output Actions"
           value={outputActions ? eventActionOutputText(outputActions): ""}
         /> 
+        <PropertyListItem
+          align={align}
+          divider
+          label="Trigger Schedules"
+          value={triggerSchedules ? listDescription(props.eventManagement): ""}
+        /> 
                   {/* {
             accessGroup ? (
               <Link component="a">
@@ -72,27 +77,8 @@ export const EventManagementDetails = (props) => {
               </SeverityPill>
             )
           } */}
-        {/* <PropertyListItem
-          align={align}
-          divider
-          label="Trigger Schedules"
-          value={triggerSchedules}
-        /> */}
-        <PropertyListItem
-          align={align}
-          divider
-          label="Access group"
-        >
-        </PropertyListItem>
       </PropertyList>
     </BasicDetailsCard>
   );
 };
 
-EventManagementDetails.propTypes = {
-  personFirstName: PropTypes.string.isRequired,
-  personLastName: PropTypes.string.isRequired,
-  personUid: PropTypes.string.isRequired,
-  personMobileNumber: PropTypes.string,
-  personEmail: PropTypes.string
-};

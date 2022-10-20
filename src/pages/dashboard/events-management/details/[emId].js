@@ -28,6 +28,7 @@ import { serverDownCode } from '../../../../api/api-helpers';
 import {eventsManagementListLink} from '../../../../utils/eventsManagement'
 import {eventsManagementApi} from '../../../../api/events-management'
 import { EventManagementDetails } from '../../../../components/dashboard/events-management/list/events-management-details';
+import { EventManagementNotifDetails } from '../../../../components/dashboard/events-management/list/events-management-notif-details';
 
 const IndividualEventManagement = () => {
 
@@ -222,6 +223,16 @@ const IndividualEventManagement = () => {
           >
             <EventManagementDetails eventManagement={eventManagement} />
           </Grid>
+          {eventManagement.eventsManagementNotification ? 
+          eventManagement.eventsManagementNotification.map((e) => (
+            <Grid
+            item
+            xs={12}
+          >
+            <EventManagementNotifDetails eventManagementNotification={e}/>
+            </Grid>
+          ))
+          : null}
 			  </Grid>
 		  </Box>
 		</Container>
