@@ -21,7 +21,7 @@ import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
-const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditAccGrpSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         accessGroupScheduleId,
         accessGroupScheduleName,
@@ -33,6 +33,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     const {
         accessGroupScheduleNameBlank,
         timeEndInvalid,
+        beginInvalid,
         untilInvalid,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
@@ -83,11 +84,17 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         descriptionHandler(rule)
     }, [rrulestring,start,end])
     
-    //blocker for invalid until date
+    //blocker for invalid begin and until date
     const [untilHolder, setUntilHolder] = useState(false)
+
     const handleInvalidUntil = (bool) => {
         setUntilHolder(bool)
     }
+
+    const handleInvalidBegin = (bool) => {
+        checkBegin(bool)
+    }
+
     useEffect(() => {
         checkUntil(untilHolder)
     }, [untilHolder])
@@ -199,6 +206,7 @@ container>
                                     getEnd={getEnd}
                                     timeEndInvalid={timeEndInvalid}
                                     handleInvalidUntil={handleInvalidUntil}
+                                    handleInvalidBegin={handleInvalidBegin}
                                 />
                             </Grid>         
                             <Divider />

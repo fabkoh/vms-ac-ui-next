@@ -229,7 +229,7 @@ const ModifyEventManagement = () => {
     });
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
-        eventsManagementNameBlank: false,
+        eventsManagementNameBlank: true,
         eventsManagementInputEventsEmpty: false,
         eventsManagementInputEventsInvalidId: false,
         eventsManagementInputEventsConflict: false,
@@ -242,7 +242,8 @@ const ModifyEventManagement = () => {
         eventsManagementEmailRecipientsEmpty: false,
         eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,
-        timeStartInvalid:false,
+        timeStartInvalid:true,
+        beginInvalid:true,
         untilInvalid:false,
         submitFailed: false
     });
@@ -348,6 +349,13 @@ const ModifyEventManagement = () => {
         validation.untilInvalid = bool
         setEventsManagementValidationsArr(newValidations);
 
+    }
+
+    const checkAnyBeginForEventManagement = (id) => (bool) => {
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.beginInvalid = bool
+        setEventsManagementValidationsArr(newValidations);
     }
 
     const submitReplaceAll = () => {
@@ -1073,7 +1081,7 @@ const ModifyEventManagement = () => {
         }
         setEventsManagementValidationsArr(newValidations);
     }
-    
+    console.log(eventsManagementValidationsArr)
     return(
         <>
             <Head>
@@ -1210,6 +1218,7 @@ const ModifyEventManagement = () => {
                                         changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
                                         changeNameCheck={changeNameCheck}
                                         changeTriggerSchedules={changeTriggerSchedules}
+                                        checkAnyBeginForEventManagement={checkAnyBeginForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
@@ -1257,6 +1266,7 @@ const ModifyEventManagement = () => {
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
                                                 validation.eventsManagementInputEventsEmpty ||
@@ -1291,6 +1301,7 @@ const ModifyEventManagement = () => {
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
                                                 validation.eventsManagementInputEventsEmpty ||

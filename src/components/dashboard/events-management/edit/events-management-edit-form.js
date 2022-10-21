@@ -27,7 +27,7 @@ import { ContactSupportOutlined, Edit } from "@mui/icons-material";
 import { EmailEdit } from "../email-edit";
 import { SMSEdit } from "../sms-edit";
 
-const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,edit,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer, notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
+const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBeginForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer, notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
     const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
     const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
     const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
@@ -196,6 +196,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         timeStartInvalid: false,
         timeEndInvalid: false,
         untilInvalid: false,
+        beginInvalid: true,
     });
 
     const [triggerScheduleArr, setTriggerScheduleArr] = useState([getEmptyTriggerSchedule(0)]);
@@ -342,6 +343,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
     //get timestart timeend 
     const [start, setStart] = useState({})
     const [end, setEnd] = useState({})
+    const [beginHolderForEventManagement, setBeginHolderForEventManagement] = useState({})
     const [untilHolderForEventManagement, setUntilHolderForEventManagement] = useState({})
     const [startHolderForEventManagement, setStartHolderForEventManagement] = useState({})
     const [endHolderForEventManagement, setEndHolderForEventManagement] = useState({})
@@ -385,14 +387,23 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         const newValidations = [ ...triggerScheduleValidations ];
         const validation = newValidations.find(v => v.triggerScheduleId == triggerScheduleId);
         validation.untilInvalid = bool;
+        checkAnyBeginForEventManagement(bool)
         setUntilHolderForEventManagement({...untilHolderForEventManagement, [eventsManagementId]: bool})
+    }
+
+    const handleInvalidBegin = (triggerScheduleId) => (bool) => {
+        const newValidations = [ ...triggerScheduleValidations ];
+        const validation = newValidations.find(v => v.triggerScheduleId == triggerScheduleId);
+        validation.beginInvalid = bool;
+        checkAnyBeginForEventManagement(bool)
+        // setBeginHolderForEventManagement({...beginHolderForEventManagement, [eventsManagementId]: bool})
     }
 
     useEffect(() => {
         checkAnyUntilForEventManagement(untilHolderForEventManagement[eventsManagementId]);
         checkAnyTimeStartForEventManagement(startHolderForEventManagement[eventsManagementId]);
         checkAnyTimeEndForEventManagement(endHolderForEventManagement[eventsManagementId]);
-    }, [untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
+    }, [beginHolderForEventManagement, untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
 
     useEffect(() => {
         const inputEventsId = allInputEvents.map(event => event.eventActionInputId);
@@ -965,6 +976,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                                                 getEnd={getEnd(schedule.triggerScheduleId)}
                                                 timeEndInvalid={triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid}
                                                 handleInvalidUntil={handleInvalidUntil(schedule.triggerScheduleId)}
+                                                handleInvalidBegin={handleInvalidBegin(schedule.triggerScheduleId)}
                                             />
                                         </Grid>
                                         <Divider />
@@ -984,7 +996,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                             <Grid sx={{color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px"}}>
                                 {
                                     Boolean(eventsManagementTriggerSchedulesEmpty) && "Error: schedules cannot be empty" ||
-                                    Boolean(untilInvalid) && "Error: until is invalid" ||
+                                    // Boolean(untilInvalid) && "Error: until is invalid" ||
                                     Boolean(submitFailed) && "Error: submit failed" 
                                 }
                             </Grid>

@@ -34,6 +34,7 @@ const Rrule = (props) => {
 		getEnd,
 		timeEndInvalid,
 		handleInvalidUntil,
+		handleInvalidBegin,
 	} = props;
 
 	const [rule, setRule] = useState({
@@ -89,7 +90,7 @@ const Rrule = (props) => {
 	}, [rule,nonChangingRule])
 	
 	//handle dtstart
-	const [dtstart, setDtstart] = useState(new Date());
+	const [dtstart, setDtstart] = useState(false);
 	const handleDtstart = (e) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
@@ -97,6 +98,7 @@ const Rrule = (props) => {
 		// console.log("date",e.target.value)
 		// console.log("datetype",typeof(e.target.value))
 		setNonChangingRule((prevState) => ({ ...prevState, dtstart:dateobj }))
+		handleInvalidBegin(false)
 	};
 	//start of All Day toggle + renderer
 	const [allDay, setAllDay] = useState(true);
@@ -579,7 +581,9 @@ const Rrule = (props) => {
 			setNonChangingRule(prevState=>({...prevState,until:null,count:1}))
 		}
 		if(e.target.value == "on"){
-			setNonChangingRule(prevState=>({...prevState,count:null}))
+			setUntil("")
+			setNonChangingRule(prevState=>({...prevState,until:null,count:null}))
+			handleInvalidUntil(true)
 		}
 		if(e.target.value == "never"){
 			setUntil("")
@@ -593,10 +597,12 @@ const Rrule = (props) => {
 	const [until, setUntil] = useState()
 	const handleUntil = (e) => {
 		const dateobj = new Date(e.target.value)
-		if(dateobj<nonChangingRule.dtstart){
-			// console.warn("INVALID DATE")
-		}
-		// console.warn("this runs after")
+		handleInvalidUntil(false)
+		// if(dateobj<nonChangingRule.dtstart){
+			
+		// 	// console.warn("INVALID DATE")
+		// }
+		// // console.warn("this runs after")
 		setUntil(e.target.value)
 		setNonChangingRule(prevState=>({...prevState, until:dateobj}))
 	}
@@ -609,13 +615,16 @@ const Rrule = (props) => {
 	};
 	const invalidUntil = () => {
 		//if end options != "on" , setdelete block = false. else,     fn should be passed to handle end options
-		if(end=="on" && nonChangingRule.until<nonChangingRule.dtstart){
-			handleInvalidUntil(true)
+		if(end=="on" && nonChangingRule.until<=nonChangingRule.dtstart){
+			// handleInvalidUntil(true)
+			return true
+		}
+		else if(end=="on" && !nonChangingRule.until){
 			return true
 		}
 		//set delete block false
 		else{
-		handleInvalidUntil(false)
+		// handleInvalidUntil(false)
 		// console.log("this until is valid")
 		return false
 		}
@@ -661,7 +670,7 @@ const Rrule = (props) => {
 							min: startDate
 						}}						
 						error={invalidUntil()}
-						helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
+						helperText={invalidUntil() ?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								
 			);
 		}
