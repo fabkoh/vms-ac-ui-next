@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { validateEmail } from "../../../utils/utils";
 
 export const EmailEdit = (props) => {
-	const { open, handleDialogClose, changeEmail, emailRecipients, emailValue } = props;
+	const { open, handleDialogClose, changeEmail, emailRecipients, emailValue, defaultEmailTitle, defaultEmailContent } = props;
 
 	// closing actions
 	const handleClose = () => { 
@@ -40,18 +40,23 @@ export const EmailEdit = (props) => {
 	
 	const [notificationEmailsInputValue, setNotificationEmailsInputValue] = useState("");
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
-	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
-	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
+	const [notificationEmailContent, setNotificationEmailContent] = useState("");
+	const [notificationEmailTitle, setNotificationEmailTitle] = useState("");
 	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails);
 	const [isInvalidEmails, setIsInvalidEmails] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
 	useEffect(() => {
 		setNotificationEmailsRecipients(emailRecipients);
-		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
-		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		if (emailValue?.useDefaultEmails) {
+			setNotificationEmailContent(defaultEmailContent);
+			setNotificationEmailTitle(defaultEmailTitle);
+		} else {
+			setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
+			setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		}
 		setUseDefaultEmails(emailValue?.useDefaultEmails);
-	}, [emailRecipients, emailValue])
+	}, [emailRecipients, emailValue, defaultEmailContent, defaultEmailTitle])
 
 	return (
 		<>
@@ -151,8 +156,8 @@ export const EmailEdit = (props) => {
 							<FormControlLabel checked={useDefaultEmails}
 								onChange={(e) => {
 									if (e.target.checked) {
-										setNotificationEmailTitle("Event Management Triggered")
-										setNotificationEmailContent("An Event Management has been triggered.")
+										setNotificationEmailTitle(defaultEmailTitle)
+										setNotificationEmailContent(defaultEmailContent)
 									}
 									setUseDefaultEmails(e.target.checked)
 								}}

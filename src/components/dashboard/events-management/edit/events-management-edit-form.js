@@ -276,6 +276,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
         controller,
         inputEvents,
         outputActions,
+        eventsManagementDefaultTitle,
+        eventsManagementDefaultContent
     } = eventsManagementInfo;
 
     if (entrance) {
@@ -527,6 +529,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                     handleDialogClose={() => setNotificationEmailEditOpen(false)}
                     emailValue={notificationEmailsValue}
                     emailRecipients={notificationEmailsRecipients}
+                    defaultEmailTitle={eventsManagementDefaultTitle}
+                    defaultEmailContent={eventsManagementDefaultContent}
                     changeEmail={(newValue) => {
                         setNotificationEmailsRecipients(newValue.eventsManagementEmailRecipients);
                         changeNotificationEmails(newValue, eventsManagementId);
@@ -537,6 +541,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyTimeS
                     handleDialogClose={() => setNotificationSMSEditOpen(false)}
                     smsValue={notificationSMSsValue}
                     smsRecipients={notificationSMSsRecipients}
+                    defaultSMSContent={eventsManagementDefaultContent}
                     changeSMS={(newValue) => {
                         setNotificationSMSsRecipients(newValue.eventsManagementSMSRecipients);
                         changeNotificationSMSs(newValue, eventsManagementId);

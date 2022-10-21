@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import { validatePhoneNumber } from "../../../utils/utils";
 
 export const SMSEdit = (props) => {
-	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue } = props;
+	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue, defaultSMSContent } = props;
 
 	// submit action
 	const handleChangeSMS = (recipients, content, defaultSMS) => {
@@ -31,7 +31,7 @@ export const SMSEdit = (props) => {
 	
 	const [notificationSMSsInputValue, setNotificationSMSsInputValue] = useState("");
     const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(smsRecipients);
-	const [notificationSMSContent, setNotificationSMSContent] = useState(smsValue?.eventsManagementSMSContent);
+	const [notificationSMSContent, setNotificationSMSContent] = useState("");
 	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS);
 	const [isInvalidSMSs, setIsInvalidSMSs] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
@@ -45,9 +45,13 @@ export const SMSEdit = (props) => {
 	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
-		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		if (smsValue?.useDefaultSMS) {
+			setNotificationSMSContent(defaultSMSContent);
+		} else {
+			setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		}
 		setUseDefaultSMS(smsValue?.useDefaultSMS);
-	}, [smsRecipients, smsValue])
+	}, [smsRecipients, smsValue, defaultSMSContent])
 
 	return (
 		<>
@@ -139,7 +143,7 @@ export const SMSEdit = (props) => {
 							<FormControlLabel checked={useDefaultSMS}
 								onChange={(e) => {
 									if (e.target.checked) {
-										setNotificationSMSContent("An Event Management has been triggered.")
+										setNotificationSMSContent(defaultSMSContent);
 									}
 									setUseDefaultSMS(e.target.checked)
 								}}
