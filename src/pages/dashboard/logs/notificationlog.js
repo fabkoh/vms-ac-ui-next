@@ -18,17 +18,6 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 import { serverDownCode } from "../../../api/api-helpers";
 import { notificationLogsApi } from "../../../api/notifications-log";
 
-const FakeNotif = {
-    notificationTime: "10-14-2022 11:52:02",
-    eventsManagementId: 1,
-    eventsManagementName: "Enter door",
-    notificationType: "EMAIL",
-    notificationStatus: "Success",
-    title: "Test",
-    message: "Test2",
-    recipients: "random@gmail.com,random2@gmail.com"
-}
-
 // fix filter, check if can import utils 
 const NotificationStringFilterHelper = (notification, query) =>
                         query === ""  
@@ -118,6 +107,9 @@ const handlePageChange = async (e, newPage) => {
             if (isMounted())
                 setNotifications(Notifications.concat(data));
         } else
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             toast.error("Some error has occurred");
     }
 }
@@ -160,6 +152,9 @@ useEffect(
 const getInfo = useCallback(async() => {
     const notifsCountRes = await notificationLogsApi.getNotifsCount();
     if (notifsCountRes.status !== 200) {
+        if (res.status == serverDownCode) {
+            setServerDownOpen(true);
+        }
         toast.error("Failed to get total notifs count");
         return;
     }
