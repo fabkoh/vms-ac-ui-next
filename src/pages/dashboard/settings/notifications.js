@@ -1,5 +1,5 @@
 import { Add, ArrowBack } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, CardHeader, Collapse, Divider, Container, Link, Stack, Item, Table, TableRow, TableCell, TextField, Typography, Switch, Grid } from "@mui/material";
+import { Box, Button, Card, CardContent, CardHeader, Collapse, Divider, InputLabel, Container, Link, Stack, Item, Table, TableRow, TableCell, TextField, Typography, Switch, Grid, Radio, RadioGroup, FormControlLabel, FormControl, Select, MenuItem } from "@mui/material";
 import toast from "react-hot-toast";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -128,6 +128,7 @@ const NotificationSettings = () => {
                 setEmailSettings(settings);
                 setEnableCustom(settings.custom)
                 setIsUpdated(true)
+                console.log(settings)
             }
         } catch(err) {
             console.log(err);
@@ -171,6 +172,11 @@ const NotificationSettings = () => {
         emailSettings.emailPassword = e.target.value;
     }
 
+    const onProtocolchange = (e) => {
+        // emailSettings.hostAddress = e.target.value;
+        console.log(1234)
+    }
+
     const onHostAddressChange = (e) => {
         emailSettings.hostAddress = e.target.value;
     }
@@ -193,6 +199,19 @@ const NotificationSettings = () => {
             toast.error("Unable to save settings");
         }        
         setDisableSubmit(false);
+    }
+
+    const onSMTPTest = async(e) => {
+        e.preventDefault();
+        try {
+            // const res = await notificationsApi.updateEmail(emailSettings);
+            if (res) { 
+                toast.success("SMTP Test Successful");
+                getEmailSettings();
+            }
+        } catch {
+            toast.error("SMTP Test Failed");
+        }        
     }
 
     return (
@@ -253,14 +272,6 @@ const NotificationSettings = () => {
                                     </Grid>
                                     <ExpandMore expand={emailSettings}>
                                     </ExpandMore>
-                                        {/* {emailSettings && isUpdated &&
-                                            <SMTPForm
-                                                emailSettings={emailSettings}
-                                                isEnableCustom={enableCustom}
-                                                setToDefault={setToDefault}
-                                                getEmailSettings={getEmailSettings}
-                                            />
-                                        } */}
                                         {emailSettings && isUpdated &&
                                         <CardContent>
                                             <Grid
@@ -311,6 +322,30 @@ const NotificationSettings = () => {
                                                     item
                                                     xs={8}
                                                 >
+                                                    <FormControl required sx={{ maxWidth: "100%", minWidth: "100%"}}>
+                                                    <InputLabel id="protocol">Select Protocol</InputLabel>
+                                                    <Select
+                                                        disabled={!enableCustom}
+                                                        labeId="protocol"
+                                                        required={true}
+                                                        onChange={onProtocolchange}
+                                                        label="Select protocol *"
+                                                        value={emailSettings.isTLS ? "TLS" : "SSL"}
+                                                        name="Protocol"
+                                                    >
+                                                        <MenuItem value="SSL">
+                                                            SSL
+                                                        </MenuItem>
+                                                        <MenuItem value="TLS">
+                                                            TLS
+                                                        </MenuItem>
+                                                    </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid
+                                                    item
+                                                    xs={8}
+                                                >
                                                     <TextField
                                                         fullWidth
                                                         label="Host Address"
@@ -343,10 +378,10 @@ const NotificationSettings = () => {
                                                             <Button variant="contained" onClick={onSubmit} disabled={!enableCustom}>Save Settings</Button>
                                                         </Grid>
                                                         <Grid item sx={{mx:2}}>
-                                                            <Button variant="outlined">Test SMTP Email</Button>
+                                                            <Button variant="outlined" onClick={onSMTPTest}>Test SMTP Email</Button>
                                                         </Grid>
                                                         <Grid>
-                                                        <Button variant="outlined" color="error" onClick={setToDefault} sx={{mr:3}} >Set to Default</Button>
+                                                        <Button variant="outlined" color="error" onClick={setToDefault} >Set to Default</Button>
                                                         </Grid>
                                                     </Grid>
                                                 </Grid>
