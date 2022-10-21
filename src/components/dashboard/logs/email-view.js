@@ -10,28 +10,27 @@ import {
 	Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { validateEmail } from "../../../utils/utils";
 
-export const EmailEdit = (props) => {
-	const { open, handleDialogClose, emailRecipients, emailValue } = props;
+export const EmailView = (props) => {
+	const { open, handleDialogClose, emailRecipients, emailTitle, emailContent } = props;
 
 	// closing actions
 	const handleClose = () => { 
-		setNotificationEmailsRecipients(emailRecipients);
-		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
-		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		setNotificationEmailsRecipients([]);
+		setNotificationEmailContent("");
+		setNotificationEmailTitle("");
 		handleDialogClose();
 	}
 	
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
-	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
-	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
+	const [notificationEmailContent, setNotificationEmailContent] = useState(emailContent ?? "");
+	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailTitle ?? "");
 
 	useEffect(() => {
 		setNotificationEmailsRecipients(emailRecipients);
-		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
-		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
-	}, [emailRecipients, emailValue])
+		setNotificationEmailContent(emailContent);
+		setNotificationEmailTitle(emailTitle);
+	}, [emailRecipients, emailContent, emailTitle])
 
 	return (
 		<>
@@ -39,8 +38,6 @@ export const EmailEdit = (props) => {
 				fullWidth
     			maxWidth='lg'
 				open={open}
-				onClose={() => {/* do nothing */}}
-				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
                     <div style={{display: "flex", flexDirection: "row"}}>

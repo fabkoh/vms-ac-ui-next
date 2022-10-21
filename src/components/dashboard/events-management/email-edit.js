@@ -6,9 +6,8 @@ import {
 	DialogContent,
 	TextField,
 	Grid,
-	Input,
 	Chip,
-	Typography,
+	InputAdornment,
 	Switch,
 	FormControlLabel
 } from "@mui/material";
@@ -16,7 +15,7 @@ import { useState, useEffect } from "react";
 import { validateEmail } from "../../../utils/utils";
 
 export const EmailEdit = (props) => {
-	const { open, handleDialogClose, changeEmail, emailRecipients, emailValue } = props;
+	const { open, handleDialogClose, changeEmail, emailRecipients, emailValue, defaultEmailTitle, defaultEmailContent } = props;
 
 	// closing actions
 	const handleClose = () => { 
@@ -41,18 +40,23 @@ export const EmailEdit = (props) => {
 	
 	const [notificationEmailsInputValue, setNotificationEmailsInputValue] = useState("");
     const [notificationEmailsRecipients, setNotificationEmailsRecipients] = useState(emailRecipients);
-	const [notificationEmailContent, setNotificationEmailContent] = useState(emailValue?.eventsManagementEmailContent ?? "");
-	const [notificationEmailTitle, setNotificationEmailTitle] = useState(emailValue?.eventsManagementEmailTitle ?? "");
-	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails ?? false);
+	const [notificationEmailContent, setNotificationEmailContent] = useState("");
+	const [notificationEmailTitle, setNotificationEmailTitle] = useState("");
+	const [useDefaultEmails, setUseDefaultEmails] = useState(emailValue?.useDefaultEmails);
 	const [isInvalidEmails, setIsInvalidEmails] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
 	useEffect(() => {
 		setNotificationEmailsRecipients(emailRecipients);
-		setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
-		setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
-		setUseDefaultEmails(emailValue?.useDefaultEmails ?? false);
-	}, [emailRecipients, emailValue])
+		if (emailValue?.useDefaultEmails) {
+			setNotificationEmailContent(defaultEmailContent);
+			setNotificationEmailTitle(defaultEmailTitle);
+		} else {
+			setNotificationEmailContent(emailValue?.eventsManagementEmailContent);
+			setNotificationEmailTitle(emailValue?.eventsManagementEmailTitle);
+		}
+		setUseDefaultEmails(emailValue?.useDefaultEmails);
+	}, [emailRecipients, emailValue, defaultEmailContent, defaultEmailTitle])
 
 	return (
 		<>
@@ -64,74 +68,67 @@ export const EmailEdit = (props) => {
 				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
-                           <div style={{display: "flex", flexDirection: "row"}}>
-                                    <Grid item
-                                            mr={2}
-                                            mb={1}>
-                                    <Typography fontWeight="bold"
-                                        width={150}>Email Recipient(s):</Typography>
-                                </Grid>
-                                <div style={{width: "80%"}}>
-                                    {notificationEmailsRecipients.map((item, index) => (
-                                        <Chip key={index}
-                                            sx={{ mr: 1, mb: 1 }}
-                                            size="small"
-                                            onDelete={() => {
-                                                let arr = [...notificationEmailsRecipients]
-                                                arr.splice(index, 1)
-												setNotificationEmailsRecipients(arr);
-												if (arr.length == 0) {
-													setIsEmptyRecipients(true);
-												}
-												let isInvalid = false;
-												for (let j = 0; j < arr.length; j++) {
-													if (validateEmail(arr[j]) === null) {
-														isInvalid = true;
-													}
-												}
-												setIsInvalidEmails(isInvalid);
-                                            }}
-                                            label={item} />
-                                    ))}
-                                <Input
-                                        sx={{mr: 2}}
-                                        variant="standard"
-                                        label="Email Recipients"
-                                        value={notificationEmailsInputValue}
-                                        onChange={(e) => {
-                                            setNotificationEmailsInputValue(e.target.value);
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key == "Enter") {
-												const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
-												let isInvalid = false;
-												for (let j = 0; j < newNotificationEmailRecipients.length; j++) {
-													if (validateEmail(newNotificationEmailRecipients[j]) === null) {
-														isInvalid = true;
-													}
-												}
-												setIsInvalidEmails(isInvalid);
-												setIsEmptyRecipients(false);
-                                                setNotificationEmailsRecipients(newNotificationEmailRecipients);
-                                                setNotificationEmailsInputValue("");
-                                            }
-                                        }}
-							/>
-						</div>
-						<div style={{width: "13.1%"}}>
-							<FormControlLabel checked={useDefaultEmails}
-								onChange={(e) => {
-									if (e.target.checked) {
-										setNotificationEmailTitle("Event Management Triggered")
-										setNotificationEmailContent("An Event Management has been triggered.")
+					<TextField
+						fullWidth
+						sx={{mr: 2}}
+						label="Email Recipients"
+						value={notificationEmailsInputValue}
+						onChange={(e) => {
+							setNotificationEmailsInputValue(e.target.value);
+						}}
+						helperText={ 
+							(isEmptyRecipients && "Error: empty email recipients is not allowed") ||
+							(isInvalidEmails && "Error: invalid email recipient(s)")
+						}
+						error={ isEmptyRecipients || isInvalidEmails }
+						InputProps={{
+						sx: {height: 80},
+						startAdornment: (
+							<InputAdornment position="start"
+								sx={{ maxWidth: "65%", marginTop: 2, marginBottom: 1, scrollbarColor: "white"}}>
+							<div style={{display: "flex", overflowX: "scroll"}}>
+							{notificationEmailsRecipients.map((item, index) => (
+								<Chip key={index}
+									color={(validateEmail(item) === null) ? "error": "default"}
+									sx={{ mr: 1, mb: 1 }}
+									size="small"
+									onDelete={() => {
+										let arr = [...notificationEmailsRecipients]
+										arr.splice(index, 1)
+										setNotificationEmailsRecipients(arr);
+										if (arr.length == 0) {
+											setIsEmptyRecipients(true);
+										}
+										let isInvalid = false;
+										for (let j = 0; j < arr.length; j++) {
+											if (validateEmail(arr[j]) === null) {
+												isInvalid = true;
+											}
+										}
+										setIsInvalidEmails(isInvalid);
+									}}
+									label={item} />
+							))}
+							</div>
+						</InputAdornment>
+						),
+						}}
+						onKeyDown={(e) => {
+							if (e.key == "Enter") {
+								const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
+								let isInvalid = false;
+								for (let j = 0; j < newNotificationEmailRecipients.length; j++) {
+									if (validateEmail(newNotificationEmailRecipients[j]) === null) {
+										isInvalid = true;
 									}
-									setUseDefaultEmails(e.target.checked)
-								}}
-								control={<Switch defaultChecked />}
-								sx={{marginRight: 0}}
-								label="Use Default" />
-						</div>
-					</div>
+								}
+								setIsInvalidEmails(isInvalid);
+								setIsEmptyRecipients(false);
+								setNotificationEmailsRecipients(newNotificationEmailRecipients);
+								setNotificationEmailsInputValue("");
+							}
+						}}
+					/>
 					<TextField
 						sx={{ mt: 2 }}
 						value={notificationEmailTitle}
@@ -150,22 +147,33 @@ export const EmailEdit = (props) => {
 						disabled={useDefaultEmails}
 						fullWidth
 					/>
-						<Box display="flex"
-							justifyContent="flex-end"
-							mt={3}>
-							{(isEmptyRecipients || isInvalidEmails) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginRight: "12px", alignSelf: "center"}}>
-								{isEmptyRecipients && "Error: empty email recipients is not allowed" || isInvalidEmails && "Error: invalid email recipient(s)"}
-							</Grid>
-						}
+					<Box
+						display="flex"
+						justifyContent="flex-end"
+						flexWrap="wrap"
+						mt={3}>
+						<div>
+							<FormControlLabel checked={useDefaultEmails}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setNotificationEmailTitle(defaultEmailTitle)
+										setNotificationEmailContent(defaultEmailContent)
+									}
+									setUseDefaultEmails(e.target.checked)
+								}}
+								control={<Switch defaultChecked />}
+								sx={{marginBottom: 2}}
+								label="Use Default" />
+						</div>
+						<div style={{display: "flex", height:"fit-content"}}>
 							<Button
 								disabled={isInvalidEmails || isEmptyRecipients}
 								variant="contained"
-							sx={{ borderRadius: 8, marginRight: 1 }}
-							onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent, notificationEmailTitle, useDefaultEmails)}
+								sx={{ borderRadius: 8, marginRight: 1 }}
+								onClick={() => handleChangeEmail(notificationEmailsRecipients, notificationEmailContent, notificationEmailTitle, useDefaultEmails)}
 							>
 							Save	
 							</Button>
-
 							<Button
 								onClick={() => {
 									handleClose();
@@ -177,8 +185,9 @@ export const EmailEdit = (props) => {
 								sx={{ borderRadius: 8, color: "main.primary" }}
 							>
 								Cancel
-							</Button>		
-						</Box>		
+							</Button>
+						</div>
+					</Box>		
 				</DialogContent>
 			</Dialog>
 		</>

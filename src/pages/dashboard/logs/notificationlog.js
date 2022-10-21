@@ -5,11 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AuthGuard } from "../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
 import NotificationLogTable from "../../../components/dashboard/logs/notification-log-table";
-import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
-import { Upload } from "../../../icons/upload";
 import { gtm } from "../../../lib/gtm"
-import { eventslogsApi } from "../../../api/events";
 import { useMounted } from "../../../hooks/use-mounted";
 import { stringIn } from "../../../utils/utils";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
@@ -17,19 +14,19 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import toast from "react-hot-toast";
-import SingleSelect from "../../../components/dashboard/shared/single-select-input";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
+import { notificationLogsApi } from "../../../api/notifications-log";
 
 const FakeNotif = {
-    notificationTime: 1200,
-    eventsManagementId: 123,
-    eventsManagementName: "enter door",
-    notificationType: "email",
-    notificationStatus: "sucessful",
-    title: "test",
-    message: "test2",
-    recipients: "999"
+    notificationTime: "10-14-2022 11:52:02",
+    eventsManagementId: 1,
+    eventsManagementName: "Enter door",
+    notificationType: "EMAIL",
+    notificationStatus: "Success",
+    title: "Test",
+    message: "Test2",
+    recipients: "random@gmail.com,random2@gmail.com"
 }
 
 // fix filter, check if can import utils 
@@ -42,7 +39,7 @@ const NotificationStringFilterHelper = (notification, query) =>
                         // || (event.accessGroup &&stringIn(query,event.accessGroup.accessGroupName))
 
     
-const filterNotificationsbyString = (event, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
+const filterNotificationsbyString = (notification, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
 const applyFilter = createFilter({
     query: filterNotificationsbyString,
 })
@@ -103,55 +100,36 @@ const handleQueryChange = (e) => {
     };
 
 
-const [Events, setEvents] = useState([]);
+const [Notifications, setNotifications] = useState([]);
 
 console.log(filters)
-const [searchedEvents, setSearchedEvents] = useState([]);
-const filteredEvents = searchedEvents.length <= 0 ? applyDateTimeFilter(applyFilter(Events, filters),filterStart,filterEnd) : searchedEvents;
+const [searchedNotifications, setSearchedNotifications] = useState([]);
+const filteredNotifications = searchedNotifications.length <= 0 ? applyDateTimeFilter(applyFilter(Notifications, filters),filterStart,filterEnd) : searchedNotifications;
 
 // for pagination
 const [page, setPage] = useState(0);
 const handlePageChange = async (e, newPage) => {
     setPage(newPage);
-    if ((newPage + 1) * rowsPerPage >= filteredEvents.length && Events.length < eventsCount) {
-        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
+    if ((newPage + 1) * rowsPerPage >= filteredNotifications.length && Notifications.length < notifsCount) {
+        const res = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
 
         if (res.status == 200) {
             const data = await res.json();
             if (isMounted())
-                setEvents(Events.concat(data));
+                setNotifications(Notifications.concat(data));
         } else
             toast.error("Some error has occurred");
     }
 }
 const [rowsPerPage, setRowsPerPage] = useState(10);
 const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
-const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
-const [eventsCount, setEventsCount] = useState(0);
+const paginatedNotifications = applyPagination(filteredNotifications, page, rowsPerPage);
+const [notifsCount, setNotifsCount] = useState(0);
 const [serverDownOpen, setServerDownOpen] = useState(false);
-const [firstTimeCall, setFirstTimeCall] = useState(true);
-    
-// for polling 
-const [isPolling, setIsPolling] = useState(true);
-const [pollingTime, setPollingTime] = useState(5000);
-const pollingOptions = [
-    { "pollingDisplay" : 1, "pollingTime" : 1000},
-    { "pollingDisplay" : 2, "pollingTime" : 2000},
-    { "pollingDisplay" : 5, "pollingTime" : 5000},
-    { "pollingDisplay" : 10, "pollingTime" : 10000},
-    { "pollingDisplay" : 30, "pollingTime" : 30000},
-    { "pollingDisplay" : 60, "pollingTime" : 60000},
-
-]
-const getPollingDisplay = (e) => e.pollingDisplay
-const getPollingValue = (e) => e.pollingTime
-const onPollingTimeChange = (e) => {
-        setPollingTime(e.target.value)}
-
 
 const getNotifications = useCallback(async () => {
     try {
-        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
+        const res = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -159,83 +137,46 @@ const getNotifications = useCallback(async () => {
                 setNotifications(data);
             }
         } else {
+            if (res.status == serverDownCode) {
+                    setServerDownOpen(true);
+                }
+            toast.error("Error loading notification logs");
             setNotifications([]);
         }
     } catch (err) {
         toast.error("Some error has occurred");
     }
 }, [isMounted]);
-    
-const getEventsWithErrorPopUps = useCallback(async () => {
-    try {
-        //const data = await personApi.getFakePersons() 
-        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
-        
-        if (res.status === 200) {
-            const data = await res.json()
-            if (isMounted()) {
-                setEvents(data);
-            }
-        } else {
-            if (firstTimeCall) {
-                if (res.status == serverDownCode) {
-                    setServerDownOpen(true);
-                }
-                toast.error("Error loading event logs");
-                setFirstTimeCall(false);
-            }
-            setEvents([]);
-        }
-    } catch (err) {
-        toast.error("Some error has occurred");
-    }
-}, [isMounted]);
 
 
 useEffect(
     () => {
-        getEventsWithErrorPopUps()
+        getNotifications()
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
 );
 
-useEffect(
-    () => {
-        if (isPolling) {
-            console.log(pollingTime)
-            const timer = setInterval(() => {
-                getInfo();
-                
-            }    , pollingTime);
-            return () => clearInterval(timer)
-        }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isPolling, pollingTime]
-);
-
 const getInfo = useCallback(async() => {
-    const eventsCountRes = await eventslogsApi.getEventsCount();
-    if (eventsCountRes.status !== 200) {
-        toast.error("Failed To Get Total Events Count");
+    const notifsCountRes = await notificationLogsApi.getNotifsCount();
+    if (notifsCountRes.status !== 200) {
+        toast.error("Failed to get total notifs count");
         return;
     }
-    const eventsCountJson = await eventsCountRes.json();
-    setEventsCount(eventsCountJson);
-    if (Events.length < eventsCountRes) {
-        const eventsRes = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
-        if (eventsRes.status !== 200) {
-            toast.error("Failed To Refresh");
+    const notifsCountJson = await notifsCountRes.json();
+    setNotifsCount(notifsCountJson);
+    if (Notifications.length < notifsCountRes) {
+        const notifsRes = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
+        if (notifsRes.status !== 200) {
+            toast.error("Failed To fetch the next 500 notifications");
             return;
         }
-        const eventsJson = await eventsRes.json();
-        toast.success("Refresh Successfully");
+        const notifsJson = await notifsRes.json();
+        toast.success("Fetched notifications successfully");
     
         if (isMounted()){
-            setEvents(eventsJson);
-            console.log("Events Arr length is " + Events.length);
-            setIsPolling(true);
+            setNotifications(notifsJson);
+            console.log("Notifications arr length is " + Notifications.length);
         }
     }
 }, [isMounted]);
@@ -243,15 +184,14 @@ const getInfo = useCallback(async() => {
 const search = async() => {
     const start = filterStart ? new Date(filterStart.getTime() - filterStart.getTimezoneOffset() * 60000).toISOString() : null;
     const end = filterEnd ? new Date(filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000).toISOString() : null;
-    const eventsRes = await eventslogsApi.searchEvent(Math.floor(searchedEvents.length / 500), filters.query, start, end);
-    if (eventsRes.status !== 200) {
+    const notifsRes = await notificationLogsApi.searchNotifLogs(Math.floor(searchedNotifications.length / 500), filters.query, start, end);
+    if (notifsRes.status !== 200) {
         toast.error("Failed To Search");
         return;
     }
-    const eventsJson = await eventsRes.json();
+    const notifsJson = await notifsRes.json();
     toast.success("Search Successfully");
-    setIsPolling(false);
-    setSearchedEvents(eventsJson);
+    setSearchedNotifications(notifsJson);
 }
 
     return (
@@ -295,47 +235,6 @@ const search = async() => {
                         <Grid container
                             justifyContent="space-between"
                             spacing={3}>
-                        <Box
-                            sx={{
-                                m: 2.5,
-                                mt: 3
-                            }}
-                        >
-                            <Button startIcon={<Upload fontSize="small" />}
-                            sx={{m: 1}}>Import</Button>
-                            <Button startIcon={<Download fontSize="small" />}
-                            sx={{m: 1}}>Export</Button>
-                            <Tooltip
-                                title="Excel template can be found at {}"
-                                enterTouchDelay={0}
-                                placement="top"
-                                sx={{
-                                    m: -0.5,
-                                    mt: 3
-                                }}
-                            >
-                                <HelpOutline />
-                            </Tooltip>
-                            </Box>
-                            
-                            <Box
-                            sx={{
-                                m: 2.5,
-                                mt: 3,
-                                mr:7.5
-                            }}>
-                                <SingleSelect
-                                    label="seconds"
-                                    getLabel={getPollingDisplay}
-                                    onChange={onPollingTimeChange}
-                                    value={pollingTime}
-                                    options={pollingOptions}
-                                    getValue={getPollingValue}
-                                    noclear
-                                    required
-                                    helperText='Auto Refresh '
-                                />
-                            </Box>
                         
                         </Grid>
                     </Box>
@@ -427,9 +326,9 @@ const search = async() => {
                             rowsPerPage={rowsPerPage}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
-                            eventsCount={eventsCount}
+                            eventsCount={notifsCount}
                             // paginatedEvents
-                            logs={FakeNotif}
+                            logs={paginatedNotifications}
                         />
                     </Card>
                 </Container>

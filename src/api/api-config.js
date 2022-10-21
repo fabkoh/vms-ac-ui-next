@@ -268,4 +268,41 @@ const fakeOutputEvents = [
     "eventActionOutputConfig" : null
   }
 ]
-export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeSMSConfig, fakeEmailConfig, fakeEventsManagement, fakeInputEvents, fakeOutputEvents };
+
+const fakeNotifLogs = [
+    {
+        "notificationLogsId": 1,
+        "notificationLogsStatusCode": 200,
+        "notificationLogsError": "",
+        "timeSent": "2022-10-21T01:48Z",
+        "eventsManagementNotification": {
+            "eventsManagementNotificationId": 1,
+            "eventsManagementNotificationType": "EMAIL",
+            "eventsManagementNotificationRecipients": "alissayarmantho1@gmail.com",
+            "eventsManagementNotificationContent": "An Event Management has been triggered.",
+            "eventsManagementNotificationTitle": "Event Management Triggered",
+            "deleted": false,
+            "eventsManagement": {
+                "eventsManagementId": 1,
+                "eventsManagementName": "Random",
+                "inputEventsId": [
+                    1
+                ],
+                "outputActionsId": [
+                    1,
+                    2
+                ],
+                "triggerSchedules": [
+                    {
+                        "triggerScheduleId": 1,
+                        "triggerName": "0",
+                        "rrule": "DTSTART:20221021T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1;COUNT=1",
+                        "timeStart": "00:00",
+                        "timeEnd": "24:00"
+                    }
+                ]
+            }
+        }
+    }
+]
+export { apiUri, useApi, fakePersons, fakeAccessGroups, fakeEntrances, fakeAccessGroupEntranceNtoN ,fakeAccessGroupSchedule, fakeControllers, fakeAuthDevices, fakeVideoRecorders, fakeSMSConfig, fakeEmailConfig, fakeEventsManagement, fakeInputEvents, fakeOutputEvents, fakeNotifLogs};

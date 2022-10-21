@@ -34,6 +34,13 @@ const toDisplayDateString = (str) => {
         str.slice(11, 19)
     );
 };
+
+const toDisplayDate = (d) => {
+    let datestring = d.getDate()  + " " + (months[d.getMonth()+1]) + " " + d.getFullYear() + " " +
+    d.getHours() + ":" + d.getMinutes();
+    return datestring;
+};
+
 // takes in a raw date string eg 05-30-2022T13:09:14.372126 and converts to display date string eg 6 May 2022 13:09:14
 const toDisplayEventsDateString = (str) => {
     return (
@@ -61,5 +68,5 @@ const validatePhoneNumber = (phoneNumber) => {
     return false;
 }
 
-export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDateString,toDisplayEventsDateString, validateEmail, validatePhoneNumber }
+export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDate, toDisplayDateString,toDisplayEventsDateString, validateEmail, validatePhoneNumber }
 

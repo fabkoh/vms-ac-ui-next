@@ -6,9 +6,8 @@ import {
 	DialogContent,
 	TextField,
 	Grid,
-	Input,
 	Chip,
-	Typography,
+	InputAdornment,
 	FormControlLabel,
 	Switch
 
@@ -17,7 +16,7 @@ import { useState, useEffect } from "react";
 import { validatePhoneNumber } from "../../../utils/utils";
 
 export const SMSEdit = (props) => {
-	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue } = props;
+	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue, defaultSMSContent } = props;
 
 	// submit action
 	const handleChangeSMS = (recipients, content, defaultSMS) => {
@@ -32,8 +31,8 @@ export const SMSEdit = (props) => {
 	
 	const [notificationSMSsInputValue, setNotificationSMSsInputValue] = useState("");
     const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(smsRecipients);
-	const [notificationSMSContent, setNotificationSMSContent] = useState(smsValue?.eventsManagementSMSContent);
-	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS ?? false);
+	const [notificationSMSContent, setNotificationSMSContent] = useState("");
+	const [useDefaultSMS, setUseDefaultSMS] = useState(smsValue?.useDefaultSMS);
 	const [isInvalidSMSs, setIsInvalidSMSs] = useState(false);
 	const [isEmptyRecipients, setIsEmptyRecipients] = useState(false);
 
@@ -41,14 +40,18 @@ export const SMSEdit = (props) => {
 	const handleClose = () => { 
 		setNotificationSMSsRecipients(smsRecipients);
 		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
-		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
+		setUseDefaultSMS(smsValue?.useDefaultSMS);
 		handleDialogClose();
 	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
-		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
-		setUseDefaultSMS(smsValue?.useDefaultSMS ?? false);
-	}, [smsRecipients, smsValue])
+		if (smsValue?.useDefaultSMS) {
+			setNotificationSMSContent(defaultSMSContent);
+		} else {
+			setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		}
+		setUseDefaultSMS(smsValue?.useDefaultSMS);
+	}, [smsRecipients, smsValue, defaultSMSContent])
 
 	return (
 		<>
@@ -60,73 +63,67 @@ export const SMSEdit = (props) => {
 				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
-                           <div style={{display: "flex", flexDirection: "row"}}>
-                                    <Grid item
-                                            mr={2}
-                                            mb={1}>
-                                    <Typography fontWeight="bold"
-                                        width={150}>SMS Recipient(s):</Typography>
-                                </Grid>
-                                <div style={{width: "80%"}}>
-                                    {notificationSMSsRecipients.map((item, index) => (
-                                        <Chip key={index}
-                                            sx={{ mr: 1, mb: 1 }}
-                                            size="small"
-                                            onDelete={() => {
-                                                let arr = [...notificationSMSsRecipients]
-                                                arr.splice(index, 1)
-												setNotificationSMSsRecipients(arr);
-												if (arr.length == 0) {
-													setIsEmptyRecipients(true);
+					<TextField
+						fullWidth
+						sx={{mr: 2}}
+						label="SMS Recipients"
+						value={notificationSMSsInputValue}
+						onChange={(e) => {
+							setNotificationSMSsInputValue(e.target.value);
+						}}
+						helperText={ 
+							(isEmptyRecipients && "Error: empty SMS recipients is not allowed") ||
+							(isInvalidSMSs && "Error: invalid SMS recipient(s)")
+						}
+						error={ isEmptyRecipients || isInvalidSMSs }
+						InputProps={{
+						sx: {height: 80},
+						startAdornment: (
+							<InputAdornment position="start"
+								sx={{ maxWidth: "65%", marginTop: 2, marginBottom: 1, scrollbarColor: "white"}}>
+							<div style={{display: "flex", overflowX: "scroll"}}>
+								{notificationSMSsRecipients.map((item, index) => (
+									<Chip key={index}
+										sx={{ mr: 1, mb: 1 }}
+										color={(!validatePhoneNumber(item)) ? "error": "default"}
+										size="small"
+										onDelete={() => {
+											let arr = [...notificationSMSsRecipients]
+											arr.splice(index, 1)
+											setNotificationSMSsRecipients(arr);
+											if (arr.length == 0) {
+												setIsEmptyRecipients(true);
+											}
+											let isInvalid = false;
+											for (let j = 0; j < arr.length; j++) {
+												if (!validatePhoneNumber(arr[j])) {
+													isInvalid = true;
 												}
-												let isInvalid = false;
-												for (let j = 0; j < arr.length; j++) {
-													if (!validatePhoneNumber(arr[j])) {
-														isInvalid = true;
-													}
-												}
-												setIsInvalidSMSs(isInvalid);
-                                            }}
-                                            label={item} />
-                                    ))}
-                                <Input
-                                        sx={{mr: 2}}
-                                        variant="standard"
-                                        label="SMS Recipients"
-                                        value={notificationSMSsInputValue}
-                                        onChange={(e) => {
-                                            setNotificationSMSsInputValue(e.target.value);
-                                        }}
-                                        onKeyDown={(e) => {
-											if (e.key == "Enter") {
-												const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
-												let isInvalid = false;
-												for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
-													if (!validatePhoneNumber(newNotificationSMSRecipients[j])) {
-														isInvalid = true;
-													}
-												}
-												setIsInvalidSMSs(isInvalid);
-												setIsEmptyRecipients(false);
-                                                setNotificationSMSsRecipients(newNotificationSMSRecipients);
-                                                setNotificationSMSsInputValue("");
-                                            }
-                                        }}
-                                    />
-						</div>
-						<div style={{width: "13.1%"}}>
-							<FormControlLabel checked={useDefaultSMS}
-								onChange={(e) => {
-									if (e.target.checked) {
-										setNotificationSMSContent("An Event Management has been triggered.")
+											}
+											setIsInvalidSMSs(isInvalid);
+										}}
+										label={item} />
+								))}
+							</div>
+						</InputAdornment>
+						),
+						}}
+						onKeyDown={(e) => {
+							if (e.key == "Enter") {
+								const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
+								let isInvalid = false;
+								for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
+									if (!validatePhoneNumber(newNotificationSMSRecipients[j])) {
+										isInvalid = true;
 									}
-									setUseDefaultSMS(e.target.checked)
-								}}
-								control={<Switch defaultChecked />}
-								sx={{marginRight: 0}}
-								label="Use Default" />
-						</div>
-					</div>
+								}
+								setIsInvalidSMSs(isInvalid);
+								setIsEmptyRecipients(false);
+								setNotificationSMSsRecipients(newNotificationSMSRecipients);
+								setNotificationSMSsInputValue("");
+							}
+						}}
+					/>
 					<TextField
 						sx={{ mt: 2 }}
 						multiline
@@ -137,22 +134,33 @@ export const SMSEdit = (props) => {
 						disabled={useDefaultSMS}
 						fullWidth
 					/>
-						<Box display="flex"
-							justifyContent="flex-end"
-							mt={3}>
-							{(isEmptyRecipients || isInvalidSMSs) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginRight: "12px", alignSelf: "center"}}>
-								{isEmptyRecipients && "Error: empty SMS recipients is not allowed" || isInvalidSMSs && "Error: invalid SMS recipient(s)"}
-							</Grid>
-							}
+					<Box
+						display="flex"
+						justifyContent="flex-end"
+						flexWrap="wrap"
+						mt={3}>
+						<div>
+							<FormControlLabel checked={useDefaultSMS}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setNotificationSMSContent(defaultSMSContent);
+									}
+									setUseDefaultSMS(e.target.checked)
+								}}
+								control={<Switch defaultChecked />}
+								sx={{marginBottom: 2 }}
+								labelPlacement="right"
+								label="Use Default" />
+						</div>
+						<div style={{display: "flex", height:"fit-content"}}>
 							<Button
 								disabled={isInvalidSMSs || isEmptyRecipients}
 								variant="contained"
-							sx={{ borderRadius: 8, marginRight: 1 }}
-							onClick={() => handleChangeSMS(notificationSMSsRecipients, notificationSMSContent, useDefaultSMS)}
+								sx={{ borderRadius: 8, marginRight: 1 }}
+								onClick={() => handleChangeSMS(notificationSMSsRecipients, notificationSMSContent, useDefaultSMS)}
 							>
 							Save	
 							</Button>
-
 							<Button
 								onClick={() => {
 									handleClose();
@@ -164,8 +172,9 @@ export const SMSEdit = (props) => {
 								sx={{ borderRadius: 8, color: "main.primary" }}
 							>
 								Cancel
-							</Button>		
-						</Box>		
+							</Button>
+						</div>
+					</Box>		
 				</DialogContent>
 			</Dialog>
 		</>

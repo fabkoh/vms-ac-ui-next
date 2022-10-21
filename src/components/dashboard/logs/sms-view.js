@@ -10,24 +10,23 @@ import {
 	Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { validatePhoneNumber } from "../../../utils/utils";
 
-export const SMSEdit = (props) => {
-	const { open, handleDialogClose, smsRecipients, smsValue } = props;
+export const SMSView = (props) => {
+	const { open, handleDialogClose, smsRecipients, smsContent } = props;
 	
     const [notificationSMSsRecipients, setNotificationSMSsRecipients] = useState(smsRecipients);
-	const [notificationSMSContent, setNotificationSMSContent] = useState(smsValue?.eventsManagementSMSContent);
+	const [notificationSMSContent, setNotificationSMSContent] = useState(smsContent ?? "");
 
 	// closing actions
 	const handleClose = () => { 
-		setNotificationSMSsRecipients(smsRecipients);
-		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
+		setNotificationSMSsRecipients([]);
+		setNotificationSMSContent("");
 		handleDialogClose();
 	}
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
-		setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
-	}, [smsRecipients, smsValue])
+		setNotificationSMSContent(smsContent);
+	}, [smsRecipients, smsContent])
 
 	return (
 		<>
@@ -35,8 +34,6 @@ export const SMSEdit = (props) => {
 				fullWidth
     			maxWidth='lg'
 				open={open}
-				onClose={() => {/* do nothing */}}
-				onBackdropClick={() => {/* do nothing */}}
 			>
 				<DialogContent>
                     <div style={{display: "flex", flexDirection: "row"}}>

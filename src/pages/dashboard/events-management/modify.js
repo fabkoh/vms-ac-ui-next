@@ -226,6 +226,8 @@ const ModifyEventManagement = () => {
         outputActions: [],
         eventsManagementEmail: null,
         eventsManagementSMS: null,
+        eventsManagementDefaultTitle: "Event Management Triggered",
+        eventsManagementDefaultContent: "An Event Management has been triggered.",
     });
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
@@ -342,6 +344,7 @@ const ModifyEventManagement = () => {
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
+        updateEventManagementDefaultTitle();
     }
     const checkAnyUntilForEventManagement = (id) => (bool) => {
         const newValidations = [...eventsManagementValidationsArr];
@@ -364,11 +367,13 @@ const ModifyEventManagement = () => {
             if (res.status!=201){ 
                 (res.json()).then(data => {
                     const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
-                            // console.log(key, singleData))
-                            array.push(singleData))
-                    })
+                    if (data[0]) {
+                        Object.entries(data[0]).map(([key, value]) => {
+                            value.map(singleData =>
+                                // console.log(key, singleData))
+                                array.push(singleData))
+                        })
+                    }
                     setSingleErrorMessage(array)
                     handleErrorMessages(data)
                     // getClashingEventsManagement
@@ -387,8 +392,8 @@ const ModifyEventManagement = () => {
         let isOpeningNotificationDisabled = false;
         if (!fromNotificationDisabledSubmit) {
             getSMSEmailConfig();
-            hasEmailNotif = false;
-            hasSMSNotif = false;
+            let hasEmailNotif = false;
+            let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
                 if (i.eventsManagementEmail) {
                     hasEmailNotif = true;
@@ -418,28 +423,30 @@ const ModifyEventManagement = () => {
 
     }
 
-        const submitAddAll = () => {
-        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
-        .then(res =>{
-            if (res.status!=201){ 
-                (res.json()).then(data => {
-                    const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
+    const submitAddAll = () => {
+    Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
+        .then(res => {
+        if (res.status!=201){ 
+            (res.json()).then(data => {
+                const array = [];
+                if (data[0]) {
+                    Object.entries(data[0]).map(([key, value]) => {
+                        value.map(singleData =>
                             // console.log(key, singleData))
                             array.push(singleData))
-                    })
-                    setSingleErrorMessage(array)
-                    handleErrorMessages(data)
-                    // getClashingEventsManagement
-                })
-            }
-            else {
-                getSMSEmailConfig();
-                toast.success("Event managements successfully added")
-                router.replace(`/dashboard/events-management`)
-            }
-        }).finally(() => setAction(""))
+                    }) 
+                }
+                setSingleErrorMessage(array)
+                handleErrorMessages(data)
+                // getClashingEventsManagement
+            })
+        }
+        else {
+            getSMSEmailConfig();
+            toast.success("Event managements successfully added")
+            router.replace(`/dashboard/events-management`)
+        }
+    }).finally(() => setAction(""))
 
     }
     const addOn = (fromNotificationDisabledSubmit) => {
@@ -447,15 +454,14 @@ const ModifyEventManagement = () => {
         let isOpeningNotificationDisabled = false;
         if (!fromNotificationDisabledSubmit) {
             getSMSEmailConfig();
-            console.log("Hello2")
-            console.log("notificationdisabledOpen: ", notificationDisabledOpen, smsConfig.enabled, emailConfig.enabled)
             let hasEmailNotif = false;
             let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
-                if (i.eventsManagementEmail) {
+                let currEventManagement = eventsManagementInfoArr[i];
+                if (currEventManagement.eventsManagementEmail) {
                     hasEmailNotif = true;
                 }
-                if (i.eventsManagementSMS) {
+                if (currEventManagement.eventsManagementSMS) {
                     hasSMSNotif = true;
                 }
             }
@@ -467,6 +473,9 @@ const ModifyEventManagement = () => {
                 notifDisabledOpen = !emailConfig.enabled;
                 setNotificationDisabledOpen(notifDisabledOpen);
             } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                console.log("smsConfigEnabled: ", smsConfig.enabled, "emailConfigEnabled: ", emailConfig.enabled)
+                console.log("notifDisabledOpen: ", notifDisabledOpen)
                 notifDisabledOpen = !smsConfig.enabled;
                 setNotificationDisabledOpen(notifDisabledOpen);
             }
@@ -504,6 +513,35 @@ const ModifyEventManagement = () => {
         ))
     }
     const getEventActionOutputName = (e) => e.eventActionOutputName;
+
+    const updateEventManagementDefaultTitle = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            updatedInfo[i].eventsManagementDefaultTitle = "Event Management " + updatedInfo[i].eventsManagementName + " Triggered";
+            
+        }
+    }
+
+    const updateEventManagementDefaultContent = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            let inputStr = ""
+            for (let j = 0; j < currInputEvents.length; j++) {
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                if (currInputEvents[j].timerDuration) {
+                    inputStr += inputEventEntity.eventActionInputName + " for " + currInputEvents[j].timerDuration + " second(s), ";
+                } else {
+                    inputStr += inputEventEntity.eventActionInputName + ", "
+                }
+            }
+            let toBeAdded = inputStr == "" ? "..." : inputStr.substring(0, inputStr.length - 2);
+            updatedInfo[i].eventsManagementDefaultContent = "Event Management " + updatedInfo[i].eventsManagementName + " with the following triggers: " + toBeAdded + " has been triggered.";
+            
+        }
+    }
 
     const changeEntranceController = (newValue) => {
         setEntrancesControllers(newValue);
@@ -718,6 +756,7 @@ const ModifyEventManagement = () => {
         // }
 
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
         const updatedInfo = [...eventsManagementInfoArr];
@@ -841,6 +880,7 @@ const ModifyEventManagement = () => {
             validation.eventsManagementInputEventsInvalidId = false;
         }
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
 
     const changeOutputActionsWithTimer = (newValue, id) => {
@@ -1041,7 +1081,7 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementEmailRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle };
+        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
@@ -1064,7 +1104,7 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementSMSRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent };
+        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent, useDefaultSMS: newValue.useDefaultSMS };
         eventManagementToBeUpdated['eventsManagementSMS'] = newSMSValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationSMSs({ ...notificationEmails, [id]: newValue });
@@ -1310,7 +1350,11 @@ const ModifyEventManagement = () => {
                                                 validation.eventsManagementOutputActionsEmpty ||
                                                 validation.eventsManagementOutputActionsInvalidId ||
                                                 validation.eventsManagementOutputActionsConflict ||
-                                                validation.eventsManagementTriggerSchedulesEmpty
+                                                validation.eventsManagementTriggerSchedulesEmpty ||
+                                                validation.eventsManagementInvalidEmailRecipients ||
+                                                validation.eventsManagementInvalidSMSRecipients ||
+                                                validation.eventsManagementEmailRecipientsEmpty ||
+                                                validation.eventsManagementSMSRecipientsEmpty
                                             )
                                         }
                                     >
