@@ -165,7 +165,7 @@ const getInfo = useCallback(async() => {
     }
     const notifsCountJson = await notifsCountRes.json();
     setNotifsCount(notifsCountJson);
-    if (Notifications.length < notifsCountRes) {
+    if (Notifications.length < notifsCountJson) {
         const notifsRes = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
         if (notifsRes.status !== 200) {
             toast.error("Failed To fetch the next 500 notifications");
