@@ -113,7 +113,7 @@ const NotificationSettings = () => {
     const setToDefault = async() => {
         try {
             const res = await notificationsApi.backToDefault();
-            if (res.statusCode == 200){
+            if (res){
                 setEnableCustom(false)
                 setIsUpdated(false)
                 toast.success("Successfully set to Default");
