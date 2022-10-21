@@ -36,6 +36,9 @@ const toDisplayDateString = (str) => {
 };
 
 const toDisplayDate = (d) => {
+    if (isNaN(d)) {
+        return "No time specified";
+    }
     let datestring = d.getDate()  + " " + (months[d.getMonth()+1]) + " " + d.getFullYear() + " " +
     d.getHours() + ":" + d.getMinutes();
     return datestring;

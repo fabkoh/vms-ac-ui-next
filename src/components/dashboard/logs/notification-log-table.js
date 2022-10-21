@@ -55,27 +55,33 @@ const NotificationLogTable = ({
 
                                 {/* // insert icon for different types of eventtype  */}
                                 <TableCell>
-                                    <NextLink
-                                        href={getEventsManagementDetailsLink(log.eventsManagementNotification.eventsManagement.eventsManagementId)}
-                                        passHref
-                                    >
-                                        <Link color="inherit"
+                                    {log.eventsManagementNotification ?
+                                        <NextLink
+                                            href={getEventsManagementDetailsLink(log.eventsManagementNotification.eventsManagement.eventsManagementId)}
+                                            passHref
+                                        >
+                                            <Link color="inherit"
                                                 variant="subtitle2">
                                                 <Typography noWrap>
-                                                {log.eventsManagementNotification.eventsManagement.eventsManagementName}
+                                                    {log.eventsManagementNotification.eventsManagement.eventsManagementName}
                                                 </Typography>
-										</Link>
-                                    </NextLink>
+                                            </Link>
+                                        </NextLink>
+                                        : "No Event Management Linked"
+                                    }
                                 </TableCell>
-                                <TableCell>
-                                    {log.notificationLogsStatusCode != 200 ?
-                                        <Tooltip title={"Error code " + log.notificationLogsStatusCode.toString() + " : " + (log.notificationLogsError == "" ? "Not sent" : log.notificationLogsError)}>
-                                            <Chip color="error"
-                                                label={log.eventsManagementNotification.eventsManagementNotificationType} />
-                                    </Tooltip>
-                                : <Chip label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                {log.eventsManagementNotification ?
+                                    <TableCell>
+                                        {log.notificationLogsStatusCode != 200 ?
+                                            <Tooltip title={"Error code " + log.notificationLogsStatusCode.toString() + " : " + (log.notificationLogsError == "" ? "Not sent" : log.notificationLogsError)}>
+                                                <Chip color="error"
+                                                    label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                            </Tooltip>
+                                            : <Chip label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                        }
+                                    </TableCell> :
+                                    <TableCell>No Event Management Notification Linked</TableCell>
                                 }
-                                </TableCell>
                                 <TableCell>
                                     {log.eventsManagementNotification ?
                                         <div>
