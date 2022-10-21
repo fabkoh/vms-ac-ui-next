@@ -21,11 +21,9 @@ import { notificationLogsApi } from "../../../api/notifications-log";
 // fix filter, check if can import utils 
 const NotificationStringFilterHelper = (notification, query) =>
                         query === ""  
-                        // || (event.entrance && stringIn(query, event.entrance.entranceName)) 
-                        // || (event.controller &&stringIn(query, event.controller.controllerName)) 
-                        // || (event.eventActionType && stringIn(query, event.eventActionType.eventActionTypeName)) 
-                        // || (event.person &&stringIn(query, event.person.personFirstName+" "+event.person.personLastName))
-                        // || (event.accessGroup &&stringIn(query,event.accessGroup.accessGroupName))
+                        || (notification.eventsManagementNotification && stringIn(query, notification.eventsManagementNotification.eventsManagementNotificationType)) 
+                        || (notification.eventsManagementNotification && stringIn(query, notification.eventsManagementNotification.eventsManagementNotificationRecipients)) 
+                        || (notification.eventsManagementNotification && notification.eventsManagementNotification.eventsManagement && stringIn(query, notification.eventsManagementNotification.eventsManagement.eventsManagementName)) 
 
     
 const filterNotificationsbyString = (notification, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
@@ -282,7 +280,7 @@ const search = async() => {
                                     renderInput={(props) => <TextField {...props} />}
                                     label="Start Date Time"
                                     value={filterStart}
-                                    onChange={(e)=> {}}
+                                    onChange={handleStartDate}
                                     onAccept={handleStartDate}
                                 />
                             </LocalizationProvider>
@@ -293,8 +291,8 @@ const search = async() => {
                                 renderInput={(props) => <TextField {...props} />}
                                 label="End Date Time"
                                 value={filterEnd}
-                                onChange={(e)=> {}}
-                                    onAccept={handleEndDate}
+                                onChange={handleEndDate}
+                                onAccept={handleEndDate}
                                 />
                             </LocalizationProvider>
                             <span> &nbsp; &nbsp;</span>

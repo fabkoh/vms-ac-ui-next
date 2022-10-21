@@ -379,7 +379,7 @@ const search = async() => {
                                     renderInput={(props) => <TextField {...props} />}
                                     label="Start Date Time"
                                     value={filterStart}
-                                    onChange={(e)=> {}}
+                                    onChange={handleStartDate}
                                     onAccept={handleStartDate}
                                 />
                             </LocalizationProvider>
@@ -390,7 +390,7 @@ const search = async() => {
                                 renderInput={(props) => <TextField {...props} />}
                                 label="End Date Time"
                                 value={filterEnd}
-                                onChange={(e)=> {}}
+                                onChange={handleEndDate}
                                     onAccept={handleEndDate}
                                 />
                             </LocalizationProvider>
