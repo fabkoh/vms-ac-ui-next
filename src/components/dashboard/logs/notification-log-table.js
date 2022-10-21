@@ -1,16 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Button } from "@mui/material";
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Button, Tooltip, Chip, Link, Typography } from "@mui/material";
+import NextLink from 'next/link';
 import { Scrollbar } from "../../scrollbar";
-import { toDisplayEventsDateString } from "../../../utils/utils";
-import NextLink from "next/link";
-import { Card, CardHeader, Grid, Link, Divider, Chip, TextField, Box, InputAdornment, Typography, Collapse, IconButton } from "@mui/material";
-import MeetingRoom from "@mui/icons-material/MeetingRoom";
-import WarningChip from "../shared/warning-chip";
-import RenderTableCell from "../shared/renderTableCell";
-import { Person, SelectAll } from "@mui/icons-material";
-import { LockClosed } from "../../../icons/lock-closed";
+import { toDisplayDate } from "../../../utils/utils";
 import { EmailView } from "./email-view";
 import { SMSView } from "./sms-view";
 import { useState, useEffect } from "react";
+import {getEventsManagementDetailsLink} from "../../../utils/eventsManagement";
 
 const NotificationLogTable = ({
     page,
@@ -60,15 +55,31 @@ const NotificationLogTable = ({
 
                                 {/* // insert icon for different types of eventtype  */}
                                 <TableCell>
-                                    {log.eventsManagementName}
+                                    <NextLink
+                                        href={getEventsManagementDetailsLink(log.eventsManagementNotification.eventsManagement.eventsManagementId)}
+                                        passHref
+                                    >
+                                        <Link color="inherit"
+                                                variant="subtitle2">
+                                                <Typography noWrap>
+                                                {log.eventsManagementNotification.eventsManagement.eventsManagementName}
+                                                </Typography>
+										</Link>
+                                    </NextLink>
                                 </TableCell>
                                 <TableCell>
-                                    <Chip label={log.notificationType} />
+                                    {log.notificationLogsStatusCode != 200 ?
+                                        <Tooltip title={"Error code " + log.notificationLogsStatusCode.toString() + " : " + (log.notificationLogsError == "" ? "Not sent" : log.notificationLogsError)}>
+                                            <Chip color="error"
+                                                label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                    </Tooltip>
+                                : <Chip label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                }
                                 </TableCell>
                                 <TableCell>
-                                    {log.recipients ?
+                                    {log.eventsManagementNotification ?
                                         <div>
-                                            {log.recipients.split(",").map((recipient, i) => (
+                                            {log.eventsManagementNotification.eventsManagementNotificationRecipients.split(",").map((recipient, i) => (
                                                 <Chip
                                                     sx={{ marginRight: 1 }}
                                                     key={`recipient${i}`}
@@ -81,14 +92,14 @@ const NotificationLogTable = ({
                                                 variant="text"
                                                 sx={{ m: 1, mr: 5 }}
                                                 onClick={() => {
-                                                    if (log.notificationType == "EMAIL") {
-                                                        setEmailRecipients(log.recipients.split(","));
-                                                        setEmailTitle(log.title);
-                                                        setEmailContent(log.content);
+                                                    if (log.eventsManagementNotification.eventsManagementNotificationType == "EMAIL") {
+                                                        setEmailRecipients(log.eventsManagementNotification.eventsManagementNotificationRecipients.split(","));
+                                                        setEmailTitle(log.eventsManagementNotification.eventsManagementNotificationTitle);
+                                                        setEmailContent(log.eventsManagementNotification.eventsManagementNotificationContent);
                                                         setEmailOpen(true);
-                                                    } else if (log.notificationType == "SMS") {
-                                                        setSMSRecipients(log.recipients.split(","));
-                                                        setSMSContent(log.content);
+                                                    } else if (log.eventsManagementNotification.eventsManagementNotificationType == "SMS") {
+                                                        setSMSRecipients(log.eventsManagementNotification.eventsManagementNotificationRecipients.split(","));
+                                                        setSMSContent(log.eventsManagementNotification.eventsManagementNotificationContent);
                                                         setSMSOpen(true);
                                                     }
                                                 }}
@@ -100,7 +111,7 @@ const NotificationLogTable = ({
                                     }
                                 </TableCell>
                                 <TableCell>
-                                    {toDisplayEventsDateString(log.notificationTime)}
+                                    {toDisplayDate(new Date(Date.parse(log.timeSent)))}
                                 </TableCell>
                             </TableRow>
                         ))

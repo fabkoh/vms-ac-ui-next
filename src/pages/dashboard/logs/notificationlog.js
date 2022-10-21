@@ -39,7 +39,7 @@ const NotificationStringFilterHelper = (notification, query) =>
                         // || (event.accessGroup &&stringIn(query,event.accessGroup.accessGroupName))
 
     
-const filterNotificationsbyString = (event, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
+const filterNotificationsbyString = (notification, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
 const applyFilter = createFilter({
     query: filterNotificationsbyString,
 })
@@ -328,7 +328,7 @@ const search = async() => {
                             onRowsPerPageChange={handleRowsPerPageChange}
                             eventsCount={notifsCount}
                             // paginatedEvents
-                            logs={[FakeNotif]}
+                            logs={paginatedNotifications}
                         />
                     </Card>
                 </Container>
