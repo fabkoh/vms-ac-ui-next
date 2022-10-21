@@ -27,22 +27,19 @@ export const JWTLogin = (props) => {
         .required('Password is required')
     }),
     onSubmit: async (values, helpers) => {
-      try {
-        await login(values.email, values.password);
-
+      const res = await login(values.email, values.password);
+      if(res.type === "success"){
         if (isMounted()) {
           const returnUrl = router.query.returnUrl || '/dashboard';
           router.push(returnUrl);
         }
-      } catch (err) {
-        console.error(err);
-
-        if (isMounted()) {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: err.message });
-          helpers.setSubmitting(false);
-        }
       }
+      else {
+        helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: res.response.message });
+        helpers.setSubmitting(false);
+      }
+      
     }
   });
 
