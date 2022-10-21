@@ -350,7 +350,9 @@ const ControllerList = () => {
 }
 
 ControllerList.getLayout = (page) => (
-    <AuthGuard>
+    // follow this for all the pages where role based authorization has to be performed
+    // add the page props so that authguard can perform the check along with checking the roles
+    <AuthGuard page={"Controllers"}>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );

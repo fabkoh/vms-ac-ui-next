@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/use-auth';
 
 export const AuthGuard = (props) => {
   const { children } = props;
+  const { user } = useAuth;
   const auth = useAuth();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
@@ -18,8 +19,18 @@ export const AuthGuard = (props) => {
         router.push({
           pathname: '/authentication/login',
           query: { returnUrl: router.asPath }
-        });
+        });    
       } else {
+        // add a condition to check the page and roles allowed to access
+        
+        // if any of the given role is not present redirect back  
+        if(props.page==='Controllers' && user && !( 
+            user.authorities.includes("ROLE_SYSTEM_ADMIN") || 
+            user.authorities.includes("ROLE_TECH_ADMIN")) ) 
+        {
+          router.back();        
+        }
+        // else go forward
         setChecked(true);
       }
     },
