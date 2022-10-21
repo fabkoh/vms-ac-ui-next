@@ -53,6 +53,7 @@ class NotificationsApi {
         emailPassword,
         hostAddress,
         portNumber,
+        isTLS,
         enabled
     }) {
         if (useApi) {
@@ -68,13 +69,44 @@ class NotificationsApi {
                     emailPassword,
                     hostAddress,
                     portNumber,
+                    isTLS,
                     enabled
                 })
             });
         }
     }
 
-    
+    testSMTP({
+        emailSettingsId,
+        username,
+        email,
+        emailPassword,
+        hostAddress,
+        portNumber,
+        enabled,
+        isTLS,
+        custom
+    }) {
+        if (useApi) {
+            return sendApi('/api/notification/testSMTP', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    emailSettingsId,
+                    username,
+                    email,
+                    emailPassword,
+                    hostAddress,
+                    portNumber,
+                    enabled,
+                    isTLS,
+                    custom
+                })
+            });
+        }
+    }    
 
 }
 
