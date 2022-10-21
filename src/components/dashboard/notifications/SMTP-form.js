@@ -7,7 +7,7 @@ import { notificationsApi } from "../../../api/notifications";
 import toast from "react-hot-toast";
 
 
-const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings}) => {
+const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings, testSMTP}) => {
 
     const [disableSubmit, setDisableSubmit] = useState(false);
     //change back later
@@ -62,7 +62,8 @@ const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings}) =>
                     spacing={3}
                     fluid
                 >
-                    <Grid item xs={8}>
+                    <Grid item
+xs={8}>
                         <TextField
                             fullWidth
                             label="Username"
@@ -162,15 +163,24 @@ const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings}) =>
                     <Grid
                         item
                         xs={8}>
-                        <Grid container alignItems="center" justifyContent="flex-start">
+                        <Grid container
+alignItems="center"
+justifyContent="flex-start">
                             <Grid item>
-                                <Button variant="contained" onClick={onSubmit} disabled={isDisabled}>Save Settings</Button>
+                                <Button variant="contained"
+onClick={onSubmit}
+disabled={isDisabled}>Save Settings</Button>
                             </Grid>
-                            <Grid item sx={{mx:2}}>
-                                <Button variant="outlined">Test SMTP Email</Button>
+                            <Grid item
+sx={{mx:2}}>
+                                <Button variant="outlined"
+onClick={testSMTP}>Test SMTP Email</Button>
                             </Grid>
                             <Grid>
-                            <Button variant="outlined" color="error" onClick={setToDefault} sx={{mr:3}}>Set to Default</Button>
+                            <Button variant="outlined"
+color="error"
+onClick={setToDefault}
+sx={{mr:3}}>Set to Default</Button>
                             </Grid>
                         </Grid>
                     </Grid>
