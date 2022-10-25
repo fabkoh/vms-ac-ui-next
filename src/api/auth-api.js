@@ -44,7 +44,7 @@ const createAuthRequest = async (path, data) => {
 
 export const authRenewToken = async() => {
     const res = await createAuthRequest("api/auth/refreshtoken", { refreshToken: sessionStorage.getItem("refreshToken") });
-    if(res.type === "success") { localStorage.removeItem("accessToken"); }
+    if(res.type === "success") { localStorage.setItem("accessToken", res.response.accessToken); }
 }
 
 
