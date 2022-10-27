@@ -96,7 +96,7 @@ const NotificationSettings = () => {
         try {
             const res = await notificationsApi.changeEmailEnablement(!enableEmail);
             if (enableEmail){
-                toast.success("Email Notifications Deactivated");
+                toast.success("Successfully deactivated Email Notifications");
             } 
             getEmailEnablementStatus()
             setEnableCustom(false);   
@@ -110,7 +110,7 @@ const NotificationSettings = () => {
         try {
             const res = await notificationsApi.changeSMSEnablement(!enableSMS);
             if (enableSMS){
-                toast.success("SMS Notifications Deactivated");
+                toast.success("Successfully deactivated SMS Notifications");
             } 
             getSMSEnablementStatus()
         } catch(err) {
