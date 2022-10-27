@@ -95,15 +95,23 @@ const NotificationSettings = () => {
     const changeEmailEnablementStatus = async() => {
         try {
             const res = await notificationsApi.changeEmailEnablement(!enableEmail);
+            if (enableEmail){
+                toast.success("Email Notifications Deactivated");
+            } 
             getEmailEnablementStatus()
+            setEnableCustom(false);   
         } catch(err) {
             console.log(err);
             }
+        
     }
 
     const changeSMSEnablementStatus = async() => {
         try {
             const res = await notificationsApi.changeSMSEnablement(!enableSMS);
+            if (enableSMS){
+                toast.success("SMS Notifications Deactivated");
+            } 
             getSMSEnablementStatus()
         } catch(err) {
             console.log(err);
@@ -335,7 +343,7 @@ const NotificationSettings = () => {
                                                 <Grid item
                                                         xs={8}>
                                                         <FormControl>
-                                                        <FormLabel id="tls-or-ssl">SMTP Type</FormLabel>
+                                                        <FormLabel id="tls-or-ssl">SMTP Protocol</FormLabel>
                                                             <RadioGroup
                                                                 row
                                                                 aria-labelledby="tls-or-ssl"
@@ -393,12 +401,8 @@ const NotificationSettings = () => {
                                                         defaultValue={emailSettings.emailPassword}
                                                         onChange={onEmailPasswordChange}
                                                         disabled={!enableCustom}
+                                                        type="password"
                                                     />
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={8}
-                                                >
                                                 </Grid>
                                                 <Grid
                                                     item
