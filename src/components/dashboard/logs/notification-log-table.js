@@ -6,6 +6,7 @@ import { EmailView } from "./email-view";
 import { SMSView } from "./sms-view";
 import { useState, useEffect } from "react";
 import {getEventsManagementDetailsLink} from "../../../utils/eventsManagement";
+import { ErrorPopUp } from "../errors/error-popup";
 
 const NotificationLogTable = ({
     page,
@@ -21,6 +22,9 @@ const NotificationLogTable = ({
     const [emailContent, setEmailContent] = useState("");
     const [emailRecipients, setEmailRecipients] = useState([]);
     const [emailTitle, setEmailTitle] = useState("");
+    const [errMsg, setErrMsg] = useState("");
+    const [errOpen, setErrOpen] = useState(false);
+
     return (<div>
         <EmailView
             open={emailOpen}
@@ -34,6 +38,11 @@ const NotificationLogTable = ({
             handleDialogClose={() =>{setSMSOpen(false)}}
             smsRecipients={smsRecipients}
             smsContent={smsContent}
+        />
+        <ErrorPopUp
+            open={errOpen}
+            handleDialogClose={() => { setErrOpen(false) }}
+            errorMessage={errMsg}
         />
         <Scrollbar>
             <Table sx={{ minWidth: 700 }}>
@@ -73,10 +82,23 @@ const NotificationLogTable = ({
                                 {log.eventsManagementNotification ?
                                     <TableCell>
                                         {log.notificationLogsStatusCode != 200 ?
-                                            <Tooltip title={"Error code " + log.notificationLogsStatusCode.toString() + " : " + (log.notificationLogsError == "" ? "Not sent" : log.notificationLogsError)}>
-                                                <Chip color="error"
-                                                    label={log.eventsManagementNotification.eventsManagementNotificationType} />
-                                            </Tooltip>
+                                            <div>
+                                                <Tooltip title="Error: notification not sent">
+                                                    <Chip color="error"
+                                                        label={log.eventsManagementNotification.eventsManagementNotificationType} />
+                                                </Tooltip>
+                                                <Button
+                                                        size="small"
+                                                        variant="text"
+                                                        sx={{ m: 1, mr: 5 }}
+                                                        onClick={() => {
+                                                            setErrMsg(log.notificationLogsError);
+                                                            setErrOpen(true);
+                                                        }}
+                                                >
+                                                See Error
+                                                </Button>
+                                            </div>
                                             : <Chip label={log.eventsManagementNotification.eventsManagementNotificationType} />
                                         }
                                     </TableCell> :

@@ -16,7 +16,7 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 import ExpandMore from "../../../components/dashboard/shared/expand-more";
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import SMTPForm from "../../../components/dashboard/notifications/SMTP-form"
-import { ErrorPopUp } from "../../../components/dashboard/notifications/error-popup";
+import { ErrorPopUp } from "../../../components/dashboard/errors/error-popup";
 
 
 const NotificationSettings = () => {
@@ -397,6 +397,7 @@ const NotificationSettings = () => {
                                                         fullWidth
                                                         label="Password"
                                                         name="Password"
+                                                        type="password"
                                                         required
                                                         defaultValue={emailSettings.emailPassword}
                                                         onChange={onEmailPasswordChange}

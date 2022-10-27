@@ -520,6 +520,7 @@ const ModifyEventManagement = () => {
             updatedInfo[i].eventsManagementDefaultTitle = "Event Management " + updatedInfo[i].eventsManagementName + " Triggered";
             
         }
+        setEventsManagementInfoArr(updatedInfo);
     }
 
     const updateEventManagementDefaultContent = () => {
@@ -541,6 +542,7 @@ const ModifyEventManagement = () => {
             updatedInfo[i].eventsManagementDefaultContent = "Event Management " + updatedInfo[i].eventsManagementName + " with the following triggers: " + toBeAdded + " has been triggered.";
             
         }
+        setEventsManagementInfoArr(updatedInfo);
     }
 
     const changeEntranceController = (newValue) => {
@@ -759,8 +761,11 @@ const ModifyEventManagement = () => {
         updateEventManagementDefaultContent();
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
-        const updatedInfo = [...eventsManagementInfoArr];
-        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        updateEventManagementDefaultContent();
+        updateEventManagementDefaultTitle();
+
+        let updatedInfo = [...eventsManagementInfoArr];
+        let eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
         let hasNotificationEmailsOutput = false;
         let hasNotificationSMSsOutput = false;
@@ -785,6 +790,7 @@ const ModifyEventManagement = () => {
         }
         newOutputActions.push(...newValueMapped);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
+
         if (!hasNotificationEmailsOutput) {
             eventManagementToBeUpdated['eventsManagementEmail'] = null;
             let newNotificationEmails = { ...notificationEmails };
@@ -795,14 +801,14 @@ const ModifyEventManagement = () => {
                 eventManagementToBeUpdated['eventsManagementEmail'] = '';
                 eventManagementToBeUpdated['eventsManagementEmail'] = {
                     eventsManagementEmailRecipients: "",
-                    eventsManagementEmailContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered"
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle
                 };
                 let newNotificationEmails = { ...notificationEmails };
                 newNotificationEmails[id] = {
                     eventsManagementEmailRecipients: [],
-                    eventsManagementEmailContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered",
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle,
                     useDefaultEmails: true
                 };
                 setNotificationEmails(newNotificationEmails);
@@ -817,12 +823,12 @@ const ModifyEventManagement = () => {
             if (eventManagementToBeUpdated['eventsManagementSMS'] === null) {
                 eventManagementToBeUpdated['eventsManagementSMS'] = {
                     eventsManagementSMSRecipients: "",
-                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
                 };
                 let newNotificationSMSs = { ...notificationSMSs };
                 newNotificationSMSs[id] = {
                     eventsManagementSMSRecipients: [],
-                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
                     useDefaultSMS: true
                 };
                 setNotificationSMSs(newNotificationSMSs);

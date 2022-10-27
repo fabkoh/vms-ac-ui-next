@@ -39,8 +39,18 @@ const toDisplayDate = (d) => {
     if (isNaN(d)) {
         return "No time specified";
     }
-    let datestring = d.getDate()  + " " + (months[d.getMonth()+1]) + " " + d.getFullYear() + " " +
-    d.getHours() + ":" + d.getMinutes();
+    let datestring = d.getDate()  + " " + (months[d.getMonth()+1]) + " " + d.getFullYear() + " ";
+    if (d.getHours() < 10) {
+        datestring += "0" + d.getHours();
+    } else {
+        datestring += d.getHours();
+    }
+    datestring += ":";
+    if (d.getMinutes() < 10) {
+        datestring += "0" + d.getMinutes();
+    } else {
+        datestring += d.getMinutes();
+    }
     return datestring;
 };
 

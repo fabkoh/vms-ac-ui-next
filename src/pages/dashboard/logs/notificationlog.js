@@ -18,25 +18,12 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 import { serverDownCode } from "../../../api/api-helpers";
 import { notificationLogsApi } from "../../../api/notifications-log";
 
-const FakeNotif = {
-    notificationTime: "10-14-2022 11:52:02",
-    eventsManagementId: 1,
-    eventsManagementName: "Enter door",
-    notificationType: "EMAIL",
-    notificationStatus: "Success",
-    title: "Test",
-    message: "Test2",
-    recipients: "random@gmail.com,random2@gmail.com"
-}
-
 // fix filter, check if can import utils 
 const NotificationStringFilterHelper = (notification, query) =>
                         query === ""  
-                        // || (event.entrance && stringIn(query, event.entrance.entranceName)) 
-                        // || (event.controller &&stringIn(query, event.controller.controllerName)) 
-                        // || (event.eventActionType && stringIn(query, event.eventActionType.eventActionTypeName)) 
-                        // || (event.person &&stringIn(query, event.person.personFirstName+" "+event.person.personLastName))
-                        // || (event.accessGroup &&stringIn(query,event.accessGroup.accessGroupName))
+                        || (notification.eventsManagementNotification && stringIn(query, notification.eventsManagementNotification.eventsManagementNotificationType)) 
+                        || (notification.eventsManagementNotification && stringIn(query, notification.eventsManagementNotification.eventsManagementNotificationRecipients)) 
+                        || (notification.eventsManagementNotification && notification.eventsManagementNotification.eventsManagement && stringIn(query, notification.eventsManagementNotification.eventsManagement.eventsManagementName)) 
 
     
 const filterNotificationsbyString = (notification, queryString) => NotificationStringFilterHelper(notification, queryString.toLowerCase());
@@ -118,6 +105,9 @@ const handlePageChange = async (e, newPage) => {
             if (isMounted())
                 setNotifications(Notifications.concat(data));
         } else
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
             toast.error("Some error has occurred");
     }
 }
@@ -160,12 +150,15 @@ useEffect(
 const getInfo = useCallback(async() => {
     const notifsCountRes = await notificationLogsApi.getNotifsCount();
     if (notifsCountRes.status !== 200) {
+        if (res.status == serverDownCode) {
+            setServerDownOpen(true);
+        }
         toast.error("Failed to get total notifs count");
         return;
     }
     const notifsCountJson = await notifsCountRes.json();
     setNotifsCount(notifsCountJson);
-    if (Notifications.length < notifsCountRes) {
+    if (Notifications.length < notifsCountJson) {
         const notifsRes = await notificationLogsApi.getNotifLogs(Math.floor(Notifications.length / 500));
         if (notifsRes.status !== 200) {
             toast.error("Failed To fetch the next 500 notifications");
@@ -287,7 +280,7 @@ const search = async() => {
                                     renderInput={(props) => <TextField {...props} />}
                                     label="Start Date Time"
                                     value={filterStart}
-                                    onChange={(e)=> {}}
+                                    onChange={handleStartDate}
                                     onAccept={handleStartDate}
                                 />
                             </LocalizationProvider>
@@ -298,8 +291,8 @@ const search = async() => {
                                 renderInput={(props) => <TextField {...props} />}
                                 label="End Date Time"
                                 value={filterEnd}
-                                onChange={(e)=> {}}
-                                    onAccept={handleEndDate}
+                                onChange={handleEndDate}
+                                onAccept={handleEndDate}
                                 />
                             </LocalizationProvider>
                             <span> &nbsp; &nbsp;</span>
