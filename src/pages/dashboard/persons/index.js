@@ -53,6 +53,17 @@ const headers = [
   {label: "Access Group", key: "accessGroup"},
 ];
 
+const headersTemplate = [
+	{ label: "First Name", key: "firstName" },
+	{ label: "Last Name", key: "lastName" },
+	{ label: "UID", key: "uid" },
+	{ label: "Email", key: "email" },
+	{ label: "Mobile Number", key: "mobileNumber" },
+	{ label: "Credential Type", key: "credentialType" },
+	{ label: "Credential Value", key: "credentialValue" },
+	{ label: "Credential Expiry", key: "credentialExpiry" },
+];
+
 const tabs = [
 	{
 		label: "All",
@@ -192,6 +203,7 @@ const PersonList = () => {
 	
     const submitForm = async (personsInfo) => {
         // send res
+		// TODO: Add validation to credentials here and some error handling
 		console.log(personsInfo);
         try {
             const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
@@ -240,7 +252,14 @@ const PersonList = () => {
 				personMobileNumber: person["Mobile Number"] ?? "",
 				personEmail: person["Email"] ?? "",
 				accessGroup: null,
-				credentials: []
+				credentials: [{
+					credId: 1,
+					credUid: person["Credential Value"] ?? "",
+					credTTL: person["Credential Expiry"] ? new Date(Date.parse(person["Credential Expiry"])) : new Date(),
+					isValid: true,
+					isPerm: person["Credential Expiry"] ? false : true,
+					credTypeId: person["Credential Type"] == "Card" ? 1 : person["Credential Type"] == "Pin" ? 4 : 0, // 0 is invalid, TODO: Change this so it's not hardcoded
+				}]
 			}
 		}));
 	};
@@ -569,14 +588,26 @@ const PersonList = () => {
 									Export
 									</Button>
 								</CSVLink>
-								<Tooltip  title='Excel template can be found at {}'
+								<CSVLink
+										style={{ textDecoration: 'none' }}
+										data={[]}
+										headers={headersTemplate}
+										filename={"PersonsTemplate.csv"}
+								>
+									<Button
+										sx={{ m: 1 }}
+									>
+										Download Import Template
+									</Button>
+								</CSVLink>
+								<Tooltip  title='Note: Expiry date format is mm/dd/yyyy and only Card and Pin type credentials can be added through the excel import.'
 								enterTouchDelay={0}
 									placement ='top'
 									sx={{
 										m: -0.5,
 										mt: 3,
 									}}>
-									<HelpOutlineIcon />
+										<HelpOutlineIcon />
 								</Tooltip>
 							</Grid>
 							<Grid item>
