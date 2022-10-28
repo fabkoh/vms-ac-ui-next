@@ -38,10 +38,20 @@ import Tooltip from '@mui/material/Tooltip'
 import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
 import toast from "react-hot-toast";
 import { createFilter } from "../../../utils/list-utils";
-import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink, personLostAndFoundLink } from "../../../utils/persons";
+import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink, personLostAndFoundLink, getPersonName} from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
+import { CSVLink } from "react-csv";
+import { saveCredentialApi, checkCredentialApi } from "../../../api/credentials";
+
+const headers = [
+  { label: "Name", key: "name" },
+  { label: "UID", key: "uid" },
+  { label: "Email", key: "email" },
+  { label: "Mobile Number", key: "mobileNumber" },
+  {label: "Access Group", key: "accessGroup"},
+];
 
 const tabs = [
 	{
@@ -140,7 +150,114 @@ const PersonList = () => {
 		// isReturning: null,
 	});
 	const [accessGroupNames, setAccessGroupNames] = useState([]);
+	const fileReader = new FileReader();
 
+	const createPerson = async (person) => {
+        const credResArr = await Promise.all(person.credentials.map(cred => checkCredentialApi(cred, person.personId)));
+        
+        let failedCredArr = credResArr.filter(res => res.status > 201);
+        let credCheckFailed = {};
+        if (failedCredArr.length > 0) { // some failed
+            for (let i = 0; i < failedCredArr.length; i++) {
+                const failedCred = await failedCredArr[i].json();
+                console.log(failedCred, "failedCred");
+                credCheckFailed = { ...credCheckFailed, ... failedCred };
+            }
+            toast.error("Credential check failed for " + person.personFirstName + " " + person.personLastName);
+            return false;
+        }
+
+        try {
+            const res = await personApi.createPerson(person);
+            if (res.status != 201) {
+                throw new Error("Unable to create person")
+            }
+            const body = await res.json();
+            const personId = body.personId;
+
+            // As the user will be redirected to the list page for creation (you can't redo a creation otherwise you are making multiple of the same thing)
+            // and we cannot fail a person's creation due to faulty credentials either as the api call are different and you couldn't make the creds first before the person
+            // credentialfailures will not be shown as error in the form
+
+            const credResArr = await Promise.all(person.credentials.map(cred => saveCredentialApi(cred, personId, true)));
+            if (credResArr.some(res => res.status > 201)) { // some failed
+                toast.error("Unable to create credential for " + getPersonName(body));
+            }
+            return true;
+        } catch(e) {
+            console.error(e);
+            return false;
+        }
+    }
+	
+    const submitForm = async (personsInfo) => {
+        // send res
+		console.log(personsInfo);
+        try {
+            const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
+
+            // success toast
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) {
+                toast.success(`Successfully created ${numSuccess} persons`); 
+            }
+
+            // if some failed
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to create persons below");    
+                // filter failed personsInfo and personsValidation
+            } else {
+                // all success
+            }
+        } catch (e) {
+            console.log("error", e);
+            toast.error("Unable to submit persons");
+		}
+		finally {
+			getPersonsLocal();
+		}
+	}
+	
+	const csvFileToArray = string => {
+		const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
+		const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
+
+		const array = csvRows.map(i => {
+		const values = i.split(",");
+		const obj = csvHeader.reduce((object, header, index) => {
+			object[header] = values[index];
+			return object;
+		}, {});
+		return obj;
+		});
+		console.log(array);
+		submitForm(array.map((person, index) => {
+			return {
+				personId: index,
+				personFirstName: person["First Name"],
+				personLastName: person["Last Name"],
+				personUid: person["UID"] ?? "",
+				personMobileNumber: person["Mobile Number"] ?? "",
+				personEmail: person["Email"] ?? "",
+				accessGroup: null,
+				credentials: []
+			}
+		}));
+	};
+	
+	const handleOnChange = (e) => {
+		let file = e.target.files[0];
+		if (file) {
+			fileReader.onload = function (event) {
+				const text = event.target.result;
+				csvFileToArray(text);
+			};
+
+			fileReader.readAsText(file);
+		}
+		// to reset the input value otherwise uploading the same file won't trigger the onchange function
+		e.target.value = null;
+  	};
 	useEffect(() => {
 		gtm.push({ event: "page_view" });
 	}, []);
@@ -418,16 +535,40 @@ const PersonList = () => {
 								justifyContent="space-between"
 								spacing={3}>
 							<Grid item>
-								<Button startIcon={<UploadIcon fontSize="small" />}
+								<Button 
+									component="label"
+									startIcon={<UploadIcon fontSize="small" />}
 									sx={{ m: 1 }}>
+									<input
+										type={"file"}
+										id={"csvFileInput"}
+										accept={".csv"}
+										onChange={handleOnChange}
+										hidden
+									/>
 									Import
 								</Button>
+								<CSVLink
+									style={{ textDecoration: 'none' }}
+									data={filteredPersons.map(person => {
+										return {
+											name: getPersonName(person),
+											uid: person.personUid,
+											mobileNumber: person.personMobileNumber || "No mobile number",
+											email: person.personEmail || "No email",
+											accessGroup: person.accessGroup?.accessGroupName || "No access group",
+										}
+									})}
+									headers={headers}
+									filename={"Persons.csv"}
+								>
 								<Button
 									startIcon={<DownloadIcon fontSize="small" />}
 									sx={{ m: 1 }}
 								>
 									Export
-								</Button>
+									</Button>
+								</CSVLink>
 								<Tooltip  title='Excel template can be found at {}'
 								enterTouchDelay={0}
 									placement ='top'
