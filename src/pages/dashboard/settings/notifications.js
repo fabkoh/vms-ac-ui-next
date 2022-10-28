@@ -402,7 +402,6 @@ const NotificationSettings = () => {
                                                         defaultValue={emailSettings.emailPassword}
                                                         onChange={onEmailPasswordChange}
                                                         disabled={!enableCustom}
-                                                        type="password"
                                                     />
                                                 </Grid>
                                                 <Grid
