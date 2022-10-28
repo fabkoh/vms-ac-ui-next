@@ -600,7 +600,7 @@ const PersonList = () => {
 										Download Import Template
 									</Button>
 								</CSVLink>
-								<Tooltip  title='Note: Expiry date format is mm/dd/yyyy -- Leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import.'
+								<Tooltip  title='Note: Expiry date format is mm/dd/yyyy -- leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import.'
 								enterTouchDelay={0}
 									placement ='top'
 									sx={{
