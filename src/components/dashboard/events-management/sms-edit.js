@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import { validatePhoneNumber } from "../../../utils/utils";
 
 export const SMSEdit = (props) => {
-	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue, defaultSMSContent } = props;
+	const { open, handleDialogClose, changeSMS, smsRecipients, smsValue, defaultSMSContent, eventManagementName } = props;
 
 	// submit action
 	const handleChangeSMS = (recipients, content, defaultSMS) => {
@@ -46,12 +46,13 @@ export const SMSEdit = (props) => {
 	useEffect(() => {
 		setNotificationSMSsRecipients(smsRecipients);
 		if (smsValue?.useDefaultSMS) {
-			setNotificationSMSContent(defaultSMSContent);
+			let content = "Event Management " + eventManagementName + " at <exit/controller name> " + defaultSMSContent + " on <occurence time>.";
+			setNotificationSMSContent(content);
 		} else {
 			setNotificationSMSContent(smsValue?.eventsManagementSMSContent);
 		}
 		setUseDefaultSMS(smsValue?.useDefaultSMS);
-	}, [smsRecipients, smsValue, defaultSMSContent])
+	}, [smsRecipients, smsValue, defaultSMSContent, eventManagementName])
 
 	return (
 		<>
@@ -143,7 +144,8 @@ export const SMSEdit = (props) => {
 							<FormControlLabel checked={useDefaultSMS}
 								onChange={(e) => {
 									if (e.target.checked) {
-										setNotificationSMSContent(defaultSMSContent);
+										let content = "Event Management " + eventManagementName + " at <exit/controller name> " + defaultSMSContent + " on <occurence time>.";
+										setNotificationSMSContent(content);
 									}
 									setUseDefaultSMS(e.target.checked)
 								}}
