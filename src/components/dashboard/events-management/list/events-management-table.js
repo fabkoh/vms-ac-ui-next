@@ -1,8 +1,9 @@
 import { Checkbox, IconButton, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import { Scrollbar } from "../../../scrollbar";
 import NextLink from "next/link";
+import { PencilAlt as PencilAltIcon} from "../../../../icons/pencil-alt";
 import { ArrowRight as ArrowRightIcon } from "../../../../icons/arrow-right";
-import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription, getEventsManagementDetailsLink} from "../../../../utils/eventsManagement";
+import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription, getEventsManagementDetailsLink, eventsManagementEditLink} from "../../../../utils/eventsManagement";
 
 function EventsManagementTable({ 
     selectedEventsManagement, 
@@ -43,6 +44,7 @@ function EventsManagementTable({
                                         <TableCell>Trigger(s)</TableCell>
                                         <TableCell>Action(s)</TableCell>
                                         <TableCell> </TableCell>
+                                        <TableCell> </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -59,14 +61,24 @@ function EventsManagementTable({
                                                     value={IsEventsManagementSelected}
                                                 /> 
                                             </TableCell> 
-                                            <TableCell width="15%">{displayEntranceOrController(eventManagement)}</TableCell>
+                                            <TableCell width="18%">{displayEntranceOrController(eventManagement)}</TableCell>
                                             <TableCell width="15%">{eventManagement.eventsManagementName}</TableCell>
                                             <TableCell width="30%">
                                                 {listDescription(eventManagement)}
                                             </TableCell>
                                             <TableCell width="15%">{ eventActionInputDescription(eventManagement.inputEvents)}</TableCell>
                                             <TableCell width="15%">{ eventActionOutputDescription(eventManagement.outputActions, smsConfig, emailConfig)}</TableCell>
-                                            <TableCell width="5%">
+                                            <TableCell width="1%">
+                                                <NextLink
+                                                    href={eventsManagementEditLink(eventManagement.eventsManagementId)}
+                                                    passHref
+                                                >
+                                                    <IconButton component="a">
+                                                        <PencilAltIcon fontSize="small" />
+                                                    </IconButton>
+                                                </NextLink>
+                                            </TableCell>
+                                            <TableCell width="1%">
                                                 <NextLink
                                                     href={getEventsManagementDetailsLink(eventManagement.eventsManagementId)}
                                                     passHref

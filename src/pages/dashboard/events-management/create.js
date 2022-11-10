@@ -11,7 +11,7 @@ import { accessGroupApi } from "../../../api/access-groups";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
 import formUtils from "../../../utils/form-utils";
-import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-edit-form";
+import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-create-form";
 import MultipleSelectInput from "../../../components/dashboard/shared/multi-select-input"
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../api/controllers";
@@ -1091,6 +1091,7 @@ const ModifyEventManagement = () => {
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
+        console.log(notificationEmails, 8899)
         
         // validations
         const newValidations = [...eventsManagementValidationsArr];
@@ -1128,6 +1129,7 @@ const ModifyEventManagement = () => {
         setEventsManagementValidationsArr(newValidations);
     }
     console.log(eventsManagementValidationsArr)
+    console.log(eventsManagementInfoArr, 33344)
     return(
         <>
             <Head>
@@ -1197,7 +1199,7 @@ const ModifyEventManagement = () => {
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Modify Events Management
+                            Create Events Management
                         </Typography>
                         {/* <Grid container
                             marginLeft={0.5}

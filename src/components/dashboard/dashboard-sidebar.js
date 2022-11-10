@@ -198,7 +198,7 @@ const getSections = (t) => [
           },
           {
             title: t('Add'),
-            path: '/dashboard/events-management/modify'
+            path: '/dashboard/events-management/create'
           }
         ]
       },

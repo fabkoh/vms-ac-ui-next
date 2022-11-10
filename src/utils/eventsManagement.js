@@ -47,7 +47,9 @@ const stringFilterHelper = (eventsManagement, query) => {
 const filterEventsManagementByString = (eventsManagement, queryString) => stringFilterHelper(eventsManagement, queryString.toLowerCase());
 
 const eventsManagementListLink = '/dashboard/events-management';
-const eventsManagementCreateLink = '/dashboard/events-management/modify';
+const eventsManagementCreateLink = '/dashboard/events-management/create';
+const eventsManagementEditLink = (emId) =>  ('/dashboard/events-management/edit?id=' + encodeURIComponent(JSON.stringify(emId)))
+
 
 const getEventManagementLabel = (eventManagement) => isObject(eventManagement) && eventManagement.eventsManagementName;
 
@@ -206,5 +208,6 @@ export {
     eventActionOutputText,
     eventActionInputText,
     listDescription,
-    getEventsManagementDetailsLink
+    getEventsManagementDetailsLink,
+    eventsManagementEditLink
  }
