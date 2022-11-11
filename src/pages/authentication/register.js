@@ -33,7 +33,7 @@ const Register = () => {
     <>
       <Head>
         <title>
-          Register | Material Kit Pro
+          Register 
         </title>
       </Head>
       <Box
@@ -45,7 +45,6 @@ const Register = () => {
           minHeight: '100vh'
         }}
       >
-        <AuthBanner />
         <Container
           maxWidth="sm"
           sx={{
@@ -117,13 +116,6 @@ const Register = () => {
               <Typography variant="h4">
                 Register
               </Typography>
-              <Typography
-                color="textSecondary"
-                sx={{ mt: 2 }}
-                variant="body2"
-              >
-                Register on the internal platform
-              </Typography>
             </Box>
             <Box
               sx={{
@@ -147,7 +139,7 @@ const Register = () => {
                 color="textSecondary"
                 variant="body2"
               >
-                Having an account
+                Already have an Account? Login here.
               </Link>
             </NextLink>
           </Card>
