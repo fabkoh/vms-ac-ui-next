@@ -1,3 +1,4 @@
+
 import { useApi, fakeInputEvents, fakeOutputEvents, fakeEventsManagement } from './api-config';
 import { encodeArrayForSpring, sendApi } from './api-helpers';
 
@@ -139,6 +140,15 @@ class EventsManagementApi {
         if (useApi) { return sendApi(`/api/eventsmanagement/${emId}`); }
         console.log("apitest")
         return Promise.resolve(new Response(JSON.stringify(eventManagement), { status: 200 }));
+    }
+
+
+    getForController(controllerId) {
+        return sendApi(`/api/controller/${controllerId}/eventsmanagement`, {method : 'GET'});
+    }
+
+    deleteById(emId) {
+        return sendApi(`/api/eventsmanagement/${emId}`, {method : 'DELETE'});
     }
 }
 

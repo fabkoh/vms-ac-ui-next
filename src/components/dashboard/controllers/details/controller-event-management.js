@@ -28,6 +28,10 @@ import RenderTableCell from "../../shared/renderTableCell";
 import { eventActionInputDescription, displayEntranceOrController, eventActionOutputDescription, listDescription} from "../../../../utils/eventsManagement";
 import ControllerEventsManagementDelete from "./controller-eventsManagement-delete";
 
+import { Confirmdelete } from "../confirm-delete"
+import { toast } from "react-hot-toast";
+import { eventsManagementApi } from "../../../../api/events-management";
+
 
 export default function ControllerEventsManagement({
 	eventsManagementCreateLink,
@@ -55,6 +59,26 @@ export default function ControllerEventsManagement({
 		setOpenDelete(false);
 		handleActionMenuClose();
 	};
+
+	// events management
+	const [eventsManagement, setEventsManagement] = useState(controllerEventManagements);
+
+	const deleteEventsManagement = async(em) => {
+		toast.loading("Deleting EventsManagement...");
+		eventsManagementApi.deleteById(em.eventsManagementId)
+		.then(async res => {
+			toast.dismiss();
+
+			if (res.status != 200) {
+				toast.error('Delete unsuccessful', {duration:3000})
+			}
+			else {
+				toast.success('Delete success');
+				setEventsManagement(eventsManagement.filter(obj => obj != em));
+			}
+		})
+		setOpenDelete(false);
+	}
     
 	const handleDeleteEventManagements = (ids, allSelected) => {
 		if (allSelected) {
@@ -135,6 +159,7 @@ export default function ControllerEventsManagement({
 						<Table>
 							<TableHead sx={{ backgroundColor: "neutral.200" }}>
 								<TableRow>
+									<TableCell>Edit/Delete</TableCell>
                                     <TableCell>
                                         <div>Controller(s)/</div> 
                                         <div>Entrance(s)</div>
@@ -146,9 +171,19 @@ export default function ControllerEventsManagement({
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{controllerEventManagements.map((eventManagement, i) => (
-									<TableRow hover
-										key={i}>
+								{eventsManagement.map((eventManagement, i) => (
+									<TableRow hover key={i}>
+										<TableCell>
+											<Button onClick={openDeleteDialog}>Delete</Button>
+											<Confirmdelete
+												setActionAnchor={setActionAnchor}
+												open={openDelete}
+												message={"Are you sure you want to remove the following event(s)? This action cannot be undone. Please ensure that you have disconnected the input/output pins."}
+												handleDialogClose={closeDeleteDialog}
+												deleteFunc={() => deleteEventsManagement(eventManagement)} />
+
+											<Button>Edit</Button>
+										</TableCell>
                                         <TableCell>{displayEntranceOrController(eventManagement)}</TableCell>
                                         <TableCell sx={{minWidth: 200}}>{eventManagement.eventsManagementName}</TableCell>
                                         <TableCell sx={{minWidth: 300}}> {listDescription(eventManagement)}</TableCell>
