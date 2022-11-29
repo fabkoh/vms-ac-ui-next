@@ -539,7 +539,7 @@ const ModifyEventManagement = () => {
                 }
             }
             let toBeAdded = inputStr == "" ? "..." : inputStr.substring(0, inputStr.length - 2);
-            updatedInfo[i].eventsManagementDefaultContent = "Event Management " + updatedInfo[i].eventsManagementName + " with the following triggers: " + toBeAdded + " has been triggered.";
+            updatedInfo[i].eventsManagementDefaultContent = "with the following triggers: " + toBeAdded + " has been triggered";
             
         }
         setEventsManagementInfoArr(updatedInfo);
@@ -1087,7 +1087,12 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementEmailRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
+        let newEmailValue;
+        if (newValue.useDefaultEmails) {
+            newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: updatedInfo[0].eventsManagementDefaultContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
+        } else {
+            newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
+        }
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
@@ -1111,7 +1116,12 @@ const ModifyEventManagement = () => {
         const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const newRecipients = newValue.eventsManagementSMSRecipients;
         const newRecipientsCSV = newRecipients.join(',');
-        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent, useDefaultSMS: newValue.useDefaultSMS };
+        let newSMSValue;
+        if (newValue.useDefaultSMS) {
+            newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: updatedInfo[0].eventsManagementDefaultContent, useDefaultSMS: newValue.useDefaultSMS };
+        } else {
+            newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent, useDefaultSMS: newValue.useDefaultSMS };
+        }
         eventManagementToBeUpdated['eventsManagementSMS'] = newSMSValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationSMSs({ ...notificationEmails, [id]: newValue });

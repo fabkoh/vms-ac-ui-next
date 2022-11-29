@@ -38,10 +38,31 @@ import Tooltip from '@mui/material/Tooltip'
 import { Confirmdelete } from "../../../components/dashboard/persons/confirm-delete";
 import toast from "react-hot-toast";
 import { createFilter } from "../../../utils/list-utils";
-import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink, personLostAndFoundLink } from "../../../utils/persons";
+import { filterPersonByAccessGroupName, filterPersonByString, filterPersonByStringPlaceholder, getPersonIdsEditLink, personCreateLink, personLostAndFoundLink, getPersonName} from "../../../utils/persons";
 import { controllerApi } from "../../../api/controllers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
+import { CSVLink } from "react-csv";
+import { saveCredentialApi, checkCredentialApi } from "../../../api/credentials";
+
+const headers = [
+  { label: "Name", key: "name" },
+  { label: "UID", key: "uid" },
+  { label: "Email", key: "email" },
+  { label: "Mobile Number", key: "mobileNumber" },
+  {label: "Access Group", key: "accessGroup"},
+];
+
+const headersTemplate = [
+	{ label: "First Name", key: "firstName" },
+	{ label: "Last Name", key: "lastName" },
+	{ label: "UID", key: "uid" },
+	{ label: "Email", key: "email" },
+	{ label: "Mobile Number", key: "mobileNumber" },
+	{ label: "Credential Type", key: "credentialType" },
+	{ label: "Credential Value", key: "credentialValue" },
+	{ label: "Credential Expiry", key: "credentialExpiry" },
+];
 
 const tabs = [
 	{
@@ -140,7 +161,122 @@ const PersonList = () => {
 		// isReturning: null,
 	});
 	const [accessGroupNames, setAccessGroupNames] = useState([]);
+	const fileReader = new FileReader();
 
+	const createPerson = async (person) => {
+        const credResArr = await Promise.all(person.credentials.map(cred => checkCredentialApi(cred, person.personId)));
+        
+        let failedCredArr = credResArr.filter(res => res.status > 201);
+        let credCheckFailed = {};
+        if (failedCredArr.length > 0) { // some failed
+            for (let i = 0; i < failedCredArr.length; i++) {
+                const failedCred = await failedCredArr[i].json();
+                console.log(failedCred, "failedCred");
+                credCheckFailed = { ...credCheckFailed, ... failedCred };
+            }
+            toast.error("Credential check failed for " + person.personFirstName + " " + person.personLastName);
+            return false;
+        }
+
+        try {
+            const res = await personApi.createPerson(person);
+            if (res.status != 201) {
+                throw new Error("Unable to create person")
+            }
+            const body = await res.json();
+            const personId = body.personId;
+
+            // As the user will be redirected to the list page for creation (you can't redo a creation otherwise you are making multiple of the same thing)
+            // and we cannot fail a person's creation due to faulty credentials either as the api call are different and you couldn't make the creds first before the person
+            // credentialfailures will not be shown as error in the form
+
+            const credResArr = await Promise.all(person.credentials.map(cred => saveCredentialApi(cred, personId, true)));
+            if (credResArr.some(res => res.status > 201)) { // some failed
+                toast.error("Unable to create credential for " + getPersonName(body));
+            }
+            return true;
+        } catch(e) {
+            console.error(e);
+            return false;
+        }
+    }
+	
+    const submitForm = async (personsInfo) => {
+        // send res
+		// TODO: Add validation to credentials here and some error handling
+		console.log(personsInfo);
+        try {
+            const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
+
+            // success toast
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) {
+                toast.success(`Successfully created ${numSuccess} persons`); 
+            }
+
+            // if some failed
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to create persons below");    
+                // filter failed personsInfo and personsValidation
+            } else {
+                // all success
+            }
+        } catch (e) {
+            console.log("error", e);
+            toast.error("Unable to submit persons");
+		}
+		finally {
+			getPersonsLocal();
+		}
+	}
+	
+	const csvFileToArray = string => {
+		const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
+		const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
+
+		const array = csvRows.map(i => {
+		const values = i.split(",");
+		const obj = csvHeader.reduce((object, header, index) => {
+			object[header] = values[index];
+			return object;
+		}, {});
+		return obj;
+		});
+		console.log(array);
+		submitForm(array.map((person, index) => {
+			return {
+				personId: index,
+				personFirstName: person["First Name"],
+				personLastName: person["Last Name"],
+				personUid: person["UID"] ?? "",
+				personMobileNumber: person["Mobile Number"] ?? "",
+				personEmail: person["Email"] ?? "",
+				accessGroup: null,
+				credentials: [{
+					credId: 1,
+					credUid: person["Credential Value"] ?? "",
+					credTTL: person["Credential Expiry"] ? new Date(Date.parse(person["Credential Expiry"])) : new Date(),
+					isValid: true,
+					isPerm: person["Credential Expiry"] ? false : true,
+					credTypeId: person["Credential Type"] == "Card" ? 1 : person["Credential Type"] == "Pin" ? 4 : 0, // 0 is invalid, TODO: Change this so it's not hardcoded
+				}]
+			}
+		}));
+	};
+	
+	const handleOnChange = (e) => {
+		let file = e.target.files[0];
+		if (file) {
+			fileReader.onload = function (event) {
+				const text = event.target.result;
+				csvFileToArray(text);
+			};
+
+			fileReader.readAsText(file);
+		}
+		// to reset the input value otherwise uploading the same file won't trigger the onchange function
+		e.target.value = null;
+  	};
 	useEffect(() => {
 		gtm.push({ event: "page_view" });
 	}, []);
@@ -418,24 +554,60 @@ const PersonList = () => {
 								justifyContent="space-between"
 								spacing={3}>
 							<Grid item>
-								<Button startIcon={<UploadIcon fontSize="small" />}
+								<Button 
+									component="label"
+									startIcon={<UploadIcon fontSize="small" />}
 									sx={{ m: 1 }}>
+									<input
+										type={"file"}
+										id={"csvFileInput"}
+										accept={".csv"}
+										onChange={handleOnChange}
+										hidden
+									/>
 									Import
 								</Button>
+								<CSVLink
+									style={{ textDecoration: 'none' }}
+									data={filteredPersons.map(person => {
+										return {
+											name: getPersonName(person),
+											uid: person.personUid,
+											mobileNumber: person.personMobileNumber || "No mobile number",
+											email: person.personEmail || "No email",
+											accessGroup: person.accessGroup?.accessGroupName || "No access group",
+										}
+									})}
+									headers={headers}
+									filename={"Persons.csv"}
+								>
 								<Button
 									startIcon={<DownloadIcon fontSize="small" />}
 									sx={{ m: 1 }}
 								>
 									Export
-								</Button>
-								<Tooltip  title='Excel template can be found at {}'
+									</Button>
+								</CSVLink>
+								<CSVLink
+										style={{ textDecoration: 'none' }}
+										data={[]}
+										headers={headersTemplate}
+										filename={"PersonsTemplate.csv"}
+								>
+									<Button
+										sx={{ m: 1 }}
+									>
+										Download Import Template
+									</Button>
+								</CSVLink>
+								<Tooltip  title='Note: Expiry date format is mm/dd/yyyy -- leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import.'
 								enterTouchDelay={0}
 									placement ='top'
 									sx={{
 										m: -0.5,
 										mt: 3,
 									}}>
-									<HelpOutlineIcon />
+										<HelpOutlineIcon />
 								</Tooltip>
 							</Grid>
 							<Grid item>

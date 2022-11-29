@@ -537,6 +537,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
             <CardContent>
                 <EmailEdit
                     open={notificationEmailEditOpen}
+                    eventManagementName={eventsManagementName}
                     handleDialogClose={() => setNotificationEmailEditOpen(false)}
                     emailValue={notificationEmailsValue}
                     emailRecipients={notificationEmailsRecipients}
@@ -549,6 +550,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                 />
                 <SMSEdit
                     open={notificationSMSEditOpen}
+                    eventManagementName={eventsManagementName}
                     handleDialogClose={() => setNotificationSMSEditOpen(false)}
                     smsValue={notificationSMSsValue}
                     smsRecipients={notificationSMSsRecipients}
