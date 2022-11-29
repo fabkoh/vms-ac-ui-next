@@ -76,7 +76,7 @@ class AuthApi {
     return new Promise((resolve, reject) => {
       try {
         // Decode access token
-        const { userId } = decode(accessToken);
+        const { userId } = decode();
 
         // Find the user
         const user = users.find((_user) => _user.id === userId);

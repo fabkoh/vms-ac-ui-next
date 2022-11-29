@@ -234,7 +234,7 @@ const EventsManagementList = () => {
                                         passHref>
                                         <MenuItem disableRipple>
                                             <Add />
-                                            &#8288;Modify
+                                            &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 

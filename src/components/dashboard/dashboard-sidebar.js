@@ -12,6 +12,7 @@ import { ChatAlt2 as ChatAlt2Icon } from '../../icons/chat-alt2';
 import { ClipboardList as ClipboardListIcon } from '../../icons/clipboard-list';
 import { CreditCard as CreditCardIcon } from '../../icons/credit-card';
 import { Home as HomeIcon } from '../../icons/home';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { LockClosed as LockClosedIcon } from '../../icons/lock-closed';
 import { Mail as MailIcon } from '../../icons/mail';
 import { MailOpen as MailOpenIcon } from '../../icons/mail-open';
@@ -43,6 +44,390 @@ import toast from 'react-hot-toast';
 import AuthenticationAddOnError from './authentication-schedule/authentication-add-on-error';
 import { useAuth } from '../../hooks/use-auth';
 
+const getSections = (t) => [
+  
+  {
+    title: t('General'),
+    items: [
+      {
+        title: t('Overview'),
+        path: '/dashboard',
+        icon: <HomeIcon fontSize="small" />
+      },
+      {
+        title: t('Settings'),
+        path: '/settings',
+        icon: <SettingsIcon fontSize="small" />,
+        children: [
+          {
+            title: 'Notifications',
+            path: '/dashboard/settings/notifications'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: t('Authentication'),
+    items: [
+      {
+        title: t('Credentials'),
+        path: '/dashboard/credentials/create',
+        icon: <UsersIcon fontSize="small" />,
+        children: [
+          {
+            title: 'Add',
+            path: '/dashboard/credentials/create'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: t('Devices'),
+    items: [
+      {
+        title: t('Controllers'),
+        path: '/dashboard/controllers/',
+        icon: <SelectAll fontSize="small" />,
+        children: [
+          {
+            title: 'List',
+            path: '/dashboard/controllers/'
+          }
+        ]
+      },
+      {
+        title: t('Video Recorders'),
+        path: '/dashboard/video-recorders/',
+        icon: <Videocam fontSize="small" />,
+        children: [
+          {
+            title: 'List',
+            path: '/dashboard/video-recorders/'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/video-recorders/create'
+          }
+        ]
+      }
+    ]
+  },
+      
+  {
+    title: t('People'),
+    items: [
+      {
+        title: t('Persons'),
+        path: '/dashboard/persons',
+        icon: <UsersIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/persons'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/persons/create'
+          }
+        ]
+      },
+      // {
+      //   title: t('Organizations'),
+      //   path: '/dashboard/jobs',
+      //   icon: <OfficeBuildingIcon fontSize="small" />,
+      //   children: [
+      //     {
+      //       title: t('List'),
+      //       path: '/dashboard/jobs'
+      //     },
+      //     {
+      //       title: t('Add'),
+      //       path: '/dashboard/jobs/companies/1'
+      //     }
+      //   ]
+      // },
+      {
+        title: t('Access Groups'),
+        path: '/dashboard/access-groups',
+        icon: <LockClosed fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/access-groups'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/access-groups/create'
+          }
+        ]
+      },
+    ]
+  },
+  {
+    title: t('Facility'),
+    items: [
+      {
+        title: t('Entrances'),
+        path: '/dashboard/entrances',
+        icon: <DoorFront fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/entrances'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/entrances/create'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: t('Events'),
+    items: [
+      {
+        title: t('Management'),
+        path: '/dashboard/events-management',
+        icon: <NotificationImportantIcon fontSize="small" />,
+        children: [
+          {
+            title: t('List'),
+            path: '/dashboard/events-management'
+          },
+          {
+            title: t('Add'),
+            path: '/dashboard/events-management/create'
+          }
+        ]
+      },
+      {
+        title: t('Logs'),
+        path: '/dashboard/logs',
+        icon: <DescriptionIcon fontSize="small" />,
+        children: [
+          {
+            title: t('Event Log'),
+            path: '/dashboard/logs/eventlog'
+          },
+          {
+            title: t('Notification Log'),
+            path: '/dashboard/logs/notificationlog'
+          }
+        ]
+      },
+    ]
+  },
+  
+  // {
+  //   title: t('Management'),
+  //   items: [
+  //     {
+  //       title: t('Customers'),
+  //       path: '/dashboard/customers',
+  //       icon: <UsersIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/customers'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/customers/1'
+  //         },
+  //         {
+  //           title: t('Edit'),
+  //           path: '/dashboard/customers/1/edit'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Products'),
+  //       path: '/dashboard/products',
+  //       icon: <ShoppingBagIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/products'
+  //         },
+  //         {
+  //           title: t('Create'),
+  //           path: '/dashboard/products/new'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Orders'),
+  //       icon: <ShoppingCartIcon fontSize="small" />,
+  //       path: '/dashboard/orders',
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/orders'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/orders/1'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Invoices'),
+  //       path: '/dashboard/invoices',
+  //       icon: <ReceiptTaxIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('List'),
+  //           path: '/dashboard/invoices'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/invoices/1'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Platforms'),
+  //   items: [
+  //     {
+  //       title: t('Job Listings'),
+  //       path: '/dashboard/jobs',
+  //       icon: <OfficeBuildingIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Browse'),
+  //           path: '/dashboard/jobs'
+  //         },
+  //         {
+  //           title: t('Details'),
+  //           path: '/dashboard/jobs/companies/1'
+  //         },
+  //         {
+  //           title: t('Create'),
+  //           path: '/dashboard/jobs/new'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Social Media'),
+  //       path: '/dashboard/social',
+  //       icon: <ShareIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Profile'),
+  //           path: '/dashboard/social/profile'
+  //         },
+  //         {
+  //           title: t('Feed'),
+  //           path: '/dashboard/social/feed'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Blog'),
+  //       path: '/blog',
+  //       icon: <NewspaperIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Post List'),
+  //           path: '/blog'
+  //         },
+  //         {
+  //           title: t('Post Details'),
+  //           path: '/blog/1'
+  //         },
+  //         {
+  //           title: t('Post Create'),
+  //           path: '/blog/new'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Apps'),
+  //   items: [
+  //     {
+  //       title: t('Kanban'),
+  //       path: '/dashboard/kanban',
+  //       icon: <ClipboardListIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Mail'),
+  //       path: '/dashboard/mail',
+  //       icon: <MailIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Chat'),
+  //       path: '/dashboard/chat',
+  //       icon: <ChatAlt2Icon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Calendar'),
+  //       path: '/dashboard/calendar',
+  //       icon: <CalendarIcon fontSize="small" />
+  //     }
+  //   ]
+  // },
+  // {
+  //   title: t('Pages'),
+  //   items: [
+  //     {
+  //       title: t('Auth'),
+  //       path: '/authentication',
+  //       icon: <LockClosedIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: t('Register'),
+  //           path: '/authentication/register?disableGuard=true'
+  //         },
+  //         {
+  //           title: t('Login'),
+  //           path: '/authentication/login?disableGuard=true'
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       title: t('Pricing'),
+  //       path: '/dashboard/pricing',
+  //       icon: <CreditCardIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Checkout'),
+  //       path: '/checkout',
+  //       icon: <CashIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Contact'),
+  //       path: '/contact',
+  //       icon: <MailOpenIcon fontSize="small" />
+  //     },
+  //     {
+  //       title: t('Error'),
+  //       path: '/error',
+  //       icon: <XCircleIcon fontSize="small" />,
+  //       children: [
+  //         {
+  //           title: '401',
+  //           path: '/401'
+  //         },
+  //         {
+  //           title: '404',
+  //           path: '/404'
+  //         },
+  //         {
+  //           title: '500',
+  //           path: '/500'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // }
+];
 
 export const DashboardSidebar = (props) => {
   const { onClose, open } = props;

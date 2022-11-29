@@ -11,7 +11,7 @@ import { accessGroupApi } from "../../../api/access-groups";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
 import formUtils from "../../../utils/form-utils";
-import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-edit-form";
+import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-create-form";
 import MultipleSelectInput from "../../../components/dashboard/shared/multi-select-input"
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../api/controllers";
@@ -226,10 +226,12 @@ const ModifyEventManagement = () => {
         outputActions: [],
         eventsManagementEmail: null,
         eventsManagementSMS: null,
+        eventsManagementDefaultTitle: "Event Management Triggered",
+        eventsManagementDefaultContent: "An Event Management has been triggered.",
     });
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
-        eventsManagementNameBlank: false,
+        eventsManagementNameBlank: true,
         eventsManagementInputEventsEmpty: false,
         eventsManagementInputEventsInvalidId: false,
         eventsManagementInputEventsConflict: false,
@@ -242,7 +244,8 @@ const ModifyEventManagement = () => {
         eventsManagementEmailRecipientsEmpty: false,
         eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,
-        timeStartInvalid:false,
+        timeStartInvalid:true,
+        beginInvalid:true,
         untilInvalid:false,
         submitFailed: false
     });
@@ -341,6 +344,7 @@ const ModifyEventManagement = () => {
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
+        updateEventManagementDefaultTitle();
     }
     const checkAnyUntilForEventManagement = (id) => (bool) => {
         const newValidations = [...eventsManagementValidationsArr];
@@ -348,6 +352,13 @@ const ModifyEventManagement = () => {
         validation.untilInvalid = bool
         setEventsManagementValidationsArr(newValidations);
 
+    }
+
+    const checkAnyBeginForEventManagement = (id) => (bool) => {
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.beginInvalid = bool
+        setEventsManagementValidationsArr(newValidations);
     }
 
     const submitReplaceAll = () => {
@@ -502,6 +513,37 @@ const ModifyEventManagement = () => {
         ))
     }
     const getEventActionOutputName = (e) => e.eventActionOutputName;
+
+    const updateEventManagementDefaultTitle = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            updatedInfo[i].eventsManagementDefaultTitle = "Event Management " + updatedInfo[i].eventsManagementName + " Triggered";
+            
+        }
+        setEventsManagementInfoArr(updatedInfo);
+    }
+
+    const updateEventManagementDefaultContent = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            let inputStr = ""
+            for (let j = 0; j < currInputEvents.length; j++) {
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                if (currInputEvents[j].timerDuration) {
+                    inputStr += inputEventEntity.eventActionInputName + " for " + currInputEvents[j].timerDuration + " second(s), ";
+                } else {
+                    inputStr += inputEventEntity.eventActionInputName + ", "
+                }
+            }
+            let toBeAdded = inputStr == "" ? "..." : inputStr.substring(0, inputStr.length - 2);
+            updatedInfo[i].eventsManagementDefaultContent = "Event Management " + updatedInfo[i].eventsManagementName + " with the following triggers: " + toBeAdded + " has been triggered.";
+            
+        }
+        setEventsManagementInfoArr(updatedInfo);
+    }
 
     const changeEntranceController = (newValue) => {
         setEntrancesControllers(newValue);
@@ -716,10 +758,14 @@ const ModifyEventManagement = () => {
         // }
 
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
-        const updatedInfo = [...eventsManagementInfoArr];
-        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        updateEventManagementDefaultContent();
+        updateEventManagementDefaultTitle();
+
+        let updatedInfo = [...eventsManagementInfoArr];
+        let eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
         let hasNotificationEmailsOutput = false;
         let hasNotificationSMSsOutput = false;
@@ -744,6 +790,7 @@ const ModifyEventManagement = () => {
         }
         newOutputActions.push(...newValueMapped);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
+
         if (!hasNotificationEmailsOutput) {
             eventManagementToBeUpdated['eventsManagementEmail'] = null;
             let newNotificationEmails = { ...notificationEmails };
@@ -754,14 +801,14 @@ const ModifyEventManagement = () => {
                 eventManagementToBeUpdated['eventsManagementEmail'] = '';
                 eventManagementToBeUpdated['eventsManagementEmail'] = {
                     eventsManagementEmailRecipients: "",
-                    eventsManagementEmailContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered"
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle
                 };
                 let newNotificationEmails = { ...notificationEmails };
                 newNotificationEmails[id] = {
                     eventsManagementEmailRecipients: [],
-                    eventsManagementEmailContent: "An Event Management has been triggered.",
-                    eventsManagementEmailTitle: "Event Management Triggered",
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle,
                     useDefaultEmails: true
                 };
                 setNotificationEmails(newNotificationEmails);
@@ -776,12 +823,12 @@ const ModifyEventManagement = () => {
             if (eventManagementToBeUpdated['eventsManagementSMS'] === null) {
                 eventManagementToBeUpdated['eventsManagementSMS'] = {
                     eventsManagementSMSRecipients: "",
-                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
                 };
                 let newNotificationSMSs = { ...notificationSMSs };
                 newNotificationSMSs[id] = {
                     eventsManagementSMSRecipients: [],
-                    eventsManagementSMSContent: "An Event Management has been triggered.",
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
                     useDefaultSMS: true
                 };
                 setNotificationSMSs(newNotificationSMSs);
@@ -839,6 +886,7 @@ const ModifyEventManagement = () => {
             validation.eventsManagementInputEventsInvalidId = false;
         }
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
 
     const changeOutputActionsWithTimer = (newValue, id) => {
@@ -1043,6 +1091,7 @@ const ModifyEventManagement = () => {
         eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
         setEventsManagementInfoArr(updatedInfo);
         setNotificationEmails({ ...notificationEmails, [id]: newValue });
+        console.log(notificationEmails, 8899)
         
         // validations
         const newValidations = [...eventsManagementValidationsArr];
@@ -1079,7 +1128,8 @@ const ModifyEventManagement = () => {
         }
         setEventsManagementValidationsArr(newValidations);
     }
-    
+    console.log(eventsManagementValidationsArr)
+    console.log(eventsManagementInfoArr, 33344)
     return(
         <>
             <Head>
@@ -1149,7 +1199,7 @@ const ModifyEventManagement = () => {
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Modify Events Management
+                            Create Events Management
                         </Typography>
                         {/* <Grid container
                             marginLeft={0.5}
@@ -1216,6 +1266,7 @@ const ModifyEventManagement = () => {
                                         changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
                                         changeNameCheck={changeNameCheck}
                                         changeTriggerSchedules={changeTriggerSchedules}
+                                        checkAnyBeginForEventManagement={checkAnyBeginForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
                                         checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
@@ -1263,6 +1314,7 @@ const ModifyEventManagement = () => {
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
                                                 validation.eventsManagementInputEventsEmpty ||
@@ -1297,6 +1349,7 @@ const ModifyEventManagement = () => {
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
                                                 validation.eventsManagementInputEventsEmpty ||

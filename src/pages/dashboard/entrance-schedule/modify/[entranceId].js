@@ -81,12 +81,13 @@ const ModifyEntranceSchedule = () => {
     });
     const getEmptyEntranceScheduleValidations = (entranceScheduleId) => ({
         entranceScheduleId,
-        entranceScheduleNameBlank: false,
+        entranceScheduleNameBlank: true,
 
         timeEndInvalid:false,
         timeStartInvalid:false,
         //Entrance valid(might not need as field is select. cannot custom add)
         untilInvalid:false,
+        beginInvalid: true,
         // submit failed
         submitFailed: false
     });
@@ -206,6 +207,14 @@ const ModifyEntranceSchedule = () => {
         // console.log("newValidations",newValidations)
         setEntranceScheduleValidationsArr(newValidations);
 
+    }
+
+    const checkBegin = (id) =>(e) => {
+        const newValidations = [ ...entranceScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.entranceScheduleId == id);
+        validation.beginInvalid = e
+        // console.log("newValidations",newValidations)
+        setEntranceScheduleValidationsArr(newValidations);
     }
     const [submitted, setSubmitted] = useState(false);
 
@@ -380,6 +389,8 @@ const ModifyEntranceSchedule = () => {
                                     changeNameCheck={changeNameCheck}
                                     changeRrule={changeRrule}
                                     checkUntil={checkUntil(accessGroupScheduleInfo.entranceScheduleId)}
+                                    checkBegin={checkBegin(accessGroupScheduleInfo.entranceScheduleId)}
+
                                 />
                             ))}
                             <div>
@@ -411,6 +422,7 @@ const ModifyEntranceSchedule = () => {
                                                 validation => validation.entranceScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
@@ -439,6 +451,7 @@ const ModifyEntranceSchedule = () => {
                                                 validation => validation.entranceScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||

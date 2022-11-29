@@ -85,12 +85,13 @@ const ModifyAccessGroupSchedule = () => {
     });
     const getEmptyAccessGroupScheduleValidations = (accessGroupScheduleId) => ({
         accessGroupScheduleId,
-        accessGroupScheduleNameBlank: false,
+        accessGroupScheduleNameBlank: true,
 
         timeEndInvalid:false,
         timeStartInvalid:false,
         //Entrance valid(might not need as field is select. cannot custom add)
         untilInvalid:false,
+        beginInvalid:true,
         // submit failed
         submitFailed: false
     });
@@ -211,6 +212,15 @@ const ModifyAccessGroupSchedule = () => {
         setAccessGroupScheduleValidationsArr(newValidations);
 
     }
+
+    const checkBegin = (id) =>(e) => {
+        const newValidations = [ ...accessGroupScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.accessGroupScheduleId == id);
+        validation.beginInvalid = e
+        // console.log("newValidations",newValidations)
+        setAccessGroupScheduleValidationsArr(newValidations);
+    }
+
     const [submitted, setSubmitted] = useState(false);
 
     const replaceAll = (e) => {
@@ -383,6 +393,7 @@ md={7}>
                                     changeNameCheck={changeNameCheck}
                                     changeRrule={changeRrule}
                                     checkUntil={checkUntil(accessGroupScheduleInfo.accessGroupScheduleId)}
+                                    checkBegin={checkBegin(accessGroupScheduleInfo.accessGroupScheduleId)}
                                 />
                             ))}
                             <div>
@@ -414,6 +425,7 @@ mb={2}>
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
@@ -442,6 +454,7 @@ mb={2}>
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||

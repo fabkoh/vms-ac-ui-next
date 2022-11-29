@@ -314,11 +314,11 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         eventsManagementEmailRecipientsEmpty,
         eventsManagementSMSRecipientsEmpty,
     } = eventsManagementValidations;
-   
     const inputEventsValueForWithoutTimer = inputEventsValueWithoutTimer[eventsManagementId];
     const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
     const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
     const [outputActionsValueWithoutTimerState, setOutputActionsValueWithoutTimerState] = useState(outputActionsValueForWithoutTimer);
+    console.log(1234, outputActionsValueForWithoutTimer, outputActionsValueWithoutTimer)
 
     const notificationEmailsValue = notificationEmails[eventsManagementId]
     const notificationSMSsValue = notificationSMSs[eventsManagementId]
@@ -384,6 +384,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
 
     useEffect(() => {
         changeOutputActionsWithTimer(outputWithTimerEventsManagementArr, eventsManagementId);
+        console.log(outputWithTimerEventsManagementArr,7777)
     }, [outputWithTimerEventsManagementArr])
     
     //blocker for invalid until date
