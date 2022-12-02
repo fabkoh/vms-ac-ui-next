@@ -2,7 +2,7 @@ var api = "http://localhost:8082";
 const createAuthRequest = async (path, data) => {
     try {
         const token = localStorage.getItem("accessToken");
-        const auth = token ? { "Authorization": `bearer ${token}` } : {};
+        const auth = token ? { "Authorization": `Bearer ${token}` } : {};
         const response = await fetch(`${api}/${path}`, {
                 method: "POST",  
                 headers: {

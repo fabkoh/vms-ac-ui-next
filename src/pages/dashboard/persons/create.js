@@ -455,6 +455,8 @@ const CreatePersonsTwo = () => {
 
     // return true if the person creation was successful
     const createPerson = async (person) => {
+        console.log(person);
+        console.log("DWHEHEHHEHEHEHE");
         const newValidations = [...personsValidation];
         const personValidation = newValidations.find(p => p.personId == person.personId);
         personValidation.credentialCheckFailed = {} // reset check failed error

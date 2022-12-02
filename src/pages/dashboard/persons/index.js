@@ -7,6 +7,7 @@ import {
 	Box,
 	Button,
 	Card,
+	circularProgressClasses,
 	Container,
 	Divider,
 	Grid,
@@ -44,13 +45,18 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 import { serverDownCode } from "../../../api/api-helpers";
 import { CSVLink } from "react-csv";
 import { saveCredentialApi, checkCredentialApi } from "../../../api/credentials";
+import { FormControlUnstyled } from "@mui/base";
 
 const headers = [
-  { label: "Name", key: "name" },
-  { label: "UID", key: "uid" },
-  { label: "Email", key: "email" },
-  { label: "Mobile Number", key: "mobileNumber" },
-  {label: "Access Group", key: "accessGroup"},
+  { label: "First Name", key: "firstName" },
+	{ label: "Last Name", key: "lastName" },
+	{ label: "UID", key: "uid" },
+	{ label: "Email", key: "email" },
+	{ label: "Mobile Number", key: "mobileNumber" },
+	{ label: "Credential (Pin)", key: "credentialType" },
+	{ label: "Credential (Card)", key: "credentialType" },
+	{ label: "Credential Expiry (MM-DD-YYYY)", key: "credentialValue" },
+	{ label: "Access Group", key: "accessGroup" }
 ];
 
 const headersTemplate = [
@@ -59,9 +65,10 @@ const headersTemplate = [
 	{ label: "UID", key: "uid" },
 	{ label: "Email", key: "email" },
 	{ label: "Mobile Number", key: "mobileNumber" },
-	{ label: "Credential Type", key: "credentialType" },
-	{ label: "Credential Value", key: "credentialValue" },
-	{ label: "Credential Expiry", key: "credentialExpiry" },
+	{ label: "Credential (Pin)", key: "credentialType" },
+	{ label: "Credential (Card)", key: "credentialType" },
+	{ label: "Credential Expiry (MM-DD-YYYY)", key: "credentialValue" },
+	{ label: "Access Group", key: "accessGroup" }
 ];
 
 const tabs = [
@@ -242,7 +249,6 @@ const PersonList = () => {
 		}, {});
 		return obj;
 		});
-		console.log(array);
 		submitForm(array.map((person, index) => {
 			return {
 				personId: index,
@@ -254,11 +260,19 @@ const PersonList = () => {
 				accessGroup: null,
 				credentials: [{
 					credId: 1,
-					credUid: person["Credential Value"] ?? "",
-					credTTL: person["Credential Expiry"] ? new Date(Date.parse(person["Credential Expiry"])) : new Date(),
+					credUid: person["Credential (Pin)"] ?? "",
+					credTTL: person["Credential Expiry (MM-DD-YYYY)"] ? new Date(Date.parse(person["Credential Expiry (MM-DD-YYYY)"])) : new Date(),
 					isValid: true,
-					isPerm: person["Credential Expiry"] ? false : true,
-					credTypeId: person["Credential Type"] == "Card" ? 1 : person["Credential Type"] == "Pin" ? 4 : 0, // 0 is invalid, TODO: Change this so it's not hardcoded
+					isPerm: person["Credential Expiry (MM-DD-YYYY)"] ? false : true,
+					credTypeId: person["Credential (Pin)"] == "" ? 0 : 1, // 0 is invalid, TODO: Change this so it's not hardcoded
+				},
+				{
+					credId: 2,
+					credUid: person["Credential (Card)"] ?? "",
+					credTTL: person["Credential Expiry (MM-DD-YYYY)"] ? new Date(Date.parse(person["Credential Expiry (MM-DD-YYYY)"])) : new Date(),
+					isValid: true,
+					isPerm: person["Credential Expiry (MM-DD-YYYY)"] ? false : true,
+					credTypeId: person["Credential (Card)"] == "" ? 0 : 4, // 0 is invalid, TODO: Change this so it's not hardcoded
 				}]
 			}
 		}));
@@ -571,7 +585,8 @@ const PersonList = () => {
 									style={{ textDecoration: 'none' }}
 									data={filteredPersons.map(person => {
 										return {
-											name: getPersonName(person),
+											firstName:person.personFirstName,
+											lastName:person.personLastName,
 											uid: person.personUid,
 											mobileNumber: person.personMobileNumber || "No mobile number",
 											email: person.personEmail || "No email",
@@ -600,7 +615,7 @@ const PersonList = () => {
 										Download Import Template
 									</Button>
 								</CSVLink>
-								<Tooltip  title='Note: Expiry date format is mm/dd/yyyy -- leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import.'
+								<Tooltip  title='Note: Expiry date format is mm-dd-yyyy  leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import.'
 								enterTouchDelay={0}
 									placement ='top'
 									sx={{

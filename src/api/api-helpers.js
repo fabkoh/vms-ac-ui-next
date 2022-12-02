@@ -8,7 +8,10 @@ export function encodeArrayForSpring(array) {
 export const serverDownCode = 599;
 
 export function sendApi(path, init={}) {
-    init["headers"] = {"Authorization":`Bearer ${localStorage.getItem("accessToken")}`};
+    const token = localStorage.getItem("accessToken");
+    const auth = token ? { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" } : {};
+    init["headers"] = auth;
+    console.log(init);
     return fetch(apiUri + path, init)
         .catch((error) => {
             console.error('Error:', error);

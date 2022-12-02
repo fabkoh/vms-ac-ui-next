@@ -87,7 +87,7 @@ const PersonDetails = () => {
         return;
       }
       const body = await res.json();
-      const accessGroupStatus = await getPersonAccessGroupCurrentStatus(body.accessGroup.accessGroupId);
+      const accessGroupStatus = body.accessGroup ? await getPersonAccessGroupCurrentStatus(body.accessGroup.accessGroupId):null;
       if (isMounted()) {
         const personWithAccGroupStatus = { ...body, accessGroupInSchedule: accessGroupStatus }
         console.log(personWithAccGroupStatus, "personWithAccGroupStatus")
