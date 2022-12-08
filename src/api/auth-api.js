@@ -1,38 +1,38 @@
-var api = "http://localhost:8082";
-const createAuthRequest = async (path, data) => {
-    try {
-        const token = localStorage.getItem("accessToken");
-        const auth = token ? { "Authorization": `Bearer ${token}` } : {};
-        console.log({body: JSON.stringify(data)});
-        const response = await fetch(`${api}/${path}`, {
-                method: "POST",  
-                headers: {
-                    "Content-Type": "application/json",
-                    ...auth
-                },
-                body: JSON.stringify(data)
-            });
-    return { response: await response.json(), type: response.ok ? "success" : "error"};
-    } catch (error) {
-        return { response: error, type: "error" };
-    }
-  };
+// var api = "http://localhost:8082";
+// const createAuthRequest = async (path, data) => {
+//     try {
+//         const token = localStorage.getItem("accessToken");
+//         const auth = token ? { "Authorization": `Bearer ${token}` } : {};
+//         console.log({body: JSON.stringify(data)});
+//         const response = await fetch(`${api}/${path}`, {
+//                 method: "POST",  
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                     ...auth
+//                 },
+//                 body: JSON.stringify(data)
+//             });
+//     return { response: await response.json(), type: response.ok ? "success" : "error"};
+//     } catch (error) {
+//         return { response: error, type: "error" };
+//     }
+//   };
 
-  const createGetRequest = async (path) => {
-    try {
-        const token = localStorage.getItem("accessToken");
-        const response = await fetch(`${api}/${path}`, {
-                method: "GET",  
-                headers: {
-                    Authorization: `Bearer ${token}`                    
-                }
-            })
+//   const createGetRequest = async (path) => {
+//     try {
+//         const token = localStorage.getItem("accessToken");
+//         const response = await fetch(`${api}/${path}`, {
+//                 method: "GET",  
+//                 headers: {
+//                     Authorization: `Bearer ${token}`                    
+//                 }
+//             })
         
-        return { response: await response.json(), type: response.ok ? "success" : "error"};
-    } catch (error) {
-        return { response: error, type: "error" };
-    }
-  };
+//         return { response: await response.json(), type: response.ok ? "success" : "error"};
+//     } catch (error) {
+//         return { response: error, type: "error" };
+//     }
+//   };
 
 import { sendApi } from "./api-helpers";
 
