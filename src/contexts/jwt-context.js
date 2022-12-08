@@ -67,11 +67,12 @@ export const AuthProvider = (props) => {
         const accessToken = window.localStorage.getItem('accessToken');
 
         if (accessToken) {
-          const user = await authApi.me(accessToken);
-
+          console.log("set to true ")
+          const user = (await authApi.me(accessToken))['response'];
           dispatch({
             type: 'INITIALIZE',
             payload: {
+              ...state,
               isAuthenticated: true,
               user
             }
@@ -80,6 +81,7 @@ export const AuthProvider = (props) => {
           dispatch({
             type: 'INITIALIZE',
             payload: {
+              ...state,
               isAuthenticated: false,
               user: null
             }
@@ -102,7 +104,7 @@ export const AuthProvider = (props) => {
 
   const login = async (email, password) => {
     // perform login
-    const res = await authLogin({ email, password });
+    const res = await authLogin( {email, password });
     // if successfull
     if(res.type === "success"){
       // get user profile
@@ -111,7 +113,9 @@ export const AuthProvider = (props) => {
       user["authorities"] = [...res.response.roles];
       dispatch({
         type: 'LOGIN',
-        payload: {
+        payload:  {
+          ...state,
+          isAuthenticated: true,
           user
         }
       });

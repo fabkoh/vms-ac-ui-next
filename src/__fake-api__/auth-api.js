@@ -1,6 +1,7 @@
 import { createResourceId } from '../utils/create-resource-id';
 import { sign, decode, JWT_SECRET, JWT_EXPIRES_IN } from '../utils/jwt';
 import { wait } from '../utils/wait';
+import { authGetProfile } from '../api/auth-api';
 
 const users = [
   {
@@ -73,6 +74,7 @@ class AuthApi {
   }
 
   me(accessToken) {
+    return authGetProfile();
     return new Promise((resolve, reject) => {
       try {
         // Decode access token
@@ -80,7 +82,7 @@ class AuthApi {
 
         // Find the user
         const user = users.find((_user) => _user.id === userId);
-
+        console.log("executing me func")
         if (!user) {
           reject(new Error('Invalid authorization token'));
           return;
