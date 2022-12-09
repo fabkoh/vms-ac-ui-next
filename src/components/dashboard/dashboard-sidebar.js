@@ -60,6 +60,10 @@ const getSections = (t) => [
         icon: <SettingsIcon fontSize="small" />,
         children: [
           {
+            title: 'Account Management',
+            path: '/dashboard/settings/account'
+          },
+          {
             title: 'Notifications',
             path: '/dashboard/settings/notifications'
           }
