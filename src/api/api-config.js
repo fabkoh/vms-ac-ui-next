@@ -1,4 +1,9 @@
+
+
 // URI for back end
+// const temp = await fetch('http://myserver.dontexist.com/config.js');
+
+// console.log(temp);
 const apiUri = process.env.NEXT_PUBLIC_URI;
 
 // true if using apiUri, false if using local, fake data
