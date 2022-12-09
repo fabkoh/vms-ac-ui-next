@@ -38,7 +38,13 @@ import { sendApi } from "./api-helpers";
 
 const sendApiHelper = async(path,init={}) =>{
     const response = await sendApi(path,init);
-    return { response: await response.json(), type: response.ok ? "success" : "error"};
+    try{
+        return { response: await response.json(), type: response.ok ? "success" : "error"};
+    }
+    catch{
+        console.log(response, 55)
+        return response
+    }
 }
 
 export const authLogin = async( {email, password}) => {
@@ -91,5 +97,19 @@ export const authGetProfile = async () => {
 
 export const authGetAccounts = async () => {
     const res = sendApiHelper("/api/auth/accounts");
+    return res;
+}
+
+export const authDeleteUserAdmin = async (id) => {
+    const res = await sendApiHelper(`/api/auth/deleteUserAdmin/${id}`, {
+        method: "DELETE",  
+    });
+    return res;
+}
+
+export const authDeleteTechAdmin = async (id) => {
+    const res = await sendApiHelper(`/api/auth/deleteTechAdmin/${id}`, {
+        method: "DELETE",  
+    });    
     return res;
 }
