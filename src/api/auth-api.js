@@ -75,7 +75,21 @@ export const authSignUp = async (data) => {
     });
     return res;
 }
+
+export const authEditProfile = async (data) => {
+    const res = await sendApiHelper("/api/auth/edit", {
+        method: "PUT",  
+        body: JSON.stringify(data)
+    });
+    return res;
+}
+
 export const authGetProfile = async () => {
     const res = sendApiHelper("/api/auth/profile");
+    return res;
+}
+
+export const authGetAccounts = async () => {
+    const res = sendApiHelper("/api/auth/accounts");
     return res;
 }

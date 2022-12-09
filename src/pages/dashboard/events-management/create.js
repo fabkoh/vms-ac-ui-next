@@ -1144,7 +1144,7 @@ const ModifyEventManagement = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Modify Events Management
+                    Etlas: Create Events Management
                 </title>
             </Head>
             <Box

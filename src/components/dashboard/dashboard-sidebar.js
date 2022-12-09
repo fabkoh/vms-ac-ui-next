@@ -461,6 +461,10 @@ export const DashboardSidebar = (props) => {
           icon: <HomeIcon fontSize="small" />,
           children: [
             {
+              title: 'Account',
+              path: '/dashboard/settings/account'
+            },
+            {
               title: 'Notifications',
               path: '/dashboard/settings/notifications'
             }
@@ -488,17 +492,17 @@ export const DashboardSidebar = (props) => {
       title: t('Devices'),
       items: [
         // check whether the logged in user has this role if yes then add this item in navbar
-        ...(user.authorities.includes("ROLE_SYSTEM_ADMIN") ? [{
-          title: t('Controllers'),
-          path: '/dashboard/controllers/',
-          icon: <SelectAll fontSize="small" />,
-          children: [
-            {
-              title: 'List',
-              path: '/dashboard/controllers/'
-            }
-          ]
-        }] : []),
+        // ...(user.authorities.includes("ROLE_SYSTEM_ADMIN") ? [{
+        //   title: t('Controllers'),
+        //   path: '/dashboard/controllers/',
+        //   icon: <SelectAll fontSize="small" />,
+        //   children: [
+        //     {
+        //       title: 'List',
+        //       path: '/dashboard/controllers/'
+        //     }
+        //   ]
+        // }] : []),
         {
           title: t('Video Recorders'),
           path: '/dashboard/video-recorders/',
