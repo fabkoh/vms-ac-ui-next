@@ -191,6 +191,17 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         rrule: null,
         timeStart: null,
         timeEnd: null,
+        dtstart: null,
+        until: null,
+        count: null,
+        repeatToggle: null,
+        rruleinterval: null,
+        byweekday: null,
+        bymonthday: null,
+        bysetpos: null,
+        bymonth: null,
+        allDay: null,
+        endOfDay: null,
     });
 
     const getEmptyTriggerScheduleValidation = (triggerScheduleId) => ({
@@ -237,6 +248,20 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     const changeTimeEndTriggerSchedule = (value, triggerScheduleId) => {
         const updatedInfo = [...triggerScheduleArr];
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeEnd'] = value;
+        setTriggerScheduleArr(updatedInfo);
+        checkTimeEnd(value, triggerScheduleId);
+    }
+
+    const changeRruleObjectsTriggerSchedule = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['dtstart'] = value.dtstart.toString();
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['until'] = value.until;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['count'] = value.count;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['byweekday'] = value.byweekday;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['bymonthday'] = value.bymonthday;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['bysetpos'] = value.bysetpos;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['bymonth'] = value.bymonth;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['rruleinterval'] = value.interval;
         setTriggerScheduleArr(updatedInfo);
         checkTimeEnd(value, triggerScheduleId);
     }
@@ -364,14 +389,18 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         setEnd({ ...end, [triggerScheduleId]: e });
     }
     const handleRrule = (triggerScheduleId) => (e) => {
+        console.log(e.options, 8765)
         descriptionHandler(triggerScheduleId, e);
+        changeRruleObjectsTriggerSchedule(e.options, triggerScheduleId);
         changeRruleTriggerSchedule(e?.toString() ?? "", triggerScheduleId);
         setRrulestring({ ...rrulestring, [triggerScheduleId]: e.toString() })
         setRule({ ...rule, [triggerScheduleId]: e });
     }
     //Description handler
     const descriptionHandler = (triggerScheduleId, e) => { //e should be the rrule obj
+        console.log(e,4532)
         setDescription({ ...description, [triggerScheduleId]: rruleDescription(e, start[triggerScheduleId], end[triggerScheduleId]) })
+        
     }
 
     useEffect(() => {

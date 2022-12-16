@@ -605,7 +605,7 @@ export const DashboardSidebar = (props) => {
             },
             {
               title: t('Add'),
-              path: '/dashboard/events-management/modify'
+              path: '/dashboard/events-management/create'
             }
           ]
         },
