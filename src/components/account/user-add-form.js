@@ -1,12 +1,14 @@
-import { Button, CardContent, CardHeader, Collapse, Divider, Grid, TextField, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { Button, CardContent, CardHeader, Collapse, Divider, Grid, TextField, MenuItem, InputLabel, FormControl } from "@mui/material";
 import ErrorCard from "../dashboard/shared/error-card";
+import SingleSelect from "../dashboard/shared/single-select-input";
 import ExpandMore from "../dashboard/shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef } from "react";
-import { isObject } from "../../utils/utils";
+import { getRoleLabel } from "../../utils/users";
+import { useAuth } from '../../hooks/use-auth';
 
-const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonPasswordChange, onPersonEmailChange, onPersonRoleChange,  validation, cardError }) => {
+const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNameChange, onPersonMobileNumberChange, onPersonPasswordChange, onPersonEmailChange, handlePersonRoleChange,  validation, cardError }) => {
 
     // update logic
     const personFirstNameRef = useRef(person.personFirstName);
@@ -15,7 +17,19 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
     const personMobileNumberRef = useRef(person.personMobileNumber);
     const personEmailRef = useRef(person.personEmail);
     const personRoleRef = useRef(person.personRole);
-    
+    const { user } = useAuth();
+    const roles1 = [
+        { value: 'System-Admin', label: 'System Admin' },
+        { value: 'Tech-Admin', label: 'Tech Admin' },
+        { value: 'User-Admin', label: 'User Admin' }
+    ]
+
+    const roles2 = [
+        { value: 'Tech-Admin', label: 'Tech Admin' },
+        { value: 'User-Admin', label: 'User Admin' }
+    ]
+
+
     const handlePersonFirstNameChange = (e) => {
         e.preventDefault();
         onPersonFirstNameChange(personFirstNameRef);
@@ -24,6 +38,7 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
     const handlePersonLastNameChange = (e) => {
         e.preventDefault();
         onPersonLastNameChange(personLastNameRef);
+        console.log(person, 8877, e)
     }
 
     const handlePersonPasswordChange = (e) => {
@@ -36,11 +51,6 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
     const handlePersonEmailChange = (e) => {
         e.preventDefault();
         onPersonEmailChange(personEmailRef);
-    }
-
-    const handlePersonRoleChange = (e) => {
-        e.preventDefault();
-        onPersonRoleChange(personRoleRef);
     }
 
     // expanding card logic
@@ -160,6 +170,7 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
                                         inputProps={{ ref: personMobileNumberRef }}
                                         value={person.personMobileNumber} 
                                         variant="outlined"
+                                        required
                                         error={validation.numberInvalid}
                                         helperText={
                                             (validation.numberInUse && "Note: number taken") ||
@@ -193,30 +204,14 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
                                     md={6}
                                     xs={12}
                                 >
-                                    <FormControl fullWidth>
-                                    <InputLabel id="select-role"
-                                    >Select Role</InputLabel>
-                                    <Select
-                                        labelId="select-role"
-                                        label="Select Role"
+                                    <SingleSelect
                                         fullWidth
-                                        id="role"
-                                        error={validation.roleBlank}
-                                        name="role"
-                                        required
+                                        label="Select Role"
+                                        getLabel={(role) => role.label}
                                         onChange={handlePersonRoleChange}
-                                    >
-                                        <MenuItem value="System-Admin">
-                                        System Admin
-                                        </MenuItem>
-                                        <MenuItem value="Tech-Admin">
-                                        Tech Admin
-                                        </MenuItem>
-                                        <MenuItem value="Admin-User">
-                                        Admin User
-                                        </MenuItem>
-                                    </Select>
-                                    </FormControl>
+                                        options={((user!=null) && user.authorities.includes("ROLE_SYSTEM_ADMIN"))? roles1 : roles2}
+                                        getValue={(role) => role.value}
+                                    />
                                 </Grid>
                             </Grid>
                         </Collapse>
