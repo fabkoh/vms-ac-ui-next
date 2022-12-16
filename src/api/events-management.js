@@ -150,6 +150,12 @@ class EventsManagementApi {
     deleteById(emId) {
         return sendApi(`/api/eventsmanagement/${emId}`, {method : 'DELETE'});
     }
+
+    editEventsManagement(emId, eventsManagementList, entranceIds, controllerIds) {
+        Promise.resolve(this.deleteById(emId))
+        .then(this.addEventsManagement(eventsManagementList, entranceIds, controllerIds))
+        
+    }
 }
 
 export const eventsManagementApi = new EventsManagementApi();
