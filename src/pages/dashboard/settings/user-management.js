@@ -32,21 +32,26 @@ const AccountManagement = () => {
     const isMounted = useMounted(); 
 
 
-    const [expandedAccount, setExpandedAccount] = useState(false)
     const [expandedUsers, setExpandedUsers] = useState(false)
-    const [userSettings, setUserSettings] = useState(false)
+    const [usersList, setUsersList] = useState(false)
     const [isUpdated, setIsUpdated] = useState(false)
 
-    const handleExpandedAccount= () => setExpandedAccount(!expandedAccount);
+    const handleExpandedUsers = () => setExpandedUsers(!expandedUsers);
 
-    const getUser = async() => {
+    const getUserList = async() => {
         try {
-            const res = await authGetProfile();
-            console.log(res)
+            const res = await authGetAccounts();
             if (res.type == 'success') {
                 const body = res.response
-                const settings = { ...body }
-                setUserSettings(settings);
+                console.log(body)
+                const newList = []
+                for (const role of Object.keys(body)){
+                    for (const user of body[role]){
+                        user['role'] = role
+                        newList.push(user)
+                    }
+                }
+                setUsersList(newList);
                 setIsUpdated(true)
             } else {
                 if (res.status == serverDownCode) {
@@ -58,9 +63,8 @@ const AccountManagement = () => {
             }
     }
 
-
     const getInfo = useCallback( () => {
-        getUser();
+        getUserList();
     }, [isMounted]);
     
     useEffect(() => {
@@ -97,37 +101,28 @@ const AccountManagement = () => {
 					/>
                     </Box>
                     <div>
-                        <Typography variant="h3">My Account Settings</Typography>
+                        <Typography variant="h3">User Management</Typography>
                     </div>
                     <Stack spacing={4}
                             sx={{mt:4}}>
                         <Card>
                             <CardHeader
-                            title="Update My Account Details"
-                            avatar={
-                                <ExpandMore
-                                    expand={expandedAccount}
-                                    onClick={handleExpandedAccount}
-                                >
-                                    <ExpandMoreIcon />
-                                </ExpandMore>
-                                }
-                            />
-                            <Collapse in={expandedAccount}>
-                                {userSettings && isUpdated ?
-                                    <CardContent sx={[{mx:7},{mt:-4},{mb:2}]}>
-                                        <Grid container
-                                        alignItems="center"
-                                        spacing={3}
-                                        justifyContent="flex-start">
-                                            <Grid item md={6}>
-                                                <EditAccountDetails props={userSettings}/>
-                                            </Grid>
-                                        </Grid>
-                                        </CardContent>
+                                title="Manage System Users"
+                                avatar={
+                                    <ExpandMore
+                                        expand={expandedUsers}
+                                        onClick={handleExpandedUsers}
+                                    >
+                                        <ExpandMoreIcon />
+                                    </ExpandMore>
+                                    }
+                                />
+                            <Collapse in={expandedUsers}>
+                                {usersList && isUpdated ?
+                                    <UsersList />
                                     : null
                                 }
-                            </Collapse>                            
+                            </Collapse>
                         </Card>
                     </Stack>
                 </Container>
