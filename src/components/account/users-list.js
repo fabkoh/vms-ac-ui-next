@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import router, { useRouter } from "next/router";
+import { CSVLink } from "react-csv";
 import {
 	Box,
 	Button,
@@ -39,10 +40,126 @@ import { createFilter } from "../../utils/list-utils";
 import { userCreateLink, filterUserByString } from "../../utils/users";
 import { ServerDownError } from "../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../api/api-helpers";
-import { authDeleteTechAdmin, authGetAccounts, authDeleteUserAdmin } from "../../api/auth-api"
+import { authDeleteTechAdmin, authGetAccounts, authDeleteUserAdmin, authSignUp } from "../../api/auth-api"
 
 
 export const UsersList = () => {
+
+	const headers = [
+		{ label: "First Name", key: "firstName" },
+		{ label: "Last Name", key: "lastName" },
+		{ label: "Email", key: "email" },
+		{ label: "Mobile Number", key: "mobile" },
+		{ label: "Role", key: "role" }
+	  ];
+
+	const headersTemplate = [
+		{ label: "First Name", key: "firstName" },
+		{ label: "Last Name", key: "lastName" },
+		{ label: "Email", key: "email" },
+		{ label: "Mobile Number", key: "mobile" },
+		{ label: "Password", key: "password" },
+		{ label: "Role", key: "role" },
+		{ label: " ", key: " " }
+	  ];
+	  
+
+	const fileReader = new FileReader();
+
+	const createPerson = async (person) => {
+        console.log(person);
+        const userSettings = {
+            firstName: person.personFirstName,
+            lastName: person.personLastName,
+            email: person.personEmail,
+            password: person.personPassword,
+            role: person.personRole,
+            mobile: person.personMobileNumber
+          }
+        try {
+            const res = await authSignUp(userSettings);
+            console.log(res)
+            if (res.type != 'success') {
+                throw new Error("Unable to register User")
+            }
+            return true;
+        } catch(e) {
+            console.error(e);
+            return false;
+        } finally {
+			getPersonsLocal()
+		}
+    }
+
+	const submitForm = async (personsInfo) => {
+        // send res
+		// TODO: Add validation to credentials here and some error handling
+		console.log(personsInfo);
+        try {
+            const boolArr = await Promise.all(personsInfo.map(p => createPerson(p)));
+
+            // success toast
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) {
+                toast.success(`Successfully created ${numSuccess} users`); 
+            }
+
+            // if some failed
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to create users below");    
+                // filter failed personsInfo and personsValidation
+            } else {
+                // all success
+            }
+        } catch (e) {
+            console.log("error", e);
+            toast.error("Unable to create users");
+		}
+		finally {
+			getPersonsLocal();
+		}
+	}
+
+	const csvFileToArray = string => {
+		const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
+		const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
+
+		const array = csvRows.map(i => {
+		const values = i.split(",");
+		const obj = csvHeader.reduce((object, header, index) => {
+			object[header] = values[index];
+			return object;
+		}, {});
+		return obj;
+		});
+		submitForm(array.map((person, index) => {
+			console.log(person, 22)
+			return {
+				personId: index,
+				personFirstName: person["First Name"],
+				personLastName: person["Last Name"],
+				personEmail: person["Email"],
+				personMobileNumber: person["Mobile Number"],
+				personRole: [ person["Role"] ],
+				personPassword: person["Password"],
+			}
+		}));
+	};
+
+	const handleOnChange = (e) => {
+		let file = e.target.files[0];
+		if (file) {
+			fileReader.onload = function (event) {
+				const text = event.target.result;
+				csvFileToArray(text);
+			};
+
+			fileReader.readAsText(file);
+		}
+		// to reset the input value otherwise uploading the same file won't trigger the onchange function
+		e.target.value = null;
+  	};
+
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
 
@@ -312,16 +429,52 @@ export const UsersList = () => {
 					justifyContent="space-between"
 					spacing={3}>
 						<Grid item>
-							<Button startIcon={<UploadIcon fontSize="small" />}
+							<Button 
+								component="label"
+								startIcon={<UploadIcon fontSize="small" />}
 								sx={{ m: 1 }}>
+								<input
+									type={"file"}
+									id={"csvFileInput"}
+									accept={".csv"}
+									onChange={handleOnChange}
+									hidden
+								/>
 								Import
 							</Button>
+							<CSVLink
+								style={{ textDecoration: 'none' }}
+								data={filteredPersons.map(person => {
+									return {
+										firstName: person.firstName,
+										lastName: person.lastName,
+										mobile: person.mobile || "No mobile number",
+										email: person.email || "No email",
+										role: person.role,
+									}
+								})}
+								headers={headers}
+								filename={"Users.csv"}
+							>
 							<Button
 								startIcon={<DownloadIcon fontSize="small" />}
 								sx={{ m: 1 }}
 							>
 								Export
-							</Button>
+								</Button>
+							</CSVLink>
+							<CSVLink
+									style={{ textDecoration: 'none' }}
+									data={[]}
+									headers={headersTemplate}
+									filename={"UsersTemplate.csv"}
+							>
+								<Button
+									sx={{ m: 1 }}
+								>
+									Download Import Template
+								</Button>
+							</CSVLink>
 							<Tooltip  title='Excel template can be found at {}'
 							enterTouchDelay={0}
 								placement ='top'

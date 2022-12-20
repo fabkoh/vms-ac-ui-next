@@ -5,7 +5,7 @@ import NextLink from "next/link";
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
 import { createCounterObject, getDuplicates } from "../../../../utils/form-utils";
-import { accountLink } from "../../../../utils/users";
+import { usersManagementLink } from "../../../../utils/users";
 import { useCallback, useEffect, useState } from 'react';
 import UserAddForm from "../../../../components/account/user-add-form";
 import { useMounted } from "../../../../hooks/use-mounted";
@@ -28,7 +28,7 @@ const getNewPersonInfo = (id) => ({
     personMobileNumber: '',
     personEmail: '',
     personPassword: '',
-    personRole: '',
+    personRole: [],
 });
 
 const getNewPersonValidation = (id) => ({
@@ -185,12 +185,19 @@ const CreatePersonsTwo = () => {
         if (b1) { setPersonsValidation([ ...personsValidation ]); }
     };
 
-    const onPersonRoleChangeFactory = (id) => (ref) => {
-        changeTextField("personRole", id, ref);
+    // const onPersonRoleChangeFactory = (id) => (ref) => {
+    //     changeTextField("personRole", id, ref);
 
-        const b1 = blankCheckHelper(id, "roleBlank", ref.current?.value, personsValidation);
+    //     const b1 = blankCheckHelper(id, "roleBlank", ref.current?.value, personsValidation);
 
-        if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    //     if (b1) { setPersonsValidation([ ...personsValidation ]); }
+    // };
+
+    const onPersonRoleChangeFactory = (id) => (e) => {
+        const newInfo = [ ...personsInfo ];
+        const value = e.target.value;
+        newInfo.find(p => p.personId === id).personRole = [value];
+        setPersonsInfo(newInfo);
     };
 
     const submitDisabled = (
@@ -203,7 +210,7 @@ const CreatePersonsTwo = () => {
 
     // return true if the person creation was successful
     const createPerson = async (person) => {
-        console.log(person);
+        console.log(person, 34);
         const userSettings = {
             firstName: person.personFirstName,
             lastName: person.personLastName,
@@ -212,6 +219,7 @@ const CreatePersonsTwo = () => {
             role: person.personRole,
             mobile: person.personMobileNumber.slice(1,)
           }
+          console.log(userSettings, 12)
         try {
             const res = await authSignUp(userSettings);
             console.log(res)
@@ -247,7 +255,7 @@ const CreatePersonsTwo = () => {
                 setPersonsValidation(personsValidation.filter((v, i) => !boolArr[i]));
             } else {
                 // all success
-                router.replace(accountLink);
+                router.replace(usersManagementLink);
             }
         } catch (e) {
             console.log("error", e);
@@ -275,7 +283,7 @@ const CreatePersonsTwo = () => {
                             handleDialogClose={() => setServerDownOpen(false)}
 					    />
                         <NextLink
-                            href={accountLink}
+                            href={usersManagementLink}
                             passHref
                         >
                             <Link
@@ -290,7 +298,7 @@ const CreatePersonsTwo = () => {
                                     fontSize="small"
                                     sx={{ mr: 1 }}
                                 />
-                                <Typography variant="subtitle2">Account</Typography>
+                                <Typography variant="subtitle2">Users Management</Typography>
                             </Link>
                         </NextLink>
                     </Box>
@@ -313,7 +321,7 @@ const CreatePersonsTwo = () => {
                                                 onPersonMobileNumberChange={onPersonMobileNumberChangeFactory(id)}
                                                 onPersonEmailChange={onPersonEmailChangeFactory(id)}
                                                 onPersonPasswordChange={onPersonPasswordChangeFactory(id)}
-                                                onPersonRoleChange={onPersonRoleChangeFactory(id)}
+                                                handlePersonRoleChange={onPersonRoleChangeFactory(id)}
                                                 validation={personsValidation[i]}
                                                 cardError={cardError}
                                             />
@@ -342,7 +350,7 @@ const CreatePersonsTwo = () => {
                                         Create Users
                                     </Button>
                                     <NextLink
-                                        href={accountLink}
+                                        href={usersManagementLink}
                                         passHref
                                     >
                                         <Button

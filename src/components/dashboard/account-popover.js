@@ -105,7 +105,7 @@ export const AccountPopover = (props) => {
           </MenuItem>
         </NextLink>
         <NextLink
-          href="/dashboard/account"
+          href="/dashboard/settings/account"
           passHref
         >
           <MenuItem component="a">
@@ -116,23 +116,6 @@ export const AccountPopover = (props) => {
               primary={(
                 <Typography variant="body1">
                   Settings
-                </Typography>
-              )}
-            />
-          </MenuItem>
-        </NextLink>
-        <NextLink
-          href="/dashboard"
-          passHref
-        >
-          <MenuItem component="a">
-            <ListItemIcon>
-              <SwitchHorizontalOutlinedIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <Typography variant="body1">
-                  Change organization
                 </Typography>
               )}
             />

@@ -1,7 +1,7 @@
 import { filterByState, isObject, stringIn } from "./utils";
 
 const userCreateLink = '/dashboard/settings/users/create';
-const accountLink = '/dashboard/settings/account';
+const usersManagementLink = '/dashboard/settings/user-management';
 
 
 const stringFilterHelper = (user, query) => (
@@ -21,4 +21,4 @@ const filterUsersByString = (users, queryString) => {
 }
 
 
-export {userCreateLink, filterUserByString, filterUsersByString, accountLink}
+export {userCreateLink, filterUserByString, filterUsersByString, usersManagementLink}
