@@ -30,10 +30,12 @@ import { InformationCircleOutlined as InformationCircleOutlinedIcon } from '../.
 import { Reports as ReportsIcon } from '../../icons/reports';
 import { Users as UsersIcon } from '../../icons/users';
 import { gtm } from '../../lib/gtm';
+import useExternalScripts from '../../__fake-api__/config';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);
-
+  // console.log("testing external scripts");
+  // console.log(useExternalScripts("http://myserver.dontexist.com/config.js"));
   useEffect(() => {
     gtm.push({ event: 'page_view' });
   }, []);

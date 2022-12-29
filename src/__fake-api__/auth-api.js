@@ -7,9 +7,9 @@ const users = [
   {
     id: '5e86809283e28b96d2d38537',
     avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    email: 'demo@devias.io',
+    email: 'ISSAdmin@isssecurity.sg	',
     name: 'Anika Visser',
-    password: 'Password123!',
+    password: 'ISSAdmin',
     plan: 'Premium'
   }
 ];
@@ -74,7 +74,7 @@ class AuthApi {
   }
 
   me(accessToken) {
-    return authGetProfile();
+    // return authGetProfile();
     return new Promise((resolve, reject) => {
       try {
         // Decode access token

@@ -11,8 +11,8 @@ export const FirebaseLogin = (props) => {
   const { signInWithEmailAndPassword, signInWithGoogle } = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: 'ISSAdmin@isssecurity.sg	',
+      password: 'ISSAdmin',
       submit: null
     },
     validationSchema: Yup.object({
@@ -150,11 +150,11 @@ export const FirebaseLogin = (props) => {
             <div>
               You can use
               {' '}
-              <b>demo@devias.io</b>
+              <b>ISSAdmin@isssecurity.sg	</b>
               {' '}
               and password
               {' '}
-              <b>Password123!</b>
+              <b>ISSAdmin</b>
             </div>
           </Alert>
         </Box>

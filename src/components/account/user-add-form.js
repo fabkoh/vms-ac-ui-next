@@ -209,7 +209,7 @@ const UserAddForm = ({ onClear, person, onPersonFirstNameChange, onPersonLastNam
                                         label="Select Role"
                                         getLabel={(role) => role.label}
                                         onChange={handlePersonRoleChange}
-                                        options={((user!=null) && user.authorities.includes("ROLE_SYSTEM_ADMIN"))? roles1 : roles2}
+                                        options={((user!=null) && user.authorities.some(pair => pair.authority === "ROLE_SYSTEM_ADMIN"))? roles1 : roles2}
                                         getValue={(role) => role.value}
                                     />
                                 </Grid>

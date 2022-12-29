@@ -55,7 +55,7 @@ export const authLogin = async( {email, password}) => {
                                })
         if(res.type === "success") { 
             localStorage.setItem("accessToken", res.response.accessToken)
-            sessionStorage.setItem("refreshToken", res.response.refreshToken);
+            localStorage.setItem("refreshToken", res.response.refreshToken);
         }
         return res;
 } 
@@ -63,14 +63,15 @@ export const authLogin = async( {email, password}) => {
 export const authRenewToken = async() => {
     const res = await sendApiHelper("/api/auth/refreshtoken", {
         method: "POST",  
-        refreshToken: sessionStorage.getItem("refreshToken") });
+        refreshToken: localStorage.getItem("refreshToken") });
     
     if(res.type === "success") { localStorage.setItem("accessToken", res.response.accessToken); }
 }
 
 
 export const authLogOut = async() => {
-    const res = await sendApiHelper("/api/auth/signout");
+    const res = await sendApiHelper("/api/auth/signout",{
+        method: "POST"});
     if(res.type === "success") { localStorage.removeItem("accessToken"); }
 }
 

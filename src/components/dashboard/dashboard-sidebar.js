@@ -444,7 +444,6 @@ export const DashboardSidebar = (props) => {
   const [syncErrorOpen, setSyncErrorOpen] = useState(false);
   const { user } = useAuth();
 
-
   const getSections = (t) => [
   
     {
@@ -455,7 +454,7 @@ export const DashboardSidebar = (props) => {
           path: '/dashboard',
           icon: <HomeIcon fontSize="small" />
         },
-        ...(!user.authorities.includes("ROLE_USER_ADMIN") ? [{
+        ...(!user.authorities.some(pair => pair.authority === "ROLE_USER_ADMIN") ? [{
           title: t('Settings'),
           path: '/settings',
           icon: <HomeIcon fontSize="small" />,
@@ -492,7 +491,7 @@ export const DashboardSidebar = (props) => {
       title: t('Devices'),
       items: [
         // check whether the logged in user has this role if yes then add this item in navbar
-        ...(user.authorities.includes("ROLE_SYSTEM_ADMIN") ? [{
+        ...(user.authorities.some(pair => pair.authority === "ROLE_SYSTEM_ADMIN") ? [{
           title: t('Controllers'),
           path: '/dashboard/controllers/',
           icon: <SelectAll fontSize="small" />,

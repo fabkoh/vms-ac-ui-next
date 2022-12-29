@@ -25,8 +25,9 @@ export const AuthGuard = (props) => {
         
         // if any of the given role is not present redirect back  
         if(props.page==='Controllers' && user && !( 
-            user.authorities.includes("ROLE_SYSTEM_ADMIN") || 
-            user.authorities.includes("ROLE_TECH_ADMIN")) ) 
+            user.authorities.some(pair => pair.authority === "ROLE_SYSTEM_ADMIN")|| 
+            user.authorities.some(pair => pair.authority === "ROLE_TECH_ADMIN")) ) 
+            
         {
           router.back();        
         }

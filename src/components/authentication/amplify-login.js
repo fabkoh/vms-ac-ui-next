@@ -11,8 +11,8 @@ export const AmplifyLogin = (props) => {
   const { login } = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: 'ISSAdmin@isssecurity.sg	',
+      password: 'ISSAdmin',
       submit: null
     },
     validationSchema: Yup.object({
@@ -35,7 +35,7 @@ export const AmplifyLogin = (props) => {
 
         if (isMounted()) {
           if (err.code === 'UserNotConfirmedException') {
-            sessionStorage.setItem('username', values.email);
+            localStorage.setItem('username', values.email);
             router.push('/authentication/verify-code');
             return;
           }
@@ -101,11 +101,11 @@ export const AmplifyLogin = (props) => {
           <div>
             You can use
             {' '}
-            <b>demo@devias.io</b>
+            <b>ISSAdmin@isssecurity.sg	</b>
             {' '}
             and password
             {' '}
-            <b>Password123!</b>
+            <b>ISSAdmin</b>
           </div>
         </Alert>
       </Box>
