@@ -24,12 +24,14 @@ import { useEffect, useState } from "react";
 import { RRule, RRuleSet, rrulestr } from "rrule";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/styles";
+import Rrule from "./rrule-form";
 
 
 const Rrule2 = (props) => {
 	const {
 		//only pass RRuleobj, timestart, timeend.
 		handleRrule,
+		handleAdd,
 		getStart,
 		getEnd,
 		timeEndInvalid,
@@ -41,24 +43,31 @@ const Rrule2 = (props) => {
 
 	const [rule, setRule] = useState({
 		//rule object use to create the string and text description
-		freq:RRule.DAILY,
-		interval: null,
-		byweekday: null, //[0,1,2,3,4,5,6]
-		bymonthday: null,
-		bysetpos: null,
-		bymonth: null,
+		freq: ogRrule.bymonth 
+				? RRule.YEARLY
+				: ogRrule.bymonthday > 0
+					? RRule.MONTHLY
+					: ogRrule.byweekday > 0
+						? RRule.WEEKLY
+						: RRule.DAILY,
+
+		interval: ogRrule.rruleinterval,
+		byweekday: ogRrule.byweekday, //[0,1,2,3,4,5,6]
+		bymonthday: ogRrule.bymonthday,
+		bysetpos: ogRrule.bysetpos,
+		bymonth: ogRrule.bymonth,
 	});
 	const [nonChangingRule, setNonChangingRule] = useState({
-		dtstart: null,
-		until: null,
-		count: null,
-		timeStart: null,
-		timeEnd: null,
+		timeStart:ogRrule.timeStart,
+		timeEnd:ogRrule.timeEnd,
+		dtstart:new Date(ogRrule.dtstart),
+		count:ogRrule.count,
+		until:ogRrule.until
 	})
 	
 
 	//handle repeatToggle for conditional rendering
-	const [repeatToggle, setRepeatToggle] = useState(false);
+	const [repeatToggle, setRepeatToggle] = useState(ogRrule.repeatToggle);
 	const handleRepeatToggle = () => {
 		repeatToggle
 			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
@@ -66,45 +75,70 @@ const Rrule2 = (props) => {
 			  setRule({freq:2,interval:1}),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
 	};
 
+	// editing 
+	const [firstRendering, setfirstRendering] = useState(false);
 	const handleRenderOriginal = () => {
-		console.log('rendering in progress', ogRrule)
-		if (ogRrule.byweekday && ogRrule.byweekday.length > 0) {
-			rule['freq'] = RRule.WEEKLY
-		}
-		else if (ogRrule.bymonthday && ogRrule.bymonthday.length > 0) {
-			rule['freq'] = RRule.MONTHLY
-		}
-		else if (ogRrule.bymonth && ogRrule.bymonth.length > 0) {
-			rule['freq'] = RRule.YEARLY
-		}
-		else{
-			handleRepeatToggle()
-		}
+		if (!firstRendering){
+			
+			console.log('rendering in progress', ogRrule)
 		
-		rule['interval'] = ogRrule.interval
-		rule['byweekday'] = ogRrule.byweekday
-		rule['bymonthday'] = ogRrule.bymonthday
-		rule['bysetpos'] = ogRrule.bysetpos
-		rule['bymonth'] = ogRrule.bymonth
+			// setTimeStart(ogRrule.starttime);
+			// setNonChangingRule(prevState=>({...prevState,timeStart:ogRrule.starttime}))
+			// setTimeEnd(ogRrule.endTime);
+			// setNonChangingRule(prevState=>({...prevState,timeEnd:ogRrule.endTime}))
+			// setRule({freq:2,interval:1}),setNonChangingRule(prevState=>(
+			// 	{...prevState,until:ogRrule.until, count:ogRrule.count}))
 
-		// nonChangingRule['dtstart'] = JSON.parse(ogRrule.dtstart)
-		nonChangingRule['until'] = ogRrule.until
-		nonChangingRule['count'] = ogRrule.count
-		nonChangingRule['timeStart'] = ogRrule.timeStart
-		nonChangingRule['timeEnd'] = ogRrule.timeEnd
+			// setRepeatToggle(ogRrule.repeatToggle)
+			// handleRepeatToggle()
+			// setAllDay(ogRrule.allDay)
+			// handleAllDay()
+			// setEndOfDay(ogRrule.endOfDay)
+			// handleEndOfDay()
+			
+			// handleRrule(ogRrule)
+			// handleAdd(ogRrule)
+			// if (eachRrule.byweekday && eachRrule.byweekday.length > 0) {
+			// 	rule['freq'] = RRule.WEEKLY
+			// }
+			// else if (eachRrule.bymonthday && eachRrule.bymonthday.length > 0) {
+			// 	rule['freq'] = RRule.MONTHLY
+			// }
+			// else if (eachRrule.bymonth && eachRrule.bymonth.length > 0) {
+			// 	rule['freq'] = RRule.YEARLY
+			// }
+			// else{
+			// 	handleRepeatToggle()
+			// }
+			
+			// rule['interval'] = eachRrule.interval
+			// rule['byweekday'] = eachRrule.byweekday
+			// rule['bymonthday'] = eachRrule.bymonthday
+			// rule['bysetpos'] = eachRrule.bysetpos
+			// rule['bymonth'] = eachRrule.bymonth
 
-		if(ogRrule.timeStart=="0:00" && ogRrule.timeEnd=="24:00"){
-			setAllDay(true)
-		}
-		else if (ogRrule.timeEnd=="24:00"){
-			setEndOfDay(true)
+			// // nonChangingRule['dtstart'] = JSON.parse(ogRrule.dtstart)
+			// nonChangingRule['until'] = eachRrule.until
+			// nonChangingRule['count'] = eachRrule.count
+			// nonChangingRule['timeStart'] = eachRrule.timeStart
+			// nonChangingRule['timeEnd'] = eachRrule.timeEnd
+
+			// if(eachRrule.timeStart=="0:00" && eachRrule.timeEnd=="24:00"){
+			// 	setAllDay(true)
+			// }
+			// else if (eachRrule.timeEnd=="24:00"){
+			// 	setEndOfDay(true)
+			//}
+		
+			setfirstRendering(true)
 		}
 
 	}
 
-	// useEffect(() => {
-	// 	handleRenderOriginal();
-	// }, [])
+	
+	useEffect(() => {
+		handleRenderOriginal();
+	}, [])
 
 	const setrrule = () => {
 		try {
@@ -112,6 +146,9 @@ const Rrule2 = (props) => {
 			const newRule2 = { ...rule, ...newrule1 };
 			const rule2 = new RRule(newRule2);
 			handleRrule(rule2);
+			handleAdd({"allDay":allDay,
+			"endOfDay":endOfDay,
+			"repeatToggle":repeatToggle});
 		} catch(e) { console.log(e); };
 	}
 
@@ -122,7 +159,7 @@ const Rrule2 = (props) => {
 	}, [rule,nonChangingRule])
 	
 	//handle dtstart
-	const [dtstart, setDtstart] = useState(false);
+	const [dtstart, setDtstart] = useState(new Date(ogRrule.dtstart).toISOString().slice(0, 10));
 	const handleDtstart = (e) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
@@ -131,18 +168,18 @@ const Rrule2 = (props) => {
 		handleInvalidBegin(false)
 	};
 	//start of All Day toggle + renderer
-	const [allDay, setAllDay] = useState(true);
+	const [allDay, setAllDay] = useState(ogRrule.allDay);
 	const handleAllDay = () => {
 		allDay ? setAllDay(false) : setAllDay(true);
 	};
 
 	// handle "end of day" time end mode (24:00)
-	const [endOfDay, setEndOfDay] = useState(true);
+	const [endOfDay, setEndOfDay] = useState(ogRrule.endOfDay);
 	const handleEndOfDay = () => {
 		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
 	};
 	
-	const [timeStart, setTimeStart] = useState("00:00"); //timeStart lift up state
+	const [timeStart, setTimeStart] = useState(ogRrule.timeStart); //timeStart lift up state
 	const handleTimeStart = (e) => {
 		if(e.target.value==""){
 			console.warn("START TIME IS EMPTYYYY")
@@ -151,7 +188,7 @@ const Rrule2 = (props) => {
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
 	};
-	const [timeEnd, setTimeEnd] = useState("00:00"); //timeEnd lift up state
+	const [timeEnd, setTimeEnd] = useState(ogRrule.timeEnd); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
 		if(timeEnd<timeStart){
 			// console.warn("invalid time")
@@ -162,6 +199,8 @@ const Rrule2 = (props) => {
 		setNonChangingRule(prevState=>({...prevState,timeEnd:e.target.value}))
 
 	};
+	
+
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
 		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart: timeStart,timeEnd: endOfDay ? timeEnd : "24:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
@@ -232,7 +271,7 @@ const Rrule2 = (props) => {
 	//end of All Day toggle + renderer
 
 	//handles interval
-	const [interval, setInterval] = useState(1); //interval lift up state
+	const [interval, setInterval] = useState(ogRrule.interval); //interval lift up state
 	const handleInterval = (e) => {
 		e.target.value <= 1
 			? (setRule((prevState) => ({ ...prevState, interval: 1 })),setInterval(1))
@@ -240,7 +279,7 @@ const Rrule2 = (props) => {
 	};
 
 	//start of Freq renderer to handle RRule freq conditional rendering
-	const [freq, setFreq] = useState();
+	const [freq, setFreq] = useState(rule.freq);
 	const handleFreq = (e) => {
 		setFreq(e.target.value);
 		setRule((prevState) => ({
@@ -249,14 +288,16 @@ const Rrule2 = (props) => {
 		}));
 	};
 
-	const [byweekday, setByweekday] = useState([]); 
+	const [byweekday, setByweekday] = useState(ogRrule.byweekday); 
 	useEffect(() => {
 	  handleYearly()
 	}, [rule.handleDtstart])
 	
 	useEffect(() => { //reininitialize fields based on freq
+		
 		if (repeatToggle && rule.freq == RRule.WEEKLY) { //reinitialize for weekly options
 			setMonthOptionsMenu(null)
+			
 			const date = new Date();
 			const day = date.getDay();
 			const f = day;
@@ -297,7 +338,9 @@ const Rrule2 = (props) => {
 		  }));
 		  handleYearly();
 		//   setMonthMenuState(null)
-		}
+		// }
+		// setfirstRendering(true)
+	}
 	}, [rule.freq]);
 	const handleYearly = () => {
 		const dateobj = new Date(nonChangingRule.dtstart);
@@ -381,7 +424,7 @@ const Rrule2 = (props) => {
 		
 	}
 
-	const [monthOptionsMenu, setMonthOptionsMenu] = useState()
+	const [monthOptionsMenu, setMonthOptionsMenu] = useState(ogRrule.bymonthday>0 ? "1" : "2")
 	const handleMonthOptionsMenu = (e) => {
 		setMonthOptionsMenu(e.target.value)
 	}
@@ -568,7 +611,7 @@ const Rrule2 = (props) => {
 
 	
 	//handle until
-	const [until, setUntil] = useState()
+	const [until, setUntil] = useState(ogRrule.until)
 	const handleUntil = (e) => {
 		const dateobj = new Date(e.target.value)
 		handleInvalidUntil(false)
@@ -581,7 +624,7 @@ const Rrule2 = (props) => {
 		setNonChangingRule(prevState=>({...prevState, until:dateobj}))
 	}
 	//handle count for number of occurrences
-	const [count, setCount] = useState(1);
+	const [count, setCount] = useState(ogRrule.count);
 	const handleCount = (e) => {
 		e.target.value <= 1
 			? (setNonChangingRule((prevState) => ({ ...prevState, count: 1 })),setCount(1))
@@ -607,7 +650,8 @@ const Rrule2 = (props) => {
 		invalidUntil()
 		endRenderer(end)
 	}, [monthOptionsMenu])
-	
+
+
 	const endRenderer = (e) => {
 		if (e == "after") {
 			return (
@@ -699,7 +743,7 @@ const Rrule2 = (props) => {
 						<FormControlLabel
 							label={<Typography fontWeight="bold"> Repeat </Typography>}
 							labelPlacement="start"
-							control={<Switch onChange={handleRepeatToggle} />}
+							control={<Switch onChange={handleRepeatToggle} checked={ogRrule.repeatToggle}/>}
 						/>
 					</FormGroup>
 				</FormControl>
@@ -792,7 +836,7 @@ const Rrule2 = (props) => {
 							<FormControlLabel
 								label={<Typography fontWeight="bold">All Day</Typography>}
 								labelPlacement="start"
-								control={<Switch onChange={handleAllDay}></Switch>}
+								control={<Switch onChange={handleAllDay} checked={!allDay}></Switch>}
 							/>
 						</FormGroup>
 					</FormControl>
@@ -809,7 +853,8 @@ mr={3}>
 							<FormControlLabel
 								label={<Typography fontWeight="bold">End of day</Typography>}
 								labelPlacement="start"
-								control={<Switch value={endOfDay} disabled={!allDay} onChange={handleEndOfDay}></Switch>}
+								control={<Switch value={endOfDay} disabled={!allDay} onChange={handleEndOfDay}
+									checked={!endOfDay}></Switch>}
 							/>
 						</FormGroup>
 					</FormControl>

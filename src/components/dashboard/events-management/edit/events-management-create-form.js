@@ -194,14 +194,14 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         dtstart: null,
         until: null,
         count: null,
-        repeatToggle: null,
+        repeatToggle: false,
         rruleinterval: null,
         byweekday: null,
         bymonthday: null,
         bysetpos: null,
         bymonth: null,
-        allDay: null,
-        endOfDay: null,
+        allDay: false,
+        endOfDay: false,
     });
 
     const getEmptyTriggerScheduleValidation = (triggerScheduleId) => ({
@@ -263,6 +263,17 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['bymonth'] = value.bymonth;
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['rruleinterval'] = value.interval;
         setTriggerScheduleArr(updatedInfo);
+        checkTimeEnd(value, triggerScheduleId);
+    }
+
+    const changeRruleObjectsTriggerScheduleForAdditional = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        //console.log(value);
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['allDay'] = value.allDay;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['endOfDay'] = value.endOfDay;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['repeatToggle'] = value.repeatToggle;
+        setTriggerScheduleArr(updatedInfo);
+        //console.log("9997",triggerScheduleArr);
         checkTimeEnd(value, triggerScheduleId);
     }
 
@@ -343,7 +354,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
     const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
     const [outputActionsValueWithoutTimerState, setOutputActionsValueWithoutTimerState] = useState(outputActionsValueForWithoutTimer);
-    console.log(1234, outputActionsValueForWithoutTimer, outputActionsValueWithoutTimer)
+    //console.log(1234, outputActionsValueForWithoutTimer, outputActionsValueWithoutTimer)
 
     const notificationEmailsValue = notificationEmails[eventsManagementId]
     const notificationSMSsValue = notificationSMSs[eventsManagementId]
@@ -389,12 +400,17 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         setEnd({ ...end, [triggerScheduleId]: e });
     }
     const handleRrule = (triggerScheduleId) => (e) => {
-        console.log(e.options, 8765)
+        //console.log(e, 8765);
         descriptionHandler(triggerScheduleId, e);
         changeRruleObjectsTriggerSchedule(e.options, triggerScheduleId);
         changeRruleTriggerSchedule(e?.toString() ?? "", triggerScheduleId);
         setRrulestring({ ...rrulestring, [triggerScheduleId]: e.toString() })
         setRule({ ...rule, [triggerScheduleId]: e });
+    }
+
+    const handleAdd = (triggerScheduleId) => (e) => {
+        //console.log(e, 8788);
+        changeRruleObjectsTriggerScheduleForAdditional(e, triggerScheduleId);
     }
     //Description handler
     const descriptionHandler = (triggerScheduleId, e) => { //e should be the rrule obj
@@ -1030,6 +1046,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         >
                                             <Rrule
                                                 handleRrule={handleRrule(schedule.triggerScheduleId)}
+                                                handleAdd={handleAdd(schedule.triggerScheduleId)}
                                                 getStart={getStart(schedule.triggerScheduleId)}
                                                 getEnd={getEnd(schedule.triggerScheduleId)}
                                                 timeEndInvalid={triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid}

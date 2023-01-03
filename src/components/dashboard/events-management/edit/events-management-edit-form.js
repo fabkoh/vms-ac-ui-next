@@ -36,7 +36,7 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
     const outputEventsWithoutTimer = allOutputEvents.filter(e => !e.timerEnabled);
     const MAX_INPUT_TIMER_DURATION = 300;
     const MAX_OUTPUT_TIMER_DURATION = 300;
-    console.log(originalEM, "og")
+    //console.log(originalEM, "og")
 
     const getEmptyInputWithTimer = (inputId) => ({
         inputId, // this id will not be used for anything
@@ -191,18 +191,18 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
         triggerName: `${triggerScheduleId}`,
         rrule: null,
         timeStart: null,
-        timeEnd: null,        
+        timeEnd: null,
         dtstart: null,
         until: null,
         count: null,
-        repeatToggle: null,
+        repeatToggle: false,
         rruleinterval: null,
         byweekday: null,
         bymonthday: null,
         bysetpos: null,
         bymonth: null,
-        allDay: null,
-        endOfDay: null,
+        allDay: false,
+        endOfDay: false,
     });
 
     const getEmptyTriggerScheduleValidation = (triggerScheduleId) => ({
@@ -214,9 +214,12 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
     });
 
 
-    const [triggerScheduleArr, setTriggerScheduleArr] = useState([originalEM.triggerSchedules]);
+    const [triggerScheduleArr, setTriggerScheduleArr] = useState(originalEM.triggerSchedules);
+    console.log(218888,originalEM);
 
-    const [triggerScheduleValidations, setTriggerScheduleValidations] = useState(triggerScheduleArr.map(x => getEmptyTriggerScheduleValidation(x.triggerScheduleId)));
+    const [triggerScheduleValidations, setTriggerScheduleValidations] = useState(triggerScheduleArr 
+        ? triggerScheduleArr.map(x => getEmptyTriggerScheduleValidation(x.triggerScheduleId))
+        : [getEmptyTriggerScheduleValidation(0)]);
 
     const getNewIdForTriggerSchedule = () => triggerScheduleArr.map(info => info.triggerScheduleId)
                                              .reduce((a, b) => Math.max(a, b), -1) + 1
@@ -243,6 +246,7 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
 
     const changeTimeStartTriggerSchedule = (value, triggerScheduleId) => {
         const updatedInfo = [...triggerScheduleArr];
+        //console.log(24777,updatedInfo.map(info => console.log(info.triggerScheduleId,triggerScheduleId)),"this",triggerScheduleId);
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['timeStart'] = value;
         setTriggerScheduleArr(updatedInfo);
         checkTimeStart(value,triggerScheduleId)
@@ -266,6 +270,17 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['bymonth'] = value.bymonth;
         updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['rruleinterval'] = value.interval;
         setTriggerScheduleArr(updatedInfo);
+        checkTimeEnd(value, triggerScheduleId);
+    }
+
+    const changeRruleObjectsTriggerScheduleForAdditional = (value, triggerScheduleId) => {
+        const updatedInfo = [...triggerScheduleArr];
+        //console.log(value);
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['allDay'] = value.allDay;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['endOfDay'] = value.endOfDay;
+        updatedInfo.find(info => info.triggerScheduleId == triggerScheduleId)['repeatToggle'] = value.repeatToggle;
+        setTriggerScheduleArr(updatedInfo);
+        //console.log("9997",triggerScheduleArr);
         checkTimeEnd(value, triggerScheduleId);
     }
 
@@ -308,7 +323,8 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
         eventsManagementDefaultTitle,
         eventsManagementDefaultContent
     } = eventsManagementInfo;
-    console.log(7788, eventsManagementInfo)
+    // console.log(7788, eventsManagementInfo == originalEM)
+    // console.log(7799,originalEM)
 
     if (entrance) {
         const {
@@ -379,8 +395,13 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
     const handleExpandClick = () => setExpanded(!expanded);
 
     //get timestart timeend 
-    const [start, setStart] = useState(originalEM.triggerSchedules.timeStart)
-    const [end, setEnd] = useState(originalEM.triggerSchedules.timeEnd)
+    const [start, setStart] = useState(originalEM.triggerSchedules 
+                            ? originalEM.triggerSchedules.timeStart
+                            : "00:00")
+    const [end, setEnd] = useState(originalEM.triggerSchedules
+                    ? originalEM.triggerSchedules.timeEnd
+                    : "00:00")
+        
     const [beginHolderForEventManagement, setBeginHolderForEventManagement] = useState({})
     const [untilHolderForEventManagement, setUntilHolderForEventManagement] = useState({})
     const [startHolderForEventManagement, setStartHolderForEventManagement] = useState({})
@@ -389,6 +410,9 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
     const [description, setDescription] = useState({})
     const [rrulestring, setRrulestring] = useState({})
     const [rule, setRule] = useState({})
+
+    const [firstRendering, setfirstRendering] = useState(false);
+
     const getStart = (triggerScheduleId) => (e) => {
         changeTimeStartTriggerSchedule(e, triggerScheduleId);
         setStart({ ...start, [triggerScheduleId]: e });
@@ -404,10 +428,26 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
         setRrulestring({ ...rrulestring, [triggerScheduleId]: e.toString() })
         setRule({ ...rule, [triggerScheduleId]: e });
     }
+    const handleAdd = (triggerScheduleId) => (e) => {
+        //console.log(e, 8788);
+        changeRruleObjectsTriggerScheduleForAdditional(e, triggerScheduleId);
+    }
+
     //Description handler
     const descriptionHandler = (triggerScheduleId, e) => { //e should be the rrule obj
         setDescription({ ...description, [triggerScheduleId]: rruleDescription(e, start[triggerScheduleId], end[triggerScheduleId]) })
     }
+    
+
+    // useEffect(() => {
+    //     if (!firstRendering){
+    //         originalEM.triggerSchedules.map(schedule => {
+    //             // console.log(11221,schedule)
+
+    //         })
+    //         setfirstRendering(true);
+    //     }
+    // }, [])
 
     useEffect(() => {
         changeTriggerSchedules(triggerScheduleArr, eventsManagementId);
@@ -995,8 +1035,10 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
                                     Add action with timer
                                 </Button>
                             </div>
-                            {triggerScheduleArr.map((schedule, i) => (
-                                <Grid container
+                            {triggerScheduleArr.map((schedule, i) => {
+                                console.log(998877,schedule);
+                                console.log(123,triggerScheduleArr);
+                                return <Grid container
                                     key={schedule.triggerScheduleId}>
                                 <Grid container
                                         mt={2}
@@ -1037,18 +1079,22 @@ const EditEventManagementForm = ({currInputEventsWithTimer, currOutputEventsWith
                                         >
                                             <Rrule2
                                                 handleRrule={handleRrule(schedule.triggerScheduleId)}
+                                                handleAdd={handleAdd(schedule.triggerScheduleId)}
                                                 getStart={getStart(schedule.triggerScheduleId)}
                                                 getEnd={getEnd(schedule.triggerScheduleId)}
-                                                timeEndInvalid={triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid}
+                                                timeEndInvalid={ //triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId) ? 
+                                                    triggerScheduleValidations.find(validation => validation.triggerScheduleId == schedule.triggerScheduleId).timeEndInvalid
+                                                    //: false
+                                                }
                                                 handleInvalidUntil={handleInvalidUntil(schedule.triggerScheduleId)}
                                                 handleInvalidBegin={handleInvalidBegin(schedule.triggerScheduleId)}
-                                                ogRrule={originalEM.triggerSchedules}
+                                                ogRrule={schedule}
                                             />
                                         </Grid>
                                         <Divider />
                                     </Grid>
                             </Grid>                           
-                            ))}
+                            })}
                             <div>
                                 <Button
                                     size="large"

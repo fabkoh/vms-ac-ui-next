@@ -33,9 +33,9 @@ export function sendApi(path, init={}) {
         if (response.status === 401 || response.status === 404) {
           // Renew the token and try again
           console.log("renew");
-          console.log("before", localStorage.getItem("accessToken"));
+          //console.log("before", localStorage.getItem("accessToken"));
           return authRenewToken().then(() => {
-            console.log("after", localStorage.getItem("accessToken"));
+            //console.log("after", localStorage.getItem("accessToken"));
             return helper();}
             )
         } else {
@@ -52,6 +52,6 @@ const authRenewToken = async() => {
         body:JSON.stringify({"refreshToken": localStorage.getItem("refreshToken") })});
     const token = await res.json();
     const newToken = token["accessToken"];
-    console.log("new token", newToken);
+    //console.log("new token", newToken);
     if(res.status === 200) { localStorage.setItem("accessToken", newToken); }
 } 

@@ -85,6 +85,7 @@ class EventsManagementApi {
     }
 
     addEventsManagement(eventsManagementList, entranceIds, controllerIds) {
+        //console.log("add ems called");
         if (useApi) {
             return sendApi(`/api/eventsmanagement/add?entranceIds=${encodeArrayForSpring(entranceIds)}&controllerIds=${encodeArrayForSpring(controllerIds)}`, 
                 {

@@ -1138,8 +1138,8 @@ const ModifyEventManagement = () => {
         }
         setEventsManagementValidationsArr(newValidations);
     }
-    console.log(eventsManagementValidationsArr)
-    console.log(eventsManagementInfoArr, 33344)
+    // console.log(eventsManagementValidationsArr)
+    // console.log(eventsManagementInfoArr, 33344)
     return(
         <>
             <Head>

@@ -30,6 +30,7 @@ const Rrule = (props) => {
 	const {
 		//only pass RRuleobj, timestart, timeend.
 		handleRrule,
+		handleAdd,
 		getStart,
 		getEnd,
 		timeEndInvalid,
@@ -53,6 +54,7 @@ const Rrule = (props) => {
 		timeStart: null,
 		timeEnd: null,
 	})
+
 	// const theme = useTheme();
 	// const matches = useMediaQuery(theme.breakpoints.up);
 	// console.log("asdasda",theme.breakpoints)
@@ -61,7 +63,8 @@ const Rrule = (props) => {
 	const [repeatToggle, setRepeatToggle] = useState(false);
 	const handleRepeatToggle = () => {
 		repeatToggle
-			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
+			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),
+				setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
 			: (setRepeatToggle(true),
 			  setRule({freq:2,interval:1}),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
 	};
@@ -79,6 +82,9 @@ const Rrule = (props) => {
 			const newRule2 = { ...rule, ...newrule1 };
 			const rule2 = new RRule(newRule2);
 			handleRrule(rule2);
+			handleAdd({"allDay":allDay,
+						"endOfDay":endOfDay,
+						"repeatToggle":repeatToggle});
 		} catch(e) { console.log(e); };
 	}
 
@@ -104,12 +110,14 @@ const Rrule = (props) => {
 	const [allDay, setAllDay] = useState(true);
 	const handleAllDay = () => {
 		allDay ? setAllDay(false) : setAllDay(true);
+		//setAdditionalInfo(prevState=>({...prevState,allDay:allDay}));
 	};
 
 	// handle "end of day" time end mode (24:00)
 	const [endOfDay, setEndOfDay] = useState(true);
 	const handleEndOfDay = () => {
 		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
+		//setAdditionalInfo(prevState=>({...prevState,endOfDay:endOfDay}));
 	};
 	
 	const [timeStart, setTimeStart] = useState("00:00"); //timeStart lift up state

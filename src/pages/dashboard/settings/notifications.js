@@ -205,7 +205,7 @@ const NotificationSettings = () => {
 
     const onProtocolchange = (e) => {
         // emailSettings.hostAddress = e.target.value;
-        console.log(1234)
+        //console.log(1234)
     }
 
     const onHostAddressChange = (e) => {

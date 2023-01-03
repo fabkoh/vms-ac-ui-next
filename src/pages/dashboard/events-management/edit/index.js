@@ -126,9 +126,9 @@ const EditEventManagement = () => {
         setDeleteOpen(false);
         setSelectedEventsManagement([])
     };
-
     const getEventManagementbyId = useCallback(async(emId) => {
         const res = await eventsManagementApi.getIndividualEventsManagement(emId);
+        
         if(res.status != 200) { // person not found
             toast.error("Event Management not found");
             setEventManagement({})
@@ -136,12 +136,17 @@ const EditEventManagement = () => {
                 setServerDownOpen(true);
             }
             return;
-        }
-            const body = await res.json();
+        }else{
+            let body = {};
+            // let trigger = {};
+            await res.json().then(temp=> body = temp);
+            // await res.json().then(temp=> trigger = temp.triggerSchedules);
+
+            // body.triggerSchedules = trigger;
             console.log(body, 333)
             if (isMounted()) {
             body.eventsManagementId=0;
-            setEventManagement(body);
+            setEventManagement({body});
             console.log(body, 335)
             if (body.controller){
                 setEntrancesControllers([body.controller])
@@ -205,8 +210,8 @@ const EditEventManagement = () => {
             }
             
 
-
-            }
+        }
+    }
         }, [isMounted]);
     
     const getAllControllers = useCallback(async() => {
@@ -523,7 +528,8 @@ const EditEventManagement = () => {
 		})
 
     const submitAddingAfterDeleting = () => {
-        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
+        console.log("emsInfoArr",eventsManagementInfoArr);
+        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr,entrances, controllers))
         .then(res => {
         if (res.status!=201){ 
             (res.json()).then(data => {
@@ -1142,8 +1148,8 @@ const EditEventManagement = () => {
         }
         setEventsManagementValidationsArr(newValidations);
     }
-    console.log(eventsManagementValidationsArr)
-    console.log(eventsManagementInfoArr, 9995)
+    // console.log(eventsManagementValidationsArr)
+    // console.log(eventsManagementInfoArr, 9995)
 
     return(
         <>
