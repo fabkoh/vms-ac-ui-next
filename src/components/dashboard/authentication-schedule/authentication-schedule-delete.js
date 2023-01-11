@@ -9,7 +9,6 @@ import { ConfirmDeleteAuthMethodSchedules } from "./authentication-confirm-delet
 const steps = ['Select Schedules to Delete', 'Confirm Delete'];
 
 const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, deleteSchedules }) => {
-
     // stepper
     const [activeStep, setActiveStep] = useState(0)
     const handleNextStep = () => {

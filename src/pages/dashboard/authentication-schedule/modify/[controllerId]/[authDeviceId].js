@@ -170,6 +170,7 @@ const ModifyauthMethodSchedule = () => {
     };
 
     const handleErrorMessages = (res) => {
+        console.log(1234,res);
         setErrorMessages(res);
     }
 
@@ -434,7 +435,7 @@ const ModifyauthMethodSchedule = () => {
                         })})
                     setSingleErrorMessage(array)
                     handleErrorMessages(data)
-                    // console.log(array)
+                    console.log(2222,data)
                     // getClashingAuthDeviceSchedule
 
                 })

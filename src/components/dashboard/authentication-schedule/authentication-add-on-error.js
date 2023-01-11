@@ -97,8 +97,8 @@ export default function AuthenticationAddOnError({
                     </TableRow> 
                 </TableHead>
                 <TableBody>
-                {/* {console.log("ERROR   ",errorMessages)} */}
-                {errorMessages.map(singleError => { return Object.entries(singleError).map(([newScheduleName,clashes],i) => {
+                {console.log("ERROR   ",errorMessages)}
+                {errorMessages ? errorMessages.map(singleError => { return Object.entries(singleError).map(([newScheduleName,clashes],i) => {
                       console.log(newScheduleName,clashes);
                         return (
                           <React.Fragment key={`row${i}`}>
@@ -113,9 +113,11 @@ export default function AuthenticationAddOnError({
                                 <TableRow key={`row${j}`}>
                                   <TableCell> ID {clash.authMethodSchedule.authMethodScheduleId} : Existing Authentication Schedule 
                                     "{clash.authMethodSchedule.authMethodScheduleName}" for {clash.controller} 
-                                    {clash.authDevice.entrance==null?" (No Entrance) ":clash.authDevice.entrance}
-                                    {clash.authDevice.authDeviceName} ({clash.authDevice.authDeviceDirection}) </TableCell>
-                                  <TableCell> {rruleDescriptionWithBr(rrulestr(clash.authMethodSchedule.rrule), clash.authMethodSchedule.timeStart, clash.authMethodSchedule.timeEnd)} </TableCell>
+                                    {clash.authDevice.entrance==null?" (No Entrance) ":clash.authDevice.entrance.entranceName}
+                                    {clash.authDevice.authDeviceName} ({clash.authDevice.authDeviceDirection}) 
+                                    </TableCell>
+                                  <TableCell> {rruleDescriptionWithBr(rrulestr(clash.authMethodSchedule.rrule), clash.authMethodSchedule.timeStart, 
+                                  clash.authMethodSchedule.timeEnd)} </TableCell>
                                   <TableCell> {clash.authMethodSchedule.authMethod.authMethodDesc} </TableCell>
                                   <TableCell padding="checkbox">
                                     <Checkbox
@@ -128,7 +130,7 @@ export default function AuthenticationAddOnError({
                         })}
                           </React.Fragment>
                         )
-                    })})}
+                    })}):null}
                   
 
                 </TableBody>
