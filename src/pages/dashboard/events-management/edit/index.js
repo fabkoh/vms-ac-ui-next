@@ -141,7 +141,7 @@ const EditEventManagement = () => {
             // let trigger = {};
             await res.json().then(temp=> body = temp);
             // await res.json().then(temp=> trigger = temp.triggerSchedules);
-
+            // console.log(body);
             // body.triggerSchedules = trigger;
             console.log(body, 333)
             if (isMounted()) {
