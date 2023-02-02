@@ -66,9 +66,13 @@ const headers = [
   { label: "UID", key: "uid" },
   { label: "Email", key: "email" },
   { label: "Mobile Number", key: "mobileNumber" },
-  { label: "Credential type", key: "credentialType" },
-  { label: "Credential Expiry (MM-DD-YYYY)", key: "credentialExpiry" },
   { label: "Access Group", key: "accessGroup" },
+  { label: "Credential type", key: "credentialType" },
+  { label: "Credential pin", key: "credentialPin" },
+  {
+    label: "Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)",
+    key: "credentialExpiry",
+  },
 ];
 
 const headersTemplate = [
@@ -77,9 +81,13 @@ const headersTemplate = [
   { label: "UID", key: "uid" },
   { label: "Email", key: "email" },
   { label: "Mobile Number", key: "mobileNumber" },
-  { label: "Credential type", key: "credentialType" },
-  { label: "Credential Expiry (MM-DD-YYYY)", key: "credentialValue" },
   { label: "Access Group", key: "accessGroup" },
+  { label: "Credential type", key: "credentialType" },
+  { label: "Credential pin", key: "credentialPin" },
+  {
+    label: "Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)",
+    key: "credentialValue",
+  },
 ];
 
 const tabs = [
@@ -277,8 +285,28 @@ const PersonList = () => {
       return obj;
     });
     // console.log(person);
+
+    // person["Credential type"] == "Card" ? 0 : 1;
     submitForm(
       array.map((person, index) => {
+        let newCredTypeId = 0;
+        switch (person["Credential type"]) {
+          case "Card":
+            newCredTypeId = 1;
+            break;
+          case "Face":
+            newCredTypeId = 2;
+            break;
+          case "Fingerprint":
+            newCredTypeId = 3;
+            break;
+          case "Pin":
+            newCredTypeId = 4;
+            break;
+
+          default:
+            break;
+        }
         return {
           personId: index,
           personFirstName: person["First Name"],
@@ -290,24 +318,30 @@ const PersonList = () => {
           credentials: [
             {
               credId: 1,
-              credUid: person["Credential type"] ?? "",
-              credTTL: person["Credential Expiry (MM-DD-YYYY)"]
-                ? new Date(Date.parse(person["Credential Expiry (MM-DD-YYYY)"]))
+              credUid: person["Credential pin"] ?? "",
+              credTTL: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
+                ? new Date(
+                    Date.parse(
+                      person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
+                    )
+                  )
                 : new Date(),
               isValid: true,
-              isPerm: person["Credential Expiry (MM-DD-YYYY)"] ? false : true,
-              credTypeId: person["Credential type"] == "" ? 0 : 1, // 0 is invalid, TODO: Change this so it's not hardcoded
+              isPerm: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
+                ? false
+                : true,
+              credTypeId: newCredTypeId, // 0 is invalid, TODO: Change this so it's not hardcoded
             },
-            {
-              credId: 2,
-              credUid: person["Credential type"] ?? "",
-              credTTL: person["Credential Expiry (MM-DD-YYYY)"]
-                ? new Date(Date.parse(person["Credential Expiry (MM-DD-YYYY)"]))
-                : new Date(),
-              isValid: true,
-              isPerm: person["Credential Expiry (MM-DD-YYYY)"] ? false : true,
-              credTypeId: person["Credential type"] == "" ? 0 : 4, // 0 is invalid, TODO: Change this so it's not hardcoded
-            },
+            // {
+            //   credId: 2,
+            //   credUid: person["Credential pin"] ?? "",
+            //   credTTL: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
+            //     ? new Date(Date.parse(person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]))
+            //     : new Date(),
+            //   isValid: true,
+            //   isPerm: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"] ? false : true,
+            //   credTypeId: person["Credential type"] == "" ? 0 : 4, // 0 is invalid, TODO: Change this so it's not hardcoded
+            // },
           ],
         };
       })
@@ -711,7 +745,11 @@ const PersonList = () => {
                       personCredentials && personCredentials.length > 0
                         ? personCredentials[0].credTTL
                         : undefined;
-                    console.log(personCredentials);
+                    const credPin =
+                      personCredentials && personCredentials.length > 0
+                        ? personCredentials[0].credUid
+                        : undefined;
+                    console.log(credPin);
                     return {
                       firstName: person.personFirstName,
                       lastName: person.personLastName,
@@ -724,6 +762,7 @@ const PersonList = () => {
                         "No access group",
                       credentialType: credType,
                       credentialExpiry: credExpiry,
+                      credentialPin: credPin,
                     };
                   })}
                   headers={headers}
