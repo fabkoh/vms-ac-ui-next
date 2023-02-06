@@ -268,7 +268,8 @@ const PersonList = () => {
       console.log("error", e);
       toast.error("Unable to submit persons");
     } finally {
-      getPersonsLocal();
+      // getPersonsLocal();
+      getInfo();
     }
   };
 
@@ -314,6 +315,8 @@ const PersonList = () => {
           personUid: person["UID"] ?? "",
           personMobileNumber: person["Mobile Number"] ?? "",
           personEmail: person["Email"] ?? "",
+          // need to fix the importing of access group
+          //  person["Access Group"] ?? null doesnt work
           accessGroup: null,
           credentials: [
             {
@@ -330,7 +333,7 @@ const PersonList = () => {
               isPerm: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
                 ? false
                 : true,
-              credTypeId: newCredTypeId, // 0 is invalid, TODO: Change this so it's not hardcoded
+              credTypeId: newCredTypeId,
             },
             // {
             //   credId: 2,
@@ -365,40 +368,40 @@ const PersonList = () => {
     gtm.push({ event: "page_view" });
   }, []);
 
-  const getPersonsLocal = useCallback(async () => {
-    try {
-      //const data = await personApi.getFakePersons()
-      const res = await personApi.getPersons();
-      if (res.status == 200) {
-        const data = await res.json();
-        if (isMounted()) {
-          setPersons(data);
-          const newAccessGroupNames = {};
-          data.forEach((p) => {
-            if (p.accessGroup) {
-              newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
-            }
-          });
-          setAccessGroupNames(Object.keys(newAccessGroupNames));
-        }
-      } else {
-        if (res.status == serverDownCode) {
-          setServerDownOpen(true);
-        }
-        setPersons([]);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [isMounted]);
+  // const getPersonsLocal = useCallback(async () => {
+  //   try {
+  //     //const data = await personApi.getFakePersons()
+  //     const res = await personApi.getPersons();
+  //     if (res.status == 200) {
+  //       const data = await res.json();
+  //       if (isMounted()) {
+  //         setPersons(data);
+  //         const newAccessGroupNames = {};
+  //         data.forEach((p) => {
+  //           if (p.accessGroup) {
+  //             newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
+  //           }
+  //         });
+  //         setAccessGroupNames(Object.keys(newAccessGroupNames));
+  //       }
+  //     } else {
+  //       if (res.status == serverDownCode) {
+  //         setServerDownOpen(true);
+  //       }
+  //       setPersons([]);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }, [isMounted]);
 
-  useEffect(
-    () => {
-      getPersonsLocal();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // useEffect(
+  //   () => {
+  //     getPersonsLocal();
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   []
+  // );
 
   // const handleTabsChange = (event, value) => {
   // 	const updatedFilters = {
@@ -528,7 +531,8 @@ const PersonList = () => {
           toast.error("Delete unsuccessful");
         }
       });
-      getPersonsLocal();
+      // getPersonsLocal();
+      getInfo();
     });
     setDeleteOpen(false);
   };
@@ -554,59 +558,6 @@ const PersonList = () => {
     setFilters(newFilters);
   };
 
-  //   const getInfo = useCallback(async () => {
-  //     try {
-  //       const res = await Promise.all([
-  //         personApi.getPersons(),
-  //         getCredentialsApi(),
-  //       ]);
-  //       const [personRes, credsRes] = res;
-  //       if (personRes.status != 200) {
-  //         if (personRes.status == serverDownCode) {
-  //           setServerDownOpen(true);
-  //         }
-  //         throw "Error loading persons info";
-  //       }
-  //       const personData = await personRes.json();
-  //       if (credsRes.status != 200) {
-  //         setPersons(personData); // at least have persons if credRes fails
-  //         throw "Error loading person credentials";
-  //       }
-  //       const temp = {}; // map personId = { numCredentials: number, cardCredentials: [list of uids] }
-  //       const credData = await credsRes.json();
-  //       Array.isArray(credData) &&
-  //         credData.forEach((cred) => {
-  //           console.log("cred");
-  //           console.log(cred);
-  //           const personId = cred.person.personId;
-  //           if (!(personId in temp))
-  //             temp[personId] = { numCredentials: 0, cardCredentials: [] };
-  //           const person = temp[personId];
-  //           person.numCredentials = (person.numCredentials || 0) + 1;
-  //           if (cred.credType?.credTypeName === "Card")
-  //             person.cardCredentials.push(cred.credUid);
-  //         });
-  //       Array.isArray(personData) &&
-  //         personData.forEach((person) => {
-  //           // transfer info to persons
-  //           const credentials = temp[person.personId];
-  //           if (credentials) {
-  //             person.credentials = credentials;
-  //             person.numCredentials = credentials.numCredentials;
-  //             person.cardCredentials = credentials.cardCredentials;
-  //           }
-  //         });
-  //       console.log(personData);
-  //       setPersons(personData);
-  //     } catch (e) {
-  //       console.error(e);
-  //       toast.error(e);
-  //     }
-  //   }, [isMounted]);
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   useEffect(getInfo, []);
-
   const getInfo = useCallback(async () => {
     try {
       const res = await Promise.all([
@@ -614,6 +565,9 @@ const PersonList = () => {
         getCredentialsApi(),
       ]);
       const [personRes, credsRes] = res;
+      // set access group
+      // getPersonsLocal();
+
       if (personRes.status != 200) {
         if (personRes.status == serverDownCode) {
           setServerDownOpen(true);
@@ -749,7 +703,7 @@ const PersonList = () => {
                       personCredentials && personCredentials.length > 0
                         ? personCredentials[0].credUid
                         : undefined;
-                    console.log(credPin);
+                    console.log(person.accessGroup?.accessGroupName);
                     return {
                       firstName: person.personFirstName,
                       lastName: person.personLastName,
