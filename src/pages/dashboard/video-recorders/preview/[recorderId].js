@@ -85,7 +85,7 @@ const VideoRecorderPreview = () => {
     const [download_end_time, setDownloadEndTime] = useState(new Date());
     const [playback_files, setPlaybackFiles] = useState([]);
     const [serverDownOpen, setServerDownOpen] = useState(false);
-
+    
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -98,6 +98,7 @@ const VideoRecorderPreview = () => {
     const attach_sdk     = async function(handle) {
         return await new Promise((resolve, reject) => {
             const {clientHeight: height, clientWidth: width} = document.getElementById('divPlugin');
+            
 
             handle.I_InitPlugin(width, height, {
                 bWndFull:       true,
@@ -124,17 +125,190 @@ const VideoRecorderPreview = () => {
     }
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
-        return await new Promise((resolve, reject) => {
-            handle.I_Login(ip, 1, port, username, password, {
-                success: function (xmlDoc) {
-                    resolve();
-                }, error: function (status, xmlDoc) {
-                    reject();
-                    alert("login failed");
-                }
-            });
-        });
-    }
+      return await new Promise((resolve, reject) => {
+          handle.I_Login(ip, 1, port, username, password, {
+              success: function (xmlDoc) {
+                  resolve();
+              }, error: function (status, xmlDoc) {
+                  reject();
+                  alert("login failed");
+              }
+          });
+      });
+  }
+
+    // time format
+// function dateFormat(oDate, fmt) {
+//   var o = {
+//       "M+": oDate.getMonth() + 1, //month
+//       "d+": oDate.getDate(), //day
+//       "h+": oDate.getHours(), //hour
+//       "m+": oDate.getMinutes(), //minute
+//       "s+": oDate.getSeconds(), //second
+//       "q+": Math.floor((oDate.getMonth() + 3) / 3), //quarter
+//       "S": oDate.getMilliseconds()//millisecond
+//   };
+//   if (/(y+)/.test(fmt)) {
+//       fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+//   }
+//   for (var k in o) {
+//       if (new RegExp("(" + k + ")").test(fmt)) {
+//           fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+//       }
+//   }
+//   return fmt;
+// }
+
+//     function showOPInfo(szInfo, status, xmlDoc) {
+//     var szTip = "<div>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo;
+//     if (typeof status != "undefined" && status != 200) {
+//         var szStatusString = $(xmlDoc).find("statusString").eq(0).text();
+//         var szSubStatusCode = $(xmlDoc).find("subStatusCode").eq(0).text();
+//         if ("" === szSubStatusCode) {
+//             if("" === szSubStatusCode && "" === szStatusString){
+//                 szTip += "(" + status + ")";
+//             }
+//             else{
+//                 szTip += "(" + status + ", " + szStatusString + ")";
+//             }
+//         } else {
+//             szTip += "(" + status + ", " + szSubStatusCode + ")";
+//         }
+//     }
+//     szTip += "</div>";
+
+//     $("#opinfo").html(szTip + $("#opinfo").html());
+// }
+
+//     const login_sdk = async function(handle, {ip, port, username, password}) {
+//       var szDeviceIdentify = ip + "_" + port;
+//       var iRet = handle.I_Login(ip, 1, port, username, password, {
+//           success: function (xmlDoc) {            
+//               showOPInfo(szDeviceIdentify + " 登录成功！");
+//               $(ip).prepend("<option value='" + szDeviceIdentify + "'>" + szDeviceIdentify + "</option>");
+//               setTimeout(function () {
+//                 $(ip).val(szDeviceIdentify);
+//                   getChannelInfo(handle,ip);
+//                   getDevicePort(handle,ip);
+//               }, 10);
+//           },
+//           error: function (status, xmlDoc) {
+//               console.log(xmlDoc);
+//               showOPInfo(szDeviceIdentify + " 登录失败！", status, xmlDoc);
+//           }
+//       });
+  
+//       if (-1 == iRet) {
+//           showOPInfo(szDeviceIdentify + " 已登录过！");
+//       }
+//   }
+//   // {
+//   //       return await new Promise((resolve, reject) => {
+//   //           handle.I_Login(ip, 1, port, username, password, {
+//   //               success: function (xmlDoc) {
+//   //                   resolve();
+//   //               }, error: function (status, xmlDoc) {
+//   //                   reject();
+//   //                   alert("login failed");
+//   //               }
+//   //           });
+//   //       });
+//   //   }
+
+//   function getChannelInfo(handle,ip) {
+//     var szDeviceIdentify =ip,
+//         oSel = $("#channels").empty();
+
+//     if (null == szDeviceIdentify) {
+//         return;
+//     }
+
+//     // analog channel
+//     handle.I_GetAnalogChannelInfo(szDeviceIdentify, {
+//         async: false,
+//         success: function (xmlDoc) {
+//             var oChannels = $(xmlDoc).find("VideoInputChannel");
+
+//             $.each(oChannels, function (i) {
+//                 var id = $(this).find("id").eq(0).text(),
+//                     name = $(this).find("name").eq(0).text();
+//                 if ("" == name) {
+//                     name = "Camera " + (i < 9 ? "0" + (i + 1) : (i + 1));
+//                 }
+//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
+//             });
+//             showOPInfo(szDeviceIdentify + " get analog channel success！");
+//         },
+//         error: function (status, xmlDoc) {
+//             showOPInfo(szDeviceIdentify + " get analog channel failed！", status, xmlDoc);
+//         }
+//     });
+//     // IP channel
+//     handle.I_GetDigitalChannelInfo(szDeviceIdentify, {
+//         async: false,
+//         success: function (xmlDoc) {
+//             var oChannels = $(xmlDoc).find("InputProxyChannelStatus");
+
+//             $.each(oChannels, function (i) {
+//                 var id = $(this).find("id").eq(0).text(),
+//                     name = $(this).find("name").eq(0).text(),
+//                     online = $(this).find("online").eq(0).text();
+//                 if ("false" == online) {// filter the forbidden IP channel
+//                     return true;
+//                 }
+//                 if ("" == name) {
+//                     name = "IPCamera " + (i < 9 ? "0" + (i + 1) : (i + 1));
+//                 }
+//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
+//             });
+//             showOPInfo(szDeviceIdentify + " get IP channel success！");
+//         },
+//         error: function (status, xmlDoc) {
+//             showOPInfo(szDeviceIdentify + " get IP channel failed！", status, xmlDoc);
+//         }
+//     });
+//     // zero-channel info
+//     handle.I_GetZeroChannelInfo(szDeviceIdentify, {
+//         async: false,
+//         success: function (xmlDoc) {
+//             var oChannels = $(xmlDoc).find("ZeroVideoChannel");
+            
+//             $.each(oChannels, function (i) {
+//                 var id = $(this).find("id").eq(0).text(),
+//                     name = $(this).find("name").eq(0).text();
+//                 if ("" == name) {
+//                     name = "Zero Channel " + (i < 9 ? "0" + (i + 1) : (i + 1));
+//                 }
+//                 if ("true" == $(this).find("enabled").eq(0).text()) {//  filter the forbidden zero-channel
+//                     oSel.append("<option value='" + id + "' bZero='true'>" + name + "</option>");
+//                 }
+//             });
+//             showOPInfo(szDeviceIdentify + " get zero-channel success！");
+//         },
+//         error: function (status, xmlDoc) {
+//             showOPInfo(szDeviceIdentify + " get zero-channel failed！", status, xmlDoc);
+//         }
+//     });
+// }
+
+// // get port
+// function getDevicePort(handle,ip) {
+//     var szDeviceIdentify = ip;
+
+//     if (null == szDeviceIdentify) {
+//         return;
+//     }
+
+//     var oPort = WebVideoCtrl.I_GetDevicePort(szDeviceIdentify);
+//     if (oPort != null) {
+//         $("#deviceport").val(oPort.iDevicePort);
+//         $("#rtspport").val(oPort.iRtspPort);
+
+//         showOPInfo(szDeviceIdentify + " get port success！");
+//     } else {
+//         showOPInfo(szDeviceIdentify + " get port failed！");
+//     }
+// }
 
     const get_device_info = async function(handle, {ip}) {
         return await new Promise((resolve, reject) => {
@@ -213,13 +387,14 @@ const VideoRecorderPreview = () => {
         });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel}) {
+    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
         return await new Promise((resolve, reject) => {
           handle.I_StartRealPlay(ip, {
             iRtspPort:      rtsp_port,
             iStreamType:    stream_type,
             iChannelID:     channel_id,
-            bZeroChannel:   zero_channel
+            bZeroChannel:   zero_channel,
+            iWSPort: port
           });
 
           resolve();
@@ -241,6 +416,7 @@ const VideoRecorderPreview = () => {
     const change_split_Screen = async function(handle, mode) {
       return await new Promise((resolve, reject) => {
         handle.I_ChangeWndNum(mode);
+        setStreamType(mode);
         resolve();
       });
     }
@@ -287,9 +463,10 @@ const VideoRecorderPreview = () => {
 
                         data.rtsp_port = device_ports.iRtspPort;
 
+                        // channel_id to switch cam
                         await preview_recorder(sdk_handle, {
                             ip: data.recorderIpAddress, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id:  1, zero_channel: false
+                            stream_type: 1, channel_id:  2, zero_channel: false, port: 7681
                         });
 
                         setVideoRecorderInfo(data);
@@ -385,7 +562,8 @@ const VideoRecorderPreview = () => {
                   style = {{justifyContent: 'center', display: 'flex'}}
                   dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
                 />
-              </Grid>
+
+              </Grid>    
 
               <Grid item
                 xs={12}>

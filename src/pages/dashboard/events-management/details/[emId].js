@@ -21,7 +21,7 @@ import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { Confirmdelete } from '../../../../components/dashboard/persons/confirm-delete';
+import { Confirmdelete } from '../../../../components/dashboard/events-management/confirm-delete';
 import toast from 'react-hot-toast';
 import { ServerDownError } from '../../../../components/dashboard/errors/server-down-error';
 import { serverDownCode } from '../../../../api/api-helpers';
@@ -85,21 +85,21 @@ const IndividualEventManagement = () => {
 		setDeleteOpen(false);
 	}
 
-	// const deletePersons = (e) => {
-  //   e.preventDefault();
-  //   Promise.resolve(
-  //     personApi.deletePerson(person.personId)
-  //   ).then(res => {
-  //     if (res.status == 204){
-  //       toast.success('Delete success');
-  //       router.replace(personListLink);
-  //     }
-  //     else{
-  //       toast.error('Delete unsuccessful');
-  //       res.json().then(json => toast.info(json))
-  //     }
-  //   })
-	// };
+	const deleteEventsManagement = (e) => {
+    e.preventDefault();
+    Promise.resolve(
+      eventsManagementApi.deleteById(eventManagement.eventsManagementId)
+    ).then(res => {
+      if (res.status == 200){
+        toast.success('Delete success');
+        router.replace(eventsManagementListLink);
+      }
+      else{
+        toast.error('Delete unsuccessful');
+        res.json().then(json => toast.info(json))
+      }
+    })
+	};
 
   // if (!eventManagement) {
   //   return null;
@@ -203,10 +203,10 @@ const IndividualEventManagement = () => {
               Delete
             </MenuItem>
             <Confirmdelete 
-              setAnchorEl={setAnchorEl}
+              //setActionAnchor={setAnchorEl}
               open={deleteOpen}
               handleDialogClose={handleDeleteClose}
-              // deletePersons={deletePersons} 
+              deleteEventsManagement={deleteEventsManagement} 
               />
           </StyledMenu>
 			  </Grid>

@@ -262,7 +262,7 @@ const ControllerList = () => {
                                 </StyledMenu>
                             </Grid>
                         </Grid>
-                        <Box
+                        {/* <Box
                             sx={{
                                 m: -1,
                                 mt: 3
@@ -291,7 +291,7 @@ const ControllerList = () => {
                             >
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Card>
                         <Divider />

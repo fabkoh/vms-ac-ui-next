@@ -205,7 +205,7 @@ const fakeVideoRecorders = [
         "recorderId": 1,
         "recorderName": "Video Recorder 1",
         "recorderSerialNumber": "123ABC",
-        "recorderIpAddress": "192.168.34.23",
+        "recorderIpAddress": "192.168.1.23",
         "recorderPortNumber": 81,
         "recorderUsername": "demo",
         "recorderPassword": "password",

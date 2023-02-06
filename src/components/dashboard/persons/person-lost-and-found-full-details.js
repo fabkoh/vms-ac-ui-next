@@ -32,7 +32,7 @@ import { useMounted } from "../../../hooks/use-mounted";
 import { findPersonWithCredUid } from "../../../api/credentials";
 import { getPersonName, getPersonsEditLink, personListLink, filterPersonByCredentialsPlaceholder} from '../../../utils/persons';
 import { getCredentialWherePersonIdApi } from '../../../api/credentials';
-
+import toast from 'react-hot-toast';
 
 
 export const PersonLostDetailsCard = (props) => {
