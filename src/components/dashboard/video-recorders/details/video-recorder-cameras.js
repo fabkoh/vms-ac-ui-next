@@ -40,7 +40,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import { useRouter } from "next/router";
 import { width } from "@mui/system";
 
-export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') => {
+export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
     return(
         <BasicDetailsCard
         	title = "Cameras"
@@ -77,6 +77,13 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 							return (
 								<TableRow
 									hover
+									onClick = {() => {
+										if (camera.online)
+											window.location.href = 
+											`/dashboard/video-recorders/preview/${recorderId}/${index + 1}`
+										else
+											alert("Camera is offline")
+									}}
 									key={index}
 								>
 									<TableCell width="10%">
@@ -121,15 +128,14 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 									</TableCell>
 									<TableCell width="10%" align="left">
 											
-											<IconButton component="a">
+											{/* <IconButton component="a">
 												<PencilAltIcon fontSize="small" />
-											</IconButton>
+											</IconButton> */}
 									
 											<div onClick ={() => {
 												if (camera.online)
-													router.push({
-													     pathname: `/dashboard/video-recorders/preview/3/${index + 1}`,
-													  })
+													window.location.href = 
+													`/dashboard/video-recorders/preview/${recorderId}/${index + 1}`
 												else
 													alert("Camera is offline")
 											}}>

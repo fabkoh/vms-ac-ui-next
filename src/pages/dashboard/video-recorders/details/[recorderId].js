@@ -56,6 +56,8 @@ const VideoRecorderDetails = () => {
     const [sdkHandle, setSDKHandle] = useState(null)
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
+    const [count, setCount] = useState(0);
+
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -157,6 +159,7 @@ const VideoRecorderDetails = () => {
                     const channels = [];
 
                     $.each($(xmlDoc).find("InputProxyChannelStatus"), function (i) {
+                        setCount(prev => prev + 1)
                         channels.push({
                             id:     $(this).find("id").eq(0).text(),
                             name:   $(this).find("name").eq(0).text(),
@@ -212,7 +215,7 @@ const VideoRecorderDetails = () => {
 
                     
                         data.cameras  = digital_channels;
-        
+
                        
 
                         setVideoRecorderInfo(data);
@@ -235,6 +238,11 @@ const VideoRecorderDetails = () => {
     const getInfo = useCallback(async() => {
         getVideoRecorder(recorderId)
     }, [isMounted])
+
+    
+    const refresh = (async() => {
+        window.location.reload(true);
+    })
 
     useEffect(() => {
         getInfo();
@@ -298,6 +306,10 @@ const VideoRecorderDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                            
+                                <NextLink
+                                    href={"/dashboard/video-recorders"}
+                                    passHref
+                                >
                                 <Link
                                     color="textPrimary"
                                     component="a"
@@ -312,6 +324,7 @@ const VideoRecorderDetails = () => {
                                     />
                                     <Typography variant="subtitle2">Video Recorders</Typography>
                                 </Link>
+                                </NextLink>
                         
                         </Box>
                         <Grid
@@ -340,7 +353,7 @@ const VideoRecorderDetails = () => {
                                 <Button 
                                 variant="contained" // add refresh fn here. refetch or refresh entire page?
                                 sx={{m:1}}
-                                onClick={getInfo}
+                                onClick={refresh}
                                 endIcon={(
                                     <Refresh fontSize="small"/>
                                 )}
@@ -398,6 +411,7 @@ const VideoRecorderDetails = () => {
                             >
                                 <VideoRecorderBasicDetails
                                     recorder={videoRecorderInfo}
+                                    count={count}
                                 />
                             </Grid>
 
@@ -406,7 +420,7 @@ const VideoRecorderDetails = () => {
                                 xs={12}
                             >
                                 <VideoRecorderCameras
-                                    recorderid={recorderId?.recorderId}
+                                    recorderId={recorderId}
                                     recorder={videoRecorderInfo}
                                     cameras={videoRecorderInfo?.cameras}
                                 />

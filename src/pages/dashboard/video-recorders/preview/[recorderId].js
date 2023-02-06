@@ -519,10 +519,18 @@ const VideoRecorderPreview = () => {
             handleDialogClose={() => setServerDownOpen(false)} />
           <Container maxWidth="lg">
             <div>
-              <Box sx={{ mb: 4 }}>         
+              <Box sx={{ mb: 4 }}>   
+              {/* <NextLink
+                  href={`/dashboard/video-recorders/details/${recorderId}`}
+                  passHref
+              > */}
                 <Link
                   color="textPrimary"
                   component="a"
+                  onClick ={() => {
+                      window.location.href = 
+                      `/dashboard/video-recorders/details/${recorderId}`
+                  }}
                   sx={{
                     alignItems: 'center',
                     display: 'flex'
@@ -533,6 +541,7 @@ const VideoRecorderPreview = () => {
                   />
                   <Typography variant="subtitle2">Video Recorders</Typography>
                 </Link>
+                {/* </NextLink> */}
                         
               </Box>
               <Grid container

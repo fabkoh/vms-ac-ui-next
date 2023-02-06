@@ -51,7 +51,7 @@ class VideoRecorderApi {
     }
 
     getRecorder(id) {
-        if (!useApi) { return sendApi(`/api/videorecorder/${id}`); }
+        if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
 
         const recorder = { ...fakeVideoRecorders.find(recorder => recorder.recorderId == id) };
 

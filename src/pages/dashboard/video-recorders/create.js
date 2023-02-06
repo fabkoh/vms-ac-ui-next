@@ -34,6 +34,7 @@ const CreateRecorders = () => {
         recorderPasswordBlank: false,
         recorderSerialNumberBlank: false,
         recorderIpAddressBlank: false,
+        //recorderIWSPortBlank: false,
 
         // Name should ideally be unique
         recorderNameExists: false,

@@ -108,6 +108,9 @@ const AccessGroupDetails = () => {
         return data;
     };
 
+    //access group IsActive now
+    const accessGroupActive = accessGroupIsActive == true;
+
     const getAccessGroup = (async() => {
         try {
             const res = await accessGroupApi.getAccessGroup(accessGroupId);
@@ -129,6 +132,7 @@ const AccessGroupDetails = () => {
 
             if (isMounted()) {
                 setAccessGroup(accessGroupWithScheduleStatus);
+                setAccessGroupIsActive(body.isActive);
             }
         } catch(err) {
             console.error(err);
@@ -354,7 +358,7 @@ const AccessGroupDetails = () => {
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiEnable}
-                                        disabled={accessGroupIsActive}
+                                        disabled={accessGroupActive}
                                     >
                                         <CloudDone />
                                         &#8288;Activate
@@ -362,7 +366,7 @@ const AccessGroupDetails = () => {
                                     <MenuItem 
                                         disableRipple
                                         onClick={handleMultiUnlock}
-                                        disabled={!accessGroupIsActive}
+                                        disabled={!accessGroupActive}
                                     >
                                         <CloudOff />
                                         &#8288;De-Activate

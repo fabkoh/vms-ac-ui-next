@@ -37,7 +37,7 @@ const IndividualEventManagement = () => {
   const [eventManagement, setEventManagement] = useState({}); 
   const router = useRouter();
   const emId = router.query;
-  console.log(emId)
+  // console.log(emId)
 	const [serverDownOpen, setServerDownOpen] = useState(false);
   
   useEffect(() => {
@@ -189,7 +189,7 @@ const IndividualEventManagement = () => {
             onClose={handleClose}
           >
             <NextLink
-              href="/dashboard/events-management/modify"
+              href="/dashboard/events-management/create"
               passHref
             >
               <MenuItem disableRipple>

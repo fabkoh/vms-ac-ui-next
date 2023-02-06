@@ -685,6 +685,9 @@ const VideoCameraDetails = () => {
                             ip: data.recorderIpAddress
                         })
 
+                        console.log(digital_channels,333);
+                        data.recorderCameras = [...digital_channels];
+
                         const device_ports      = await get_device_ports(sdk_handle, {
                             ip: data.recorderIpAddress
                         })
@@ -692,8 +695,8 @@ const VideoCameraDetails = () => {
                         data.rtsp_port = device_ports.iRtspPort;
 
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderIpAddress, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id:  1, zero_channel: false, port: 7681
+                            ip: data.recorderIpAddress, rtsp_port: data.recorderPortNumber,
+                            stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
 
                         setVideoRecorderInfo(data);
@@ -747,10 +750,18 @@ const VideoCameraDetails = () => {
           />
           <Container maxWidth="lg">
             <div>
-              <Box sx={{ mb: 4 }}>         
+              <Box sx={{ mb: 4 }}>   
+              {/* <NextLink
+                  href={`/dashboard/video-recorders/details/${recorderId}`}
+                  passHref
+              >       */}
                 <Link
                   color="textPrimary"
                   component="a"
+                  onClick ={() => {
+                    window.location.href = 
+                    `/dashboard/video-recorders/details/${recorderId}`
+                }}
                   sx={{
                     alignItems: 'center',
                     display: 'flex'
@@ -761,6 +772,7 @@ const VideoCameraDetails = () => {
                   />
                   <Typography variant="subtitle2">Video Recorders</Typography>
                 </Link>
+                {/* </NextLink> */}
                         
               </Box>
               <Grid container
@@ -774,7 +786,9 @@ const VideoCameraDetails = () => {
                   }}>
                   <div>
                     <Typography variant="h4">
-                      { videoRecorderInfo? `Live View/Playback: ${videoRecorderInfo.recorderCameras[parseInt(cameraId)  - 1]}`: " Camera Not Found" }    
+                      { videoRecorderInfo? `Live View/Playback: 
+                      ${videoRecorderInfo.recorderCameras
+                      [parseInt(cameraId)  - 1].name}`: " Camera Not Found" }    
                     </Typography>    
                   </div>    
                 </Grid>

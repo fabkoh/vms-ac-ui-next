@@ -223,7 +223,7 @@ const fakeVideoRecorders = [
     }, 
     {
         "recorderId": 3,
-        "isActive": true,
+        // "isActive": true,
         "recorderName": "Real Video Recorder",
         "recorderSerialNumber": "DS-7616NI-I21620210923CCRRG74241239WCVU",
         "recorderIpAddress": "128.106.80.68",

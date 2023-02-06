@@ -6,7 +6,7 @@ import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCardNoCollapse from "../../shared/basic-no-collapse";
 
-export const VideoRecorderBasicDetails = ({recorder}) => {
+export const VideoRecorderBasicDetails = ({count,recorder}) => {
     const mdUp  = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
     
@@ -42,7 +42,7 @@ export const VideoRecorderBasicDetails = ({recorder}) => {
                     align={align}
                     divider
                     label="Channels"
-                    value={(recorder) ? recorder.recorderChannels.length : <CircularProgress size='1rem'/>}
+                    value={(recorder) ? count : <CircularProgress size='1rem'/>}
                 />
                 
                 <PropertyListItem
