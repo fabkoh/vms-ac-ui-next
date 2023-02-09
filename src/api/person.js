@@ -1,4 +1,5 @@
 import { useApi, fakePersons, fakeAccessGroups } from "./api-config";
+import axios from "axios";
 import { sendApi } from "./api-helpers";
 
 class PersonApi {
@@ -230,6 +231,23 @@ class PersonApi {
       )
     );
   }
+
+  importCSV = async (CSVData) => {
+    const formData = new FormData();
+    formData.append("file", CSVData);
+    try {
+      // sendApi("/api/person/importcsv", CSVData);
+      await axios.post("http://localhost:8082/api/person/importcsv", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("File uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to upload file");
+    }
+  };
 }
 
 export const personApi = new PersonApi();

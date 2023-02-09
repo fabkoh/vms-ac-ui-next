@@ -60,7 +60,7 @@ import {
 } from "../../../api/credentials";
 import { FormControlUnstyled } from "@mui/base";
 
-const headers = [
+const e = [
   { label: "First Name", key: "firstName" },
   { label: "Last Name", key: "lastName" },
   { label: "UID", key: "uid" },
@@ -75,13 +75,13 @@ const headers = [
   },
 ];
 
-const headersTemplate = [
+const eImportTemplate = [
   { label: "First Name", key: "firstName" },
   { label: "Last Name", key: "lastName" },
   { label: "UID", key: "uid" },
   { label: "Email", key: "email" },
   { label: "Mobile Number", key: "mobileNumber" },
-  { label: "Access Group", key: "accessGroup" },
+  // { label: "Access Group", key: "accessGroup" },
   { label: "Credential type", key: "credentialType" },
   { label: "Credential pin", key: "credentialPin" },
   {
@@ -354,12 +354,12 @@ const PersonList = () => {
   const handleOnChange = (e) => {
     let file = e.target.files[0];
     if (file) {
-      fileReader.onload = function (event) {
-        const text = event.target.result;
-        csvFileToArray(text);
-      };
-
-      fileReader.readAsText(file);
+      // fileReader.onload = function (event) {
+      //   const text = event.target.result;
+      //   csvFileToArray(text);
+      // };
+      // fileReader.readAsText(file);
+      personApi.importCSV(file);
     }
     // to reset the input value otherwise uploading the same file won't trigger the onchange function
     e.target.value = null;
@@ -719,7 +719,7 @@ const PersonList = () => {
                       credentialPin: credPin,
                     };
                   })}
-                  headers={headers}
+                  e={e}
                   filename={"Persons.csv"}
                 >
                   <Button
@@ -732,7 +732,7 @@ const PersonList = () => {
                 <CSVLink
                   style={{ textDecoration: "none" }}
                   data={[]}
-                  headers={headersTemplate}
+                  e={eImportTemplate}
                   filename={"PersonsTemplate.csv"}
                 >
                   <Button sx={{ m: 1 }}>Download Import Template</Button>
