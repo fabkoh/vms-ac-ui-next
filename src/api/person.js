@@ -1,6 +1,7 @@
 import { useApi, fakePersons, fakeAccessGroups } from "./api-config";
 import axios from "axios";
 import { sendApi } from "./api-helpers";
+import { apiUri } from "./api-config";
 
 class PersonApi {
   createPerson({
@@ -233,19 +234,34 @@ class PersonApi {
   }
 
   importCSV = async (CSVData) => {
+    const boundary =
+      "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
+
     const formData = new FormData();
-    formData.append("file", CSVData);
+    formData.append("file", CSVData, "file.csv");
     try {
-      // sendApi("/api/person/importcsv", CSVData);
-      await axios.post("http://localhost:8082/api/person/importcsv", formData, {
+      // sendApi still getting error of wrong file type, cant fix
+      // sendApi("/api/person/importcsv", {
+      //   method: "POST",
+      //   body: formData,
+      //   headers: {
+      //     "Content-Type": `multipart/form-data; boundary=${boundary}`,
+      //   },
+      // });
+
+      // use axios for now, apiUri is BE address
+      await axios.post(apiUri + "/api/person/importcsv", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
       alert("File uploaded successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to upload file");
+      alert(
+        "Failed to upload file, excel first row headers need to match import template"
+      );
     }
   };
 }
