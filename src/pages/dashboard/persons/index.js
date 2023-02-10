@@ -705,18 +705,18 @@ const PersonList = () => {
                         : undefined;
                     console.log(person.accessGroup?.accessGroupName);
                     return {
-                      firstName: person.personFirstName,
-                      lastName: person.personLastName,
-                      uid: person.personUid,
-                      mobileNumber:
+                      "First Name": person.personFirstName,
+                      "Last Name": person.personLastName,
+                      UID: person.personUid,
+                      Email: person.personEmail || "No email",
+                      "Mobile Number":
                         person.personMobileNumber || "No mobile number",
-                      email: person.personEmail || "No email",
-                      accessGroup:
+                      "Access Group":
                         person.accessGroup?.accessGroupName ||
                         "No access group",
-                      credentialType: credType,
-                      credentialExpiry: credExpiry,
-                      credentialPin: credPin,
+                      "Credential type": credType,
+                      "Credential pin": credPin,
+                      "Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)": credExpiry,
                     };
                   })}
                   e={e}
@@ -732,7 +732,7 @@ const PersonList = () => {
                 <CSVLink
                   style={{ textDecoration: "none" }}
                   data={[]}
-                  e={eImportTemplate}
+                  headers={eImportTemplate}
                   filename={"PersonsTemplate.csv"}
                 >
                   <Button sx={{ m: 1 }}>Download Import Template</Button>
