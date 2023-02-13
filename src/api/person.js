@@ -2,6 +2,8 @@ import { useApi, fakePersons, fakeAccessGroups } from "./api-config";
 import axios from "axios";
 import { sendApi } from "./api-helpers";
 import { apiUri } from "./api-config";
+import toast from "react-hot-toast";
+import { handleClickOpen } from "./../pages/dashboard/persons/index.js";
 
 class PersonApi {
   createPerson({
@@ -233,36 +235,41 @@ class PersonApi {
     );
   }
 
-  importCSV = async (CSVData) => {
-    const boundary =
-      "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
-
+  importCSV =(CSVData) => {
     const formData = new FormData();
     formData.append("file", CSVData, "file.csv");
-    try {
-      // sendApi still getting error of wrong file type, cant fix
-      // sendApi("/api/person/importcsv", {
-      //   method: "POST",
-      //   body: formData,
-      //   headers: {
-      //     "Content-Type": `multipart/form-data; boundary=${boundary}`,
-      //   },
-      // });
+    // use axios for now, apiUri is BE address
 
-      // use axios for now, apiUri is BE address
-      await axios.post(apiUri + "/api/person/importcsv", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    return axios.post(apiUri + "/api/person/importcsv", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      alert("File uploaded successfully");
-    } catch (error) {
-      console.error(error);
-      alert(
-        "Failed to upload file, excel first row headers need to match import template"
-      );
-    }
+    
+    // try {
+    // sendApi doesnt send multipart request
+
+    // const boundary =
+    //   "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
+    // sendApi(
+    //   "/api/person/importcsv",
+    //   {
+    //     method: "POST",
+    //     body: formData,
+    //   },
+    //   "multipart/form-data"
+    // );
+
+    //   toast.success("File uploaded successfully");
+
+    //   // handleClickOpen();
+    // } catch (error) {
+    //   console.error(error);
+    //   toast.error(
+    //     "Failed to upload file, excel first row headers need to match import template"
+    //   );
+    // }
   };
 }
 

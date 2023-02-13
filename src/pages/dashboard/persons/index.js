@@ -4,6 +4,7 @@ import Head from "next/head";
 import NextLink from "next/link";
 import router, { useRouter } from "next/router";
 import { getCredentialsApi } from "../../../api/credentials";
+import PersonImportCheck from ".//../../../components/dashboard/persons/person-import-check";
 
 import {
   Box,
@@ -59,6 +60,28 @@ import {
   checkCredentialApi,
 } from "../../../api/credentials";
 import { FormControlUnstyled } from "@mui/base";
+
+const getEmptyauthMethodScheduleInfo = (authMethodScheduleId) => ({
+  authMethodScheduleId,
+  authMethodScheduleName: "",
+  rrule: "",
+  authMethod: "",
+  timeStart: "",
+  timeEnd: "",
+});
+
+const getEmptyauthMethodScheduleValidations = (authMethodScheduleId) => ({
+  authMethodScheduleId,
+  authMethodScheduleNameBlank: false,
+
+  timeEndInvalid: false,
+  timeStartInvalid: false,
+  //Entrance valid(might not need as field is select. cannot custom add)
+  untilInvalid: false,
+  // submit failed
+  submitFailed: false,
+  overlapped: false,
+});
 
 const e = [
   { label: "First Name", key: "firstName" },
@@ -359,8 +382,41 @@ const PersonList = () => {
       //   csvFileToArray(text);
       // };
       // fileReader.readAsText(file);
-      personApi.importCSV(file);
+
+      // const promise = new Promise((resolve, reject) => {
+      //   // code that might throw an error
+      //   const res = personApi.importCSV(file);
+      // });
+
+      // promise
+      //   .then((result) => {
+      //     // code to handle the result if the promise resolves successfully
+      //     toast.success("File uploaded successfully");
+      //     console.log(res.status);
+      //   })
+      //   .catch((error) => {
+      //     // code to handle the error if the promise is rejected
+      //     console.error(error);
+      //     toast.error(
+      //       "Failed to upload file, excel first row headers need to match import template"
+      //     );
+      //   });
+
+      const importCSVActive = useCallback(async () => {
+        try {
+          const res = await personApi.importCSV(file);
+          toast.success("File uploaded successfully");
+          console.log(res.status);
+          // handleClickOpen();
+        } catch (error) {
+          console.error(error);
+          toast.error(
+            "Failed to upload file, excel first row headers need to match import template"
+          );
+        }
+      });
     }
+    useEffect(importCSVActive, []);
     // to reset the input value otherwise uploading the same file won't trigger the onchange function
     e.target.value = null;
   };
@@ -600,11 +656,113 @@ const PersonList = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getInfo, []);
 
+  // pop-up for import-check
+
+  const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+
+  // for selection of checkboxes
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const selectedAllSchedules =
+    selectedSchedules.length ===
+    [
+      ...new Set(
+        singleErrorMessage.map((e) => e.authMethodSchedule.authMethodScheduleId)
+      ),
+    ].length;
+  const selectedSomeSchedules =
+    selectedSchedules.length > 0 && !selectedAllSchedules;
+  const handleSelectAllSchedules = (e) =>
+    setSelectedSchedules(
+      e.target.checked
+        ? [
+            ...new Set(
+              singleErrorMessage.map(
+                (e) => e.authMethodSchedule.authMethodScheduleId
+              )
+            ),
+          ]
+        : []
+    );
+  const handleSelectFactory = (authMethodScheduleId) => () => {
+    console.log(
+      authMethodScheduleId,
+      "the authMethodScheduleId getting passed"
+    );
+    console.log(singleErrorMessage, "singleErrorMessage");
+    if (selectedSchedules.includes(authMethodScheduleId)) {
+      setSelectedSchedules(
+        selectedSchedules.filter((id) => id !== authMethodScheduleId)
+      );
+    } else {
+      setSelectedSchedules([...selectedSchedules, authMethodScheduleId]);
+    }
+  };
+
+  const getEmptyauthMethodScheduleInfo = (authMethodScheduleId) => ({
+    authMethodScheduleId,
+    authMethodScheduleName: "",
+    rrule: "",
+    authMethod: "",
+    timeStart: "",
+    timeEnd: "",
+  });
+
+  const getEmptyauthMethodScheduleValidations = (authMethodScheduleId) => ({
+    authMethodScheduleId,
+    authMethodScheduleNameBlank: false,
+
+    timeEndInvalid: false,
+    timeStartInvalid: false,
+    //Entrance valid(might not need as field is select. cannot custom add)
+    untilInvalid: false,
+    // submit failed
+    submitFailed: false,
+    overlapped: false,
+  });
+
+  const [authMethodScheduleInfoArr, setauthMethodScheduleInfoArr] = useState([
+    getEmptyauthMethodScheduleInfo(0),
+  ]);
+  const [
+    authMethodScheduleValidationsArr,
+    setauthMethodScheduleValidationsArr,
+  ] = useState([getEmptyauthMethodScheduleValidations(0)]);
+
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [openImport, setOpenImport] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpenImport(true);
+    console.log("handleClickOpen activated");
+  };
+
+  const handleCloseImport = () => {
+    setOpenImport(false);
+    setErrorMessages([]);
+    setSelectedSchedules([]);
+  };
+
+  const handleErrorMessages = (res) => {
+    console.log(1234, res);
+    setErrorMessages(res);
+  };
   return (
     <>
       <Head>
         <title>Etlas : Persons List</title>
       </Head>
+
+      <PersonImportCheck
+        errorMessages={errorMessages}
+        handleClose={handleClose}
+        open={openImport}
+        selectedSchedules={selectedSchedules}
+        handleSelectFactory={handleSelectFactory}
+        selectedSomeSchedules={selectedSomeSchedules}
+        selectedAllSchedules={selectedAllSchedules}
+        handleSelectAllSchedules={handleSelectAllSchedules}
+        deleteSchedules={handleDeleteOpen}
+      />
       <Box
         component="main"
         sx={{
@@ -677,6 +835,7 @@ const PersonList = () => {
                   component="label"
                   startIcon={<UploadIcon fontSize="small" />}
                   sx={{ m: 1 }}
+                  // onClick={handleClickOpen}
                 >
                   <input
                     type={"file"}
@@ -708,9 +867,8 @@ const PersonList = () => {
                       "First Name": person.personFirstName,
                       "Last Name": person.personLastName,
                       UID: person.personUid,
-                      Email: person.personEmail || "No email",
-                      "Mobile Number":
-                        person.personMobileNumber || "No mobile number",
+                      Email: person.personEmail || "",
+                      "Mobile Number": person.personMobileNumber || "",
                       "Access Group":
                         person.accessGroup?.accessGroupName ||
                         "No access group",
@@ -735,7 +893,9 @@ const PersonList = () => {
                   headers={eImportTemplate}
                   filename={"PersonsTemplate.csv"}
                 >
-                  <Button sx={{ m: 1 }}>Download Import Template</Button>
+                  <Button sx={{ m: 1 }} onClick={handleClose}>
+                    Download Import Template
+                  </Button>
                 </CSVLink>
                 <Tooltip
                   title="Note: Expiry date format is mm-dd-yyyy  leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import."
@@ -848,5 +1008,7 @@ PersonList.getLayout = (page) => (
     <DashboardLayout>{page}</DashboardLayout>
   </AuthGuard>
 );
+
+// export { handleClickOpen };
 
 export default PersonList;
