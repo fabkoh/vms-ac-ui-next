@@ -382,41 +382,8 @@ const PersonList = () => {
       //   csvFileToArray(text);
       // };
       // fileReader.readAsText(file);
-
-      // const promise = new Promise((resolve, reject) => {
-      //   // code that might throw an error
-      //   const res = personApi.importCSV(file);
-      // });
-
-      // promise
-      //   .then((result) => {
-      //     // code to handle the result if the promise resolves successfully
-      //     toast.success("File uploaded successfully");
-      //     console.log(res.status);
-      //   })
-      //   .catch((error) => {
-      //     // code to handle the error if the promise is rejected
-      //     console.error(error);
-      //     toast.error(
-      //       "Failed to upload file, excel first row headers need to match import template"
-      //     );
-      //   });
-
-      const importCSVActive = useCallback(async () => {
-        try {
-          const res = await personApi.importCSV(file);
-          toast.success("File uploaded successfully");
-          console.log(res.status);
-          // handleClickOpen();
-        } catch (error) {
-          console.error(error);
-          toast.error(
-            "Failed to upload file, excel first row headers need to match import template"
-          );
-        }
-      });
+      personApi.importCSV(file);
     }
-    useEffect(importCSVActive, []);
     // to reset the input value otherwise uploading the same file won't trigger the onchange function
     e.target.value = null;
   };
@@ -735,7 +702,6 @@ const PersonList = () => {
     setOpenImport(true);
     console.log("handleClickOpen activated");
   };
-
   const handleCloseImport = () => {
     setOpenImport(false);
     setErrorMessages([]);
@@ -1008,7 +974,5 @@ PersonList.getLayout = (page) => (
     <DashboardLayout>{page}</DashboardLayout>
   </AuthGuard>
 );
-
-// export { handleClickOpen };
 
 export default PersonList;

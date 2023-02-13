@@ -3,7 +3,6 @@ import axios from "axios";
 import { sendApi } from "./api-helpers";
 import { apiUri } from "./api-config";
 import toast from "react-hot-toast";
-import { handleClickOpen } from "./../pages/dashboard/persons/index.js";
 
 class PersonApi {
   createPerson({
@@ -235,41 +234,37 @@ class PersonApi {
     );
   }
 
-  importCSV =(CSVData) => {
+  importCSV = async (CSVData) => {
     const formData = new FormData();
     formData.append("file", CSVData, "file.csv");
-    // use axios for now, apiUri is BE address
+    try {
+      // sendApi doesnt send multipart request
 
-    return axios.post(apiUri + "/api/person/importcsv", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      // const boundary =
+      //   "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
+      // sendApi("/api/person/importcsv", {
+      //   method: "POST",
+      //   body: formData,
+      //   headers: {
+      //     "Content-Type": `multipart/form-data; boundary=${boundary}`,
+      //   },
+      // });
 
-    
-    // try {
-    // sendApi doesnt send multipart request
+      // use axios for now, apiUri is BE address
 
-    // const boundary =
-    //   "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
-    // sendApi(
-    //   "/api/person/importcsv",
-    //   {
-    //     method: "POST",
-    //     body: formData,
-    //   },
-    //   "multipart/form-data"
-    // );
+      await axios.post(apiUri + "/api/person/importcsv", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    //   toast.success("File uploaded successfully");
-
-    //   // handleClickOpen();
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error(
-    //     "Failed to upload file, excel first row headers need to match import template"
-    //   );
-    // }
+      alert("File uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      alert(
+        "Failed to upload file, excel first row headers need to match import template"
+      );
+    }
   };
 }
 
