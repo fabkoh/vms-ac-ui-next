@@ -251,6 +251,28 @@ class PersonApi {
     // });
   }
 
+  getCSVJson() {
+    // if (useApi) {
+    // return sendApi("/api/person/importcsv/json", {
+    //   method: "GET",
+    // });
+    // }
+    if (useApi) {
+      return sendApi("/api/person/importcsv/json", {
+        method: "GET",
+      });
+    }
+
+    return Promise.resolve(
+      new Response(
+        JSON.stringify(
+          fakePersons.some((person) => person.personEmail == email)
+        ),
+        { status: 200 }
+      )
+    );
+  }
+
   //   importCSV = async (CSVData) => {
   //     const formData = new FormData();
   //     formData.append("file", CSVData, "file.csv");

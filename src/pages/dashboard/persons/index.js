@@ -383,6 +383,8 @@ const PersonList = () => {
         toast.success("File uploaded successfully");
         handleOpenImport();
       }
+      const jsonResultRes = await personApi.getCSVJson();
+      console.log(jsonResultRes);
     } catch (error) {
       console.error(error);
       toast.error(
