@@ -5,8 +5,10 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+
 import {
   Alert,
+  AlertTitle,
   Box,
   Button,
   Checkbox,
@@ -81,31 +83,30 @@ export default function PersonImportCheck({
     // enable scrolling
     // Helper text
     <Dialog onBackdropClick={handleClose} fullWidth maxWidth="lg" open={open}>
-      <DialogTitle sx={{ color: "#F44336" }}>
-        Error : Failed to create new schedules.
+      <DialogTitle sx={{ color: "#111827" }} fontSize={{ fontSize: "32px" }}>
+        Import Confirmation
       </DialogTitle>
       <DialogContent>
         <Box marginTop={1} marginBottom={5}>
           <Alert severity="info" variant="outlined">
-            The new schedules highlighted below clashes with existing schedules.
-            Do make the necessary changes before pressing the <b>Add on</b>{" "}
-            button again.
+            <AlertTitle>Import Check</AlertTitle>
+            We detected 2 entries which have format or validation errors and
+            will not be added into the database. They are highlighted in red
+            below. 20 entries will be added without issues on confirmation.
           </Alert>
         </Box>
+
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>New Schedule(s)</TableCell>
-              <TableCell>Auth Device with Existing Schedule(s)</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Auth Method</TableCell>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedAllSchedules}
-                  indeterminate={selectedSomeSchedules}
-                  onChange={handleSelectAllSchedules}
-                />
-              </TableCell>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>UID</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Mobile Number</TableCell>
+              <TableCell>Credential type</TableCell>
+              <TableCell>Credential pin</TableCell>
+              <TableCell>Credential Expiry</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -187,9 +188,17 @@ export default function PersonImportCheck({
         </Table>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
-        <Button onClick={deleteSchedules} sx={{ color: "#F44336" }} autoFocus>
-          Delete Selected
+        <Button onClick={handleClose} variant="outlined">
+          Cancel
+        </Button>
+        <Button
+          onClick={deleteSchedules}
+          // sx={{ color: "#F44336" }}
+          autoFocus
+          variant="contained"
+          color="success"
+        >
+          Submit
         </Button>
       </DialogActions>
     </Dialog>

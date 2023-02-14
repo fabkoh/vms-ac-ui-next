@@ -374,6 +374,23 @@ const PersonList = () => {
     );
   };
 
+  const importCSVIndex = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file, "file.csv");
+    try {
+      const res = await personApi.postCSV(formData);
+      if (res.status == 200) {
+        toast.success("File uploaded successfully");
+        handleOpenImport();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "Failed to upload file, excel first row headers need to match import template"
+      );
+    }
+  };
+
   const handleOnChange = (e) => {
     let file = e.target.files[0];
     if (file) {
@@ -382,7 +399,8 @@ const PersonList = () => {
       //   csvFileToArray(text);
       // };
       // fileReader.readAsText(file);
-      personApi.importCSV(file);
+      importCSVIndex(file);
+      // personApi.importCSV(file);
     }
     // to reset the input value otherwise uploading the same file won't trigger the onchange function
     e.target.value = null;
@@ -698,14 +716,15 @@ const PersonList = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [openImport, setOpenImport] = useState(false);
 
-  const handleClickOpen = () => {
+  const handleOpenImport = () => {
     setOpenImport(true);
-    console.log("handleClickOpen activated");
+    console.log("handleOpenImport activated");
   };
   const handleCloseImport = () => {
     setOpenImport(false);
     setErrorMessages([]);
     setSelectedSchedules([]);
+    console.log("handleCloseImport activated");
   };
 
   const handleErrorMessages = (res) => {
@@ -720,7 +739,7 @@ const PersonList = () => {
 
       <PersonImportCheck
         errorMessages={errorMessages}
-        handleClose={handleClose}
+        handleClose={handleCloseImport}
         open={openImport}
         selectedSchedules={selectedSchedules}
         handleSelectFactory={handleSelectFactory}

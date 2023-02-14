@@ -16,9 +16,15 @@ export function sendApi(path, init = {}, contentType = "application/json") {
 
   function helper(contentType) {
     const token = localStorage.getItem("accessToken");
-    const auth = token
-      ? { Authorization: `Bearer ${token}`, "Content-Type": contentType }
-      : { "Content-Type": contentType };
+    var auth = {};
+    if (contentType == "multipart/form-data") {
+      auth = token ? { Authorization: `Bearer ${token}` } : {};
+    } else {
+      auth = token
+        ? { Authorization: `Bearer ${token}`, "Content-Type": contentType }
+        : { "Content-Type": contentType };
+    }
+
     init["headers"] = auth;
     //console.log(init);
     const promise = fetch(apiUri + path, init).catch((error) => {
