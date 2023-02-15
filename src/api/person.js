@@ -261,16 +261,26 @@ class PersonApi {
       return sendApi("/api/person/importcsv/json", {
         method: "GET",
       });
-    }
 
-    return Promise.resolve(
-      new Response(
-        JSON.stringify(
-          fakePersons.some((person) => person.personEmail == email)
-        ),
-        { status: 200 }
-      )
-    );
+      const persons = fakePersons.map((p) => {
+        return { ...p };
+      });
+
+      persons.forEach((person) => {
+        if (person.accessGroup) {
+          // populate access group
+          person.accessGroup = {
+            ...fakeAccessGroups.find(
+              (group) => group.accessGroupId == person.accessGroup
+            ),
+          };
+        }
+        return person;
+      });
+      return Promise.resolve(
+        new Response(JSON.stringify(persons), { status: 200 })
+      );
+    }
   }
 
   //   importCSV = async (CSVData) => {

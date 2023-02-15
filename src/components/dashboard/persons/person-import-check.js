@@ -1,12 +1,19 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { styled } from "@mui/material/styles";
+import {
+  styled,
+  createMuiTheme,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material/styles";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+import styles from "./person-import-check.module.css";
 
 import {
+  Avatar,
   Alert,
   AlertTitle,
   Box,
@@ -29,6 +36,20 @@ import {
 import { rruleDescriptionWithBr } from "../../../utils/rrule-desc";
 import { rrulestr } from "rrule";
 
+const theme = createMuiTheme({
+  overrides: {
+    MuiTableCell: {
+      root: {
+        color: "#F44336",
+      },
+    },
+    MuiTableCell: {
+      root: {
+        color: "#F44336",
+      },
+    },
+  },
+});
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -77,8 +98,14 @@ export default function PersonImportCheck({
   selectedAllSchedules,
   handleSelectAllSchedules,
   deleteSchedules,
+  csvData,
   ...rest
 }) {
+  const greenCount = csvData.filter((obj) => obj.Color === "green").length;
+  const redCount = csvData.filter((obj) => obj.Color === "red").length;
+  const greenData = csvData.filter((obj) => obj.Color === "green");
+  const redData = csvData.filter((obj) => obj.Color === "red");
+
   return (
     // enable scrolling
     // Helper text
@@ -90,102 +117,72 @@ export default function PersonImportCheck({
         <Box marginTop={1} marginBottom={5}>
           <Alert severity="info" variant="outlined">
             <AlertTitle>Import Check</AlertTitle>
-            We detected 2 entries which have format or validation errors and
-            will not be added into the database. They are highlighted in red
-            below. 20 entries will be added without issues on confirmation.
+            <p>{`We detected ${greenCount} entries which have format or validation errors and will not be added into the database. They are highlighted in red below. ${redCount} entries will be added without issues on confirmation.`}</p>
           </Alert>
         </Box>
-
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>UID</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Mobile Number</TableCell>
-              <TableCell>Credential type</TableCell>
-              <TableCell>Credential pin</TableCell>
-              <TableCell>Credential Expiry</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {console.log("ERROR   ", errorMessages)}
-            {errorMessages
-              ? errorMessages.map((singleError) => {
-                  return Object.entries(singleError).map(
-                    ([newScheduleName, clashes], i) => {
-                      console.log(newScheduleName, clashes);
-                      return (
-                        <React.Fragment key={`row${i}`}>
-                          <TableRow>
-                            <TableCell rowSpan={clashes.length + 1}>
-                              {newScheduleName}
-                            </TableCell>
-                          </TableRow>
-                          {clashes.map((clash, j) => {
-                            console.log(clash);
-                            const isAuthMethodScheduleSelected =
-                              selectedSchedules.includes(
-                                clash.authMethodSchedule.authMethodScheduleId
-                              );
-                            const handleSelect = handleSelectFactory(
-                              clash.authMethodSchedule.authMethodScheduleId
-                            );
-                            return (
-                              <TableRow key={`row${j}`}>
-                                <TableCell>
-                                  {" "}
-                                  ID{" "}
-                                  {
-                                    clash.authMethodSchedule
-                                      .authMethodScheduleId
-                                  }{" "}
-                                  : Existing Authentication Schedule "
-                                  {
-                                    clash.authMethodSchedule
-                                      .authMethodScheduleName
-                                  }
-                                  " for {clash.controller}
-                                  {clash.authDevice.entrance == null
-                                    ? " (No Entrance) "
-                                    : clash.authDevice.entrance.entranceName}
-                                  {clash.authDevice.authDeviceName} (
-                                  {clash.authDevice.authDeviceDirection})
-                                </TableCell>
-                                <TableCell>
-                                  {" "}
-                                  {rruleDescriptionWithBr(
-                                    rrulestr(clash.authMethodSchedule.rrule),
-                                    clash.authMethodSchedule.timeStart,
-                                    clash.authMethodSchedule.timeEnd
-                                  )}{" "}
-                                </TableCell>
-                                <TableCell>
-                                  {" "}
-                                  {
-                                    clash.authMethodSchedule.authMethod
-                                      .authMethodDesc
-                                  }{" "}
-                                </TableCell>
-                                <TableCell padding="checkbox">
-                                  <Checkbox
-                                    checked={isAuthMethodScheduleSelected}
-                                    onChange={handleSelect}
-                                    value={isAuthMethodScheduleSelected}
-                                  />
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </React.Fragment>
-                      );
-                    }
+        <ThemeProvider theme={theme}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>First Name</TableCell>
+                <TableCell>Last Name</TableCell>
+                <TableCell>UID</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Mobile Number</TableCell>
+                <TableCell>Credential type</TableCell>
+                <TableCell>Credential pin</TableCell>
+                <TableCell>Credential Expiry</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {redData &&
+                redData.map((item) => {
+                  return (
+                    <TableRow
+                      key={item.UID}
+                      // theme={theme}
+                      // className={styles.tableRow}
+                      // style={{ color: "#F44336" }}
+                    >
+                      <TableCell>{item["﻿First Name"]}</TableCell>
+                      <TableCell>{item["Last Name"]}</TableCell>
+                      <TableCell>{item.UID}</TableCell>
+                      <TableCell>{item.Email}</TableCell>
+                      <TableCell>{item["Mobile Number"]}</TableCell>
+                      <TableCell>{item["Credential type"]}</TableCell>
+                      <TableCell>{item["Credential pin"]}</TableCell>
+                      <TableCell>
+                        {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                      </TableCell>
+                    </TableRow>
                   );
-                })
-              : null}
-          </TableBody>
-        </Table>
+                })}
+            </TableBody>
+            <TableBody>
+              {greenData &&
+                greenData.map((item) => {
+                  return (
+                    <TableRow
+                      key={item.UID}
+                      className="tableRow"
+                      // style={{ color: "#F44336" }}
+                    >
+                      <TableCell>{item["﻿First Name"]}</TableCell>
+                      <TableCell>{item["Last Name"]}</TableCell>
+                      <TableCell>{item.UID}</TableCell>
+                      <TableCell>{item.Email}</TableCell>
+                      <TableCell>{item["Mobile Number"]}</TableCell>
+                      <TableCell>{item["Credential type"]}</TableCell>
+                      <TableCell>{item["Credential pin"]}</TableCell>
+                      <TableCell>
+                        {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </ThemeProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined">

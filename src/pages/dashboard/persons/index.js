@@ -374,6 +374,8 @@ const PersonList = () => {
     );
   };
 
+  // json data from csv file
+  const [csvData, setCsvData] = useState([]);
   const importCSVIndex = async (file) => {
     const formData = new FormData();
     formData.append("file", file, "file.csv");
@@ -384,7 +386,8 @@ const PersonList = () => {
         handleOpenImport();
       }
       const jsonResultRes = await personApi.getCSVJson();
-      console.log(jsonResultRes);
+      setCsvData(await jsonResultRes.json());
+      console.log(csvData);
     } catch (error) {
       console.error(error);
       toast.error(
@@ -749,6 +752,7 @@ const PersonList = () => {
         selectedAllSchedules={selectedAllSchedules}
         handleSelectAllSchedules={handleSelectAllSchedules}
         deleteSchedules={handleDeleteOpen}
+        csvData={csvData}
       />
       <Box
         component="main"
