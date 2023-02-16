@@ -122,6 +122,7 @@ export default function PersonImportCheck({
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, csvData.length - page * rowsPerPage);
+  const [showButton, setShowButton] = useState(false);
 
   function handleSubmitClick() {
     submitGreenData(greenData);
@@ -139,7 +140,12 @@ export default function PersonImportCheck({
         <Box marginTop={1} marginBottom={5}>
           <Alert severity="info" variant="outlined">
             <AlertTitle>Import Check</AlertTitle>
-            <p>{`We detected ${greenCount} entries which have format or validation errors and will not be added into the database. They are highlighted in red below. ${redCount} entries will be added without issues on confirmation.`}</p>
+            {redCount != 0 && (
+              <p>{`We detected ${redCount} entries which have format or validation errors . They are highlighted in red below. Please fix them to submit the import. `}</p>
+            )}
+            {redCount == 0 && (
+              <p>{`${greenCount} entries will be added without issues on confirmation.`}</p>
+            )}
           </Alert>
         </Box>
         <Table>
@@ -300,14 +306,16 @@ export default function PersonImportCheck({
         <Button onClick={handleClose} variant="outlined">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmitClick}
-          autoFocus
-          variant="contained"
-          color="success"
-        >
-          Submit
-        </Button>
+        {redCount == 0 && (
+          <Button
+            onClick={handleSubmitClick}
+            autoFocus
+            variant="contained"
+            color="success"
+          >
+            Submit
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

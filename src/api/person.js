@@ -285,15 +285,35 @@ class PersonApi {
 
   postGreenData(file) {
     if (useApi) {
-      const stringData = file.map((obj) => JSON.stringify(obj)).join(", ");
-      // const dataArray = JSON.parse(`[${stringData}]`);
-      console.log(stringData);
+      const dataArray = file.map((obj) => {
+        // remove any invalid characters (such as the BOM marker)
+        const cleanObj = Object.keys(obj).reduce((acc, key) => {
+          const cleanKey = key.replace(/\W/g, "");
+          const cleanVal = obj[key];
+          return { ...acc, [cleanKey]: cleanVal };
+        }, {});
+        return cleanObj;
+      });
+      console.log(dataArray);
       return sendApi("/api/person/importcsv/greenData", {
         method: "POST",
-        body: stringData,
+        body: JSON.stringify(dataArray),
+        headers: { "Content-Type": "application/json" },
       });
     }
   }
+
+  // postGreenData(file) {
+  //   if (useApi) {
+  //     const stringData = file.map((obj) => JSON.stringify(obj)).join(", ");
+  //     // const dataArray = JSON.parse(`[${stringData}]`);
+  //     console.log(stringData);
+  //     return sendApi("/api/person/importcsv/greenData", {
+  //       method: "POST",
+  //       body: stringData,
+  //     });
+  //   }
+  // }
 
   //   importCSV = async (CSVData) => {
   //     const formData = new FormData();
