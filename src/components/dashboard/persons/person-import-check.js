@@ -10,7 +10,7 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
-import styles from "./person-import-check.module.css";
+import { useState } from "react";
 
 import {
   Avatar,
@@ -31,6 +31,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TablePagination,
   TextField,
 } from "@mui/material";
 import { rruleDescriptionWithBr } from "../../../utils/rrule-desc";
@@ -50,6 +51,7 @@ const theme = createMuiTheme({
     },
   },
 });
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -97,14 +99,34 @@ export default function PersonImportCheck({
   selectedSomeSchedules,
   selectedAllSchedules,
   handleSelectAllSchedules,
-  deleteSchedules,
   csvData,
+  submitGreenData,
   ...rest
 }) {
-  const greenCount = csvData.filter((obj) => obj.Color === "green").length;
-  const redCount = csvData.filter((obj) => obj.Color === "red").length;
   const greenData = csvData.filter((obj) => obj.Color === "green");
   const redData = csvData.filter((obj) => obj.Color === "red");
+  const greenCount = greenData.length;
+  const redCount = redData.length;
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, csvData.length - page * rowsPerPage);
+
+  function handleSubmitClick() {
+    submitGreenData(greenData);
+    handleClose();
+  }
 
   return (
     // enable scrolling
@@ -120,77 +142,166 @@ export default function PersonImportCheck({
             <p>{`We detected ${greenCount} entries which have format or validation errors and will not be added into the database. They are highlighted in red below. ${redCount} entries will be added without issues on confirmation.`}</p>
           </Alert>
         </Box>
-        <ThemeProvider theme={theme}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>First Name</TableCell>
-                <TableCell>Last Name</TableCell>
-                <TableCell>UID</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Mobile Number</TableCell>
-                <TableCell>Credential type</TableCell>
-                <TableCell>Credential pin</TableCell>
-                <TableCell>Credential Expiry</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {redData &&
-                redData.map((item) => {
-                  return (
-                    <TableRow
-                      key={item.UID}
-                      // theme={theme}
-                      // className={styles.tableRow}
-                      // style={{ color: "#F44336" }}
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>UID</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Mobile Number</TableCell>
+              <TableCell>Credential type</TableCell>
+              <TableCell>Credential pin</TableCell>
+              <TableCell>Credential Expiry</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {redData
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((item) => {
+                return (
+                  <TableRow key={item.UID}>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
                     >
-                      <TableCell>{item["﻿First Name"]}</TableCell>
-                      <TableCell>{item["Last Name"]}</TableCell>
-                      <TableCell>{item.UID}</TableCell>
-                      <TableCell>{item.Email}</TableCell>
-                      <TableCell>{item["Mobile Number"]}</TableCell>
-                      <TableCell>{item["Credential type"]}</TableCell>
-                      <TableCell>{item["Credential pin"]}</TableCell>
-                      <TableCell>
-                        {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-            <TableBody>
-              {greenData &&
-                greenData.map((item) => {
-                  return (
-                    <TableRow
-                      key={item.UID}
-                      className="tableRow"
-                      // style={{ color: "#F44336" }}
+                      {item["﻿First Name"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
                     >
-                      <TableCell>{item["﻿First Name"]}</TableCell>
-                      <TableCell>{item["Last Name"]}</TableCell>
-                      <TableCell>{item.UID}</TableCell>
-                      <TableCell>{item.Email}</TableCell>
-                      <TableCell>{item["Mobile Number"]}</TableCell>
-                      <TableCell>{item["Credential type"]}</TableCell>
-                      <TableCell>{item["Credential pin"]}</TableCell>
-                      <TableCell>
-                        {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </ThemeProvider>
+                      {item["Last Name"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item.UID}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item.Email}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item["Mobile Number"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item["Credential type"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item["Credential pin"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#F44336",
+                      }}
+                    >
+                      {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            {greenData
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((item) => {
+                return (
+                  <TableRow key={item.UID}>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["﻿First Name"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["Last Name"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item.UID}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item.Email}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["Mobile Number"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["Credential type"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["Credential pin"]}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#00994C",
+                      }}
+                    >
+                      {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50]}
+          component="div"
+          count={redData.length + greenData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined">
           Cancel
         </Button>
         <Button
-          onClick={deleteSchedules}
-          // sx={{ color: "#F44336" }}
+          onClick={handleSubmitClick}
           autoFocus
           variant="contained"
           color="success"

@@ -283,6 +283,18 @@ class PersonApi {
     }
   }
 
+  postGreenData(file) {
+    if (useApi) {
+      const stringData = file.map((obj) => JSON.stringify(obj)).join(", ");
+      // const dataArray = JSON.parse(`[${stringData}]`);
+      console.log(stringData);
+      return sendApi("/api/person/importcsv/greenData", {
+        method: "POST",
+        body: stringData,
+      });
+    }
+  }
+
   //   importCSV = async (CSVData) => {
   //     const formData = new FormData();
   //     formData.append("file", CSVData, "file.csv");

@@ -396,6 +396,14 @@ const PersonList = () => {
     }
   };
 
+  async function submitGreenData(file) {
+    try {
+      const res = await personApi.postGreenData(file);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const handleOnChange = (e) => {
     let file = e.target.files[0];
     if (file) {
@@ -753,6 +761,7 @@ const PersonList = () => {
         handleSelectAllSchedules={handleSelectAllSchedules}
         deleteSchedules={handleDeleteOpen}
         csvData={csvData}
+        submitGreenData={submitGreenData}
       />
       <Box
         component="main"
