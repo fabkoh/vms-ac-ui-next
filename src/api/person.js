@@ -285,19 +285,19 @@ class PersonApi {
 
   postGreenData(file) {
     if (useApi) {
-      const dataArray = file.map((obj) => {
-        // remove any invalid characters (such as the BOM marker)
-        const cleanObj = Object.keys(obj).reduce((acc, key) => {
-          const cleanKey = key.replace(/\W/g, "");
-          const cleanVal = obj[key];
-          return { ...acc, [cleanKey]: cleanVal };
-        }, {});
-        return cleanObj;
-      });
-      console.log(dataArray);
+      // const dataArray = file.map((obj) => {
+      //   // remove any invalid characters (such as the BOM marker)
+      //   const cleanObj = Object.keys(obj).reduce((acc, key) => {
+      //     const cleanKey = key.replace(/\W/g, "");
+      //     const cleanVal = obj[key];
+      //     return { ...acc, [cleanKey]: cleanVal };
+      //   }, {});
+      //   return cleanObj;
+      // });
+      console.log(file);
       return sendApi("/api/person/importcsv/greenData", {
         method: "POST",
-        body: JSON.stringify(dataArray),
+        body: file,
         headers: { "Content-Type": "application/json" },
       });
     }

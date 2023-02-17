@@ -125,8 +125,16 @@ export default function PersonImportCheck({
   const [showButton, setShowButton] = useState(false);
 
   function handleSubmitClick() {
-    submitGreenData(greenData);
+    const filteredObj = {};
+    Object.keys(csvData).forEach((key) => {
+      if (greenData[key] !== undefined) {
+        filteredObj[key.toString()] = greenData[key];
+      }
+    });
+    const myString = JSON.stringify(filteredObj);
+    submitGreenData(myString.replace(/\s/g, "").replace(/[-()]/g, ""));
     handleClose();
+    window.location.reload();
   }
 
   return (
@@ -152,12 +160,12 @@ export default function PersonImportCheck({
           <TableHead>
             <TableRow>
               <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
+              <TableCell>personLastName</TableCell>
               <TableCell>UID</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Mobile Number</TableCell>
-              <TableCell>Credential type</TableCell>
-              <TableCell>Credential pin</TableCell>
+              <TableCell>personMobileNumber</TableCell>
+              <TableCell>credentialType</TableCell>
+              <TableCell>credentialPin</TableCell>
               <TableCell>Credential Expiry</TableCell>
             </TableRow>
           </TableHead>
@@ -166,62 +174,62 @@ export default function PersonImportCheck({
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((item) => {
                 return (
-                  <TableRow key={item.UID}>
+                  <TableRow key={item["personUid"]}>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["﻿First Name"]}
+                      {item["personFirstName"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["Last Name"]}
+                      {item["personLastName"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item.UID}
+                      {item["personUid"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item.Email}
+                      {item["personEmail"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["Mobile Number"]}
+                      {item["personMobileNumber"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["Credential type"]}
+                      {item["credentialType"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["Credential pin"]}
+                      {item["credentialPin"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#F44336",
                       }}
                     >
-                      {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                      {item["credentialExpiry"]}
                     </TableCell>
                   </TableRow>
                 );
@@ -230,77 +238,77 @@ export default function PersonImportCheck({
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((item) => {
                 return (
-                  <TableRow key={item.UID}>
+                  <TableRow key={item["personUid"]}>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["﻿First Name"]}
+                      {item["personFirstName"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["Last Name"]}
+                      {item["personLastName"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item.UID}
+                      {item["personUid"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item.Email}
+                      {item["personEmail"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["Mobile Number"]}
+                      {item["personMobileNumber"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["Credential type"]}
+                      {item["credentialType"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["Credential pin"]}
+                      {item["credentialPin"]}
                     </TableCell>
                     <TableCell
                       sx={{
                         color: "#00994C",
                       }}
                     >
-                      {item["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]}
+                      {item["credentialExpiry"]}
                     </TableCell>
                   </TableRow>
                 );
               })}
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50]}
+              component="div"
+              count={redData.length + greenData.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </TableBody>
         </Table>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component="div"
-          count={redData.length + greenData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined">
