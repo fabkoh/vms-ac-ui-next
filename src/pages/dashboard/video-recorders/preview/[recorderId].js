@@ -435,14 +435,14 @@ const VideoRecorderPreview = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderIpAddress,
+                            ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -450,22 +450,22 @@ const VideoRecorderPreview = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         data.rtsp_port = device_ports.iRtspPort;
 
                         // channel_id to switch cam
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderIpAddress, rtsp_port: device_ports.iRtspPort,
+                            ip: data.recorderPublicIp, rtsp_port: device_ports.iRtspPort,
                             stream_type: 1, channel_id:  2, zero_channel: false, port: 7681
                         });
 
