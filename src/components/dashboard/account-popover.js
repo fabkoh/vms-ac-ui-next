@@ -26,7 +26,7 @@ export const AccountPopover = (props) => {
   // `const { user } = useAuth();`
   const user = {
     avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    name: 'Anika Visser'
+    name: 'ISS ADMIN'
   };
 
   const handleLogout = async () => {
@@ -81,13 +81,13 @@ export const AccountPopover = (props) => {
             color="textSecondary"
             variant="body2"
           >
-            Acme Inc
+            ISS Admin
           </Typography>
         </Box>
       </Box>
       <Divider />
       <Box sx={{ my: 1 }}>
-        <NextLink
+        {/* <NextLink
           href="/dashboard/social/profile"
           passHref
         >
@@ -103,7 +103,7 @@ export const AccountPopover = (props) => {
               )}
             />
           </MenuItem>
-        </NextLink>
+        </NextLink> */}
         <NextLink
           href="/dashboard/settings/account"
           passHref

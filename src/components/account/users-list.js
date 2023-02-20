@@ -418,12 +418,8 @@ export const UsersList = () => {
           handleDialogClose={() => setServerDownOpen(false)}
         />
         <Box sx={{ mb: 4 }}>
-          <Typography sx={[{ mx: 3 }, { mb: 6 }, { mt: 3 }]}>
-            This section shows you the list of all user accounts that you are
-            able to manage. This does not pertain to Persons.
-          </Typography>
           <Grid container justifyContent="space-between" spacing={3}>
-            <Grid item>
+            {/* <Grid item>
               <Button
                 component="label"
                 startIcon={<UploadIcon fontSize="small" />}
@@ -478,6 +474,12 @@ export const UsersList = () => {
               >
                 <HelpOutlineIcon />
               </Tooltip>
+            </Grid> */}
+            <Grid item xs={8}>
+            <Typography sx={[{ mx: 3 }, { mb: 6 }, { mt: 3 }]}>
+            This section shows you the list of all user accounts that you are
+            able to manage. This does not pertain to Persons.
+            </Typography>
             </Grid>
             <Grid item>
               <Button
