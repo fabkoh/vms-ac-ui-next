@@ -43,7 +43,9 @@ import { width } from "@mui/system";
 export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
     return(
         <BasicDetailsCard
-        	title = "Cameras"
+        	title =  {(recorder && "cameras" in recorder) 
+					? "Cameras"
+					: "Warning : Unable to connect to video recorder"}
         	subtitle = "Click on camera name below to go to live view">
 
 		<div>
@@ -65,7 +67,7 @@ export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
 							<TableCell>NAME</TableCell>
 							<TableCell>IP ADDRESS</TableCell>
 							<TableCell>MODEL</TableCell>
-							<TableCell>SERIA NO.</TableCell>
+							<TableCell>SERIAL NO.</TableCell>
 							<TableCell>STATUS</TableCell>
 							<TableCell>LAST ONLINE</TableCell>
 							<TableCell align="left"></TableCell>
@@ -125,6 +127,12 @@ export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
 										) : (
 											<SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>
 										) }
+									</TableCell>
+									<TableCell width="20%">
+										-
+										{/* <Typography width={180} noWrap>
+											{recorder.created}
+										</Typography> */}
 									</TableCell>
 									<TableCell width="10%" align="left">
 											

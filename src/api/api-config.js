@@ -200,6 +200,7 @@ const fakeAuthDevices = [
 
 ]
 
+//const fakeVideoRecorders = []
 const fakeVideoRecorders = [
     {
         "recorderId": 1,
@@ -212,7 +213,7 @@ const fakeVideoRecorders = [
         "created": "2022-06-24T10:31:35.126183"
     }, 
     {
-        "recorderId": 2,
+        "recorderId": 3,
         "recorderName": "Video Recorder 2",
         "recorderSerialNumber": "123ABCD",
         "recorderIpAddress": "192.168.34.22",
@@ -222,12 +223,13 @@ const fakeVideoRecorders = [
         "created": "2022-06-24T10:31:35.126183"
     }, 
     {
-        "recorderId": 3,
+        "recorderId": 2,
         // "isActive": true,
         "recorderName": "Real Video Recorder",
         "recorderSerialNumber": "DS-7616NI-I21620210923CCRRG74241239WCVU",
         "recorderIpAddress": "128.106.80.68",
         "recorderPortNumber": 8085,
+        "recorderIWSPort": 7681,
         "recorderChannels": [
             "IPdome"
         ],

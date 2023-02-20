@@ -663,14 +663,14 @@ const VideoCameraDetails = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderIpAddress,
+                            ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -678,24 +678,24 @@ const VideoCameraDetails = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         console.log(digital_channels,333);
                         data.recorderCameras = [...digital_channels];
 
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         data.rtsp_port = device_ports.iRtspPort;
 
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderIpAddress, rtsp_port: data.recorderPortNumber,
+                            ip: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
                             stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
 
@@ -770,7 +770,7 @@ const VideoCameraDetails = () => {
                     fontSize="small"
                     sx={{ mr: 1 }}
                   />
-                  <Typography variant="subtitle2">Video Recorders</Typography>
+                  <Typography variant="subtitle2">Video Recorder Details</Typography>
                 </Link>
                 {/* </NextLink> */}
                         
@@ -823,7 +823,7 @@ const VideoCameraDetails = () => {
                         onClick = {async ()=> {
                           setPreviewMode('live');
                           await preview_recorder(sdk_handle, {
-                            ip: videoRecorderInfo.recorderIpAddress, rtsp_port: videoRecorderInfo.rstp_port,
+                            ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                             stream_type: 1, channel_id:  1, zero_channel: false
                           });
                         }}>
@@ -837,7 +837,7 @@ const VideoCameraDetails = () => {
                           } else {
                             setPreviewMode('live')
                             await preview_recorder(sdk_handle, {
-                              ip: videoRecorderInfo.recorderIpAddress, rtsp_port: videoRecorderInfo.rstp_port,
+                              ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                               stream_type: 1, channel_id:  1, zero_channel: false
                             });
                           }
@@ -1282,7 +1282,7 @@ value = {value}>{value}</MenuItem>))
                               onClick={async () => {
                                 const results = await search_video(sdkHandle, {
                                   type: 1,
-                                  ip: videoRecorderInfo.recorderIpAddress,
+                                  ip: videoRecorderInfo.recorderPublicIp,
                                   port: videoRecorderInfo.recorderPortNumber,
                                   stream_type, start_time, end_time
                                 });
@@ -1331,7 +1331,7 @@ value = {value}>{value}</MenuItem>))
                                     } = playback_files[0];
 
                                     await download_video(sdkHandle, {
-                                        ip: videoRecorderInfo.recorderIpAddress,
+                                        ip: videoRecorderInfo.recorderPublicIp,
                                         file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                       })
                                   }
@@ -1364,7 +1364,7 @@ value = {value}>{value}</MenuItem>))
                                   <td>
                                     <div onClick = {async () => {
                                       await download_video(sdkHandle, {
-                                        ip: videoRecorderInfo.recorderIpAddress,
+                                        ip: videoRecorderInfo.recorderPublicIp,
                                         file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                       })
                                     }}>
@@ -1390,7 +1390,7 @@ value = {value}>{value}</MenuItem>))
                                 variant="contained"
                                 onClick={async () => {
                                   await play(sdkHandle, {
-                                    ip: videoRecorderInfo.recorderIpAddress,
+                                    ip: videoRecorderInfo.recorderPublicIp,
                                     rtsp_port: videoRecorderInfo.rstp_port,
                                     type: 1,
                                     stream_type, start_time, end_time

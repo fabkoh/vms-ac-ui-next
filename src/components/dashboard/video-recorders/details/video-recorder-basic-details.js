@@ -23,13 +23,13 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                     align={align}
                     divider
                     label="IP Address"
-                    value={(recorder) ? recorder.recorderIpAddress : <CircularProgress size='1rem'/>}
+                    value={(recorder) ? recorder.recorderPublicIp : <CircularProgress size='1rem'/>}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Model"
-                    value={(recorder) ? recorder.model : <CircularProgress size='1rem'/>}
+                    value={(recorder && "model" in recorder) ? recorder.model : <CircularProgress size='1rem'/>}
                 />
                 <PropertyListItem
                     align={align}
@@ -42,24 +42,26 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                     align={align}
                     divider
                     label="Channels"
-                    value={(recorder) ? count : <CircularProgress size='1rem'/>}
+                    value={(recorder && "cameras" in recorder) ? count : <CircularProgress size='1rem'/>}
                 />
                 
                 <PropertyListItem
                     align={align}
                     divider
-                    label="Camera Status"
-                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
+                    label="Recorder Status"
+                    value={(recorder && "cameras" in recorder) 
+                        ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> 
+                        : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>}
                 >
                 </PropertyListItem>
 
-                <PropertyListItem
+                {/* <PropertyListItem
                     align={align}
                     divider
                     label="Alarm Status"
                     value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
                 >
-                </PropertyListItem>
+                </PropertyListItem> */}
             </PropertyList>
         </BasicDetailsCardNoCollapse>
     )

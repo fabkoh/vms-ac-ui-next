@@ -22,7 +22,7 @@ import { authDeviceApi } from "../../../../api/auth-devices";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 
-const EditController = () => {
+const EditVideoRecorder = () => {
     const isMounted = useMounted();
     const { recorderId }  = router.query; 
     const [videoRecorderInfo, setVideoRecorderInfo] = useState(null)
@@ -30,10 +30,6 @@ const EditController = () => {
         invalidIP:false,
         invalidEntrance:false,
     })
-    const [E1, setE1] = useState()
-    const [E2, setE2] = useState()
-    const [authStatus, setAuthStatus] = useState({})
-    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getVideoRecorder = async(recorderId) => {
         try{
@@ -55,42 +51,6 @@ const EditController = () => {
         }catch(err){console.log(err)}
     }
 
-    const getPairs = (controllerInfo) => {
-        const E1=[]
-        const E2=[]
-        videoRecorderInfo.authDevices.forEach(dev=>{
-            if(dev.authDeviceDirection.includes('E1')){
-                E1.push(dev)
-            }
-            else{E2.push(dev)}
-        })
-        getEntrances(E1,E2)
-        setE1(E1)
-        setE2(E2)
-    }
-
-    const [statusLoaded, setStatusLoaded] = useState(false)
-    const getStatus = async() => {
-            Promise.resolve(videoRecorderApi.getAuthStatus(recorderId),toast.loading("Fetching status..."))
-            .then(async res=>{
-                toast.dismiss()
-                if(res.status!=200){
-                    setStatusLoaded(true)
-                    toast.error("Failed to fetch status")
-                }
-                else{
-                    setStatusLoaded(true)
-                    toast.success("Status successfully fetched")
-                    const data = await res.json();
-                    setAuthStatus(data)
-                }
-                // setAuthStatus(E1)
-                // setE2Status(E2)
-            })
-        // }catch(err){console.log(err)}
-        // setStatusLoaded(true)
-    }
-
 
     const getInfo = useCallback(async() => {
         setStatusLoaded(false)
@@ -104,26 +64,6 @@ const EditController = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
 
-    // fetch all entrance info
-    const [allEntrances, setAllEntrances] = useState([]);
-    const getEntrances = async(E1,E2) => {
-        const toUpdate =[...allEntrances]
-        Promise.resolve(authDeviceApi.getAvailableEntrances())
-        .then(async res=>{
-            if(res.status==200){
-                // toast.success("Successfully fetched entrance info")
-                const data = await res.json()
-                data.forEach(data=>toUpdate.push(data))
-                E1?(E1[0].entrance?toUpdate.push(E1[0].entrance):false):false
-                E2?(E2[0].entrance?toUpdate.push(E2[0].entrance):false):false
-            }
-            else{toast.error("Failed to fetch entrance data")}
-        })        
-       
-        setAllEntrances(toUpdate)
-        
-    }
-    
     const [submitted, setSubmitted] = useState(false);
 
     const changeText = (e) => {
@@ -222,7 +162,7 @@ const EditController = () => {
         <>
             <Head>
                 <title>
-                    Etlas: Edit Controller
+                    Etlas: Edit Video Recorder
                 </title>
             </Head>
             <Box
@@ -252,14 +192,14 @@ const EditController = () => {
                                     sx={{ mr: 1 }}
                                 />
                                 <Typography variant="subtitle2">
-                                    Controllers
+                                    Video Recorders
                                 </Typography>
                             </Link>
                  
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Edit Controller
+                            Edit Recorders
                         </Typography>
                     </Box>
                     <form onSubmit={submitForm}>
@@ -323,7 +263,7 @@ const EditController = () => {
     )
 }
 
-EditController.getLayout = (page) => (
+EditVideoRecorder.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -331,4 +271,4 @@ EditController.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default EditController;
+export default EditVideoRecorder;

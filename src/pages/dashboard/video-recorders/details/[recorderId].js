@@ -183,7 +183,8 @@ const VideoRecorderDetails = () => {
             .then( async res=>{
                 if(res.status==200){
                     const data              = await res.json()
-
+                    // console.log(data);
+                    setVideoRecorderInfo(data);
                     if (!loadedSDK) {
                         const sdk_handle        = await get_sdk_handle();
                         setSDKHandle(sdk_handle);
@@ -191,14 +192,14 @@ const VideoRecorderDetails = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderIpAddress,
+                            ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -206,11 +207,11 @@ const VideoRecorderDetails = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                     
@@ -218,7 +219,7 @@ const VideoRecorderDetails = () => {
 
                        
 
-                        setVideoRecorderInfo(data);
+                        setVideoRecorderInfo({...data});
 
                         setLoadedSDK(true);
                     }
@@ -316,6 +317,10 @@ const VideoRecorderDetails = () => {
                                     sx={{
                                         alignItems: 'center',
                                         display: 'flex'
+                                    }}
+                                    onClick ={() => {
+                                        window.location.href = 
+                                        `/dashboard/video-recorders`
                                     }}
                                 >
                                     <ArrowBackIcon

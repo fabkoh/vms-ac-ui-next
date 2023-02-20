@@ -7,12 +7,20 @@ import { ArrowRight } from "../../../icons/arrow-right";
 import { ListFilter } from "../shared/list-filter";
 import { getVideoRecorderDetailsLink, getVideoRecorderEditLink } from "../../../utils/video-recorder";
 import { toDisplayDateString } from "../../../utils/utils";
+import CropPortraitIcon from '@mui/icons-material/CropPortrait';
+import SignalCellularAlt1BarSharpIcon from '@mui/icons-material/SignalCellularAlt1BarSharp';
+import { resolveTypeReferenceDirective } from "typescript";
+import { SeverityPill } from "../../severity-pill";
+import { useEffect, useState } from "react";
 
 // for status options
 const statusOptions = ['Non-Active', 'Active'];
 
+
 export default function VideoListTable({ selectedAllVideoRecorders, selectedSomeVideoRecorders, handleSelectAllVideoRecorders, videoRecorders, selectedVideoRecorders, handleSelectFactory, videoRecorderCount, onPageChange, onRowsPerPageChange, page, rowsPerPage, 
-    handleStatusSelect, ...other }) {   
+    handleStatusSelect, 
+    getRecordersLocal, ...other }) {   
+
     return(
         <div {...other}>
             <Scrollbar>
@@ -34,11 +42,13 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                     defaultLabel="Status"
                                 />
                             </TableCell>
-                            <TableCell>Serial No.</TableCell>
-                            <TableCell>IP Address</TableCell>
                             <TableCell>No. of Ch</TableCell>
                             <TableCell>Cam Status</TableCell>
-                            <TableCell>Alarm Status</TableCell>
+                            <TableCell>Serial No.</TableCell>
+                            <TableCell>Public IP Address</TableCell>
+                            <TableCell>Private IP Address</TableCell>
+                            <TableCell>Port Number</TableCell>
+                            <TableCell>IWS Port</TableCell>
                             <TableCell>Created</TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>    
@@ -46,15 +56,17 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                     <TableBody>
                         {
                             videoRecorders.map(recorder => {
+                            
                                 const {
                                     recorderId,
                                     recorderName,
-                                    recorderIpAddress,
+                                    recorderPublicIp,
+                                    recorderPrivateIp,
+                                    recorderPortNumber,
+                                    recorderIWSPort,
                                     recorderSerialNumber,
-                                    recorderChannels,
-                                    recorderCameras,
-                                    recorderAlarms,
                                     isActive,
+                                    cameras,
                                     created
                                 } = recorder
                                 const isVideoRecorderSelected = selectedVideoRecorders.includes(recorderId);
@@ -62,6 +74,7 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                 const detailsLink = getVideoRecorderDetailsLink(recorder);
                                 const editLink = getVideoRecorderEditLink(recorderId);
                                 return(
+
                                     <TableRow
                                         hover
                                         key={recorderId}
@@ -75,25 +88,61 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                             /> 
                                         </TableCell>    
                                         <TableCell>
-                                            <NextLink
+                                            {/* <NextLink
                                                 href={detailsLink}    
                                                 passHref
-                                            >
-                                                <Link color="inherit">
+                                            > */}
+                                                <Link 
+                                                    color="inherit" 
+                                                    onClick ={() => {
+                                                        window.location.href = 
+                                                        `/dashboard/video-recorders/details/${recorderId}`
+                                                    }}>
                                                     <Typography noWrap>{ recorderName }</Typography>
+                                                    
                                                 </Link>    
-                                            </NextLink>
+                                            {/* </NextLink> */}
                                         </TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={recorderName === "Real Video Recorder" ? "ACTIVE" : "NON-ACTIVE"}
-                                                color={recorderName === "Real Video Recorder"? "success" : "error"}
+                                                label={isActive ? "ACTIVE" : "NON-ACTIVE"}
+                                                color={isActive ? "success" : "error"}
                                                 sx={{
                                                     fontSize: "12px",
                                                     fontWeight: 600
                                                 }}
                                                 size="small"
                                             />
+                                        </TableCell>
+                                        <TableCell>
+                                            {
+                                                (Array.isArray(cameras) && cameras.length > 0) ? (
+                                                    <Typography noWrap>{cameras.length}</Typography>
+                                                ) : (
+                                                    <WarningChip text="No channels" />
+                                                )
+                                            }
+                                        </TableCell>
+                                        <TableCell>
+                                            { 
+                                                (Array.isArray(cameras) && cameras.length > 0) ? (
+                                                    // <Typography noWrap>{cameras.length}</Typography>
+                                                    cameras.map(camera => 
+                                                    // <SignalCellularAlt1BarSharpIcon 
+                                                    //     color="primary"
+                                                    //     style={{ fontSize: 160}}
+                                                    //     />
+                                                    (recorder.cameras[0]["online"]) 
+                                                    ? <SeverityPill color="success" 
+                                                        style={{color: 'transparent'}}>_.</SeverityPill> 
+                                                    : <SeverityPill color="error" 
+                                                    style={{color: 'transparent'}}>_.</SeverityPill> 
+                                                        )
+                                                    
+                                                ) : (
+                                                    <WarningChip text="No cameras found" />
+                                                )
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             { 
@@ -103,29 +152,29 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                         </TableCell>
                                         <TableCell>
                                             { 
-                                                <Typography noWrap>{recorderIpAddress}</Typography>
+                                                <Typography noWrap>{recorderPublicIp}</Typography>
                                                 
                                             }
                                         </TableCell>
                                         <TableCell>
-                                            {
-                                                (Array.isArray(recorderChannels) && recorderChannels.length > 0) ? (
-                                                    <Typography noWrap>{recorderChannels.length}</Typography>
-                                                ) : (
-                                                    <WarningChip text="No channels" />
-                                                )
+                                            { 
+                                                <Typography noWrap>{recorderPrivateIp}</Typography>
+                                                
                                             }
                                         </TableCell>
                                         <TableCell>
-                                            {
-                                                (Array.isArray(recorderCameras) && recorderCameras.length > 0) ? (
-                                                    <Typography noWrap>{recorderCameras.length}</Typography>
-                                                ) : (
-                                                    <WarningChip text="No cameras found" />
-                                                )
+                                            { 
+                                                <Typography noWrap>{recorderPortNumber}</Typography>
+                                                
                                             }
                                         </TableCell>
                                         <TableCell>
+                                            { 
+                                                <Typography noWrap>{recorderIWSPort}</Typography>
+                                                
+                                            }
+                                        </TableCell>
+                                        {/* <TableCell>
                                             {
                                                  (Array.isArray(recorderAlarms) && recorderAlarms.length > 0) ? (
                                                     <Typography noWrap>{recorderAlarms.length}</Typography>
@@ -133,7 +182,7 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                                     <WarningChip text="No alarms found" />
                                                 )
                                             }
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell>
                                             <NextLink
                                                 href={detailsLink}    
@@ -157,7 +206,11 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                                 href={ detailsLink }
                                                 passHref
                                             >
-                                                <IconButton component="a">
+                                                <IconButton component="a"
+                                                onClick ={() => {
+                                                    window.location.href = 
+                                                    `/dashboard/video-recorders/details/${recorderId}`
+                                                }}>
                                                     <ArrowRight fontSize="small" />    
                                                 </IconButton>    
                                             </NextLink>
