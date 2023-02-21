@@ -256,7 +256,7 @@ const EventsManagementList = () => {
                                 </StyledMenu>
                             </Grid> 
                         </Grid>
-                        <Box
+                        {/* <Box
                             sx={{
                                 m: -1,
                                 mt: 3
@@ -276,7 +276,7 @@ const EventsManagementList = () => {
                                 }}>
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Card>
                         <Divider />

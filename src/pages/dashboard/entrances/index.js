@@ -466,7 +466,7 @@ const EntranceList = () => {
                                 </StyledMenu>
                             </Grid> 
                         </Grid>
-                        <Box
+                        {/* <Box
                             sx={{
                                 m: -1,
                                 mt: 3
@@ -486,7 +486,7 @@ const EntranceList = () => {
                                 }}>
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Card>
                         <Divider />

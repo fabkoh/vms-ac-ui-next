@@ -16,24 +16,21 @@ import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
 	const { open, handleDialogClose, deleteEventsManagement } = props;
-	// //handle delete action. put this in parent component
-	// const [Open, setOpen] = React.useState(false);
+	//handle delete action. put this in parent component
+	const [Open, setOpen] = React.useState(false);
 
-	// const handleclickOpen = () => {        //click open is for binding to button.
-	// 	setOpen(true);                        //can remove if not needed
-	// 	console.log('true');
-	// };
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// 	console.log('false');
-	// };
-	// const handleDelete = () => {
-	// 	try {
-	// 		setOpen(false);
-	// 		console.log('false');
-	// 		// const data = await personApi.getPersons()
-	// 	} catch (error) {}
-	// };
+	const handleclickOpen = () => {        //click open is for binding to button.
+		setOpen(true);                        //can remove if not needed
+		console.log('true');
+	};
+
+	const handleDelete = () => {
+		try {
+			setOpen(false);
+			console.log('false');
+			// const data = await personApi.getPersons()
+		} catch (error) {}
+	};
 
 	//move text state here
 

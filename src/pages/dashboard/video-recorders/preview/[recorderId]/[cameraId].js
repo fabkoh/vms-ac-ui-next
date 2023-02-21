@@ -297,13 +297,14 @@ const VideoCameraDetails = () => {
       });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel}) {
+    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
         return await new Promise((resolve, reject) => {
           handle.I_StartRealPlay(ip, {
             iRtspPort:      rtsp_port,
             iStreamType:    stream_type,
             iChannelID:     channel_id,
-            bZeroChannel:   zero_channel
+            bZeroChannel:   zero_channel,
+            iWSPort: port
           });
 
           resolve();
@@ -565,6 +566,7 @@ const VideoCameraDetails = () => {
           iChannelID:   1,
           szStartTime:  szStartTime,
           szEndTime:    szEndTime,
+          port: 7681,
           success: function () {
             resolve();
           }, error: function (status, xmlDoc) {
@@ -691,7 +693,7 @@ const VideoCameraDetails = () => {
 
                         await preview_recorder(sdk_handle, {
                             ip: data.recorderIpAddress, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id:  1, zero_channel: false
+                            stream_type: 1, channel_id:  1, zero_channel: false, port: 7681
                         });
 
                         setVideoRecorderInfo(data);

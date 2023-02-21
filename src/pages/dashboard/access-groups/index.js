@@ -525,7 +525,7 @@ const AccessGroupList = () => {
 								</StyledMenu>
 							</Grid>
 						</Grid>
-						<Box
+						{/* <Box
 							sx={{
 								m: -1,
 								mt: 3,
@@ -550,7 +550,7 @@ const AccessGroupList = () => {
 								}}>
 								<HelpOutlineIcon />
 							</Tooltip>
-						</Box>
+						</Box> */}
 					</Box>
 					<Card>
 						{/* <Tabs
