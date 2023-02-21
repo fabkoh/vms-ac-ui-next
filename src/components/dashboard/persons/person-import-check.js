@@ -149,7 +149,7 @@ export default function PersonImportCheck({
           {redCount != 0 && (
             <Alert severity="error" variant="outlined">
               <AlertTitle>Import Check</AlertTitle>
-              <p>{`We detected ${redCount} entries which have format or validation errors. They are highlighted in red below. Please fix them to submit the import. Persons require first name, last name and mobile number`}</p>
+              <p>{`We detected ${redCount} entries which have format or validation errors. They are highlighted in red below. Please fix them to submit the import. Persons require first name, last name and unique mobile number. Credentials require unique pin.`}</p>
             </Alert>
           )}
           {redCount == 0 && (
