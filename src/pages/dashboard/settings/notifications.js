@@ -267,7 +267,10 @@ const NotificationSettings = () => {
       if (res.status == 200) {
         toast.success(message);
       } else {
-        setErrorMessage(message);
+        console.log(res);
+        setErrorMessage(
+          `SMTP settings test failed with status ${res.status}. \n Ensure that email notifications are enabled.`
+        );
         setErrorPopUp(true);
       }
     } catch {
@@ -359,7 +362,7 @@ const NotificationSettings = () => {
                     spacing={3}
                     justifyContent="flex-start"
                   >
-                    {/* <Grid item>
+                    <Grid item>
                       <Typography variant="body">
                         Switch to Custom SMTP Email Server
                       </Typography>
@@ -369,7 +372,7 @@ const NotificationSettings = () => {
                         onClick={handleEnableCustom}
                         checked={enableCustom}
                       ></Switch>
-                    </Grid> */}
+                    </Grid>
                     <ExpandMore expand={emailSettings}></ExpandMore>
                     {emailSettings && isUpdated && (
                       <CardContent>
@@ -405,7 +408,7 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Username"
+                              label="Sender Username"
                               name="Username"
                               required
                               defaultValue={emailSettings.username}
@@ -416,7 +419,7 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Email"
+                              label="Sender Email"
                               name="Email"
                               required
                               defaultValue={emailSettings.email}
@@ -424,50 +427,41 @@ const NotificationSettings = () => {
                               disabled={!enableCustom}
                             />
                           </Grid>
-                          {/* <Grid
-                                                    item
-                                                    xs={8}
-                                                >
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Password"
-                                                        name="Password"
-                                                        type="password"
-                                                        required
-                                                        defaultValue={emailSettings.emailPassword}
-                                                        onChange={onEmailPasswordChange}
-                                                        disabled={!enableCustom}
-                                                    />
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={8}
-                                                >
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Host Address"
-                                                        name="Host Address"
-                                                        required
-                                                        defaultValue={emailSettings.hostAddress}
-                                                        onChange={onHostAddressChange}
-                                                        disabled={!enableCustom}
-                                                    />
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={8}
-                                                >
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Port Number"
-                                                        name="Port Number"
-                                                        required
-                                                        defaultValue={emailSettings.portNumber}
-                                                        value={portNumberValue}
-                                                        onChange={onPortNumberChange}
-                                                        disabled={!enableCustom}
-                                                    />
-                                                    </Grid> */}
+                          <Grid item xs={8}>
+                            <TextField
+                              fullWidth
+                              label="Sender Password"
+                              name="Password"
+                              type="password"
+                              required
+                              defaultValue={emailSettings.emailPassword}
+                              onChange={onEmailPasswordChange}
+                              disabled={!enableCustom}
+                            />
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField
+                              fullWidth
+                              label="Sender SMTP Host Address"
+                              name="Host Address"
+                              required
+                              defaultValue={emailSettings.hostAddress}
+                              onChange={onHostAddressChange}
+                              disabled={!enableCustom}
+                            />
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField
+                              fullWidth
+                              label="Sender SMTP Port Number"
+                              name="Port Number"
+                              required
+                              defaultValue={emailSettings.portNumber}
+                              value={portNumberValue}
+                              onChange={onPortNumberChange}
+                              disabled={!enableCustom}
+                            />
+                          </Grid>
                           <Grid item xs={8}>
                             <Grid
                               container
