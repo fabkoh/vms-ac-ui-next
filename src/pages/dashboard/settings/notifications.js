@@ -359,7 +359,7 @@ const NotificationSettings = () => {
                     spacing={3}
                     justifyContent="flex-start"
                   >
-                    <Grid item>
+                    {/* <Grid item>
                       <Typography variant="body">
                         Switch to Custom SMTP Email Server
                       </Typography>
@@ -369,7 +369,7 @@ const NotificationSettings = () => {
                         onClick={handleEnableCustom}
                         checked={enableCustom}
                       ></Switch>
-                    </Grid>
+                    </Grid> */}
                     <ExpandMore expand={emailSettings}></ExpandMore>
                     {emailSettings && isUpdated && (
                       <CardContent>
@@ -488,7 +488,7 @@ const NotificationSettings = () => {
                                   Test SMTP Email
                                 </Button>
                               </Grid>
-                              <Grid>
+                              {/* <Grid>
                                 <Button
                                   variant="outlined"
                                   color="error"
@@ -497,7 +497,7 @@ const NotificationSettings = () => {
                                 >
                                   Set to Default
                                 </Button>
-                              </Grid>
+                              </Grid> */}
                             </Grid>
                           </Grid>
                         </Grid>
