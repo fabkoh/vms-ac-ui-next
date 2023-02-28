@@ -59,6 +59,9 @@ const NotificationSettings = () => {
   const [smsSettings, setSMSSettings] = useState([]);
   const [disableSubmit, setDisableSubmit] = useState(false);
   const [portNumberValue, setPortNumberValue] = useState("");
+  const [recipentUser, setRecipentUser] = useState("Zephan");
+  const [recipentEmail, setRecipentEmail] = useState("bickybong@gmail.com");
+  const [recipentSMS, setRecipentSMS] = useState("+6583664634");
   const [errorPopUp, setErrorPopUp] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageValue, setErrorMessageValue] = useState("");
@@ -221,6 +224,21 @@ const NotificationSettings = () => {
     emailSettings.emailPassword = e.target.value;
   };
 
+  const onRecipentUserChange = (e) => {
+    setRecipentUser(e.target.value);
+    console.log(recipentUser);
+  };
+
+  const onRecipentEmailChange = (e) => {
+    setRecipentEmail(e.target.value);
+    console.log(recipentEmail);
+  };
+
+  const onRecipentSMSChange = (e) => {
+    setRecipentSMS(e.target.value);
+    console.log(recipentSMS);
+  };
+
   const onProtocolchange = (e) => {
     // emailSettings.hostAddress = e.target.value;
     //console.log(1234)
@@ -240,15 +258,11 @@ const NotificationSettings = () => {
     e.preventDefault();
     setDisableSubmit(true);
     try {
-      const testRes = await notificationsApi.testSMTP(emailSettings);
-      const message = await testRes.text();
-      if (testRes.status == 200) {
-        const res = await notificationsApi.updateEmail(emailSettings);
-        if (res) {
-          toast.success("Successfully saved Notification Settings");
-          setErrorMessage("");
-          getEmailSettings();
-        }
+      const res = await notificationsApi.updateEmail(emailSettings);
+      if (res) {
+        toast.success("Successfully saved Notification Settings");
+        setErrorMessage("");
+        getEmailSettings();
       } else {
         toast.error("SMTP settings are not valid");
       }
@@ -262,7 +276,11 @@ const NotificationSettings = () => {
     e.preventDefault();
     setDisableSubmit(true);
     try {
-      const res = await notificationsApi.testSMTP(emailSettings);
+      const res = await notificationsApi.testSMTP(
+        emailSettings,
+        recipentUser,
+        recipentEmail
+      );
       const message = await res.text();
       if (res.status == 200) {
         toast.success(message);
@@ -283,6 +301,11 @@ const NotificationSettings = () => {
   useEffect(() => {
     setErrorMessageValue(errorMessage);
   }, [errorPopUp]);
+
+  const testSMS = async (e) => {
+    e.preventDefault();
+    setDisableSubmit(true);
+  };
 
   return (
     <>
@@ -312,7 +335,7 @@ const NotificationSettings = () => {
             <Typography variant="h3">Notification Settings</Typography>
           </div>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <Card>
+            {/* <Card>
               <Table sx={[{ "& td": { border: 0 } }, { m: 4 }]}>
                 <TableRow>
                   <TableCell width="40%">
@@ -341,7 +364,7 @@ const NotificationSettings = () => {
                   </TableCell>
                 </TableRow>
               </Table>
-            </Card>
+            </Card> */}
             <Card>
               <CardHeader
                 title="Email SMTP Settings"
@@ -361,6 +384,26 @@ const NotificationSettings = () => {
                     alignItems="center"
                     spacing={3}
                     justifyContent="flex-start"
+                    padding="10px"
+                  >
+                    <Grid item>
+                      <Typography variant="body1">
+                        Enable Email Notifications
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Switch
+                        onClick={changeEmailEnablementStatus}
+                        checked={enableEmail}
+                      ></Switch>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={3}
+                    justifyContent="flex-start"
+                    padding="10px"
                   >
                     <Grid item>
                       <Typography variant="body">
@@ -463,35 +506,45 @@ const NotificationSettings = () => {
                             />
                           </Grid>
                           <Grid item xs={8}>
-                            <Grid
-                              container
-                              alignItems="center"
-                              justifyContent="flex"
-                            >
-                              <Grid item>
-                                <Button
-                                  variant="contained"
-                                  onClick={onSubmit}
-                                  disabled={!enableCustom}
-                                >
-                                  Save Settings
-                                </Button>
-                              </Grid>
-                              <Grid item sx={{ mx: 2 }}>
-                                <Button variant="outlined" onClick={testSMTP}>
-                                  Test SMTP Email
-                                </Button>
-                              </Grid>
-                              {/* <Grid>
-                                <Button
-                                  variant="outlined"
-                                  color="error"
-                                  onClick={setToDefault}
-                                  sx={{ mr: 3 }}
-                                >
-                                  Set to Default
-                                </Button>
-                              </Grid> */}
+                            <Grid item>
+                              <Button
+                                variant="contained"
+                                onClick={onSubmit}
+                                disabled={!enableCustom}
+                              >
+                                Save Settings
+                              </Button>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField
+                              fullWidth
+                              label="Recipent Username"
+                              name="Recipent Username"
+                              required
+                              defaultValue={recipentUser}
+                              value={recipentUser}
+                              onChange={onRecipentUserChange}
+                              disabled={!enableCustom}
+                            />
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField
+                              fullWidth
+                              label="Recipent Email"
+                              name="Recipent Email"
+                              required
+                              defaultValue={recipentEmail}
+                              value={recipentEmail}
+                              onChange={onRecipentEmailChange}
+                              disabled={!enableCustom}
+                            />
+                          </Grid>
+                          <Grid item xs={8}>
+                            <Grid item>
+                              <Button variant="outlined" onClick={testSMTP}>
+                                Test SMTP Email
+                              </Button>
                             </Grid>
                           </Grid>
                         </Grid>
@@ -519,18 +572,66 @@ const NotificationSettings = () => {
                   justifyContent="flex-start"
                 >
                   <Grid item>
-                    <Typography variant="body">
-                      Number of SMS Credits Used
+                    <Typography variant="body1">
+                      Enable SMS Notifications
                     </Typography>
                   </Grid>
-                  <Grid item xs={1}>
-                    10
+                  <Grid item>
+                    <Switch
+                      onClick={changeSMSEnablementStatus}
+                      checked={enableSMS}
+                    ></Switch>
                   </Grid>
-                  <Grid item xs={1}>
-                    out of
+                </Grid>
+
+                <Grid
+                  container
+                  sx={[{ ml: 7 }, { mb: 4 }]}
+                  alignItems="center"
+                  spacing={3}
+                  justifyContent="flex-start"
+                >
+                  <Grid item xs={8}>
+                    <TextField
+                      fullWidth
+                      label="Recipent SMS"
+                      name="Recipent SMS"
+                      required
+                      defaultValue={recipentSMS}
+                      value={recipentSMS}
+                      onChange={onRecipentSMSChange}
+                      disabled={!enableCustom}
+                    />
                   </Grid>
-                  <Grid item xs={1}>
-                    100
+                  <Grid item xs={8}>
+                    <Grid item>
+                      <Button variant="outlined" onClick={testSMS}>
+                        Test SMS
+                      </Button>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    container
+                    // sx={[{ ml: 7 }, { mb: 4 }]}
+                    // alignItems="center"
+                    spacing={3}
+                    // justifyContent="flex-start"
+                    margin="0"
+                  >
+                    <Grid item>
+                      <Typography variant="body">
+                        Number of SMS Credits Used
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={1}>
+                      10
+                    </Grid>
+                    <Grid item xs={1}>
+                      out of
+                    </Grid>
+                    <Grid item xs={1}>
+                      100
+                    </Grid>
                   </Grid>
                 </Grid>
               </Collapse>
