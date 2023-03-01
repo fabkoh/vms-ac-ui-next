@@ -245,19 +245,19 @@ const AccountButton = () => {
 };
 
 export const DashboardNavbar = (props) => {
-  const { onOpenSidebar, ...other } = props;
+  const { theaterMode , onOpenSidebar, ...other } = props;
 
   return (
     <>
       <DashboardNavbarRoot
-        sx={{
+        sx={ !theaterMode ? {
           left: {
             lg: 280
           },
           width: {
             lg: 'calc(100% - 280px)'
           }
-        }}
+        } : { position: "absolute"}}
         {...other}>
         <Toolbar
           disableGutters
@@ -272,7 +272,7 @@ export const DashboardNavbar = (props) => {
             sx={{
               display: {
                 xs: 'inline-flex',
-                lg: 'none'
+                lg: !theaterMode ? 'none' : "inline-flex"
               }
             }}
           >
