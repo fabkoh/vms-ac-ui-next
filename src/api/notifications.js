@@ -94,7 +94,6 @@ class NotificationsApi {
       portNumber,
       enabled,
       isTLS,
-
       custom,
     },
     recipentUser,
@@ -118,6 +117,25 @@ class NotificationsApi {
           recipentUser,
           recipentEmail,
           custom,
+        }),
+      });
+    }
+  }
+
+  testSMS(recipentSMS) {
+    console.log("recipentSMS:", recipentSMS);
+    console.log("JSON body:", JSON.stringify({ recipentSMS }));
+
+    if (useApi) {
+      return sendApi("/api/notification/sms/test", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          //   smsAPI: "test",
+          //   enabled: true,
+          recipentSMS,
         }),
       });
     }

@@ -298,13 +298,32 @@ const NotificationSettings = () => {
     }
     setDisableSubmit(false);
   };
-  useEffect(() => {
-    setErrorMessageValue(errorMessage);
-  }, [errorPopUp]);
+  // useEffect(() => {
+  //   setErrorMessageValue(errorMessage);
+  // }, [errorPopUp]);
 
   const testSMS = async (e) => {
     e.preventDefault();
     setDisableSubmit(true);
+    try {
+      console.log(recipentSMS);
+      const res = await notificationsApi.testSMS(recipentSMS);
+      const message = await res.text();
+      if (res.status == 200) {
+        toast.success(message);
+      } else {
+        console.log(res);
+        setErrorMessage(
+          `SMTP settings test failed with status ${res.status}. \n Ensure that email notifications are enabled.`
+        );
+        setErrorPopUp(true);
+      }
+    } catch {
+      toast.error("Unable to test SMTP settings");
+    } finally {
+      setErrorMessage("");
+    }
+    setDisableSubmit(false);
   };
 
   return (
