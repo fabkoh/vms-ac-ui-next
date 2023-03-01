@@ -434,7 +434,7 @@ const getSections = (t) => [
 ];
 
 export const DashboardSidebar = (props) => {
-  const { onClose, open } = props;
+  const { theaterMode, onClose, open } = props;
   const router = useRouter();
   const { t } = useTranslation();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'), {
@@ -1068,12 +1068,12 @@ export const DashboardSidebar = (props) => {
       />
     </>
   );
-
+    
   if (lgUp) {
     return (
       <Drawer
+        open={!theaterMode}
         anchor="left"
-        open
         PaperProps={{
           sx: {
             backgroundColor: 'primary.dark',
@@ -1084,7 +1084,7 @@ export const DashboardSidebar = (props) => {
             width: 280
           }
         }}
-        variant="permanent"
+        variant={ theaterMode ? "persistent" : "permanent" }
       >
         {content}
       </Drawer>
