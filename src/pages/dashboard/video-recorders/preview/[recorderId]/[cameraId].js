@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";
 import accessGroupEntranceApi from "../../../../../api/access-group-entrance-n-to-n";
@@ -29,7 +29,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../../components/authentication/auth-guard";
-import { DashboardLayout } from "../../../../../components/dashboard/dashboard-layout";
+import { DashboardLayout, TheaterModeContext } from "../../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../../components/dashboard/video-recorders/confirm-delete';
@@ -66,6 +66,7 @@ const VideoCameraDetails = () => {
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
+    const { theaterMode, setTheaterMode} = useContext(TheaterModeContext)
 
     useEffect(() => {
         gtm.push({ event: 'page_view' });
@@ -100,12 +101,11 @@ const VideoCameraDetails = () => {
         return await new Promise((resolve, reject) => {
             const {clientHeight: height, clientWidth: width} = document.getElementById('divPlugin');
 
-            handle.I_InitPlugin(width, height, {
+            handle.I_InitPlugin(  width, height , {
                 bWndFull:       true,
                 iPackageType:   2,
                 iWndowType:     1,
                 bNoPlugin:      true,
-                oStyle: {border: 0},
 
                 cbSelWnd:           function (xmlDoc) { },
                 cbDoubleClickWnd:   function (iWndIndex, bFullScreen) { },
@@ -717,6 +717,30 @@ const VideoCameraDetails = () => {
         getVideoRecorder(recorderId)
     }, [isMounted])
 
+    const updateTheaterScreen = async () => {
+      if(sdkHandle) { 
+        // resize the window of stream
+        if(theaterMode) {
+          sdkHandle.I_Resize(`${window.innerWidth - 48}`, `${window.innerHeight}`)
+        }  else {
+          const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
+          sdkHandle.I_Resize(`${width}`, `${height}`)
+        }    
+        // scroll to the this position
+      }
+      if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
+    }
+    // if full screen closed using ESC key
+    addEventListener("fullscreenchange", async () => {      
+      if( sdkHandle && theaterMode && !document.fullscreenElement) {
+        setTheaterMode(false);
+      }
+    })
+
+    useEffect(() => {
+      updateTheaterScreen();
+    }, [theaterMode]);
+
     useEffect(() => {
         getInfo();
     },
@@ -748,7 +772,7 @@ const VideoCameraDetails = () => {
             open={serverDownOpen}
             handleDialogClose={() => { setServerDownOpen(false) }}
           />
-          <Container maxWidth="lg">
+          <Container style={ theaterMode ? { maxWidth: "100%" } : {}}>
             <div>
               <Box sx={{ mb: 4 }}>   
               {/* <NextLink
@@ -798,12 +822,48 @@ const VideoCameraDetails = () => {
             <Grid container
               spacing={3}>
               <Grid item
-                xs={12}>
-                <div
-                  key = "plugin_div"
-                  style = {{justifyContent: 'center', display: 'flex'}}
-                  dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
-                />
+                id="stream-container"
+                xs={12} 
+                sx={{ position: "relative" }}>
+                    <div
+                      key = "plugin_div"
+                      style = {{justifyContent: 'center', display: 'flex'}}
+                      dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
+                    />
+                  
+                  <button type="button" 
+                    style={{ 
+                      position: "absolute", 
+                      bottom: "10px", 
+                      right: "10px", 
+                      background: "transparent", 
+                      border: "none" 
+                    }}
+                    onClick={ async () => { 
+                      var elem = document.documentElement
+                      if(theaterMode) { 
+                        if (document.exitFullscreen) {
+                          document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) { /* Safari */
+                          document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { /* IE11 */
+                          document.msExitFullscreen();
+                        }
+                      } else { 
+                        if (elem.requestFullscreen) {
+                          await elem.requestFullscreen().catch((err) => console.log(err));
+                        } else if (elem.webkitRequestFullscreen) { /* Safari */
+                          await elem.webkitRequestFullscreen().catch((err) => console.log(err));
+                        } else if (elem.msRequestFullscreen) { /* IE11 */
+                          await elem.msRequestFullscreen().catch((err) => console.log(err));
+                        }
+                      }
+                      setTheaterMode(!theaterMode); 
+                    }}>
+                    <img alt="theater mode" 
+                      style={{ filter: "invert(1)" }} 
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAjklEQVR4nO2WwQmAMAxFu1jq1Q2SUZL1FBTX0EEqxYuokFB7EJsHvf38DyWQH4LTHB1xDyhbJEnnByijNps117lIvGZPNTgL78OSgHgoCz7Cgx58iEMlzH7Rg19i/kFAGS2LZKW2n+M4HyYiL4AyVfUjnnWhH4kG7jE/V5/izmWsPh1x/xRe3rmMZc/5HTtHhL2kVsbKbgAAAABJRU5ErkJggg==" />
+                  </button>
               </Grid>
 
               <Grid item
