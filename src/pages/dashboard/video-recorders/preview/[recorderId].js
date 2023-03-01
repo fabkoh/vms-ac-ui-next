@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useContext, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
 import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
@@ -29,7 +29,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
-import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
+import { DashboardLayout, TheaterModeContext } from "../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/video-recorders/confirm-delete';
@@ -64,6 +64,7 @@ function formatDate(date) {
 
 const VideoRecorderPreview = () => {
     const isMounted = useMounted();
+    const { theaterMode, setTheaterMode} = useContext(TheaterModeContext);
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
 
@@ -85,7 +86,10 @@ const VideoRecorderPreview = () => {
     const [download_end_time, setDownloadEndTime] = useState(new Date());
     const [playback_files, setPlaybackFiles] = useState([]);
     const [serverDownOpen, setServerDownOpen] = useState(false);
-    
+    const [selectedWindow, setSelectedWindow] = useState(1);
+    const [selectedChannel, setSelectedChannel] = useState('1');
+    const [availableChannels, setAvailableChannels] = useState([]);
+
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -105,9 +109,11 @@ const VideoRecorderPreview = () => {
                 iPackageType:   2,
                 iWndowType:     1,
                 bNoPlugin:      true,
-                oStyle: {border: 0},
 
-                cbSelWnd:           function (xmlDoc) { },
+                cbSelWnd: function (xmlDoc) {
+                  const windowIndex = parseInt($(xmlDoc).find("SelectWnd").eq(0).text(), 10);
+                  setSelectedWindow(windowIndex);
+                },
                 cbDoubleClickWnd:   function (iWndIndex, bFullScreen) { },
                 cbEvent:            function (iEventType, iParam1, iParam2) { },
                 cbRemoteConfig:     function () { },
@@ -389,12 +395,22 @@ const VideoRecorderPreview = () => {
 
     const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
         return await new Promise((resolve, reject) => {
-          handle.I_StartRealPlay(ip, {
+            handle.I_StartRealPlay(ip, {
             iRtspPort:      rtsp_port,
             iStreamType:    stream_type,
             iChannelID:     channel_id,
             bZeroChannel:   zero_channel,
-            iWSPort: port
+            iWSPort: port,
+            success: function () {
+              console.log("started the preview", selectedWindow)
+            },
+            error: function (status, xmlDoc) {
+              if (status === 403) {
+                  console.log("Device do not support Websocket extracting the flow！");
+              } else {
+                  console.log("start real play failed！");
+              }
+            }
           });
 
           resolve();
@@ -402,15 +418,19 @@ const VideoRecorderPreview = () => {
     }
 
     const stop_preview_recorder = async function(handle) {
-      return await new Promise((resolve, reject) => {
-        handle.I_Stop({
-          success: function () {
-            resolve();
-          }, error: function () {
-            reject()
-          }
+      const currentStatus = await sdkHandle.I_GetWindowStatus(selectedWindow)
+      if(!!currentStatus) { 
+        return await new Promise((resolve, reject) => {
+          handle.I_Stop({
+            success: function () {
+              resolve();
+            }, error: function () {
+              reject()
+            }
+          });
         });
-      });
+      } else { return; }
+                                
     }
 
     const change_split_Screen = async function(handle, mode) {
@@ -461,14 +481,13 @@ const VideoRecorderPreview = () => {
                             ip: data.recorderPublicIp
                         })
 
+                        setAvailableChannels([...digital_channels]);
                         data.rtsp_port = device_ports.iRtspPort;
-
                         // channel_id to switch cam
                         await preview_recorder(sdk_handle, {
                             ip: data.recorderPublicIp, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id:  2, zero_channel: false, port: 7681
+                            stream_type: 1, channel_id: 1, zero_channel: false, port: 7681
                         });
-
                         setVideoRecorderInfo(data);
 
                         setLoadedSDK(true);
@@ -492,19 +511,44 @@ const VideoRecorderPreview = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
+    
+    const updateTheaterScreen = async () => {
+      if(sdkHandle) { 
+        // resize the window of stream
+        if(theaterMode) {
+          sdkHandle.I_Resize(`${window.innerWidth - 48}`, `${window.innerHeight}`)
+        }  else {
+          const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
+          sdkHandle.I_Resize(`${width}`, `${height}`)
+        }    
+        // scroll to the this position
+        if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
+      }
+    }
+    // if full screen closed using ESC key
+    addEventListener("fullscreenchange", async () => {      
+      if( sdkHandle && theaterMode && !document.fullscreenElement) {
+        setTheaterMode(false);
+      }
+    })
+    
+    useEffect(() => {
+      updateTheaterScreen();
+    }, [theaterMode]);
 
     const [actionAnchor, setActionAnchor] = useState(null);
     const open = Boolean(actionAnchor);
     const handleActionClick = (e) => { setActionAnchor(e.currentTarget); }
     const handleActionClose = () => { setActionAnchor(null); }
 
-	const [selectedState, setselectedState] = useState(false);
-	const checkSelected = () => {
-		setselectedState(true)
-	};
-	useEffect(() => {
-		checkSelected()
-	});
+    const [selectedState, setselectedState] = useState(false);
+    const checkSelected = () => {
+      setselectedState(true)
+    };
+
+    useEffect(() => {
+      checkSelected();
+    });
 
     return (
       <>
@@ -517,7 +561,7 @@ const VideoRecorderPreview = () => {
           <ServerDownError
             open={serverDownOpen}
             handleDialogClose={() => setServerDownOpen(false)} />
-          <Container maxWidth="lg">
+          <Container style={ theaterMode ? { maxWidth: "100%" } : {}}>
             <div>
               <Box sx={{ mb: 4 }}>   
               {/* <NextLink
@@ -565,13 +609,45 @@ const VideoRecorderPreview = () => {
             <Grid container
               spacing={3}>
               <Grid item
-                xs={12}>
-                <div
-                  key = "plugin_div"
-                  style = {{justifyContent: 'center', display: 'flex'}}
-                  dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
-                />
-
+                id="stream-container"
+                xs={12}
+                sx={{ position: "relative" }}>
+                  <div
+                    key = "plugin_div"
+                    dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
+                  />
+                   <button type="button" 
+                    style={{ 
+                      position: "absolute", 
+                      bottom: "10px", 
+                      right: "10px", 
+                      background: "transparent", 
+                      border: "none" 
+                    }}
+                    onClick={ async () => { 
+                      var elem = document.documentElement
+                      if(theaterMode) { 
+                        if (document.exitFullscreen) {
+                          document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) { /* Safari */
+                          document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { /* IE11 */
+                          document.msExitFullscreen();
+                        }
+                      } else { 
+                        if (elem.requestFullscreen) {
+                          await elem.requestFullscreen().catch((err) => console.log(err));
+                        } else if (elem.webkitRequestFullscreen) { /* Safari */
+                          await elem.webkitRequestFullscreen().catch((err) => console.log(err));
+                        } else if (elem.msRequestFullscreen) { /* IE11 */
+                          await elem.msRequestFullscreen().catch((err) => console.log(err));
+                        }
+                      }
+                      setTheaterMode(!theaterMode);  }}>
+                    <img alt="theater mode" 
+                      style={{ filter: "invert(1)" }} 
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAjklEQVR4nO2WwQmAMAxFu1jq1Q2SUZL1FBTX0EEqxYuokFB7EJsHvf38DyWQH4LTHB1xDyhbJEnnByijNps117lIvGZPNTgL78OSgHgoCz7Cgx58iEMlzH7Rg19i/kFAGS2LZKW2n+M4HyYiL4AyVfUjnnWhH4kG7jE/V5/izmWsPh1x/xRe3rmMZc/5HTtHhL2kVsbKbgAAAABJRU5ErkJggg==" />
+                  </button>
               </Grid>    
 
               <Grid item
@@ -593,6 +669,7 @@ const VideoRecorderPreview = () => {
                               labelId="split_screen"
                               onChange = {async ({target: {value}})=> {
                                 await change_split_Screen(sdkHandle, value)
+                                if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
                               }}
                               sx={{ width: 200 }}
                               value={stream_type}
@@ -608,6 +685,41 @@ const VideoRecorderPreview = () => {
                               }
                             </Select>
                           </div>
+                          {/* Select the channel that has to be displayed when clicked on start preview */}
+                          { availableChannels.length > 0 && 
+                            <div style={{ marginTop: "20px" }}>
+                              <InputLabel id="channels">Select Channel</InputLabel>
+                              <Select
+                                labelId="Channels"
+                                onChange = {async ({target: {value}})=> {
+                                  setSelectedChannel(value);
+                                }}
+                                sx={{ width: 200 }}
+                                value={selectedChannel}
+                                label="Channels">
+                                {
+                                  availableChannels.map(({id, name, online})  => online && (
+                                  <MenuItem 
+                                    key = {name} 
+                                    value = {id}>
+                                    {name}
+                                  </MenuItem>))
+                                }
+                              </Select>
+                              <Button onClick={async () => { 
+                                // if something is already running then close it to play the current choice
+                                await stop_preview_recorder(sdkHandle) 
+                                await preview_recorder(sdkHandle, {
+                                  ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
+                                  stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: 7681
+                                });
+                              }}>Start Preview</Button>
+                              <Button onClick={async () => {
+                                // to stop the current preview
+                                await stop_preview_recorder(sdkHandle) 
+                              }}>Stop Preview</Button>
+                            </div> 
+                          }
                         </div>
                       </div>
                     </div>
