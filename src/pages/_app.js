@@ -19,6 +19,7 @@ import { gtm } from '../lib/gtm';
 import { store } from '../store';
 import { createTheme } from '../theme';
 import { createEmotionCache } from '../utils/create-emotion-cache';
+import "../../styles/globals.css";
 import '../i18n';
 
 Router.events.on('routeChangeStart', nProgress.start);
