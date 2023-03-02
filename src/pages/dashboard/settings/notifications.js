@@ -53,6 +53,7 @@ const NotificationSettings = () => {
   const [enableSMS, setSMSEnablementStatus] = useState(false);
   const [expandedEmail, setExpandedEmail] = useState(false);
   const [expandedSMS, setExpandedSMS] = useState(false);
+  const [SMSCredits, setSMSCredits] = useState(0);
   const [enableCustom, setEnableCustom] = useState(false);
   const [emailSettings, setEmailSettings] = useState({ isTLS: false });
   const [isUpdated, setIsUpdated] = useState(false);
@@ -100,6 +101,17 @@ const NotificationSettings = () => {
     }
   };
 
+  const getSMSCredits = async () => {
+    try {
+      const res = await notificationsApi.getSMSCredits();
+      const body = await res.json();
+      console.log(body);
+      setSMSCredits(body);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getSMSEnablementStatus = async () => {
     try {
       const res = await notificationsApi.getSMSSettings();
@@ -134,10 +146,13 @@ const NotificationSettings = () => {
       const res = await notificationsApi.changeSMSEnablement(!enableSMS);
       if (enableSMS) {
         toast.success("Successfully deactivated SMS Notifications");
+      } else {
+        toast.success("Successfully activated SMS Notifications");
       }
       getSMSEnablementStatus();
     } catch (err) {
       console.log(err);
+      toast.error("Unable to change SMS Notifications");
     }
   };
 
@@ -203,6 +218,7 @@ const NotificationSettings = () => {
 
   useEffect(() => {
     getInfo();
+    getSMSCredits();
   }, []);
 
   const onUsernameChange = (e) => {
@@ -286,7 +302,7 @@ const NotificationSettings = () => {
         toast.success(message);
       } else {
         console.log(res);
-        setErrorMessage(
+        setErrorMessageValue(
           `SMTP settings test failed with status ${res.status}. \n Ensure that email notifications are enabled.`
         );
         setErrorPopUp(true);
@@ -310,18 +326,19 @@ const NotificationSettings = () => {
       const res = await notificationsApi.testSMS(recipentSMS);
       const message = await res.text();
       if (res.status == 200) {
-        toast.success(message);
+        toast.success("Test SMS successfully sent");
       } else {
         console.log(res);
-        setErrorMessage(
-          `SMTP settings test failed with status ${res.status}. \n Ensure that email notifications are enabled.`
+        setErrorMessageValue(
+          `SMS settings test failed with status ${res.status}. \n Ensure that SMS notifications are enabled.`
         );
         setErrorPopUp(true);
+        toast.error("Unable to test SMS settings");
       }
     } catch {
-      toast.error("Unable to test SMTP settings");
+      toast.error("Unable to test SMS settings");
     } finally {
-      setErrorMessage("");
+      getSMSCredits();
     }
     setDisableSubmit(false);
   };
@@ -631,25 +648,16 @@ const NotificationSettings = () => {
                   </Grid>
                   <Grid
                     container
+                    spacing={3}
+                    margin="0"
                     // sx={[{ ml: 7 }, { mb: 4 }]}
                     // alignItems="center"
-                    spacing={3}
                     // justifyContent="flex-start"
-                    margin="0"
                   >
                     <Grid item>
                       <Typography variant="body">
-                        Number of SMS Credits Used
+                        Number of SMS Credits Left: {SMSCredits}
                       </Typography>
-                    </Grid>
-                    <Grid item xs={1}>
-                      10
-                    </Grid>
-                    <Grid item xs={1}>
-                      out of
-                    </Grid>
-                    <Grid item xs={1}>
-                      100
                     </Grid>
                   </Grid>
                 </Grid>
