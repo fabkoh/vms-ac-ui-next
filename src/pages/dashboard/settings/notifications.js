@@ -487,8 +487,8 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Sender Username"
-                              name="Username"
+                              label="Sender Name"
+                              name="Sender Name"
                               required
                               defaultValue={emailSettings.username}
                               onChange={onUsernameChange}
@@ -499,7 +499,7 @@ const NotificationSettings = () => {
                             <TextField
                               fullWidth
                               label="Sender Email"
-                              name="Email"
+                              name="Sender Email"
                               required
                               defaultValue={emailSettings.email}
                               onChange={onEmailChange}
@@ -510,7 +510,7 @@ const NotificationSettings = () => {
                             <TextField
                               fullWidth
                               label="Sender Password"
-                              name="Password"
+                              name="Sender Password"
                               type="password"
                               required
                               defaultValue={emailSettings.emailPassword}
@@ -555,8 +555,8 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Recipent Username"
-                              name="Recipent Username"
+                              label="Recipent Name"
+                              name="Recipent Name"
                               required
                               defaultValue={recipentUser}
                               value={recipentUser}
@@ -628,10 +628,14 @@ const NotificationSettings = () => {
                   justifyContent="flex-start"
                 >
                   <Grid item xs={8}>
+                    <p className="paragraph" padding="100%">
+                      Mobile Number requires country code. Example: +65 for
+                      Singapore
+                    </p>
                     <TextField
                       fullWidth
-                      label="Recipent SMS"
-                      name="Recipent SMS"
+                      label="Recipent Mobile Number"
+                      name="Recipent Mobile Number"
                       required
                       defaultValue={recipentSMS}
                       value={recipentSMS}
