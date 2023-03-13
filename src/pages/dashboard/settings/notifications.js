@@ -60,12 +60,14 @@ const NotificationSettings = () => {
   const [smsSettings, setSMSSettings] = useState([]);
   const [disableSubmit, setDisableSubmit] = useState(false);
   const [portNumberValue, setPortNumberValue] = useState("");
-  const [recipentUser, setRecipentUser] = useState("Zephan");
-  const [recipentEmail, setRecipentEmail] = useState("bickybong@gmail.com");
-  const [recipentSMS, setRecipentSMS] = useState("+6583664634");
   const [errorPopUp, setErrorPopUp] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageValue, setErrorMessageValue] = useState("");
+  // change back to default "" later
+  const [recipentUser, setRecipentUser] = useState("Zephan");
+  const [recipentEmail, setRecipentEmail] = useState("bickybong@gmail.com");
+  const [recipentSMS, setRecipentSMS] = useState("+6583664634");
+  const [SMSApiKey, setSMSApiKey] = useState("isssecurity");
 
   const handleExpandedEmail = () => setExpandedEmail(!expandedEmail);
   const handleExpandedSMS = () => setExpandedSMS(!expandedSMS);
@@ -250,6 +252,11 @@ const NotificationSettings = () => {
     console.log(recipentEmail);
   };
 
+  const onSMSApiKeyChange = (e) => {
+    setSMSApiKey(e.target.value);
+    console.log(SMSApiKey);
+  };
+
   const onRecipentSMSChange = (e) => {
     setRecipentSMS(e.target.value);
     console.log(recipentSMS);
@@ -422,6 +429,17 @@ const NotificationSettings = () => {
                     justifyContent="flex-start"
                     padding="10px"
                   >
+                    <Grid item xs={8}>
+                      <FormLabel id="SMTP-settings">Email Settings</FormLabel>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={3}
+                    justifyContent="flex-start"
+                    padding="10px"
+                  >
                     <Grid item>
                       <Typography variant="body1">
                         Enable Email Notifications
@@ -457,10 +475,12 @@ const NotificationSettings = () => {
                       <CardContent>
                         <Grid container spacing={3} fluid>
                           <Grid item xs={8}>
+                            <Typography variant="body">
+                              SMTP Protocol
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={8}>
                             <FormControl>
-                              <FormLabel id="tls-or-ssl">
-                                SMTP Protocol
-                              </FormLabel>
                               <RadioGroup
                                 row
                                 aria-labelledby="tls-or-ssl"
@@ -553,6 +573,9 @@ const NotificationSettings = () => {
                             </Grid>
                           </Grid>
                           <Grid item xs={8}>
+                            <FormLabel id="test-email">Test Email</FormLabel>
+                          </Grid>
+                          <Grid item xs={8}>
                             <TextField
                               fullWidth
                               label="Recipent Name"
@@ -607,6 +630,17 @@ const NotificationSettings = () => {
                   spacing={3}
                   justifyContent="flex-start"
                 >
+                  <Grid item xs={8}>
+                    <FormLabel id="test-email">SMS settings</FormLabel>
+                  </Grid>
+                </Grid>
+                <Grid
+                  container
+                  sx={[{ ml: 7 }, { mb: 4 }]}
+                  alignItems="center"
+                  spacing={3}
+                  justifyContent="flex-start"
+                >
                   <Grid item>
                     <Typography variant="body1">
                       Enable SMS Notifications
@@ -619,7 +653,48 @@ const NotificationSettings = () => {
                     ></Switch>
                   </Grid>
                 </Grid>
-
+                <Grid
+                  container
+                  sx={[{ ml: 7 }, { mb: 4 }]}
+                  alignItems="center"
+                  spacing={3}
+                  justifyContent="flex-start"
+                >
+                  <Grid item xs={8}>
+                    <TextField
+                      fullWidth
+                      label="SMS Apikey"
+                      name="SMS Apikey"
+                      required
+                      defaultValue={SMSApiKey}
+                      value={SMSApiKey}
+                      onChange={onSMSApiKeyChange}
+                      disabled={!enableCustom}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        onClick={onSubmit}
+                        disabled={!enableCustom}
+                      >
+                        Save Settings
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid
+                  container
+                  sx={[{ ml: 7 }, { mb: 4 }]}
+                  alignItems="center"
+                  spacing={3}
+                  justifyContent="flex-start"
+                >
+                  <Grid item xs={8}>
+                    <FormLabel id="test-email">Test SMS</FormLabel>
+                  </Grid>
+                </Grid>
                 <Grid
                   container
                   sx={[{ ml: 7 }, { mb: 4 }]}
