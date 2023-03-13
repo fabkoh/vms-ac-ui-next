@@ -67,7 +67,7 @@ const NotificationSettings = () => {
   const [recipentUser, setRecipentUser] = useState("Zephan");
   const [recipentEmail, setRecipentEmail] = useState("bickybong@gmail.com");
   const [recipentSMS, setRecipentSMS] = useState("+6583664634");
-  const [SMSApiKey, setSMSApiKey] = useState("isssecurity");
+  const [SMSApiKey, setSMSApiKey] = useState("");
 
   const handleExpandedEmail = () => setExpandedEmail(!expandedEmail);
   const handleExpandedSMS = () => setExpandedSMS(!expandedSMS);
@@ -206,6 +206,8 @@ const NotificationSettings = () => {
       if (isMounted()) {
         const settings = { ...body };
         setSMSSettings(settings);
+        console.log(settings.smsAPI);
+        setSMSApiKey(settings.smsAPI);
       }
     } catch (err) {
       console.log(err);
@@ -216,6 +218,7 @@ const NotificationSettings = () => {
     getEmailEnablementStatus();
     getSMSEnablementStatus();
     getEmailSettings();
+    getSMSSettings();
   }, [isMounted]);
 
   useEffect(() => {
@@ -277,7 +280,7 @@ const NotificationSettings = () => {
     console.log(emailSettings);
   };
 
-  const onSubmit = async (e) => {
+  const onSubmitEmailSetting = async (e) => {
     e.preventDefault();
     setDisableSubmit(true);
     try {
@@ -288,6 +291,25 @@ const NotificationSettings = () => {
         getEmailSettings();
       } else {
         toast.error("SMTP settings are not valid");
+      }
+    } catch {
+      toast.error("Unable to save settings");
+    }
+    setDisableSubmit(false);
+  };
+
+  const onSubmitSMSSetting = async (e) => {
+    e.preventDefault();
+    setDisableSubmit(true);
+    try {
+      // console.log(SMSApiKey);
+      const res = await notificationsApi.updateSMS(SMSApiKey);
+      if (res) {
+        toast.success("Successfully saved Notification Settings");
+        setErrorMessage("");
+        getSMSSettings();
+      } else {
+        toast.error("SMS settings are not valid");
       }
     } catch {
       toast.error("Unable to save settings");
@@ -565,7 +587,7 @@ const NotificationSettings = () => {
                             <Grid item>
                               <Button
                                 variant="contained"
-                                onClick={onSubmit}
+                                onClick={onSubmitEmailSetting}
                                 disabled={!enableCustom}
                               >
                                 Save Settings
@@ -676,7 +698,7 @@ const NotificationSettings = () => {
                     <Grid item>
                       <Button
                         variant="contained"
-                        onClick={onSubmit}
+                        onClick={onSubmitSMSSetting}
                         disabled={!enableCustom}
                       >
                         Save Settings

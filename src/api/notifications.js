@@ -84,6 +84,23 @@ class NotificationsApi {
     }
   }
 
+  updateSMS(SMSApiKey) {
+    // console.log(SMSApiKey);
+    const smsAPI = SMSApiKey;
+    console.log(smsAPI);
+    if (useApi) {
+      return sendApi("/api/notification/sms", {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          smsAPI,
+        }),
+      });
+    }
+  }
+
   testSMTP(
     {
       emailSettingsId,
