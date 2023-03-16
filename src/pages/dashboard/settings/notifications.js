@@ -63,10 +63,9 @@ const NotificationSettings = () => {
   const [errorPopUp, setErrorPopUp] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageValue, setErrorMessageValue] = useState("");
-  // change back to default "" later
-  const [recipentUser, setRecipentUser] = useState("Zephan");
-  const [recipentEmail, setRecipentEmail] = useState("bickybong@gmail.com");
-  const [recipentSMS, setRecipentSMS] = useState("+6583664634");
+  const [recipentUser, setRecipentUser] = useState("");
+  const [recipentEmail, setRecipentEmail] = useState("");
+  const [recipentSMS, setRecipentSMS] = useState("");
   const [SMSApiKey, setSMSApiKey] = useState("");
 
   const handleExpandedEmail = () => setExpandedEmail(!expandedEmail);
@@ -343,9 +342,6 @@ const NotificationSettings = () => {
     }
     setDisableSubmit(false);
   };
-  // useEffect(() => {
-  //   setErrorMessageValue(errorMessage);
-  // }, [errorPopUp]);
 
   const testSMS = async (e) => {
     e.preventDefault();
@@ -400,36 +396,6 @@ const NotificationSettings = () => {
             <Typography variant="h3">Notification Settings</Typography>
           </div>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            {/* <Card>
-              <Table sx={[{ "& td": { border: 0 } }, { m: 4 }]}>
-                <TableRow>
-                  <TableCell width="40%">
-                    <Typography variant="body1">
-                      Enable Email Notifications
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      onClick={changeEmailEnablementStatus}
-                      checked={enableEmail}
-                    ></Switch>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="body1">
-                      Enable SMS Notifications
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      onClick={changeSMSEnablementStatus}
-                      checked={enableSMS}
-                    ></Switch>
-                  </TableCell>
-                </TableRow>
-              </Table>
-            </Card> */}
             <Card>
               <CardHeader
                 title="Email SMTP Settings"
@@ -444,17 +410,6 @@ const NotificationSettings = () => {
               />
               <Collapse in={expandedEmail}>
                 <CardContent sx={[{ mx: 7 }, { mt: -4 }]}>
-                  <Grid
-                    container
-                    alignItems="center"
-                    spacing={3}
-                    justifyContent="flex-start"
-                    padding="10px"
-                  >
-                    <Grid item xs={8}>
-                      <FormLabel id="SMTP-settings">Email Settings</FormLabel>
-                    </Grid>
-                  </Grid>
                   <Grid
                     container
                     alignItems="center"
@@ -595,7 +550,9 @@ const NotificationSettings = () => {
                             </Grid>
                           </Grid>
                           <Grid item xs={8}>
-                            <FormLabel id="test-email">Test Email</FormLabel>
+                            <FormLabel id="test-email">
+                              Test Email Settings
+                            </FormLabel>
                           </Grid>
                           <Grid item xs={8}>
                             <TextField
@@ -624,7 +581,7 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <Grid item>
                               <Button variant="outlined" onClick={testSMTP}>
-                                Test SMTP Email
+                                Send Test Email
                               </Button>
                             </Grid>
                           </Grid>
@@ -645,17 +602,6 @@ const NotificationSettings = () => {
                 }
               />
               <Collapse in={expandedSMS}>
-                <Grid
-                  container
-                  sx={[{ ml: 7 }, { mb: 4 }]}
-                  alignItems="center"
-                  spacing={3}
-                  justifyContent="flex-start"
-                >
-                  <Grid item xs={8}>
-                    <FormLabel id="test-email">SMS settings</FormLabel>
-                  </Grid>
-                </Grid>
                 <Grid
                   container
                   sx={[{ ml: 7 }, { mb: 4 }]}
@@ -706,6 +652,14 @@ const NotificationSettings = () => {
                     </Grid>
                   </Grid>
                 </Grid>
+                {/* <Grid
+                  container
+                  sx={[{ ml: 7 }, { mb: 4 }]}
+                  alignItems="center"
+                  spacing={3}
+                  justifyContent="flex-start"
+                > */}
+                {/* </Grid> */}
                 <Grid
                   container
                   sx={[{ ml: 7 }, { mb: 4 }]}
@@ -714,17 +668,16 @@ const NotificationSettings = () => {
                   justifyContent="flex-start"
                 >
                   <Grid item xs={8}>
-                    <FormLabel id="test-email">Test SMS</FormLabel>
+                    <FormLabel id="test-email">Test SMS Settings</FormLabel>
                   </Grid>
-                </Grid>
-                <Grid
-                  container
-                  sx={[{ ml: 7 }, { mb: 4 }]}
-                  alignItems="center"
-                  spacing={3}
-                  justifyContent="flex-start"
-                >
-                  <Grid item xs={8}>
+                  <Grid
+                    item
+                    xs={8}
+                    style={{
+                      padding: "5px",
+                      paddingLeft: "24px",
+                    }}
+                  >
                     <p className="paragraph" padding="100%">
                       Mobile Number requires country code. Example: +65 for
                       Singapore
@@ -743,7 +696,7 @@ const NotificationSettings = () => {
                   <Grid item xs={8}>
                     <Grid item>
                       <Button variant="outlined" onClick={testSMS}>
-                        Test SMS
+                        Send Test SMS
                       </Button>
                     </Grid>
                   </Grid>
