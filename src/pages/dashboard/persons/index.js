@@ -384,9 +384,13 @@ const PersonList = () => {
       if (res.status == 200) {
         toast.success("File uploaded successfully");
         handleOpenImport();
+        const jsonResultRes = await personApi.getCSVJson();
+        setCsvData(await jsonResultRes.json());
+      } else {
+        toast.error(
+          "Failed to upload file, excel first row headers need to match import template"
+        );
       }
-      const jsonResultRes = await personApi.getCSVJson();
-      setCsvData(await jsonResultRes.json());
       console.log(csvData);
     } catch (error) {
       console.error(error);
