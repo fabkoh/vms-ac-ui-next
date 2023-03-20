@@ -11,6 +11,7 @@
  * users type in the query to filter entrances by (like in entrance list)
 **/
 
+import { isInteger } from "formik";
 import { filterByState, isObject, stringIn } from "./utils";
 
 // for textfield placeholder
@@ -27,14 +28,18 @@ const filterRecorderByString = (recorder, queryString) => stringFilterHelper(rec
 //                 isActive == status
 const filterRecorderByStatus = (recorder, status) => status == null || recorder.isActive == status;
 
-const getVideoRecorderDetailsLink = (recorder) => isObject(recorder) && `/dashboard/video-recorders/details/${recorder.recorderId}`;
+const getVideoRecorderDetailsLink = (recorder) => isObject(recorder) && `/dashboard/video-recorders/details/${recorder}`;
 
 const getVideoRecorderEditLink = (recorderId) => {
     console.warn("recorders ===>", recorderId)
-    return `/dashboard/video-recorders/edit/id=${recorderId}` //'/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
+    return `/dashboard/video-recorders/edit/${recorderId}` //'/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
 };
 
 const getVideoRecorderIdsEditLink = (ids) =>  '/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(ids));
+
+const getVideoRecordersEditLink = (recorders) =>  
+{   console.log(recorders)
+    return `/dashboard/video-recorders/edit?ids=${encodeURIComponent(JSON.stringify(recorders))}`;}
 
 
 const videoRecorderListLink = '/dashboard/video-recorders';
@@ -51,4 +56,4 @@ const filterRecorderByState = filterByState(filterVideoRecordersByString);
 
 const isRecorderEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.recorderId != null && e1.recorderId === e2.recorderId;
 
-export { filterVideoByStringPlaceholder, filterRecorderByString, filterRecorderByStatus, videoRecorderListLink, videoRecorderCreateLink, getVideoRecorderEditLink, getVideoRecorderIdsEditLink, getVideoRecorderDetailsLink, getVideoRecorderLabel, filterVideoRecordersByString, filterRecorderByState, isRecorderEqual }
+export { getVideoRecordersEditLink, filterVideoByStringPlaceholder, filterRecorderByString, filterRecorderByStatus, videoRecorderListLink, videoRecorderCreateLink, getVideoRecorderEditLink, getVideoRecorderIdsEditLink, getVideoRecorderDetailsLink, getVideoRecorderLabel, filterVideoRecordersByString, filterRecorderByState, isRecorderEqual }

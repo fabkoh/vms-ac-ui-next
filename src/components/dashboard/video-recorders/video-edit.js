@@ -1,20 +1,12 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { 
-    Button, 
-    CardHeader, 
-    Collapse, 
-    Grid, 
-    TextField, 
-    Divider, 
-    CardContent,
-    Box,
-} from "@mui/material";
-import { useState } from "react";
-import ExpandMore from "../shared/expand-more";
+import { Button, CardContent, CardHeader, Collapse, Divider, Grid, TextField } from "@mui/material";
 import ErrorCard from "../shared/error-card";
-import EditFormTooltip from "../shared/edit_form_tooltip";
+import ExpandMore from "../shared/expand-more";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useState, useRef } from "react";
+import SingleSelect from "../shared/single-select-input";
+import { isObject } from "../../../utils/utils";
 
-const VideoRecorderAddForm = ({ recorderInfo, recorderValidations, 
+const VideoRecorderEditForm = ({ recorderInfo, recorderValidations, 
     removeCard, onNameChange, onSerialNumberChange, 
     onPublicIpChange, onPrivateIpChange, onPortNumberChange, 
     onIWSPortChange, onUsernameChange, 
@@ -164,7 +156,8 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
                             error={Boolean(recorderSerialNumberExists || recorderSerialNumberDuplicated)}
                             helperText={ 
                                     (recorderSerialNumberExists && 'Error: Recorder serial number taken') ||
-                                    (recorderSerialNumberDuplicated && 'Error: Duplicate recorder serial number in form')                                }
+                                    (recorderSerialNumberDuplicated && 'Error: Duplicate recorder serial number in form')
+                                }
                             label="Serial Number"
                             name="recorderSerialNumber"
                             onChange={onSerialNumberChange}
@@ -305,4 +298,4 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
     )
 }
 
-export default VideoRecorderAddForm;
+export default VideoRecorderEditForm;
