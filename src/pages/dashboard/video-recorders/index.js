@@ -213,6 +213,9 @@ const RecorderList = () => {
                         //             "cameras":digital_channels,
                         //             "isActive":true}
                         recorder.cameras  = digital_channels;
+                        recorder.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(recorder);
+
                         recorder.isActive = true;
                         setRecorders([...data]);
                         

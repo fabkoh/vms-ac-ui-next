@@ -198,6 +198,7 @@ const fakeAuthDevices = [
 
 //const fakeVideoRecorders = []
 const fakeVideoRecorders = [
+    {
         "recorderId": 1,
         "recorderName": "Video Recorder 1",
         "recorderSerialNumber": "123ABC",
@@ -237,6 +238,42 @@ const fakeVideoRecorders = [
     }
 ]
 
+const fakeSMSConfig = {
+  smsSettingsId: 1,
+  smsAPI: "ThisIsTheTestingApi",
+  enabled: true,
+};
+
+const fakeEmailConfig = {
+  emailSettingsId: 1,
+  username: "Lee Yong Ning",
+  email: "yongning.lee@iss.security.sg",
+  emailPassword: "TestingPassword",
+  hostAddress: "TestingHostAddress",
+  portNumber: "8080",
+  enabled: true,
+};
+
+const fakeEventsManagement = [];
+const fakeInputEvents = [
+  {
+    eventActionInputId: 1,
+    eventActionInputName: "name",
+    timerEnabled: false,
+    eventActionInputConfig: null,
+  },
+];
+const fakeOutputEvents = [
+  {
+    eventActionOutputId: 1,
+    eventActionOutputName: "name",
+    timerEnabled: false,
+    eventActionOutputConfig: null,
+  },
+];
+
+const fakeNotifLogs = [
+  {
     notificationLogsId: 1,
     notificationLogsStatusCode: 200,
     notificationLogsError: "",

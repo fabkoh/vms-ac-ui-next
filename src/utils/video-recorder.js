@@ -32,7 +32,7 @@ const getVideoRecorderDetailsLink = (recorder) => isObject(recorder) && `/dashbo
 
 const getVideoRecorderEditLink = (recorderId) => {
     console.warn("recorders ===>", recorderId)
-    return `/dashboard/video-recorders/edit/${recorderId}` //'/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
+    return `/dashboard/video-recorders/edit?ids=${encodeURIComponent(JSON.stringify([recorderId]))}` //'/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(recorders.filter(isObject).map(e => e.recorderId)))
 };
 
 const getVideoRecorderIdsEditLink = (ids) =>  '/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(ids));

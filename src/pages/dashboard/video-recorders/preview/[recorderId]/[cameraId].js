@@ -698,7 +698,8 @@ const VideoCameraDetails = () => {
                             ip: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
                             stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
-
+                        data.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(data);
                         setVideoRecorderInfo(data);
 
                         setLoadedSDK(true);

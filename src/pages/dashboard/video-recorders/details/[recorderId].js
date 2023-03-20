@@ -216,8 +216,8 @@ const VideoRecorderDetails = () => {
 
                     
                         data.cameras  = digital_channels;
-
-                       
+                        data.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(data);
 
                         setVideoRecorderInfo({...data});
 
@@ -380,7 +380,8 @@ const VideoRecorderDetails = () => {
                                     onClose={handleActionClose}
                                 >
                                     <NextLink
-                                        href={getVideoRecorderEditLink(videoRecorderInfo)}
+                                        href={getVideoRecorderEditLink(videoRecorderInfo ?
+                                            videoRecorderInfo.recorderId : null)}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
