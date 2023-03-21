@@ -5,7 +5,7 @@ import NextLink from "next/link";
 import { PencilAlt } from "../../../icons/pencil-alt";
 import { ArrowRight } from "../../../icons/arrow-right";
 import { ListFilter } from "../shared/list-filter";
-import { getVideoRecorderDetailsLink, getVideoRecorderEditLink } from "../../../utils/video-recorder";
+import { getVideoRecorderDetailsLink, getVideoRecordersEditLink,getVideoRecorderEditLink } from "../../../utils/video-recorder";
 import { toDisplayDateString } from "../../../utils/utils";
 import CropPortraitIcon from '@mui/icons-material/CropPortrait';
 import SignalCellularAlt1BarSharpIcon from '@mui/icons-material/SignalCellularAlt1BarSharp';

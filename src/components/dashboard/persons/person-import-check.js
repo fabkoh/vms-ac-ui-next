@@ -109,19 +109,18 @@ export default function PersonImportCheck({
   const redCount = redData.length;
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    console.log(page);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, csvData.length - page * rowsPerPage);
+  // for submit button
   const [showButton, setShowButton] = useState(false);
 
   function handleSubmitClick() {
@@ -132,7 +131,8 @@ export default function PersonImportCheck({
       }
     });
     const myString = JSON.stringify(filteredObj);
-    submitGreenData(myString.replace(/\s/g, "").replace(/[-()]/g, ""));
+    submitGreenData(myString);
+    // submitGreenData(myString.replace(/\s/g, "").replace(/[-()]/g, ""));
     handleClose();
     window.location.reload();
   }
@@ -146,15 +146,18 @@ export default function PersonImportCheck({
       </DialogTitle>
       <DialogContent>
         <Box marginTop={1} marginBottom={5}>
-          <Alert severity="info" variant="outlined">
-            <AlertTitle>Import Check</AlertTitle>
-            {redCount != 0 && (
-              <p>{`We detected ${redCount} entries which have format or validation errors . They are highlighted in red below. Please fix them to submit the import. `}</p>
-            )}
-            {redCount == 0 && (
-              <p>{`${greenCount} entries will be added without issues on confirmation.`}</p>
-            )}
-          </Alert>
+          {redCount != 0 && (
+            <Alert severity="error" variant="outlined">
+              <AlertTitle>Import Check</AlertTitle>
+              <p>{`We detected ${redCount} entries which have format or validation errors. They are highlighted in red below. Please fix them to submit the import. Persons require first name, last name and unique mobile number. Credentials require unique pin.`}</p>
+            </Alert>
+          )}
+          {redCount == 0 && (
+            <Alert severity="success" variant="outlined">
+              <AlertTitle>Import Check</AlertTitle>
+              <p>{`${greenCount} entries will be added without issues on confirmation. Credentials are only added if the type, pin and expiry is formatted properly.`}</p>
+            </Alert>
+          )}
         </Box>
         <Table>
           <TableHead>
@@ -172,9 +175,9 @@ export default function PersonImportCheck({
           <TableBody>
             {redData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((item) => {
+              .map((item, index) => {
                 return (
-                  <TableRow key={item["personUid"]}>
+                  <TableRow key={item["personUid"] + index}>
                     <TableCell
                       sx={{
                         color: "#F44336",
@@ -234,81 +237,82 @@ export default function PersonImportCheck({
                   </TableRow>
                 );
               })}
-            {greenData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((item) => {
-                return (
-                  <TableRow key={item["personUid"]}>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["personFirstName"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["personLastName"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["personUid"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["personEmail"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["personMobileNumber"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["credentialType"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["credentialPin"]}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#00994C",
-                      }}
-                    >
-                      {item["credentialExpiry"]}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 50]}
-              component="div"
-              count={redData.length + greenData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+            {redCount == 0 &&
+              greenData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((item, index) => {
+                  return (
+                    <TableRow key={index}>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["personFirstName"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["personLastName"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["personUid"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["personEmail"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["personMobileNumber"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["credentialType"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["credentialPin"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#00994C",
+                        }}
+                      >
+                        {item["credentialExpiry"]}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={csvData.length}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[10, 25, 50]}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined">

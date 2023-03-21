@@ -17,7 +17,7 @@ import { Search } from "../../../icons/search";
 import VideoListTable from "../../../components/dashboard/video-recorders/video-list-table";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { Confirmdelete } from "../../../components/dashboard/video-recorders/confirm-delete";
-import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecorderIdsEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
+import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecordersEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
 import Script from 'next/script'
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
@@ -213,6 +213,9 @@ const RecorderList = () => {
                         //             "cameras":digital_channels,
                         //             "isActive":true}
                         recorder.cameras  = digital_channels;
+                        recorder.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(recorder);
+
                         recorder.isActive = true;
                         setRecorders([...data]);
                         
@@ -327,15 +330,15 @@ const RecorderList = () => {
 	};
 
     // Reset selectedRecorders when recorders change
-	useEffect(
-		() => {
-			if (selectedRecorders.length) {
-				setSelectedRecorders([]);
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[recorders]
-    );
+	// useEffect(
+	// 	() => {
+	// 		if (selectedRecorders.length) {
+	// 			setSelectedRecorders([]);
+	// 		}
+	// 	},
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// 	[recorders]
+    // );
     
     useEffect(() => getRecordersLocal(), [isMounted]);
 
@@ -385,7 +388,7 @@ const RecorderList = () => {
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href={getVideoRecorderIdsEditLink(selectedRecorders)}
+                                    <NextLink href={getVideoRecordersEditLink(selectedRecorders)}
                                         passHref>    
                                         <MenuItem disableRipple
                                             disabled={actionDisabled}>

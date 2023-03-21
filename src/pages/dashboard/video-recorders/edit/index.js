@@ -1,34 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import VideoRecorderAddForm from "../../../components/dashboard/video-recorders/video-add-form";
-import { AuthGuard } from '../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
-import Add from "@mui/icons-material/Add";
-import videoRecorderApi from "../../../api/videorecorder";
+import AccessGroupEditForm from "../../../../components/dashboard/access-groups/forms/access-group-add-form";
+import { AuthGuard } from '../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
+import { personApi } from "../../../../api/person";
+import { accessGroupApi } from "../../../../api/access-groups";
+import entranceApi from "../../../../api/entrance";
+import { useMounted } from "../../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
-import formUtils from "../../../utils/form-utils";
-import { entranceListLink } from "../../../utils/entrance";
-import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
-import { serverDownCode } from "../../../api/api-helpers";
+import formUtils from "../../../../utils/form-utils";
+import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
+import ControllerEditForm from "../../../../components/dashboard/controllers/controller-edit-form";
+import AssignAuthDevice from "../../../../components/dashboard/controllers/assign-auth-device";
+import videoRecorderApi from "../../../../api/videorecorder";
+import { getVideoRecorderEditLink, getVideoRecorderListLink, getVideoRecorderDetailsLink, videoRecorderListLink } from "../../../../utils/video-recorder";
+import { authDeviceApi } from "../../../../api/auth-devices";
+import { useRouter } from "next/router";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import VideoRecorderEditForm from "../../../../components/dashboard/video-recorders/video-edit";
 
-const CreateRecorders = () => {
+const EditVideoRecorder = () => {
+    const router = useRouter();
+    const ids = JSON.parse(decodeURIComponent(router.query.ids));
+    console.log(router)
+    const isMounted = useMounted();
+    const [recorderInfoArr, setRecorderInfoArr] = useState([])
+    const [serverDownOpen, setServerDownOpen] = useState(false);
 
-    // empty objects for initialisation of new card
-    const getEmptyRecorderInfo = (recorderId) => ({
-        recorderId,
-        recorderSerialNumber: '',
-        recorderPortNumber: '',
-        recorderIWSPort: '',
-        recorderName: '',
-        recorderPublicIp: '',
-        recorderPrivateIp: '',
-        recorderUsername: '',
-        recorderPassword: '',
-    });
     const getEmptyRecorderValidations = (recorderId) => ({
         recorderId,
         recorderNameBlank: false,
@@ -69,18 +72,12 @@ const CreateRecorders = () => {
         submitFailed: false
     });
 
-    const [recorderInfoArr, 
-        setRecorderInfoArr] = useState([getEmptyRecorderInfo(0)]);
-    const [recorderValidationsArr, 
-        setRecorderValidationsArr] = useState([getEmptyRecorderValidations(0)]);
-
     // store previous video recorder names & ip addresses
     const [recorderNames, setRecorderNames] = useState({});
     const [recorderPrivateIpes, setRecorderPrivateIpes] = useState({});
     const [recorderSerialNumbers, setRecorderSerialNumbers] = useState({});
     const [recorderPortNumbers, setRecorderPortNumbers] = useState({});
 
-    const [serverDownOpen, setServerDownOpen] = useState(false);
 
     useEffect(() => {
         videoRecorderApi.getRecorders()
@@ -92,11 +89,13 @@ const CreateRecorders = () => {
                 if (res.status == 200) {
                     const body = await res.json();
                     body.forEach(recorder => {
+                        if (!(ids.includes(recorder.recorderId))){
                         newRecorderPrivateIpes[recorder.recorderPrivateIp] = true;
                         newRecorderNames[recorder.recorderName] = true;
                         newRecorderSerialNumbers[recorder.recorderSerialNumber] = true;
                         newRecorderPortNumbers[recorder.recorderPortNumber] = true;
                         newRecorderPortNumbers[recorder.recorderIWSPort] = true;
+                        }
                     }); 
                     setRecorderNames(newRecorderNames);
                     setRecorderPrivateIpes(newRecorderPrivateIpes);
@@ -108,19 +107,99 @@ const CreateRecorders = () => {
             })
     }, []);
 
-    // add card logic
-    //returns largest recorderId + 1
-    const getNewId = () => recorderInfoArr.map(info => info.recorderId)
-                                             .reduce((a, b) => Math.max(a, b), -1) + 1
+    const [recorderValidationsArr, 
+        setRecorderValidationsArr] = useState(ids.map(i => getEmptyRecorderValidations(i)));
 
-    const addCard = () => {
-        const newId = getNewId();
-        setRecorderInfoArr([ ...recorderInfoArr, getEmptyRecorderInfo(newId) ]);
-        setRecorderValidationsArr([ ...recorderValidationsArr, getEmptyRecorderValidations(newId) ]);
+    const getVideoRecorder = async ids => {
+        console.log(ids)
+        // map each id to a fetch req for that access group
+        const resArr = await Promise.all(ids.map(id => videoRecorderApi.getRecorder(id)
+        ));
+        const successfulRes = resArr.filter(res => res.status == 200);
+        
+        // no persons to edit
+        if (successfulRes.length == 0) {
+            toast.error('Error editing recorders. Please try again');
+            router.replace('/dashboard/video-recorders');
+        }
+        
+        // some persons not found
+        if (successfulRes.length != resArr.length) {
+            toast.error('Some recorders were not found');
+        }
+        
+        const bodyArr = await Promise.all(successfulRes.map(req => req.json()));
+
+        // setPersonsValidation(validations);
+        setRecorderInfoArr(bodyArr);
     }
+    //  {
+    //     try{
+    //         Promise.resolve(videoRecorderApi.getRecorder(recorderId)) 
+    //         .then( async res=>{
+    //             if(res.status==200){
+    //                 const data = await res.json()
+    //                 setRecorderInfoArr([data])
+    //                 console.log("loaded video recorder")
+    //             }
+    //             else {
+    //                 if (res.status == serverDownCode) {
+    //                     setServerDownOpen(true);
+    //                 }
+    //                 toast.error("Video recorder info not found")
+    //                 //router.replace(getControllerListLink())
+    //             }
+    //         })
+    //     }catch(err){console.log(err)}
+    // }
 
-    // helper for remove card and changeNameCheck
-    // directly modifies validationArr
+
+    const getInfo = useCallback(() => {
+        getVideoRecorder(ids)
+        //getStatus()
+    }, [isMounted])
+
+    useEffect(() => {
+        getInfo();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+    [])
+
+    const [submitted, setSubmitted] = useState(false);
+    
+    const submitDisabled = (
+        recorderInfoArr.length == 0 || // no recorders to submit
+        recorderValidationsArr.some( // check if validations fail
+            validation => validation.recorderNameBlank ||
+                validation.recorderNameDuplicated ||
+                validation.recorderNameExists ||
+                validation.recorderSerialNumberExists ||
+                validation.recorderSerialNumberDuplicated ||
+                validation.recorderPublicIpBlank ||
+                validation.recorderPublicIpExists ||
+                validation.recorderPrivateIpBlank ||
+                validation.recorderPrivateIpDuplicated ||
+                validation.recorderPrivateIpExists ||
+                validation.recorderPortNumberDuplicated ||
+                validation.recorderPortNumberExist ||
+                validation.recorderIWSPortDuplicated ||
+                validation.recorderIWSPortExist ||
+                validation.recorderUsernameBlank ||
+                validation.recorderPasswordBlank
+        )
+    );
+
+    const [disableSubmit, setDisableSubmit] = useState(false);
+
+
+    const changeIPHandler = (e) => {
+        changeIP(e);
+        checkIP(e);
+    }
+    const [loading, setLoading] = useState(true)
+
+
+
     const checkDuplicateName = (groupArr, validationArr) => {
         const duplicatedNames = formUtils.getDuplicates(
             groupArr
@@ -260,6 +339,7 @@ const CreateRecorders = () => {
     const changeSerialNumberCheck = async (e, id) => {
         const recorderSerialNumber = e.target.value;
         const newValidations = [ ...recorderValidationsArr ];
+        
         const validation = newValidations.find(v => v.recorderId == id);
 
         // store a temp updated access group info
@@ -268,7 +348,6 @@ const CreateRecorders = () => {
 
         // remove submit failed and error
         validation.submitFailed = false;
-
 
         // check serial number exists?
         validation.recorderSerialNumberExists = !!recorderSerialNumbers[recorderSerialNumber];
@@ -386,62 +465,59 @@ const CreateRecorders = () => {
         changeIWSPortCheck(e, id);
     }
 
-    const [submitted, setSubmitted] = useState(false);
-
-    const submitForm = e => {
-        e.preventDefault(); 
-
-        setSubmitted(true);
-        Promise.all(recorderInfoArr.map(recorder => videoRecorderApi.createVideoRecorder(recorder)))
-               .then(resArr => {
-                    const failedResIndex = []; // stores the index of the failed creations
-                   const successResIndex = []; // stores the index of success creations
-                   
-                    resArr.forEach((res, i) => {
-                        if (res.status != 201) {
-                            failedResIndex.push(i);
-                        } else {
-                            successResIndex.push(i);
-                        }
-                    })
-
-                    const numCreated = recorderInfoArr.length - failedResIndex.length
-                    if (numCreated) {
-                        toast.success(`${numCreated} recorders created`); 
-                    }
-
-                    if (failedResIndex.length) {
-                        // some failed
-                        toast.error('Error creating the highlighted recorder(s)');
-                        Promise.all(failedResIndex.map(i => resArr[i].json()))
-                            .then(failedResArr => {
-                                setRecorderInfoArr(failedResIndex.map(i => recorderInfoArr[i])); // set failed recorders to stay
-                                setRecorderValidationsArr(failedResIndex.map((i) => {
-                                    let recordValidation = recorderValidationsArr[i]
-                                    recordValidation.recorderNameError = failedResArr.recorderName ?? "";
-                                    recordValidation.recorderPublicIpError = failedResArr.recorderPublicIp ?? "",
-                                    recordValidation.recorderPrivateIpError = failedResArr.recorderPrivateIp ?? "";
-                                    recordValidation.recorderPortNumberError = failedResArr.recorderPortNumber ?? "";
-                                    recordValidation.recorderIWSPortError = failedResArr.recorderIWSPort ?? "";
-                                    recordValidation.recorderUsernameError = failedResArr.recorderUsername ?? "";
-                                    recordValidation.recorderPasswordError = failedResArr.recorderPassword ?? "";
-                                    recordValidation.submitFailed = true;
-                                    return recordValidation;
-                                })); // set failed recorder validations to stay
-                            });
-                    } else {
-                        // all passed
-                        router.replace('/dashboard/video-recorders')
-                    }
-               })
-        .finally(() => setSubmitted(false))
+    const updateRecorderHelper = async (recorder) => {
+        try {
+            const res = await videoRecorderApi.updateRecorder(recorder);
+            if (res.status != 200) {
+                throw new Error("Unable to update recorder")
+            }
+            return true;
+        } catch {
+            return false;
+        }
     }
+
+    const submitForm = async (e) => {
+        e.preventDefault();
+        setSubmitted(true)
+
+        // send res
+        try {
+            const boolArr = await Promise.all(recorderInfoArr.map(recorder => updateRecorderHelper(recorder)));
+            console.log("boolArr",boolArr)
+            // success toast
+            const numSuccess = boolArr.filter(b => b).length;
+            if (numSuccess) { 
+                toast.success(`Successfully edited ${numSuccess} video recorders`);
+            }
+
+            // if some failed
+            if (boolArr.some(b => !b)) {
+                toast.error("Unable to edit video recorders below");    
+                // filter failed personsInfo and personsValidation
+                setRecorderInfoArr(recorderInfoArr.filter((p, i) => !boolArr[i]));
+                setRecorderValidation(recorderValidationsArr.filter((p, i) => !boolArr[i]));
+            } else {
+                // all success
+                router.replace(videoRecorderListLink);
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error("Unable to submit form");
+        }        
+        setDisableSubmit(false);
+
+    }
+
+    useEffect(() => {
+        console.log("video recorde info ",recorderInfoArr)
+    }, [recorderInfoArr])
 
     return(
         <>
             <Head>
                 <title>
-                    Etlas: Add Video Recorders
+                    Etlas: Edit Video Recorder
                 </title>
             </Head>
             <Box
@@ -451,14 +527,15 @@ const CreateRecorders = () => {
                     py: 8
                 }}
             >
-                <ServerDownError
-                    open={serverDownOpen}
-                    handleDialogClose={() => setServerDownOpen(false)}
-                />
+
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
+                        <ServerDownError
+                        open={serverDownOpen}
+                        handleDialogClose={() => setServerDownOpen(false)}
+                    />
                         <NextLink
-                            href={entranceListLink}
+                            href={videoRecorderListLink}
                             passHref
                         >
                             <Link
@@ -473,105 +550,76 @@ const CreateRecorders = () => {
                                     fontSize="small"
                                     sx={{ mr: 1 }}
                                 />
-                                <Typography variant="subtitle2">
-                                    Video Recorders
-                                </Typography>
+                                <Typography variant="subtitle2">Video Recorders</Typography>
                             </Link>
                         </NextLink>
+                 
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Add Video Recorders
+                            Edit Video Recorders
                         </Typography>
                     </Box>
                     <form onSubmit={submitForm}>
-                        <Stack spacing={3}>
-                            { recorderInfoArr.map((recorderInfo, i) => {
-                                const id = recorderInfo.recorderId
-                                return (
-                                    <VideoRecorderAddForm
-                                        key={id}
-                                        recorderInfo={recorderInfo}
-                                        removeCard={removeCard}
-                                        recorderValidations={recorderValidationsArr[i]}
-                                        onNameChange={onNameChangeFactory(id)}
-                                        onSerialNumberChange={onSerialNumberChangeFactory(id)}
-                                        onPublicIpChange = {onPublicIpChangeFactory(id)}
-                                        onPrivateIpChange={onPrivateIpChangeFactory(id)}
-                                        onPortNumberChange={onPortNumberChangeFactory(id)}
-                                        onIWSPortChange={onIWSPortChangeFactory(id)}
-                                        onUsernameChange={onUsernameChangeFactory(id)}
-                                        onPasswordChange={onPasswordChangeFactory(id)}
-                                    />
-                                )
-                            })}
-                            <div>
-                                <Button
-                                    size="large"
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                    onClick={addCard}
-                                >
-                                    Add video recorder
-                                </Button>
-                            </div>
-                            <Grid container>
-                                <Grid item
-                                      marginRight={3}>
-                                    <Button
-                                        type="submit"
+                            <Stack spacing={3}>
+                                { 
+                                    // Array.isArray(videoRecorderInfo) && videoRecorderInfo.map((p,i) => {
+                                    //     console.log(p.recorderId);
+                                    recorderInfoArr.map((recorderInfo,i) => {
+                                        const id = recorderInfo.recorderId
+                                        return (
+                                        <VideoRecorderEditForm
+                                            key={id}
+                                            recorderInfo={recorderInfo}
+                                            removeCard={removeCard}
+                                            recorderValidations={recorderValidationsArr[i]}
+                                            onNameChange={onNameChangeFactory(id)}
+                                            onSerialNumberChange={onSerialNumberChangeFactory(id)}
+                                            onPublicIpChange = {onPublicIpChangeFactory(id)}
+                                            onPrivateIpChange={onPrivateIpChangeFactory(id)}
+                                            onPortNumberChange={onPortNumberChangeFactory(id)}
+                                            onIWSPortChange={onIWSPortChangeFactory(id)}
+                                            onUsernameChange={onUsernameChangeFactory(id)}
+                                            onPasswordChange={onPasswordChangeFactory(id)}
+                                        />
+                                    )
+                                })
+
+                                    
+                                }
+                                <div>
+                                    <Button 
                                         size="large"
+                                        type="submit"
+                                        sx={{ mr: 3 }}
                                         variant="contained"
-                                        disabled={
-                                            submitted ||
-                                            recorderInfoArr.length == 0 || // no recorders to submit
-                                            recorderValidationsArr.some( // check if validations fail
-                                                validation => validation.recorderNameBlank ||
-                                                    validation.recorderNameDuplicated ||
-                                                    validation.recorderNameExists ||
-                                                    validation.recorderSerialNumberExists ||
-                                                    validation.recorderSerialNumberDuplicated ||
-                                                    validation.recorderPublicIpBlank ||
-                                                    validation.recorderPublicIpExists ||
-                                                    validation.recorderPrivateIpBlank ||
-                                                    validation.recorderPrivateIpDuplicated ||
-                                                    validation.recorderPrivateIpExists ||
-                                                    validation.recorderPortNumberDuplicated ||
-                                                    validation.recorderPortNumberExist ||
-                                                    validation.recorderIWSPortDuplicated ||
-                                                    validation.recorderIWSPortExist ||
-                                                    validation.recorderUsernameBlank ||
-                                                    validation.recorderPasswordBlank
-                                            )
-                                        }
+                                        disabled={submitDisabled || disableSubmit}
                                     >
                                         Submit
                                     </Button>
-                                </Grid>
-                                <Grid item>
                                     <NextLink
-                                        href="/dashboard/video-recorders/"
+                                        href={videoRecorderListLink}
                                         passHref
                                     >
                                         <Button
                                             size="large"
+                                            sx={{ mr: 3 }}
                                             variant="outlined"
                                             color="error"
                                         >
                                             Cancel
                                         </Button>
                                     </NextLink>
-                                </Grid>                              
-                            </Grid>
-                        </Stack>
-                    </form>
+                                </div>
+                            </Stack>
+                        </form>
                 </Container>
             </Box>
         </>
     )
 }
 
-CreateRecorders.getLayout = (page) => (
+EditVideoRecorder.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
@@ -579,4 +627,4 @@ CreateRecorders.getLayout = (page) => (
     </AuthGuard>
 )
 
-export default CreateRecorders;
+export default EditVideoRecorder;

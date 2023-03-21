@@ -1264,7 +1264,7 @@ const ModifyEventManagement = () => {
                                 }
                             />
                         </Grid>
-                    </Grid>
+                    </Grid> 
                         <Stack spacing={3}>
                             {eventsManagementInfoArr.map((eventsManagementInfo, i) => {
                                 return (
