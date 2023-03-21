@@ -102,7 +102,7 @@ const VideoRecorderPreview = () => {
     const attach_sdk     = async function(handle) {
         return await new Promise((resolve, reject) => {
             const {clientHeight: height, clientWidth: width} = document.getElementById('divPlugin');
-            
+            console.log(width, height)
 
             handle.I_InitPlugin(width, height, {
                 bWndFull:       true,
@@ -504,6 +504,7 @@ const VideoRecorderPreview = () => {
 
     const getInfo = useCallback(async() => {
         getVideoRecorder(recorderId)
+        if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
     }, [isMounted])
 
     useEffect(() => {
@@ -511,30 +512,14 @@ const VideoRecorderPreview = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps 
     [])
-    
-    const updateTheaterScreen = async () => {
-      if(sdkHandle) { 
-        // resize the window of stream
-        if(theaterMode) {
-          sdkHandle.I_Resize(`${window.innerWidth - 48}`, `${window.innerHeight}`)
-        }  else {
-          const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
-          sdkHandle.I_Resize(`${width}`, `${height}`)
-        }    
-        // scroll to the this position
-        if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
-      }
-    }
     // if full screen closed using ESC key
     addEventListener("fullscreenchange", async () => {      
       if( sdkHandle && theaterMode && !document.fullscreenElement) {
+        const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
+        await sdkHandle.I_Resize(`${width}`, `${window.innerHeight - 20}`)
         setTheaterMode(false);
       }
     })
-    
-    useEffect(() => {
-      updateTheaterScreen();
-    }, [theaterMode]);
 
     const [actionAnchor, setActionAnchor] = useState(null);
     const open = Boolean(actionAnchor);
@@ -625,25 +610,17 @@ const VideoRecorderPreview = () => {
                       border: "none" 
                     }}
                     onClick={ async () => { 
-                      var elem = document.documentElement
-                      if(theaterMode) { 
-                        if (document.exitFullscreen) {
-                          document.exitFullscreen();
-                        } else if (document.webkitExitFullscreen) { /* Safari */
-                          document.webkitExitFullscreen();
-                        } else if (document.msExitFullscreen) { /* IE11 */
-                          document.msExitFullscreen();
-                        }
-                      } else { 
-                        if (elem.requestFullscreen) {
-                          await elem.requestFullscreen().catch((err) => console.log(err));
-                        } else if (elem.webkitRequestFullscreen) { /* Safari */
-                          await elem.webkitRequestFullscreen().catch((err) => console.log(err));
-                        } else if (elem.msRequestFullscreen) { /* IE11 */
-                          await elem.msRequestFullscreen().catch((err) => console.log(err));
-                        }
-                      }
-                      setTheaterMode(!theaterMode);  }}>
+                      await sdkHandle.I_Resize(`${window.outerWidth}`, `${window.outerHeight}`);
+                      var elem = document.getElementById("divPlugin");
+                      if (elem.requestFullscreen) {
+                        await elem.requestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.webkitRequestFullscreen) { /* Safari */
+                        await elem.webkitRequestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.msRequestFullscreen) { /* IE11 */
+                        await elem.msRequestFullscreen().catch((err) => console.log(err));
+                      }                    
+                      setTheaterMode(!theaterMode);
+                    }}>
                     <img alt="theater mode" 
                       style={{ filter: "invert(1)" }} 
                       src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAjklEQVR4nO2WwQmAMAxFu1jq1Q2SUZL1FBTX0EEqxYuokFB7EJsHvf38DyWQH4LTHB1xDyhbJEnnByijNps117lIvGZPNTgL78OSgHgoCz7Cgx58iEMlzH7Rg19i/kFAGS2LZKW2n+M4HyYiL4AyVfUjnnWhH4kG7jE/V5/izmWsPh1x/xRe3rmMZc/5HTtHhL2kVsbKbgAAAABJRU5ErkJggg==" />

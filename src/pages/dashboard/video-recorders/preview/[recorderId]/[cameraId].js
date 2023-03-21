@@ -717,29 +717,14 @@ const VideoCameraDetails = () => {
         getVideoRecorder(recorderId)
     }, [isMounted])
 
-    const updateTheaterScreen = async () => {
-      if(sdkHandle) { 
-        // resize the window of stream
-        if(theaterMode) {
-          sdkHandle.I_Resize(`${window.innerWidth - 48}`, `${window.innerHeight}`)
-        }  else {
-          const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
-          sdkHandle.I_Resize(`${width}`, `${height}`)
-        }    
-        // scroll to the this position
-      }
-      if(window.pageYOffset !== 177.6) window.scroll(0, 177.6);
-    }
     // if full screen closed using ESC key
     addEventListener("fullscreenchange", async () => {      
       if( sdkHandle && theaterMode && !document.fullscreenElement) {
+        const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
+        await sdkHandle.I_Resize(`${width}`, `${window.innerHeight - 20}`)
         setTheaterMode(false);
       }
     })
-
-    useEffect(() => {
-      updateTheaterScreen();
-    }, [theaterMode]);
 
     useEffect(() => {
         getInfo();
@@ -840,25 +825,17 @@ const VideoCameraDetails = () => {
                       border: "none" 
                     }}
                     onClick={ async () => { 
-                      var elem = document.documentElement
-                      if(theaterMode) { 
-                        if (document.exitFullscreen) {
-                          document.exitFullscreen();
-                        } else if (document.webkitExitFullscreen) { /* Safari */
-                          document.webkitExitFullscreen();
-                        } else if (document.msExitFullscreen) { /* IE11 */
-                          document.msExitFullscreen();
-                        }
-                      } else { 
-                        if (elem.requestFullscreen) {
-                          await elem.requestFullscreen().catch((err) => console.log(err));
-                        } else if (elem.webkitRequestFullscreen) { /* Safari */
-                          await elem.webkitRequestFullscreen().catch((err) => console.log(err));
-                        } else if (elem.msRequestFullscreen) { /* IE11 */
-                          await elem.msRequestFullscreen().catch((err) => console.log(err));
-                        }
-                      }
-                      setTheaterMode(!theaterMode); 
+                      await sdkHandle.I_Resize(`${window.outerWidth}`, `${window.outerHeight}`);
+                      var elem = document.getElementById("divPlugin");
+                      if (elem.requestFullscreen) {
+                        await elem.requestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.webkitRequestFullscreen) { /* Safari */
+                        await elem.webkitRequestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.msRequestFullscreen) { /* IE11 */
+                        await elem.msRequestFullscreen().catch((err) => console.log(err));
+                      }                    
+                      setTheaterMode(!theaterMode);
+
                     }}>
                     <img alt="theater mode" 
                       style={{ filter: "invert(1)" }} 
