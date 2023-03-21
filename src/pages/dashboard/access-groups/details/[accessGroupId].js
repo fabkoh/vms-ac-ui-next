@@ -356,7 +356,7 @@ const AccessGroupDetails = () => {
                   <MenuItem
                     disableRipple
                     onClick={handleMultiEnable}
-                    disabled={!accessGroupIsActive}
+                    disabled={accessGroup.isActive}
                   >
                     <CloudDone />
                     &#8288;Activate
@@ -364,7 +364,7 @@ const AccessGroupDetails = () => {
                   <MenuItem
                     disableRipple
                     onClick={handleMultiUnlock}
-                    disabled={accessGroupIsActive}
+                    disabled={!accessGroup.isActive}
                   >
                     <CloudOff />
                     &#8288;De-Activate
