@@ -557,8 +557,8 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Recipent Name"
-                              name="Recipent Name"
+                              label="Recipient Name"
+                              name="Recipient Name"
                               required
                               defaultValue={recipentUser}
                               value={recipentUser}
@@ -569,8 +569,8 @@ const NotificationSettings = () => {
                           <Grid item xs={8}>
                             <TextField
                               fullWidth
-                              label="Recipent Email"
-                              name="Recipent Email"
+                              label="Recipient Email"
+                              name="Recipient Email"
                               required
                               defaultValue={recipentEmail}
                               value={recipentEmail}
@@ -652,14 +652,7 @@ const NotificationSettings = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                {/* <Grid
-                  container
-                  sx={[{ ml: 7 }, { mb: 4 }]}
-                  alignItems="center"
-                  spacing={3}
-                  justifyContent="flex-start"
-                > */}
-                {/* </Grid> */}
+
                 <Grid
                   container
                   sx={[{ ml: 7 }, { mb: 4 }]}
@@ -684,8 +677,8 @@ const NotificationSettings = () => {
                     </p>
                     <TextField
                       fullWidth
-                      label="Recipent Mobile Number"
-                      name="Recipent Mobile Number"
+                      label="Recipient Mobile Number"
+                      name="Recipient Mobile Number"
                       required
                       defaultValue={recipentSMS}
                       value={recipentSMS}
@@ -704,9 +697,6 @@ const NotificationSettings = () => {
                     container
                     spacing={3}
                     margin="0"
-                    // sx={[{ ml: 7 }, { mb: 4 }]}
-                    // alignItems="center"
-                    // justifyContent="flex-start"
                   >
                     <Grid item>
                       <Typography variant="body">
