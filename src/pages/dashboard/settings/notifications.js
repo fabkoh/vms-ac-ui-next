@@ -563,7 +563,7 @@ const NotificationSettings = () => {
                               defaultValue={recipentUser}
                               value={recipentUser}
                               onChange={onRecipentUserChange}
-                              disabled={!enableCustom}
+                              // disabled={!enableCustom}
                             />
                           </Grid>
                           <Grid item xs={8}>
@@ -575,7 +575,7 @@ const NotificationSettings = () => {
                               defaultValue={recipentEmail}
                               value={recipentEmail}
                               onChange={onRecipentEmailChange}
-                              disabled={!enableCustom}
+                              // disabled={!enableCustom}
                             />
                           </Grid>
                           <Grid item xs={8}>
@@ -637,7 +637,7 @@ const NotificationSettings = () => {
                       defaultValue={SMSApiKey}
                       value={SMSApiKey}
                       onChange={onSMSApiKeyChange}
-                      disabled={!enableCustom}
+                      // disabled={!enableCustom}
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -645,7 +645,7 @@ const NotificationSettings = () => {
                       <Button
                         variant="contained"
                         onClick={onSubmitSMSSetting}
-                        disabled={!enableCustom}
+                        // disabled={!enableCustom}
                       >
                         Save Settings
                       </Button>
@@ -690,7 +690,7 @@ const NotificationSettings = () => {
                       defaultValue={recipentSMS}
                       value={recipentSMS}
                       onChange={onRecipentSMSChange}
-                      disabled={!enableCustom}
+                      // disabled={!enableCustom}
                     />
                   </Grid>
                   <Grid item xs={8}>
