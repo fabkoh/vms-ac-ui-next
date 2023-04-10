@@ -11,7 +11,8 @@ class VideoRecorderApi {
         recorderPortNumber,
         recorderIWSPort,
         recorderUsername,
-        recorderPassword
+        recorderPassword,
+        autoPortForwarding
     }) {
         if (useApi) {
             return sendApi("/api/videorecorder", {
@@ -27,7 +28,8 @@ class VideoRecorderApi {
                     recorderPortNumber,
                     recorderIWSPort,
                     recorderUsername,
-                    recorderPassword
+                    recorderPassword,
+                    autoPortForwarding
                 })
             })
         }
@@ -76,7 +78,8 @@ class VideoRecorderApi {
         recorderPortNumber,
         recorderUsername,
         recorderPassword,
-        recorderIWSPort
+        recorderIWSPort,
+        autoPortForwarding
     }) {
         if (useApi) {
             return sendApi("/api/videorecorder", {
@@ -93,7 +96,8 @@ class VideoRecorderApi {
                     recorderPortNumber,
                     recorderUsername,
                     recorderPassword,
-                    recorderIWSPort
+                    recorderIWSPort,
+                    autoPortForwarding
                 })
             });
         }

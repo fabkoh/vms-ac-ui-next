@@ -20,7 +20,6 @@ const CreateRecorders = () => {
     // empty objects for initialisation of new card
     const getEmptyRecorderInfo = (recorderId) => ({
         recorderId,
-        recorderSerialNumber: '',
         recorderPortNumber: '',
         recorderIWSPort: '',
         recorderName: '',
@@ -28,6 +27,8 @@ const CreateRecorders = () => {
         recorderPrivateIp: '',
         recorderUsername: '',
         recorderPassword: '',
+        autoPortForwarding: true,
+        defaultIP: false
     });
     const getEmptyRecorderValidations = (recorderId) => ({
         recorderId,
@@ -50,9 +51,7 @@ const CreateRecorders = () => {
         recorderIWSPortExist: false,
         recorderIWSPortDuplicated: false,
 
-        // Serial number must be unique between recorders
-        recorderSerialNumberExists: false,
-        recorderSerialNumberDuplicated: false,
+
 
         // private IP address must be unique between recorders
         recorderPrivateIpExists: false,
@@ -77,7 +76,6 @@ const CreateRecorders = () => {
     // store previous video recorder names & ip addresses
     const [recorderNames, setRecorderNames] = useState({});
     const [recorderPrivateIpes, setRecorderPrivateIpes] = useState({});
-    const [recorderSerialNumbers, setRecorderSerialNumbers] = useState({});
     const [recorderPortNumbers, setRecorderPortNumbers] = useState({});
 
     const [serverDownOpen, setServerDownOpen] = useState(false);
@@ -87,20 +85,17 @@ const CreateRecorders = () => {
             .then(async res => {
                 const newRecorderNames = {}
                 const newRecorderPrivateIpes = {}
-                const newRecorderSerialNumbers = {}
                 const newRecorderPortNumbers = {}
                 if (res.status == 200) {
                     const body = await res.json();
                     body.forEach(recorder => {
                         newRecorderPrivateIpes[recorder.recorderPrivateIp] = true;
                         newRecorderNames[recorder.recorderName] = true;
-                        newRecorderSerialNumbers[recorder.recorderSerialNumber] = true;
                         newRecorderPortNumbers[recorder.recorderPortNumber] = true;
                         newRecorderPortNumbers[recorder.recorderIWSPort] = true;
                     }); 
                     setRecorderNames(newRecorderNames);
                     setRecorderPrivateIpes(newRecorderPrivateIpes);
-                    setRecorderSerialNumbers(newRecorderSerialNumbers);
                     setRecorderPortNumbers(newRecorderPortNumbers);
                 } else if (res.status == serverDownCode) {
                     setServerDownOpen(true);
@@ -149,20 +144,6 @@ const CreateRecorders = () => {
         }
     }
 
-    // helper for remove card and changeSerialNumberCheck
-    // directly modifies validationArr
-    const checkDuplicateSerialNumber = (groupArr, validationArr) => {
-        const duplicatedSerialNumber = formUtils.getDuplicates(
-            groupArr
-                // get recorder serial number
-                .map(group => group.recorderSerialNumber)
-                // keep the ones that are not blank strings
-                .filter(ip => !(/^\s*$/.test(ip)))
-        );
-        for(let i=0; i<groupArr.length; i++) {
-            validationArr[i].recorderSerialNumberDuplicated = groupArr[i].recorderSerialNumber in duplicatedSerialNumber;
-        }
-    }
 
     // helper for remove card and changePortNumberCheck
     // directly modifies validationArr
@@ -179,6 +160,25 @@ const CreateRecorders = () => {
 
         }
     }
+
+    const handleToggleDefaultIP = (id) => (e) => {
+        const updatedInfo = [ ...recorderInfoArr ];
+        // this method is reliant on text field having a name field == key in info object ie recorderName, recorderPrivateIp, etc
+        updatedInfo.find(info => info.recorderId == id)["defaultIP"] = 
+            !(updatedInfo.find(info => info.recorderId == id)["defaultIP"]);
+        e.target.value = "118.201.255.164";
+        e.target.name = "recorderPublicIp";
+        onPublicIpChangeFactory(id)(e);
+    }
+
+    const handleToggleAutoPortForwarding = (id) => (e) => {
+        //console.log(12345,"here");
+        const updatedInfo = [ ...recorderInfoArr ];
+        // this method is reliant on text field having a name field == key in info object ie recorderName, recorderPrivateIp, etc
+        updatedInfo.find(info => info.recorderId == id)["autoPortForwarding"] = 
+            !(updatedInfo.find(info => info.recorderId == id)["autoPortForwarding"]);
+        setRecorderInfoArr(updatedInfo);
+    } 
 
     // helper for remove card and changeIWSPortCheck
     // directly modifies validationArr
@@ -255,32 +255,6 @@ const CreateRecorders = () => {
         validation.recorderPublicIpBlank = formUtils.checkBlank(recorderPublicIp);
         validation.recorderPublicIpError = "";
         setRecorderValidationsArr(newValidations);
-    }
-
-    const changeSerialNumberCheck = async (e, id) => {
-        const recorderSerialNumber = e.target.value;
-        const newValidations = [ ...recorderValidationsArr ];
-        const validation = newValidations.find(v => v.recorderId == id);
-
-        // store a temp updated access group info
-        const newRecorderInfoArr = [ ...recorderInfoArr ]
-        newRecorderInfoArr.find(group => group.recorderId == id).recorderSerialNumber = recorderSerialNumber;
-
-        // remove submit failed and error
-        validation.submitFailed = false;
-
-
-        // check serial number exists?
-        validation.recorderSerialNumberExists = !!recorderSerialNumbers[recorderSerialNumber];
-
-        // check serial number duplicated
-        checkDuplicateSerialNumber(newRecorderInfoArr, newValidations);
-
-        setRecorderValidationsArr(newValidations);
-    }
-    const onSerialNumberChangeFactory = (id) => (e) => {
-        changeTextField(e, id);
-        changeSerialNumberCheck(e, id);
     }
 
     const onUsernameChangeFactory = (id) => (e) => {
@@ -495,14 +469,15 @@ const CreateRecorders = () => {
                                         removeCard={removeCard}
                                         recorderValidations={recorderValidationsArr[i]}
                                         onNameChange={onNameChangeFactory(id)}
-                                        onSerialNumberChange={onSerialNumberChangeFactory(id)}
                                         onPublicIpChange = {onPublicIpChangeFactory(id)}
                                         onPrivateIpChange={onPrivateIpChangeFactory(id)}
                                         onPortNumberChange={onPortNumberChangeFactory(id)}
                                         onIWSPortChange={onIWSPortChangeFactory(id)}
                                         onUsernameChange={onUsernameChangeFactory(id)}
                                         onPasswordChange={onPasswordChangeFactory(id)}
-                                    />
+                                        handleToggleDefaultIP={handleToggleDefaultIP(id)}
+                                        handleToggleAutoPortForwarding={handleToggleAutoPortForwarding(id)}
+                                        />
                                 )
                             })}
                             <div>
@@ -529,8 +504,6 @@ const CreateRecorders = () => {
                                                 validation => validation.recorderNameBlank ||
                                                     validation.recorderNameDuplicated ||
                                                     validation.recorderNameExists ||
-                                                    validation.recorderSerialNumberExists ||
-                                                    validation.recorderSerialNumberDuplicated ||
                                                     validation.recorderPublicIpBlank ||
                                                     validation.recorderPublicIpExists ||
                                                     validation.recorderPrivateIpBlank ||

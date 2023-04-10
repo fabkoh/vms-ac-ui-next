@@ -7,6 +7,11 @@ import {
     TextField, 
     Divider, 
     CardContent,
+    Switch,
+	FormControl,
+	FormControlLabel,
+    Typography,
+	FormGroup,
     Box,
 } from "@mui/material";
 import { useState } from "react";
@@ -15,21 +20,23 @@ import ErrorCard from "../shared/error-card";
 import EditFormTooltip from "../shared/edit_form_tooltip";
 
 const VideoRecorderAddForm = ({ recorderInfo, recorderValidations, 
-    removeCard, onNameChange, onSerialNumberChange, 
+    removeCard, onNameChange, 
     onPublicIpChange, onPrivateIpChange, onPortNumberChange, 
-    onIWSPortChange, onUsernameChange, 
+    onIWSPortChange, onUsernameChange, handleToggleDefaultIP, 
+    handleToggleAutoPortForwarding,
     onPasswordChange, edit }) => {
 
     const {
         recorderId,
         recorderName,
-        recorderSerialNumber,
+        defaultIP,
         recorderPublicIp,
         recorderPrivateIp,
         recorderPortNumber,
         recorderIWSPort,
         recorderUsername,
-        recorderPassword
+        recorderPassword,
+        autoPortForwarding
     } = recorderInfo;
 
     const {
@@ -44,8 +51,6 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
         recorderPortNumberDuplicated,
         recorderIWSPortExists,
         recorderIWSPortDuplicated,
-        recorderSerialNumberExists,
-        recorderSerialNumberDuplicated,
         recorderUsernameBlank,
         recorderPasswordBlank,
         recorderNameError,
@@ -78,9 +83,6 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
             recorderIWSPortDuplicated ||
             recorderUsernameBlank ||
             recorderPasswordBlank ||
-            recorderSerialNumberExists ||
-            recorderSerialNumberDuplicated ||
-
             submitFailed
         }>
             <CardHeader
@@ -155,32 +157,69 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
                         />
                     </Grid>
                     <Grid
+                            item
+                            md={6}
+                            xs={12}
+                        >
+                            <TextField
+                                fullWidth
+                                error={Boolean(recorderPrivateIpBlank || recorderPrivateIpExists || recorderPrivateIpDuplicated || recorderPrivateIpError)}
+                                helperText={
+                                        (recorderPrivateIpExists && 'Error: Recorder Private IP address taken') ||
+                                        (recorderPrivateIpDuplicated && 'Error: Duplicate recorder private IP address in form') ||
+                                        (recorderPrivateIpError && 'Error: ' + recorderPrivateIpError) ||
+                                        "Private IP address of the video recorder."
+                                    }
+                                label="Private IP Address"
+                                name="recorderPrivateIp"
+                                onChange={onPrivateIpChange}
+                                value={recorderPrivateIp}
+                                required
+                            />
+                    </Grid>
+                    <Grid
+                    item
+                    md={3}
+                    xs={6}
+                >
+
+                    <FormControl>
+                        <FormGroup>
+                            <FormControlLabel
+                                label={<Typography fontWeight="bold">Enable uPnP</Typography>}
+                                labelPlacement="start" 
+                                control={<Switch value={autoPortForwarding} checked={autoPortForwarding} onChange={handleToggleAutoPortForwarding}></Switch>}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Grid>
+                    <Grid
                         item
-                        md={6}
-                        xs={12}
+                        md={3}
+                        xs={6}
                     >
-                        <TextField
-                            fullWidth
-                            error={Boolean(recorderSerialNumberExists || recorderSerialNumberDuplicated)}
-                            helperText={ 
-                                    (recorderSerialNumberExists && 'Error: Recorder serial number taken') ||
-                                    (recorderSerialNumberDuplicated && 'Error: Duplicate recorder serial number in form')                                }
-                            label="Serial Number"
-                            name="recorderSerialNumber"
-                            onChange={onSerialNumberChange}
-                            value={recorderSerialNumber}
-                        />
+
+                        <FormControl>
+                            <FormGroup>
+                                <FormControlLabel
+                                    label={<Typography fontWeight="bold">Default Public IP</Typography>}
+                                    labelPlacement="start"
+                                    control={<Switch value={defaultIP} checked={defaultIP} onChange={handleToggleDefaultIP}></Switch>}
+                                />
+                            </FormGroup>
+					    </FormControl>
                     </Grid>
                     <Grid
                         item
                         md={6}
                         xs={12}
                     >
+
                         <TextField
                             fullWidth
                             label="Public IP Address"
                             name="recorderPublicIp"
-                            required
+                            disabled={defaultIP}
                             value={recorderPublicIp}
                             onChange={onPublicIpChange}
                             error={Boolean(recorderPublicIpBlank || recorderPublicIpError)}
@@ -200,27 +239,6 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
                                 container
                                 spacing={3}
                             >
-                                <Grid
-                                    item
-                                    md={6}
-                                    xs={12}
-                                >
-                                    <TextField
-                                        fullWidth
-                                        error={Boolean(recorderPrivateIpBlank || recorderPrivateIpExists || recorderPrivateIpDuplicated || recorderPrivateIpError)}
-                                        helperText={
-                                                (recorderPrivateIpExists && 'Error: Recorder Private IP address taken') ||
-                                                (recorderPrivateIpDuplicated && 'Error: Duplicate recorder private IP address in form') ||
-                                                (recorderPrivateIpError && 'Error: ' + recorderPrivateIpError) ||
-                                                "Private IP address of the video recorder."
-                                            }
-                                        label="Private IP Address"
-                                        name="recorderPrivateIp"
-                                        onChange={onPrivateIpChange}
-                                        value={recorderPrivateIp}
-                                        required
-                                    />
-                                </Grid>
                                 <Grid
                                     item
                                     md={6}
