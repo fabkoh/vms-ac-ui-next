@@ -179,12 +179,27 @@ const CreatePersonsTwo = () => {
     }
     console.log(usernames);
     console.log(newNum);
-    if (usernames.includes(newNum)) {
-      console.log(newNum + " is in list");
-      return (validArr[id][key] = true);
+    const isDuplicate = usernames.includes(newNum);
+    if (!validArr[id]) {
+      validArr[id] = {};
     }
-    return (validArr[id][key] = false);
+    validArr[id][key] = isDuplicate;
+    return isDuplicate;
   };
+
+  // const checkDuplicateHelper = (id, number, key, validArr, usernames) => {
+  //   let newNum = number;
+  //   if (number.charAt(0) === "+") {
+  //     newNum = number.slice(1);
+  //   }
+  //   console.log(usernames);
+  //   console.log(newNum);
+  //   if (usernames.includes(newNum)) {
+  //     console.log(newNum + " is in list");
+  //     return (validArr[id][key] = true);
+  //   }
+  //   return (validArr[id][key] = false);
+  // };
 
   // check if phone number is a valid Singapore phone numnber
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {

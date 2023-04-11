@@ -30,8 +30,8 @@ const IndividualEventManagement = () => {
   const router = useRouter();
   const emId = router.query;
   // console.log(emId)
-	const [serverDownOpen, setServerDownOpen] = useState(false);
-  
+  const [serverDownOpen, setServerDownOpen] = useState(false);
+
   useEffect(() => {
     gtm.push({ event: "page_view" });
   }, []);
@@ -177,13 +177,13 @@ const IndividualEventManagement = () => {
                     <DeleteIcon />
                     Delete
                   </MenuItem>
-                  <Confirmdelete
-                    //setActionAnchor={setAnchorEl}
-                    open={deleteOpen}
-                    handleDialogClose={handleDeleteClose}
-                    deleteEventsManagement={deleteEventsManagement}
-                  />
                 </StyledMenu>
+                <Confirmdelete
+                  //setActionAnchor={setAnchorEl}
+                  open={deleteOpen}
+                  handleDialogClose={handleDeleteClose}
+                  deleteEventsManagement={deleteEventsManagement}
+                />
               </Grid>
             </Grid>
           </div>

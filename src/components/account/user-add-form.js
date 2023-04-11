@@ -199,6 +199,7 @@ const UserAddForm = ({
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <SingleSelect
+                    required
                     fullWidth
                     label="Select Role"
                     getLabel={(role) => role.label}
