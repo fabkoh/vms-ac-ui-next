@@ -1,7 +1,7 @@
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
-import PropTypes from 'prop-types';
-import toast from 'react-hot-toast';
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import PropTypes from "prop-types";
+import toast from "react-hot-toast";
 import {
   Avatar,
   Box,
@@ -10,13 +10,13 @@ import {
   ListItemText,
   MenuItem,
   Popover,
-  Typography
-} from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../../hooks/use-auth';
-import { Cog as CogIcon } from '../../icons/cog';
-import { UserCircle as UserCircleIcon } from '../../icons/user-circle';
-import { SwitchHorizontalOutlined as SwitchHorizontalOutlinedIcon } from '../../icons/switch-horizontal-outlined';
+  Typography,
+} from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth } from "../../hooks/use-auth";
+import { Cog as CogIcon } from "../../icons/cog";
+import { UserCircle as UserCircleIcon } from "../../icons/user-circle";
+import { SwitchHorizontalOutlined as SwitchHorizontalOutlinedIcon } from "../../icons/switch-horizontal-outlined";
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open, ...other } = props;
@@ -25,18 +25,18 @@ export const AccountPopover = (props) => {
   // To get the user from the authContext, you can use
   // `const { user } = useAuth();`
   const user = {
-    avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    name: 'ISS ADMIN'
+    avatar: "/static/mock-images/avatars/avatar-anika_visser.png",
+    name: "ISS ADMIN",
   };
 
   const handleLogout = async () => {
     try {
       onClose?.();
       await logout();
-      router.push('/');
+      router.push("/");
     } catch (err) {
       console.error(err);
-      toast.error('Unable to logout.');
+      toast.error("Unable to logout.");
     }
   };
 
@@ -44,44 +44,40 @@ export const AccountPopover = (props) => {
     <Popover
       anchorEl={anchorEl}
       anchorOrigin={{
-        horizontal: 'center',
-        vertical: 'bottom'
+        horizontal: "center",
+        vertical: "bottom",
       }}
       keepMounted
       onClose={onClose}
       open={open}
       PaperProps={{ sx: { width: 300 } }}
       transitionDuration={0}
-      {...other}>
+      {...other}
+    >
       <Box
         sx={{
-          alignItems: 'center',
+          alignItems: "center",
           p: 2,
-          display: 'flex'
+          display: "flex",
         }}
       >
         <Avatar
           src={user.avatar}
           sx={{
             height: 40,
-            width: 40
+            width: 40,
           }}
         >
           <UserCircleIcon fontSize="small" />
         </Avatar>
         <Box
           sx={{
-            ml: 1
+            ml: 1,
           }}
         >
-          <Typography variant="body1">
+          <Typography variant="body1">{user.name}</Typography>
+          <Typography color="textSecondary" variant="body2">
             {user.name}
-          </Typography>
-          <Typography
-            color="textSecondary"
-            variant="body2"
-          >
-            ISS Admin
           </Typography>
         </Box>
       </Box>
@@ -104,20 +100,13 @@ export const AccountPopover = (props) => {
             />
           </MenuItem>
         </NextLink> */}
-        <NextLink
-          href="/dashboard/settings/account"
-          passHref
-        >
+        <NextLink href="/dashboard/settings/account" passHref>
           <MenuItem component="a">
             <ListItemIcon>
               <CogIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
-              primary={(
-                <Typography variant="body1">
-                  Settings
-                </Typography>
-              )}
+              primary={<Typography variant="body1">Settings</Typography>}
             />
           </MenuItem>
         </NextLink>
@@ -127,11 +116,7 @@ export const AccountPopover = (props) => {
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
-            primary={(
-              <Typography variant="body1">
-                Logout
-              </Typography>
-            )}
+            primary={<Typography variant="body1">Logout</Typography>}
           />
         </MenuItem>
       </Box>
@@ -142,5 +127,5 @@ export const AccountPopover = (props) => {
 AccountPopover.propTypes = {
   anchorEl: PropTypes.any,
   onClose: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool,
 };

@@ -1,46 +1,55 @@
-import { useRouter } from 'next/router';
-import * as Yup from 'yup';
+import { useRouter } from "next/router";
+import * as Yup from "yup";
 import "yup-phone";
-import { ErrorMessage, useFormik } from 'formik';
-import { Box, Button, Checkbox, FormHelperText, TextField, Typography, Link, Select, MenuItem, InputLabel, Grid, InputAdornment } from '@mui/material';
-import { useAuth } from '../../hooks/use-auth';
-import { useMounted } from '../../hooks/use-mounted';
-import { authEditProfile } from '../../api/auth-api';
+import { ErrorMessage, useFormik, Formik, Form } from "formik";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormHelperText,
+  TextField,
+  Typography,
+  Link,
+  Select,
+  MenuItem,
+  InputLabel,
+  Grid,
+  InputAdornment,
+} from "@mui/material";
+import { useAuth } from "../../hooks/use-auth";
+import { useMounted } from "../../hooks/use-mounted";
+import { authEditProfile } from "../../api/auth-api";
 import toast from "react-hot-toast";
-
 
 export const EditAccountDetails = (accountDetails) => {
   const isMounted = useMounted();
   const router = useRouter();
   const { register } = useAuth();
-  
+
   const formik = useFormik({
     initialValues: {
       email: accountDetails.props.email,
       firstName: accountDetails.props.firstName,
       lastName: accountDetails.props.lastName,
       mobileNumber: accountDetails.props.mobile,
-      submit: null
+      submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
+      email: Yup.string()
+        .email("Must be a valid email")
         .max(255)
-        .required('Email is required'),
-      firstName: Yup
-        .string()
-        .max(255)
-        .required('First Name is required'),
-      lastName: Yup
-        .string()
-        .max(255)
-        .required('Last Name is required'),
-      mobileNumber: Yup
-        .string()
-        .required('Mobile Number is required')
-        .phone(),
+        .required("Email is required"),
+      firstName: Yup.string()
+        .min(3, "Must be at least 3 characters")
+        .max(20, "Must be at most 20 characters")
+        .required("First Name is required"),
+      lastName: Yup.string()
+        .min(3, "Must be at least 3 characters")
+        .max(20, "Must be at most 20 characters")
+        .required("Last Name is required"),
+      mobileNumber: Yup.string().required("Mobile Number is required").phone(),
     }),
+
     onSubmit: async (values, helpers) => {
       try {
         const userSettings = {
@@ -49,14 +58,14 @@ export const EditAccountDetails = (accountDetails) => {
           email: values.email,
           role: [values.role],
           mobile: values.mobileNumber,
-          password: 'asdasd',
-        }
+          password: "asdasd",
+        };
         const res = await authEditProfile(userSettings);
-          if(res.type == 'success'){
-            toast.success('You have successfully edited your user details')
-          }
+        if (res.type == "success") {
+          toast.success("You have successfully edited your user details");
+        }
       } catch (err) {
-        toast.error('There has been an error, please try again.')
+        toast.error("There has been an error, please try again.");
         console.error(err);
 
         if (isMounted()) {
@@ -65,14 +74,11 @@ export const EditAccountDetails = (accountDetails) => {
           helpers.setSubmitting(false);
         }
       }
-    }
+    },
   });
 
   return (
-    <form
-      noValidate
-      onSubmit={formik.handleSubmit}
-      >
+    <form noValidate onSubmit={formik.handleSubmit}>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <TextField
@@ -85,6 +91,7 @@ export const EditAccountDetails = (accountDetails) => {
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.firstName}
+            required
           />
         </Grid>
         <Grid item xs={6}>
@@ -98,6 +105,7 @@ export const EditAccountDetails = (accountDetails) => {
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.lastName}
+            required
           />
         </Grid>
       </Grid>
@@ -112,9 +120,13 @@ export const EditAccountDetails = (accountDetails) => {
         onChange={formik.handleChange}
         type="email"
         value={formik.values.email}
+        required
       />
+
       <TextField
-        error={Boolean(formik.touched.mobileNumber && formik.errors.mobileNumber)}
+        error={Boolean(
+          formik.touched.mobileNumber && formik.errors.mobileNumber
+        )}
         fullWidth
         helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
         label="Mobile Number"
@@ -126,12 +138,11 @@ export const EditAccountDetails = (accountDetails) => {
         InputProps={{
           startAdornment: <InputAdornment position="start">+</InputAdornment>,
         }}
+        required
       />
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
-          <FormHelperText error>
-            {formik.errors.submit}
-          </FormHelperText>
+          <FormHelperText error>{formik.errors.submit}</FormHelperText>
         </Box>
       )}
       <Box sx={{ mt: 2 }}>
