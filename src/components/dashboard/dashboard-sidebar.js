@@ -469,10 +469,6 @@ export const DashboardSidebar = (props) => {
               title: "My Account",
               path: "/dashboard/settings/account",
             },
-            {
-              title: "Notifications",
-              path: "/dashboard/settings/notifications",
-            },
             ...(!user.authorities.some(
               (pair) => pair.authority === "ROLE_USER_ADMIN"
             )
@@ -480,6 +476,10 @@ export const DashboardSidebar = (props) => {
                   {
                     title: "User Management",
                     path: "/dashboard/settings/user-management",
+                  },
+                  {
+                    title: "Notifications",
+                    path: "/dashboard/settings/notifications",
                   },
                 ]
               : []),
