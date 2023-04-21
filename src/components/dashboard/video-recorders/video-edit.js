@@ -163,10 +163,12 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                 >
                                     <TextField
                                         fullWidth
-                                        error={Boolean(recorderPrivateIpBlank || recorderPrivateIpExists || recorderPrivateIpDuplicated || recorderPrivateIpError)}
+                                        error={Boolean(recorderPrivateIpBlank || recorderPrivateIpError)}
+                                        //  || recorderPrivateIpExists || recorderPrivateIpDuplicated
                                         helperText={
-                                                (recorderPrivateIpExists && 'Error: Recorder Private IP address taken') ||
-                                                (recorderPrivateIpDuplicated && 'Error: Duplicate recorder private IP address in form') ||
+                                                //(recorderPrivateIpExists && 'Error: Recorder Private IP address taken') ||
+                                                //(recorderPrivateIpDuplicated && 'Error: Duplicate recorder private IP address in form') ||
+                                                (recorderPrivateIpBlank && 'Error: Recorder private IP address cannot be blank') ||
                                                 (recorderPrivateIpError && 'Error: ' + recorderPrivateIpError) ||
                                                 "Private IP address of the video recorder."
                                             }
@@ -247,10 +249,11 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                 >
                                     <TextField
                                         fullWidth
-                                        error={Boolean(recorderPortNumberExists || recorderPortNumberDuplicated || recorderPortNumberError)}
+                                        error={Boolean(recorderPortNumberError)}
+                                        // recorderPortNumberExists || recorderPortNumberDuplicated || 
                                         helperText={ 
-                                                (recorderPortNumberExists && 'Error: Recorder port number taken') ||
-                                                (recorderPortNumberDuplicated && 'Error: Duplicate recorder port number in form') ||
+                                                //(recorderPortNumberExists && 'Error: Recorder port number taken') ||
+                                                //(recorderPortNumberDuplicated && 'Error: Duplicate recorder port number in form') ||
                                                 (recorderPortNumberError && 'Error: ' + recorderPortNumberError) ||
                                                 "Public port number of the video recorder. Auto-generated if empty."
                                             }
@@ -267,10 +270,11 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                 >
                                     <TextField
                                         fullWidth
-                                        error={Boolean(recorderIWSPortExists || recorderIWSPortDuplicated || recorderIWSPortError)}
+                                        error={Boolean(recorderIWSPortError)}
+                                        // recorderIWSPortExists || recorderIWSPortDuplicated || 
                                         helperText={ 
-                                                (recorderIWSPortExists && 'Error: Recorder IWS port taken') ||
-                                                (recorderIWSPortDuplicated && 'Error: Duplicate port number in form') ||
+                                                //(recorderIWSPortExists && 'Error: Recorder IWS port taken') ||
+                                                //(recorderIWSPortDuplicated && 'Error: Duplicate port number in form') ||
                                                 (recorderIWSPortError && 'Error: ' + recorderIWSPortError) ||
                                                 "Public IWS Port of the video recorder. Auto-generated if empty."
                                             }

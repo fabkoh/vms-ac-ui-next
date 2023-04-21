@@ -507,12 +507,12 @@ const CreateRecorders = () => {
                                                     validation.recorderPublicIpBlank ||
                                                     validation.recorderPublicIpExists ||
                                                     validation.recorderPrivateIpBlank ||
-                                                    validation.recorderPrivateIpDuplicated ||
-                                                    validation.recorderPrivateIpExists ||
-                                                    validation.recorderPortNumberDuplicated ||
-                                                    validation.recorderPortNumberExist ||
-                                                    validation.recorderIWSPortDuplicated ||
-                                                    validation.recorderIWSPortExist ||
+                                                    //validation.recorderPrivateIpDuplicated ||
+                                                    //validation.recorderPrivateIpExists ||
+                                                    //validation.recorderPortNumberDuplicated ||
+                                                    //validation.recorderPortNumberExist ||
+                                                    //validation.recorderIWSPortDuplicated ||
+                                                    //validation.recorderIWSPortExist ||
                                                     validation.recorderUsernameBlank ||
                                                     validation.recorderPasswordBlank
                                             )

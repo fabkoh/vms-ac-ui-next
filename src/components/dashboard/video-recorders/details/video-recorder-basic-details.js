@@ -22,8 +22,23 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                 <PropertyListItem
                     align={align}
                     divider
-                    label="IP Address"
+                    label="Public IP Address"
                     value={(recorder) ? recorder.recorderPublicIp : <CircularProgress size='1rem'/>}
+                />
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Private IP Address"
+                    value={(recorder) ? recorder.recorderPrivateIp : <CircularProgress size='1rem'/>}
+                />
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="uPnP enabled"
+                    value={(recorder) ? recorder.autoPortForwarding
+                            ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill>
+                            : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill> 
+                        : <CircularProgress size='1rem'/>}
                 />
                 <PropertyListItem
                     align={align}
@@ -54,6 +69,12 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                         : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>}
                 >
                 </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Created"
+                    value={(recorder) ? toDisplayDateString(recorder.created) : <CircularProgress size='1rem'/>}
+                />
 
                 {/* <PropertyListItem
                     align={align}

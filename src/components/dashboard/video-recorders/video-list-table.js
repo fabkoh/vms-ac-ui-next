@@ -49,6 +49,7 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                             <TableCell>Private IP Address</TableCell>
                             <TableCell>Port Number</TableCell>
                             <TableCell>IWS Port</TableCell>
+                            <TableCell>uPnP enabled</TableCell>
                             <TableCell>Created</TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>    
@@ -65,6 +66,7 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                     recorderPortNumber,
                                     recorderIWSPort,
                                     recorderSerialNumber,
+                                    autoPortForwarding,
                                     isActive,
                                     cameras,
                                     created
@@ -183,6 +185,17 @@ export default function VideoListTable({ selectedAllVideoRecorders, selectedSome
                                                 )
                                             }
                                         </TableCell> */}
+                                        <TableCell>
+                                            { 
+                                                autoPortForwarding
+                                                ? <SeverityPill color="success" 
+                                                    style={{color: 'transparent'}}>_.</SeverityPill> 
+                                                : <SeverityPill color="error" 
+                                                style={{color: 'transparent'}}>_.</SeverityPill> 
+                                                    
+                                                
+                                            }
+                                        </TableCell>
                                         <TableCell>
                                             <NextLink
                                                 href={detailsLink}    
