@@ -30,10 +30,12 @@ const Rrule = (props) => {
 	const {
 		//only pass RRuleobj, timestart, timeend.
 		handleRrule,
+		handleAdd,
 		getStart,
 		getEnd,
 		timeEndInvalid,
 		handleInvalidUntil,
+		handleInvalidBegin,
 	} = props;
 
 	const [rule, setRule] = useState({
@@ -52,6 +54,7 @@ const Rrule = (props) => {
 		timeStart: null,
 		timeEnd: null,
 	})
+
 	// const theme = useTheme();
 	// const matches = useMediaQuery(theme.breakpoints.up);
 	// console.log("asdasda",theme.breakpoints)
@@ -60,7 +63,8 @@ const Rrule = (props) => {
 	const [repeatToggle, setRepeatToggle] = useState(false);
 	const handleRepeatToggle = () => {
 		repeatToggle
-			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
+			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),
+				setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
 			: (setRepeatToggle(true),
 			  setRule({freq:2,interval:1}),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
 	};
@@ -77,8 +81,10 @@ const Rrule = (props) => {
 			const { timeStart, timeEnd, ...newrule1} = nonChangingRule;
 			const newRule2 = { ...rule, ...newrule1 };
 			const rule2 = new RRule(newRule2);
-			console.log(rule2.toText()); // DELETE THIS
 			handleRrule(rule2);
+			handleAdd({"allDay":allDay,
+						"endOfDay":endOfDay,
+						"repeatToggle":repeatToggle});
 		} catch(e) { console.log(e); };
 	}
 
@@ -90,7 +96,7 @@ const Rrule = (props) => {
 	}, [rule,nonChangingRule])
 	
 	//handle dtstart
-	const [dtstart, setDtstart] = useState(new Date());
+	const [dtstart, setDtstart] = useState(false);
 	const handleDtstart = (e) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
@@ -98,14 +104,23 @@ const Rrule = (props) => {
 		// console.log("date",e.target.value)
 		// console.log("datetype",typeof(e.target.value))
 		setNonChangingRule((prevState) => ({ ...prevState, dtstart:dateobj }))
+		handleInvalidBegin(false)
 	};
 	//start of All Day toggle + renderer
 	const [allDay, setAllDay] = useState(true);
 	const handleAllDay = () => {
 		allDay ? setAllDay(false) : setAllDay(true);
+		//setAdditionalInfo(prevState=>({...prevState,allDay:allDay}));
+	};
+
+	// handle "end of day" time end mode (24:00)
+	const [endOfDay, setEndOfDay] = useState(true);
+	const handleEndOfDay = () => {
+		endOfDay ? setEndOfDay(false) : setEndOfDay(true);
+		//setAdditionalInfo(prevState=>({...prevState,endOfDay:endOfDay}));
 	};
 	
-	const [timeStart, setTimeStart] = useState(); //timeStart lift up state
+	const [timeStart, setTimeStart] = useState("00:00"); //timeStart lift up state
 	const handleTimeStart = (e) => {
 		if(e.target.value==""){
 			console.warn("START TIME IS EMPTYYYY")
@@ -114,7 +129,7 @@ const Rrule = (props) => {
 		setTimeStart(e.target.value);
 		setNonChangingRule(prevState=>({...prevState,timeStart:e.target.value}))
 	};
-	const [timeEnd, setTimeEnd] = useState(); //timeEnd lift up state
+	const [timeEnd, setTimeEnd] = useState("00:00"); //timeEnd lift up state
 	const handleTimeEnd = (e) => {
 		if(timeEnd<timeStart){
 			// console.warn("invalid time")
@@ -127,8 +142,12 @@ const Rrule = (props) => {
 	};
 	useEffect(() => {
 		//reset timeStart and timeEnd if allDay is false.
-		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"00:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
+		allDay ? (setNonChangingRule(prevState=>({...prevState,timeStart: timeStart,timeEnd: endOfDay ? timeEnd : "24:00"}))) : (setNonChangingRule(prevState=>({...prevState,timeStart:"00:00",timeEnd:"24:00"})));
 	}, [allDay]);
+
+	useEffect(() => {
+		endOfDay ? (setNonChangingRule(prevState=>({...prevState, timeEnd:timeEnd}))) : (setNonChangingRule(prevState=>({...prevState, timeEnd:"24:00"})));
+	}, [endOfDay]);
 
 	// const AllDayRenderer = (allDay) => {
 	// 	if (allDay) {
@@ -210,6 +229,7 @@ const Rrule = (props) => {
 						<Typography mr={2}
 						fontWeight="bold">to</Typography>
 					</Grid>
+					{endOfDay ?
 					<Grid item
 						ml={2}
 						mr={2}
@@ -227,6 +247,7 @@ const Rrule = (props) => {
 							value={nonChangingRule.timeEnd}
 						></TextField>
 					</Grid>
+				: null}
 				</Grid>
 			);
 		}
@@ -397,7 +418,7 @@ const Rrule = (props) => {
 	const monthMenuSetter1 = () => {
 		let date;
 		try {
-			date = nonChangingRule.dtstart.getDate()
+			date = nonChangingRule.dtstart?.getDate()
 		} catch (err) {
 			console.log(err);
 			return;
@@ -411,7 +432,7 @@ const Rrule = (props) => {
 		let newtempday;
 		let tempday;
 		try {
-			tempday = nonChangingRule.dtstart.getDay();
+			tempday = nonChangingRule.dtstart?.getDay();
 			newtempday = tempday-1;
 			newtempday ==-1? newtempday=6:false
 		} catch (err) {
@@ -568,7 +589,9 @@ const Rrule = (props) => {
 			setNonChangingRule(prevState=>({...prevState,until:null,count:1}))
 		}
 		if(e.target.value == "on"){
-			setNonChangingRule(prevState=>({...prevState,count:null}))
+			setUntil("")
+			setNonChangingRule(prevState=>({...prevState,until:null,count:null}))
+			handleInvalidUntil(true)
 		}
 		if(e.target.value == "never"){
 			setUntil("")
@@ -582,10 +605,12 @@ const Rrule = (props) => {
 	const [until, setUntil] = useState()
 	const handleUntil = (e) => {
 		const dateobj = new Date(e.target.value)
-		if(dateobj<nonChangingRule.dtstart){
-			// console.warn("INVALID DATE")
-		}
-		// console.warn("this runs after")
+		handleInvalidUntil(false)
+		// if(dateobj<nonChangingRule.dtstart){
+			
+		// 	// console.warn("INVALID DATE")
+		// }
+		// // console.warn("this runs after")
 		setUntil(e.target.value)
 		setNonChangingRule(prevState=>({...prevState, until:dateobj}))
 	}
@@ -598,13 +623,16 @@ const Rrule = (props) => {
 	};
 	const invalidUntil = () => {
 		//if end options != "on" , setdelete block = false. else,     fn should be passed to handle end options
-		if(end=="on" && nonChangingRule.until<nonChangingRule.dtstart){
-			handleInvalidUntil(true)
+		if(end=="on" && nonChangingRule.until<=nonChangingRule.dtstart){
+			// handleInvalidUntil(true)
+			return true
+		}
+		else if(end=="on" && !nonChangingRule.until){
 			return true
 		}
 		//set delete block false
 		else{
-		handleInvalidUntil(false)
+		// handleInvalidUntil(false)
 		// console.log("this until is valid")
 		return false
 		}
@@ -650,7 +678,7 @@ const Rrule = (props) => {
 							min: startDate
 						}}						
 						error={invalidUntil()}
-						helperText={invalidUntil()?"Error: end date must be greater than start date":" "}></TextField>
+						helperText={invalidUntil() ?"Error: end date must be greater than start date":" "}></TextField>
 				</Grid> 								
 			);
 		}
@@ -792,6 +820,7 @@ const Rrule = (props) => {
 				ml={-2}
 				alignItems="center"
 				xs={12}>
+					
 				<Grid item
 					mr={3}>
 					<FormControl>
@@ -804,9 +833,24 @@ const Rrule = (props) => {
 						</FormGroup>
 					</FormControl>
 				</Grid>
+
 				<Grid item>
 					{AllDayRenderer(allDay)}
 				</Grid>
+
+				<Grid item
+mr={3}>
+					<FormControl>
+						<FormGroup>
+							<FormControlLabel
+								label={<Typography fontWeight="bold">End of day</Typography>}
+								labelPlacement="start"
+								control={<Switch value={endOfDay} disabled={!allDay} onChange={handleEndOfDay}></Switch>}
+							/>
+						</FormGroup>
+					</FormControl>
+				</Grid>
+				
 			</Grid>
 		</Grid>
 	);

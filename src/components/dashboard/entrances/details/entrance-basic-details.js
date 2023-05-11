@@ -1,5 +1,6 @@
 import Warning from "@mui/icons-material/Warning";
-import { Card, useMediaQuery, CardHeader, Divider, Link, Typography } from "@mui/material";
+import {Lock, LockOpen} from "@mui/icons-material";
+import { Card, useMediaQuery, CardHeader, Divider, Link, Typography, Chip } from "@mui/material";
 import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
@@ -9,7 +10,7 @@ import NextLink from "next/link";
 import { getControllerDetailsLink } from "../../../../utils/controller";
 
 export const EntranceBasicDetails = (props) => {
-    const { entranceId, entranceName, entranceDesc, isActive, thirdPartyOption } = props.entrance;
+    const { entranceId, entranceName, entranceDesc, isActive, isLocked, thirdPartyOption } = props.entrance;
     const controller = props.entranceController[entranceId];
     
     // copied from template
@@ -54,13 +55,29 @@ export const EntranceBasicDetails = (props) => {
                 <PropertyListItem
                     align={align}
                     divider
+                    label="Current"
+                    value={isLocked}
+                >
+                    <Chip
+                        label={isLocked ? "LOCKED" : "UNLOCKED"}
+                        icon={isLocked ? <Lock /> : <LockOpen />}
+                        sx={{
+                            fontSize: "12px",
+                            fontWeight: 600
+                        }}
+                        size="small"
+                    />
+                </PropertyListItem>
+                <PropertyListItem
+                    align={align}
+                    divider
                     label="Status"
                     value={isActive}
                 >
                     {
                         !isActive && (
                             <SeverityPill color="error">
-                                UNLOCKED
+                                INACTIVE
                             </SeverityPill>
                         ) || (
                             <SeverityPill color="success">

@@ -73,7 +73,7 @@ export const Confirmdelete = (props) => {
 						undone.
 					</DialogContentText>
 
-					<form onSubmit={handleDeleteAccessGroups}>
+					<form onSubmit={e => handleDeleteAccessGroups(e)}>
 						<TextField
 							variant="filled"
 							fullWidth 

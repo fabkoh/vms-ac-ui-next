@@ -58,11 +58,13 @@ const Logs=()=>{
     const [filterEnd, setfilterEnd] = useState(null);
 
     const handleStartDate = (e) => {
-        setfilterStart(e)
+        setfilterStart(e);
+        console.log(filterStart);
     }
 
     const handleEndDate = (value) => {
-        setfilterEnd(value)
+        setfilterEnd(value);
+        console.log(filterEnd);
     }
     
     function onClear() {
@@ -94,20 +96,34 @@ const handleQueryChange = (e) => {
 const [Events, setEvents] = useState([]);
 
 console.log(filters)
-const filteredEvents = applyDateTimeFilter(applyFilter(Events, filters),filterStart,filterEnd)
+const [searchedEvents, setSearchedEvents] = useState([]);
+const filteredEvents = searchedEvents.length <= 0 ? applyDateTimeFilter(applyFilter(Events, filters),filterStart,filterEnd) : searchedEvents;
 
 // for pagination
 const [page, setPage] = useState(0);
-const handlePageChange = (e, newPage) => setPage(newPage);
+const handlePageChange = async (e, newPage) => {
+    setPage(newPage);
+    if ((newPage + 1) * rowsPerPage >= filteredEvents.length && Events.length < eventsCount) {
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
+
+        if (res.status == 200) {
+            const data = await res.json();
+            if (isMounted())
+                setEvents(Events.concat(data));
+        } else
+            toast.error("Some error has occurred");
+    }
+}
 const [rowsPerPage, setRowsPerPage] = useState(10);
 const handleRowsPerPageChange = (e) => setRowsPerPage(parseInt(e.target.value, 10));
 const paginatedEvents = applyPagination(filteredEvents, page, rowsPerPage);
-const eventsCount = filteredEvents.length;
+const [eventsCount, setEventsCount] = useState(0);
 const [serverDownOpen, setServerDownOpen] = useState(false);
 const [firstTimeCall, setFirstTimeCall] = useState(true);
     
 // for polling 
-const [pollingTime, setPollingTime] = useState(1000);
+const [isPolling, setIsPolling] = useState(true);
+const [pollingTime, setPollingTime] = useState(5000);
 const pollingOptions = [
     { "pollingDisplay" : 1, "pollingTime" : 1000},
     { "pollingDisplay" : 2, "pollingTime" : 2000},
@@ -126,7 +142,7 @@ const onPollingTimeChange = (e) => {
 const getEvents = useCallback(async () => {
     try {
         //const data = await personApi.getFakePersons() 
-        const res = await eventslogsApi.getEvents()
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -144,7 +160,7 @@ const getEvents = useCallback(async () => {
 const getEventsWithErrorPopUps = useCallback(async () => {
     try {
         //const data = await personApi.getFakePersons() 
-        const res = await eventslogsApi.getEvents()
+        const res = await eventslogsApi.getEvents(Math.floor(Events.length / 500))
         
         if (res.status === 200) {
             const data = await res.json()
@@ -177,27 +193,57 @@ useEffect(
 
 useEffect(
     () => {
-        console.log(pollingTime)
-        const timer = setInterval(getEvents, pollingTime);
-        return () => clearInterval(timer)
+        if (isPolling) {
+            console.log(pollingTime)
+            const timer = setInterval(() => {
+                getInfo();
+                
+            }    , pollingTime);
+            return () => clearInterval(timer)
+        }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pollingTime]
+    [isPolling, pollingTime]
 );
 
 const getInfo = useCallback(async() => {
-    const eventsRes = await eventslogsApi.getEvents();
+    const eventsCountRes = await eventslogsApi.getEventsCount();
+    if (eventsCountRes.status !== 200) {
+        toast.error("Failed To Get Total Events Count");
+        return;
+    }
+    const eventsCountJson = await eventsCountRes.json();
+    setEventsCount(eventsCountJson);
+    if (Events.length < eventsCountRes) {
+        const eventsRes = await eventslogsApi.getEvents(Math.floor(Events.length / 500));
+        if (eventsRes.status !== 200) {
+            toast.error("Failed To Refresh");
+            return;
+        }
+        const eventsJson = await eventsRes.json();
+        toast.success("Refresh Successfully");
+    
+        if (isMounted()){
+            setEvents(eventsJson);
+            console.log("Events Arr length is " + Events.length);
+            setIsPolling(true);
+        }
+    }
+}, [isMounted]);
+
+const search = async() => {
+    const start = filterStart ? new Date(filterStart.getTime() - filterStart.getTimezoneOffset() * 60000).toISOString() : null;
+    const end = filterEnd ? new Date(filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000).toISOString() : null;
+    const eventsRes = await eventslogsApi.searchEvent(Math.floor(searchedEvents.length / 500), filters.query, start, end);
     if (eventsRes.status !== 200) {
-        toast.error("Failed To Refresh");
+        toast.error("Failed To Search");
         return;
     }
     const eventsJson = await eventsRes.json();
-    toast.success("Refresh Successfully");
-
-    if (isMounted()){
-        setEvents(eventsJson);
-    }
-}, [isMounted]);
+    toast.success("Search Successfully");
+    setIsPolling(false);
+    setSearchedEvents(eventsJson);
+}
 
     return (
         <>
@@ -333,7 +379,7 @@ const getInfo = useCallback(async() => {
                                     renderInput={(props) => <TextField {...props} />}
                                     label="Start Date Time"
                                     value={filterStart}
-                                    onChange={(e)=> {}}
+                                    onChange={handleStartDate}
                                     onAccept={handleStartDate}
                                 />
                             </LocalizationProvider>
@@ -344,7 +390,7 @@ const getInfo = useCallback(async() => {
                                 renderInput={(props) => <TextField {...props} />}
                                 label="End Date Time"
                                 value={filterEnd}
-                                onChange={(e)=> {}}
+                                onChange={handleEndDate}
                                     onAccept={handleEndDate}
                                 />
                             </LocalizationProvider>
@@ -357,6 +403,13 @@ const getInfo = useCallback(async() => {
                                 onClick={onClear}
                             >
                                 Clear Dates
+                            </Button>
+                            <Button
+                                    variant="contained"
+                                    sx={{ m: 1 , mr : 5 }}
+                                    onClick={search}
+                                >
+                                    Search
                             </Button>
                         
                         </Box>

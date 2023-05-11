@@ -226,11 +226,13 @@ const ControllerDetails = () => {
 		setDeleteOpen(false);
 	}
 
-    const deleteController = async() => {
+    const deleteController = async(e) => {
+        e.preventDefault();
         toast.loading("Deleting Controller...");
         controllerApi.deleteController(controllerId)
         .then(async res =>{
-            toast.dismiss()
+            console.log(res);
+            toast.dismiss();
 
             if (res.status != 204) {
                 toast.error('Delete unsuccessful', {duration:3000})
@@ -509,6 +511,7 @@ const ControllerDetails = () => {
                                     <Confirmdelete 
                                     setActionAnchor={setActionAnchor} 
                                     open={deleteOpen}
+                                    message={"Are you sure you want to delete controller(s)? This action cannot be undone. Authentication devices of selected controller(s) will be deleted."}
                                     handleDialogClose={handleDeleteClose}
                                     deleteControllers={deleteController} />
 

@@ -13,6 +13,7 @@ import {
 	TableCell,
 	TableHead,
 	TableRow,
+	Switch
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "../../shared/expand-more";
@@ -22,7 +23,8 @@ import StyledMenu from "../../styled-menu";
 import { Delete, Edit } from "@mui/icons-material";
 import { Scrollbar } from "../../../scrollbar";
 import { rrulestr } from "rrule";
-
+import {authMethodScheduleApi} from "../../../../api/authentication-schedule";
+import toast from 'react-hot-toast';
 import NextLink from 'next/link';
 import rruleDescription from "../../../../utils/rrule-desc";
 import WarningChip from "../../shared/warning-chip";
@@ -34,13 +36,29 @@ export default function AuthenticationSchedules({
 	authenticationSchedules,
 	deleteSchedules,
 }) {
+
+	const handleToggleFactory = (authMethodSchedId) => async (e) => {
+        const bool = e.target.checked;
+        const verb = bool ? 'activated' : 'deactivated';
+        try {
+            const res = await (bool ? authMethodScheduleApi.activateAuthDeviceSchedule(authMethodSchedId) : authMethodScheduleApi.deactivateAuthDeviceSchedule(authMethodSchedId));
+            if (res.status != 200) throw new Error("Failed to send req");
+            toast.success(`Successfully ${verb} auth method schedule`);
+            return true
+        } catch(e) {
+            console.error(e);
+            const errorVerb = bool ? 'activate' : 'deactivate';
+            toast.error(`Failed to ${errorVerb} auth method schedule`);
+            return false
+        }
+    }
 	// expanding card
 	const [expanded, setExpanded] = useState(true);
 	const handleExpandClick = () => setExpanded(!expanded);
 
 	// schedules
 	const [authdeviceId, setAuthDeviceId] = useState("");
-
+	
 	const schedules = authenticationSchedules
 
 	// schedule actions
@@ -84,7 +102,8 @@ export default function AuthenticationSchedules({
 						title="Authentication Schedules"
 						subheader="The list belows shows all authentication schedules currently linked to the authentication device"
 						avatar={
-							<ExpandMore expand={expanded} onClick={handleExpandClick}>
+							<ExpandMore expand={expanded}
+									onClick={handleExpandClick}>
 								<ExpandMoreIcon />
 							</ExpandMore>
 						}
@@ -139,15 +158,22 @@ export default function AuthenticationSchedules({
 									<TableCell>Name</TableCell>
 									<TableCell>Description</TableCell>
 									<TableCell>Authentication Method</TableCell>
+									<TableCell>Active</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
 								{schedules.map((schedule, i) => (
-									<TableRow hover key={i}>
+									<TableRow hover
+											key={i}>
 										<TableCell>{schedule.authMethodScheduleName}</TableCell>
 										<TableCell>{ rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd) }</TableCell>
 										<TableCell>
 											<Chip label= { schedule.authMethod.authMethodDesc } />																
+										</TableCell>
+										<TableCell>
+											<Switch onChange={handleToggleFactory(schedule.authMethodScheduleId)}
+												defaultChecked={schedule.isActive}
+												size="small" ></Switch>
 										</TableCell>
 									</TableRow>
 								))}

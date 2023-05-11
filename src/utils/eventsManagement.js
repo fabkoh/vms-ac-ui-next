@@ -11,12 +11,14 @@
  * users type in the query to filter entrances by (like in entrance list)
 **/
 
-import { MeetingRoom, SelectAll } from "@mui/icons-material";
+import { MeetingRoom, SelectAll, WarningAmber } from "@mui/icons-material";
+import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
-import rruleDescription from "./rrule-desc";
+import { rruleDescriptionWithBr } from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
-import {Grid} from "@mui/material";
+import {Grid, Tooltip, IconButton} from "@mui/material";
+import { bool } from "prop-types";
 
 // for textfield placeholder
 const filterEventsManagementByStringPlaceholder = "Search for Controller, Entrance, Name, Description, Trigger(s) or Action(s)";
@@ -45,7 +47,9 @@ const stringFilterHelper = (eventsManagement, query) => {
 const filterEventsManagementByString = (eventsManagement, queryString) => stringFilterHelper(eventsManagement, queryString.toLowerCase());
 
 const eventsManagementListLink = '/dashboard/events-management';
-const eventsManagementCreateLink = '/dashboard/events-management/modify';
+const eventsManagementCreateLink = '/dashboard/events-management/create';
+const eventsManagementEditLink = (emId) =>  ('/dashboard/events-management/edit?id=' + encodeURIComponent(JSON.stringify(emId)))
+
 
 const getEventManagementLabel = (eventManagement) => isObject(eventManagement) && eventManagement.eventsManagementName;
 
@@ -102,7 +106,7 @@ const eventActionOutputText = outputActions => {
 
 const displayEntranceOrController = eventManagement => {
     return (
-        eventManagement.controller  ?
+        eventManagement.controller ?
             <RenderTableCell
                 exist={eventManagement.controller ? true : false}
                 deleted={false}
@@ -124,20 +128,47 @@ const displayEntranceOrController = eventManagement => {
 }
 
 // takes in outputActions list and return string 
-const eventActionOutputDescription = outputActions => {
+const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig={}) => {
     
     return (outputActions.map(
-        (outputAction,i) =>
+        (outputAction, i) =>
         // check if timer enabled, concatenate to string 
         
-            <div key={i}>
-            {`${outputAction.eventActionOutputType.eventActionOutputName}`}
-            {outputAction.eventActionOutputType.timerEnabled ?
-                (outputAction.timerDuration?
-                ` (${outputAction.timerDuration} secs)`:
-                ``)
-            :"" }
-            </div>      
+        {
+            let hasSMS = false;
+            let hasSMSDisabled = false;
+            let hasEmail = false;
+            let hasEmailDisabled = false;
+            if (outputAction.eventActionOutputType.eventActionOutputName === "NOTIFICATION (SMS)") {
+                hasSMS = true;
+                hasSMSDisabled = !smsConfig.enabled;
+            }
+
+            if (outputAction.eventActionOutputType.eventActionOutputName === "NOTIFICATION (EMAIL)") {
+                hasEmail = true;
+                hasEmailDisabled = !emailConfig.enabled;
+            }
+            return <div key={i}
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                }}>
+                {(hasSMS && hasSMSDisabled) || (hasEmail && hasEmailDisabled) ?
+                    <Tooltip title={(hasSMS && hasSMSDisabled) ? "SMS Notification is disabled": "Email Notification is disabled"}>
+                        <IconButton sx={{ borderRadius: "50%" }}>
+                            <WarningAmber sx={{ color: "#FFB020", width: 20, marginRight: 0.5 }} />
+                        </IconButton>
+                    </Tooltip> : ""}
+                <div style={{alignSelf: "center"}}>
+                    {`${outputAction.eventActionOutputType.eventActionOutputName}`}
+                    {outputAction.eventActionOutputType.timerEnabled ?
+                        (outputAction.timerDuration ?
+                            ` (${outputAction.timerDuration} secs)` :
+                            ``)
+                        : ""}
+                </div>
+        </div>
+        }
 
     ))
 }
@@ -148,18 +179,21 @@ const listDescription = eventManagement =>
     if(i<eventManagement.triggerSchedules.length-1)
         return(
             <div key={i} >
-                {rruleDescription(rrulestr(trigger.rrule), 
+                {rruleDescriptionWithBr(rrulestr(trigger.rrule), 
                 trigger.timeStart, 
                 trigger.timeEnd)}
                 <br /><br />
             </div>)
         else return(
             <div key={i}>
-                {rruleDescription(rrulestr(trigger.rrule), 
+                {rruleDescriptionWithBr(rrulestr(trigger.rrule), 
                 trigger.timeStart, 
                 trigger.timeEnd)}
             </div>
         )}))}
+
+const getEventsManagementDetailsLink = (emId) =>  ('/dashboard/events-management/details/' + emId)
+
 
 export { 
     filterEventsManagementByStringPlaceholder, 
@@ -173,5 +207,7 @@ export {
     eventActionOutputDescription,
     eventActionOutputText,
     eventActionInputText,
-    listDescription
+    listDescription,
+    getEventsManagementDetailsLink,
+    eventsManagementEditLink
  }

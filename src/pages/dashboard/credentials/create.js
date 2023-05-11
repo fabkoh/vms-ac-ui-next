@@ -119,30 +119,8 @@ const AddCredentials = () => {
                 />
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
-                        <Grid container justifyContent="space-between" spacing={3}>
-                            <Grid item sx={{m:2.5}}>
-                                <Typography variant="h4">Select Person(s)</Typography>
-                            </Grid>
-                            <Grid item>
-                                <Box
-                                display="flex"
-                                justifyContent="flex-end"
-                                mb={5}
-                                mt={2}
-                                >
-                                    <NextLink
-                                        href={getPersonIdsEditLink(selectedPersons)}
-                                        passHref
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            disabled={nextDisabled}
-                                        >
-                                            next
-                                        </Button>
-                                    </NextLink>
-                                </Box>
-                            </Grid>
+                        <Grid sx={{ m: 2.5 }}>
+                            <Typography variant="h4">Select Person(s)</Typography>
                         </Grid>
                     </Box>
                     <Card>
@@ -192,6 +170,25 @@ const AddCredentials = () => {
                             count={persons.length}
                         />
                     </Card>
+                    <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        mb={5}
+                        mt={2}
+                    >
+                        <NextLink
+                            href={getPersonIdsEditLink(selectedPersons)}
+                            passHref
+                        >
+                            <Button
+                                variant="contained"
+                                disabled={nextDisabled}
+
+                            >
+                                next
+                            </Button>
+                        </NextLink>
+                    </Box>
                 </Container>
             </Box>
         </>

@@ -1,6 +1,7 @@
 import { createContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { authApi } from '../__fake-api__/auth-api';
+import { authApi, authLogOut } from '../api/auth-api';
+import { authLogin, authGetProfile } from '../api/auth-api';
 
 const initialState = {
   isAuthenticated: false,
@@ -66,19 +67,31 @@ export const AuthProvider = (props) => {
         const accessToken = window.localStorage.getItem('accessToken');
 
         if (accessToken) {
-          const user = await authApi.me(accessToken);
-
+          const res = (await authGetProfile());
+          const user = res["response"];
+          if (res.type === "success"){
           dispatch({
             type: 'INITIALIZE',
             payload: {
+              ...state,
               isAuthenticated: true,
               user
             }
           });
-        } else {
+        }else{
           dispatch({
             type: 'INITIALIZE',
             payload: {
+              isAuthenticated: false,
+              user: null
+            }
+          });
+        }}
+         else {
+          dispatch({
+            type: 'INITIALIZE',
+            payload: {
+              ...state,
               isAuthenticated: false,
               user: null
             }
@@ -95,29 +108,35 @@ export const AuthProvider = (props) => {
         });
       }
     };
-
     initialize();
   }, []);
 
   const login = async (email, password) => {
-    const accessToken = await authApi.login({ email, password });
-    const user = await authApi.me(accessToken);
-
-    localStorage.setItem('accessToken', accessToken);
-
-    dispatch({
-      type: 'LOGIN',
-      payload: {
-        user
-      }
-    });
+    // perform login
+    const res = await authLogin( {email, password });
+    // if successfull
+    if(res.type === "success"){
+      // get user profile
+      const user_res = await authGetProfile();
+      const user = user_res.response;
+      dispatch({
+        type: 'LOGIN',
+        payload:  {
+          ...state,
+          isAuthenticated: true,
+          user
+        }
+      });
+    }
+    return res
   };
 
   const logout = async () => {
-    localStorage.removeItem('accessToken');
+    await authLogOut();
     dispatch({ type: 'LOGOUT' });
   };
 
+  // for creating new acc
   const register = async (email, name, password) => {
     const accessToken = await authApi.register({ email, name, password });
     const user = await authApi.me(accessToken);

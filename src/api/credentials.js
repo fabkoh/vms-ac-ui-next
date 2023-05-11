@@ -92,6 +92,12 @@ const getCredentialWherePersonIdApi = (personId) => {
     }
 }
 
+const findPersonWithCredUid = (credUid) => {
+    if (useApi) {
+        return sendApi('/api/lostcredentials?creduid=' + encodeURIComponent(credUid));
+    }
+}
+
 const enableCredentialWithIdApi = (credId) => {
     if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}/enable`, { method: 'PUT' })
 }
@@ -104,4 +110,4 @@ const deleteCredentialApi = (credId) => {
     if (useApi) return sendApi(`/api/credential/${encodeURIComponent(credId)}`, { method: 'DELETE' })
 }
 
-export { getCredentialsApi, checkCredentialApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi,deleteCredentialApi }
+export { getCredentialsApi, checkCredentialApi, saveCredentialApi, getCredentialWherePersonIdApi, enableCredentialWithIdApi, disableCredentialWithIdApi,deleteCredentialApi, findPersonWithCredUid }

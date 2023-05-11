@@ -18,9 +18,11 @@ import ConfirmStatusUpdate from "../../../components/dashboard/entrances/list/co
 import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
 import { filterEventsManagementByStringPlaceholder, filterEventsManagementByString,eventsManagementCreateLink } from "../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../api/events-management";
+import notificationConfigApi from "../../../api/notifications-config";
 import  EventsManagementTable  from "../../../components/dashboard/events-management/list/events-management-table";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { notificationsApi } from "../../../api/notifications";
 
 const applyFilter = createFilter({
     query: filterEventsManagementByString,
@@ -30,7 +32,34 @@ const EventsManagementList = () => {
     const isMounted = useMounted();
     const [eventsManagement, setEventsManagement] = useState([]);
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [smsConfig, setSMSConfig] = useState({});
+    const [emailConfig, setEmailConfig] = useState({});
 
+    const getSMSEmailConfig = useCallback(async() => {
+        const smsNotificationConfig= await notificationsApi.getSMSSettings();
+        const emailNotificationConfig = await notificationsApi.getEmailSettings();
+        if (smsNotificationConfig.status !== 200) {
+            toast.error("Error loading SMS config");
+            setSMSConfig({});
+            if (smsNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+        }
+        if (emailNotificationConfig.status !== 200) {
+            toast.error("Error loading email config");
+            setEmailConfig({});
+            if (emailNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            return;
+        }
+        const smsConfigJson = await smsNotificationConfig.json();
+        const emailConfigJson = await emailNotificationConfig.json();
+        if (isMounted()){
+            setSMSConfig(smsConfigJson);
+            setEmailConfig(emailConfigJson);
+        }
+    }, [isMounted]);
     const getEventManagements = useCallback(async () => {
         try {
             const eventManagements = await eventsManagementApi.getAllEventsManagement();
@@ -39,6 +68,7 @@ const EventsManagementList = () => {
                 const body = await eventManagements.json();
                 if (isMounted()) {
                     setEventsManagement(body);
+                    console.log(body)
                 }
             }
             else {
@@ -56,6 +86,7 @@ const EventsManagementList = () => {
 
     useEffect(() => {
         getEventManagements();
+        getSMSEmailConfig();
     }, [])
     // copied
     useEffect(() => {
@@ -203,7 +234,7 @@ const EventsManagementList = () => {
                                         passHref>
                                         <MenuItem disableRipple>
                                             <Add />
-                                            &#8288;Modify
+                                            &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <MenuItem 
@@ -225,7 +256,7 @@ const EventsManagementList = () => {
                                 </StyledMenu>
                             </Grid> 
                         </Grid>
-                        <Box
+                        {/* <Box
                             sx={{
                                 m: -1,
                                 mt: 3
@@ -245,7 +276,7 @@ const EventsManagementList = () => {
                                 }}>
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Card>
                         <Divider />
@@ -285,6 +316,8 @@ const EventsManagementList = () => {
                         
                         <EventsManagementTable 
                             eventsManagements={paginatedEventsManagement}
+                            smsConfig={smsConfig}
+                            emailConfig={emailConfig}
                             selectedAllEventsManagement={selectedAllEventsManagement}
                             selectedSomeEventsManagement={selectedSomeEventsManagement}
                             handleSelectAllEventsManagement={handleSelectAllEventsManagement}

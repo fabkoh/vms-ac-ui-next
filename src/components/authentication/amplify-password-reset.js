@@ -62,7 +62,7 @@ export const AmplifyPasswordReset = (props) => {
   useEffect(() => {
     itemsRef.current = itemsRef.current.slice(0, 6);
 
-    const storedUsername = sessionStorage.getItem('username');
+    const storedUsername = localStorage.getItem('username');
 
     if (storedUsername) {
       setUsername(storedUsername);

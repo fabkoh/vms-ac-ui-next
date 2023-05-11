@@ -56,6 +56,8 @@ const VideoRecorderDetails = () => {
     const [sdkHandle, setSDKHandle] = useState(null)
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
+    const [count, setCount] = useState(0);
+
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -157,6 +159,7 @@ const VideoRecorderDetails = () => {
                     const channels = [];
 
                     $.each($(xmlDoc).find("InputProxyChannelStatus"), function (i) {
+                        setCount(prev => prev + 1)
                         channels.push({
                             id:     $(this).find("id").eq(0).text(),
                             name:   $(this).find("name").eq(0).text(),
@@ -180,7 +183,8 @@ const VideoRecorderDetails = () => {
             .then( async res=>{
                 if(res.status==200){
                     const data              = await res.json()
-
+                    // console.log(data);
+                    setVideoRecorderInfo(data);
                     if (!loadedSDK) {
                         const sdk_handle        = await get_sdk_handle();
                         setSDKHandle(sdk_handle);
@@ -188,14 +192,14 @@ const VideoRecorderDetails = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderIpAddress,
+                            ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -203,19 +207,19 @@ const VideoRecorderDetails = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                     
                         data.cameras  = digital_channels;
-        
-                       
+                        data.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(data);
 
-                        setVideoRecorderInfo(data);
+                        setVideoRecorderInfo({...data});
 
                         setLoadedSDK(true);
                     }
@@ -235,6 +239,11 @@ const VideoRecorderDetails = () => {
     const getInfo = useCallback(async() => {
         getVideoRecorder(recorderId)
     }, [isMounted])
+
+    
+    const refresh = (async() => {
+        window.location.reload(true);
+    })
 
     useEffect(() => {
         getInfo();
@@ -298,12 +307,20 @@ const VideoRecorderDetails = () => {
                     <div>
                         <Box sx={{ mb: 4 }}>
                            
+                                <NextLink
+                                    href={"/dashboard/video-recorders"}
+                                    passHref
+                                >
                                 <Link
                                     color="textPrimary"
                                     component="a"
                                     sx={{
                                         alignItems: 'center',
                                         display: 'flex'
+                                    }}
+                                    onClick ={() => {
+                                        window.location.href = 
+                                        `/dashboard/video-recorders`
                                     }}
                                 >
                                     <ArrowBackIcon
@@ -312,6 +329,7 @@ const VideoRecorderDetails = () => {
                                     />
                                     <Typography variant="subtitle2">Video Recorders</Typography>
                                 </Link>
+                                </NextLink>
                         
                         </Box>
                         <Grid
@@ -340,7 +358,7 @@ const VideoRecorderDetails = () => {
                                 <Button 
                                 variant="contained" // add refresh fn here. refetch or refresh entire page?
                                 sx={{m:1}}
-                                onClick={getInfo}
+                                onClick={refresh}
                                 endIcon={(
                                     <Refresh fontSize="small"/>
                                 )}
@@ -362,7 +380,8 @@ const VideoRecorderDetails = () => {
                                     onClose={handleActionClose}
                                 >
                                     <NextLink
-                                        href={getVideoRecorderEditLink(videoRecorderInfo)}
+                                        href={getVideoRecorderEditLink(videoRecorderInfo ?
+                                            videoRecorderInfo.recorderId : null)}
                                         passHref
                                     >
                                         <MenuItem disableRipple>
@@ -398,6 +417,7 @@ const VideoRecorderDetails = () => {
                             >
                                 <VideoRecorderBasicDetails
                                     recorder={videoRecorderInfo}
+                                    count={count}
                                 />
                             </Grid>
 
@@ -406,7 +426,7 @@ const VideoRecorderDetails = () => {
                                 xs={12}
                             >
                                 <VideoRecorderCameras
-                                    recorderid={recorderId?.recorderId}
+                                    recorderId={recorderId}
                                     recorder={videoRecorderInfo}
                                     cameras={videoRecorderInfo?.cameras}
                                 />

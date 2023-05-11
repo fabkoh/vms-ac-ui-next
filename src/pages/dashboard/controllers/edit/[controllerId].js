@@ -32,6 +32,7 @@ const EditController = () => {
     const [controllerValidations, setControllerValidations] = useState({
         invalidIP:false,
         invalidEntrance:false,
+        takenIP:false
     })
     const [E1, setE1] = useState()
     const [E2, setE2] = useState()
@@ -183,7 +184,7 @@ const EditController = () => {
     const changeIPStatic = (e) => {
         if(controllerInfo.controllerIPStatic==true){
         setControllerInfo(prevState=>({...prevState,controllerIP:"",controllerIPStatic:false}))
-        setControllerValidations(prevState=>({...prevState,invalidIP:false}))
+        setControllerValidations(prevState=>({...prevState,invalidIP:false,takenIP:false}))
         }
         if(controllerInfo.controllerIPStatic==false){
             setControllerInfo(prevState=>({...prevState ,controllerIPStatic:true}))
@@ -197,9 +198,9 @@ const EditController = () => {
     const checkIP = (e) => {
         if(controllerInfo.controllerIPStatic){
             const invalid = !/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(e.target.value)
-            setControllerValidations(prevState=>({...prevState,invalidIP:invalid}))
+            setControllerValidations(prevState=>({...prevState,invalidIP:invalid,takenIP:false}))
         }
-        else{setControllerValidations(prevState=>({...prevState,invalidIP:false}))}
+        else{setControllerValidations(prevState=>({...prevState,invalidIP:false,takenIP:false}))}
     }
 
     const e1Handler = (e) => {
@@ -264,35 +265,37 @@ const EditController = () => {
             toast.dismiss()
             if(res.status!=200){
                 toast.error("Error updating controller")
-            setSubmitted(false)
+                setSubmitted(false)
+                setControllerValidations(prevState=>({...prevState,takenIP:true}))
             }
             else{
-                toast.success("Controller info updated")
+                
+                Promise.resolve(authDeviceApi.removeEntrance(E1))
+                .then(
+                    (res) => Promise.resolve(authDeviceApi.removeEntrance(E2))
+                )
+                .then( (res) =>
+                Promise.resolve(authDeviceApi.assignEntrance(E1))
+                .then(res=>{
+                    if(res.status==200){
+                        toast.success("Entrance E1 updated")
+                    }
+                    else(toast.error("Failed to update entrance E1"))
+                }))
+                .then( () =>
+                Promise.resolve(authDeviceApi.assignEntrance(E2))
+                .then(res=>{
+                    if(res.status==200){
+                        toast.success("Entrance E2 updated")
+                        router.replace(getControllerListLink())
+                    }
+                    else(toast.error("Failed to update entrance E2"))
+                })).then(() => {
+                    toast.success("Controller info updated")
+                })
             }
         })
-        .then(
-            () => Promise.resolve(authDeviceApi.removeEntrance(E1))
-        )
-        .then(
-            () => Promise.resolve(authDeviceApi.removeEntrance(E2))
-        )
-        .then( () =>
-        Promise.resolve(authDeviceApi.assignEntrance(E1))
-        .then(res=>{
-            if(res.status==200){
-                toast.success("Entrance E1 updated")
-            }
-            else(toast.error("Failed to update entrance E1"))
-        }))
-        .then( () =>
-        Promise.resolve(authDeviceApi.assignEntrance(E2))
-        .then(res=>{
-            if(res.status==200){
-                toast.success("Entrance E2 updated")
-                router.replace(getControllerListLink())
-            }
-            else(toast.error("Failed to update entrance E2"))
-        }))
+        
     }
     return(
         <>
@@ -378,7 +381,8 @@ marginRight={3}>
                                         disabled={
                                             submitted||
                                             controllerValidations.invalidIP||
-                                            controllerValidations.invalidEntrance
+                                            controllerValidations.invalidEntrance||
+                                            controllerValidations.takenIP
                                         }
                                         // disabled={
                                         //     submitted                      ||
@@ -396,7 +400,7 @@ marginRight={3}>
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href={getControllerDetailsLink(controllerId)} 
+                                        href={getControllerDetailsLink(controllerInfo)} 
                                         passHref
                                     >
                                         <Button

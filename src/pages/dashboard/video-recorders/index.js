@@ -17,7 +17,7 @@ import { Search } from "../../../icons/search";
 import VideoListTable from "../../../components/dashboard/video-recorders/video-list-table";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { Confirmdelete } from "../../../components/dashboard/video-recorders/confirm-delete";
-import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecorderIdsEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
+import { filterVideoByStringPlaceholder, videoRecorderCreateLink, filterRecorderByString, getVideoRecordersEditLink, filterRecorderByStatus } from "../../../utils/video-recorder";
 import Script from 'next/script'
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
@@ -40,7 +40,133 @@ const RecorderList = () => {
 
     const isMounted = useMounted();
 
-    const getRecordersLocal = useCallback(async () => {
+    const [loadedSDK, setLoadedSDK] = useState(false)
+    const [authStatus, setAuthStatus] = useState({})
+    const [sdkHandle, setSDKHandle] = useState(null)
+
+
+    // sdk 
+    const get_sdk_handle = async function() {
+        while (true) {
+            if (window.WebVideoCtrl && window.jQuery) {
+                return window.WebVideoCtrl
+            }
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+    }
+
+    const attach_sdk     = async function(handle) {
+        return await new Promise((resolve, reject) => {
+            handle.I_InitPlugin(500, 300, {
+                bWndFull:       true,
+                iPackageType:   2,
+                iWndowType:     1,
+                bNoPlugin:      true,
+                cbSelWnd:           function (xmlDoc) { },
+                cbDoubleClickWnd:   function (iWndIndex, bFullScreen) { },
+                cbEvent:            function (iEventType, iParam1, iParam2) { },
+                cbRemoteConfig:     function () { },
+                cbInitPluginComplete: function () {
+                    try {
+                        resolve();
+                    } catch (ex) {
+                        console.warn("Failed to inject plugin")
+                        reject();
+                    }
+                }
+            });
+        });
+    }
+
+    const login_sdk = async function(handle, {ip, port, username, password}) {
+        return await new Promise((resolve, reject) => {
+            handle.I_Login(ip, 1, port, username, password, {
+                success: function (xmlDoc) {
+                    resolve();
+                }, error: function (status, xmlDoc) {
+                    reject();
+                    alert("login failed");
+                }
+            });
+        });
+    }
+
+    const get_device_info = async function(handle, {ip}) {
+        return await new Promise((resolve, reject) => {
+            try{
+            handle.I_GetDeviceInfo(ip, {
+                success: function (xmlDoc) {
+                    const xml_handle = $(xmlDoc);
+
+                    resolve({
+                        device_name:        xml_handle.find("deviceName").eq(0).text(),
+                        device_id:          xml_handle.find("deviceID").eq(0).text(),
+                        model:              xml_handle.find("model").eq(0).text(),
+                        serial_number:      xml_handle.find("serialNumber").eq(0).text(),
+                        mac_addreess:       xml_handle.find("macAddress").eq(0).text(),
+                        firmware_version:   `${xml_handle.find("firmwareVersion").eq(0).text()}  ${xml_handle.find("firmwareReleasedDate").eq(0).text()}`,
+                        encoder_version:    `${xml_handle.find("encoderVersion").eq(0).text()}  ${xml_handle.find("encoderReleasedDate").eq(0).text()}`,
+                    });
+                },
+                error: function (status, xmlDoc) {
+                    reject();
+                }
+            })
+        } catch(ex) {}
+        })
+    }
+
+    const get_analogue_channels = async function(handle, {ip}) {
+        return await new Promise((resolve, reject) => {
+            handle.I_GetAnalogChannelInfo(ip, {
+                async: false,
+                success: function (xmlDoc) {
+                    const channels = [];
+
+                    $.each($(xmlDoc).find("VideoInputChannel"), function (i) {
+                        channels.push({
+                            id:     $(this).find("id").eq(0).text(),
+                            name:   $(this).find("name").eq(0).text()
+                        });
+                    });
+
+                    resolve(channels);
+                },
+                error: function (status, xmlDoc) {
+                    reject();
+                }
+            });
+        });
+    }
+
+    const get_digital_channels = async function(handle, {ip}) {
+        return await new Promise((resolve, reject) => {
+            handle.I_GetDigitalChannelInfo(ip, {
+                async: false,
+                success: function (xmlDoc) {
+                    const channels = [];
+
+                    $.each($(xmlDoc).find("InputProxyChannelStatus"), function (i) {
+                        //setCount(prev => prev + 1)
+                        channels.push({
+                            id:     $(this).find("id").eq(0).text(),
+                            name:   $(this).find("name").eq(0).text(),
+                            online: ($(this).find("online").eq(0).text().toLowerCase() === 'true'),
+                            ip:     $(this).find("ipAddress").eq(0).text()
+                        });
+                    });
+
+                    resolve(channels);
+                },
+                error: function (status, xmlDoc) {
+                    reject();
+                }
+            });
+        });
+    }
+
+
+    const getRecordersLocal = async () => {
         const res = await videoRecorderApi.getRecorders();
         if (res.status != 200) {
             toast.error("Recorders info failed to load");
@@ -50,12 +176,69 @@ const RecorderList = () => {
             return [];
         }
         const data = await res.json();
+        setRecorders(data);
         if (isMounted()) {
-            //TODO: ping isActive to get the actual status
-            setRecorders(data.map((recorder) => { return { ...recorder, isActive: false } }));
-        }
+            // try{
+                if (!loadedSDK){
+                    await Promise.resolve(data.forEach(async(recorder) => { 
+                        const sdk_handle        = await get_sdk_handle();
+                        setSDKHandle(sdk_handle);
+
+                        await attach_sdk(sdk_handle);
+
+                        const login             = await login_sdk(sdk_handle, {
+                            ip:         recorder.recorderPublicIp,
+                            port:       recorder.recorderPortNumber,
+                            username:   recorder.recorderUsername,
+                            password:   recorder.recorderPassword
+                        });
+
+                        const device_info       = await get_device_info(sdk_handle, {
+                            ip: recorder.recorderPublicIp
+                        })
+
+                        for (const key of Object.keys(device_info)) {
+                            recorder[key] = device_info[key]
+                        }
+
+                        const analogue_channels = await get_analogue_channels(sdk_handle, {
+                            ip: recorder.recorderPublicIp
+                        })
+
+                        const digital_channels  = await get_digital_channels(sdk_handle, {
+                            ip: recorder.recorderPublicIp
+                        })
+
+                        // recorder = {...recorder,
+                        //             "cameras":digital_channels,
+                        //             "isActive":true}
+                        recorder.cameras  = digital_channels;
+                        recorder.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(recorder);
+
+                        recorder.isActive = true;
+                        setRecorders([...data]);
+                        
+                    //return { ...recorder } 
+                }))
+
+                    
+                // console.log(222,data);
+                // const newData = [...data]; 
+                // newData.forEach(recorder => console.log(444,recorder.device_id
+                //     ));
+                // setRecorders([...newData]);
+                setLoadedSDK(true);
+                }
+            }
+        
+        // } catch(err){ }
         return data;
-    }, [isMounted]);
+    }
+
+    const refresh = (async() => {
+        window.location.reload(true);
+    })
 
     // for selection of checkboxes
     const [selectedRecorders, setSelectedRecorders] = useState([]);
@@ -147,17 +330,17 @@ const RecorderList = () => {
 	};
 
     // Reset selectedRecorders when recorders change
-	useEffect(
-		() => {
-			if (selectedRecorders.length) {
-				setSelectedRecorders([]);
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[recorders]
-    );
+	// useEffect(
+	// 	() => {
+	// 		if (selectedRecorders.length) {
+	// 			setSelectedRecorders([]);
+	// 		}
+	// 	},
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// 	[recorders]
+    // );
     
-    useEffect(() => getRecordersLocal(), [getRecordersLocal]);
+    useEffect(() => getRecordersLocal(), [isMounted]);
 
     return(
         <>
@@ -205,7 +388,7 @@ const RecorderList = () => {
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
-                                    <NextLink href={getVideoRecorderIdsEditLink(selectedRecorders)}
+                                    <NextLink href={getVideoRecordersEditLink(selectedRecorders)}
                                         passHref>    
                                         <MenuItem disableRipple
                                             disabled={actionDisabled}>
@@ -290,6 +473,7 @@ const RecorderList = () => {
                             </Box>
                         </Box>
                         <VideoListTable 
+                            key={recorders.toString()}
                             videoRecorders={paginatedRecorders}
                             selectedAllVideoRecorders={selectedAllRecorders}
                             selectedSomeVideoRecorders={selectedSomeRecorders}
@@ -302,6 +486,7 @@ const RecorderList = () => {
                             page={page}
                             rowsPerPage={rowsPerPage}
                             handleStatusSelect={handleStatusSelect}
+                            getRecordersLocal={getRecordersLocal}
                         />
                     </Card>
                 </Container>    
@@ -313,11 +498,11 @@ const RecorderList = () => {
 RecorderList.getLayout = (page) => (
     <AuthGuard>
         <Head>
-            <script src="/static/sdk/codebase/encryption/AES.js"></script>
-                <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
-                <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-                <script id="videonode"
-src="/static/sdk/codebase/webVideoCtrl.js"></script>
+             <script src="/static/sdk/codebase/jquery-1.12.1.min.js"></script>
+             <script src="/static/sdk/codebase/encryption/AES.js"></script>
+             <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
+             <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
+             <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
         </Head>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>

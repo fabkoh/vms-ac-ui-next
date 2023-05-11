@@ -6,7 +6,7 @@ import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCardNoCollapse from "../../shared/basic-no-collapse";
 
-export const VideoRecorderBasicDetails = ({recorder}) => {
+export const VideoRecorderBasicDetails = ({count,recorder}) => {
     const mdUp  = useMediaQuery ((theme) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
     
@@ -22,14 +22,29 @@ export const VideoRecorderBasicDetails = ({recorder}) => {
                 <PropertyListItem
                     align={align}
                     divider
-                    label="IP Address"
-                    value={(recorder) ? recorder.recorderIpAddress : <CircularProgress size='1rem'/>}
+                    label="Public IP Address"
+                    value={(recorder) ? recorder.recorderPublicIp : <CircularProgress size='1rem'/>}
+                />
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="Private IP Address"
+                    value={(recorder) ? recorder.recorderPrivateIp : <CircularProgress size='1rem'/>}
+                />
+                <PropertyListItem
+                    align={align}
+                    divider
+                    label="uPnP enabled"
+                    value={(recorder) ? recorder.autoPortForwarding
+                            ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill>
+                            : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill> 
+                        : <CircularProgress size='1rem'/>}
                 />
                 <PropertyListItem
                     align={align}
                     divider
                     label="Model"
-                    value={(recorder) ? recorder.model : <CircularProgress size='1rem'/>}
+                    value={(recorder && "model" in recorder) ? recorder.model : <CircularProgress size='1rem'/>}
                 />
                 <PropertyListItem
                     align={align}
@@ -42,24 +57,32 @@ export const VideoRecorderBasicDetails = ({recorder}) => {
                     align={align}
                     divider
                     label="Channels"
-                    value={(recorder) ? recorder.recorderChannels.length : <CircularProgress size='1rem'/>}
+                    value={(recorder && "cameras" in recorder) ? count : <CircularProgress size='1rem'/>}
                 />
                 
                 <PropertyListItem
                     align={align}
                     divider
-                    label="Camera Status"
-                    value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
+                    label="Recorder Status"
+                    value={(recorder && "cameras" in recorder) 
+                        ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> 
+                        : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>}
                 >
                 </PropertyListItem>
-
                 <PropertyListItem
+                    align={align}
+                    divider
+                    label="Created"
+                    value={(recorder) ? toDisplayDateString(recorder.created) : <CircularProgress size='1rem'/>}
+                />
+
+                {/* <PropertyListItem
                     align={align}
                     divider
                     label="Alarm Status"
                     value={(recorder) ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> : <CircularProgress size='1rem'/>}
                 >
-                </PropertyListItem>
+                </PropertyListItem> */}
             </PropertyList>
         </BasicDetailsCardNoCollapse>
     )

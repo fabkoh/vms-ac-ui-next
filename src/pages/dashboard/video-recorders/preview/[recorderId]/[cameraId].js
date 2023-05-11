@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";
 import accessGroupEntranceApi from "../../../../../api/access-group-entrance-n-to-n";
@@ -29,7 +29,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../../components/authentication/auth-guard";
-import { DashboardLayout } from "../../../../../components/dashboard/dashboard-layout";
+import { DashboardLayout, TheaterModeContext } from "../../../../../components/dashboard/dashboard-layout";
 import { EntranceBasicDetails } from "../../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../../components/dashboard/video-recorders/confirm-delete';
@@ -66,6 +66,7 @@ const VideoCameraDetails = () => {
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
+    const { theaterMode, setTheaterMode} = useContext(TheaterModeContext)
 
     useEffect(() => {
         gtm.push({ event: 'page_view' });
@@ -100,12 +101,11 @@ const VideoCameraDetails = () => {
         return await new Promise((resolve, reject) => {
             const {clientHeight: height, clientWidth: width} = document.getElementById('divPlugin');
 
-            handle.I_InitPlugin(width, height, {
+            handle.I_InitPlugin(  width, height , {
                 bWndFull:       true,
                 iPackageType:   2,
                 iWndowType:     1,
                 bNoPlugin:      true,
-                oStyle: {border: 0},
 
                 cbSelWnd:           function (xmlDoc) { },
                 cbDoubleClickWnd:   function (iWndIndex, bFullScreen) { },
@@ -297,13 +297,14 @@ const VideoCameraDetails = () => {
       });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel}) {
+    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
         return await new Promise((resolve, reject) => {
           handle.I_StartRealPlay(ip, {
             iRtspPort:      rtsp_port,
             iStreamType:    stream_type,
             iChannelID:     channel_id,
-            bZeroChannel:   zero_channel
+            bZeroChannel:   zero_channel,
+            iWSPort: port
           });
 
           resolve();
@@ -565,6 +566,7 @@ const VideoCameraDetails = () => {
           iChannelID:   1,
           szStartTime:  szStartTime,
           szEndTime:    szEndTime,
+          port: 7681,
           success: function () {
             resolve();
           }, error: function (status, xmlDoc) {
@@ -661,14 +663,14 @@ const VideoCameraDetails = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderIpAddress,
+                            ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -676,24 +678,28 @@ const VideoCameraDetails = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
+                        console.log(digital_channels,333);
+                        data.recorderCameras = [...digital_channels];
+
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderIpAddress
+                            ip: data.recorderPublicIp
                         })
 
                         data.rtsp_port = device_ports.iRtspPort;
 
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderIpAddress, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id:  1, zero_channel: false
+                            ip: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
+                            stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
-
+                        data.recorderSerialNumber = device_info["serial_number"];
+                        videoRecorderApi.updateRecorder(data);
                         setVideoRecorderInfo(data);
 
                         setLoadedSDK(true);
@@ -711,6 +717,15 @@ const VideoCameraDetails = () => {
     const getInfo = useCallback(async() => {
         getVideoRecorder(recorderId)
     }, [isMounted])
+
+    // if full screen closed using ESC key
+    addEventListener("fullscreenchange", async () => {      
+      if( sdkHandle && theaterMode && !document.fullscreenElement) {
+        const {clientHeight: height, clientWidth: width} = document.getElementById('stream-container');
+        await sdkHandle.I_Resize(`${width}`, `${window.innerHeight - 20}`)
+        setTheaterMode(false);
+      }
+    })
 
     useEffect(() => {
         getInfo();
@@ -743,12 +758,20 @@ const VideoCameraDetails = () => {
             open={serverDownOpen}
             handleDialogClose={() => { setServerDownOpen(false) }}
           />
-          <Container maxWidth="lg">
+          <Container style={ theaterMode ? { maxWidth: "100%" } : {}}>
             <div>
-              <Box sx={{ mb: 4 }}>         
+              <Box sx={{ mb: 4 }}>   
+              {/* <NextLink
+                  href={`/dashboard/video-recorders/details/${recorderId}`}
+                  passHref
+              >       */}
                 <Link
                   color="textPrimary"
                   component="a"
+                  onClick ={() => {
+                    window.location.href = 
+                    `/dashboard/video-recorders/details/${recorderId}`
+                }}
                   sx={{
                     alignItems: 'center',
                     display: 'flex'
@@ -757,8 +780,9 @@ const VideoCameraDetails = () => {
                     fontSize="small"
                     sx={{ mr: 1 }}
                   />
-                  <Typography variant="subtitle2">Video Recorders</Typography>
+                  <Typography variant="subtitle2">Video Recorder Details</Typography>
                 </Link>
+                {/* </NextLink> */}
                         
               </Box>
               <Grid container
@@ -772,7 +796,9 @@ const VideoCameraDetails = () => {
                   }}>
                   <div>
                     <Typography variant="h4">
-                      { videoRecorderInfo? `Live View/Playback: ${videoRecorderInfo.recorderCameras[parseInt(cameraId)  - 1]}`: " Camera Not Found" }    
+                      { videoRecorderInfo? `Live View/Playback: 
+                      ${videoRecorderInfo.recorderCameras
+                      [parseInt(cameraId)  - 1].name}`: " Camera Not Found" }    
                     </Typography>    
                   </div>    
                 </Grid>
@@ -782,12 +808,40 @@ const VideoCameraDetails = () => {
             <Grid container
               spacing={3}>
               <Grid item
-                xs={12}>
-                <div
-                  key = "plugin_div"
-                  style = {{justifyContent: 'center', display: 'flex'}}
-                  dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
-                />
+                id="stream-container"
+                xs={12} 
+                sx={{ position: "relative" }}>
+                    <div
+                      key = "plugin_div"
+                      style = {{justifyContent: 'center', display: 'flex'}}
+                      dangerouslySetInnerHTML = {{ __html: '<div id="divPlugin" style = "height: auto;width: 100%;background-color: black;aspect-ratio: 1.6; border-radius: 4px;overflow: hidden;"></div>'}}
+                    />
+                  
+                  <button type="button" 
+                    style={{ 
+                      position: "absolute", 
+                      bottom: "10px", 
+                      right: "10px", 
+                      background: "transparent", 
+                      border: "none" 
+                    }}
+                    onClick={ async () => { 
+                      await sdkHandle.I_Resize(`${window.outerWidth}`, `${window.outerHeight}`);
+                      var elem = document.getElementById("divPlugin");
+                      if (elem.requestFullscreen) {
+                        await elem.requestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.webkitRequestFullscreen) { /* Safari */
+                        await elem.webkitRequestFullscreen().catch((err) => console.log(err));
+                      } else if (elem.msRequestFullscreen) { /* IE11 */
+                        await elem.msRequestFullscreen().catch((err) => console.log(err));
+                      }                    
+                      setTheaterMode(!theaterMode);
+
+                    }}>
+                    <img alt="theater mode" 
+                      style={{ filter: "invert(1)" }} 
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAjklEQVR4nO2WwQmAMAxFu1jq1Q2SUZL1FBTX0EEqxYuokFB7EJsHvf38DyWQH4LTHB1xDyhbJEnnByijNps117lIvGZPNTgL78OSgHgoCz7Cgx58iEMlzH7Rg19i/kFAGS2LZKW2n+M4HyYiL4AyVfUjnnWhH4kG7jE/V5/izmWsPh1x/xRe3rmMZc/5HTtHhL2kVsbKbgAAAABJRU5ErkJggg==" />
+                  </button>
               </Grid>
 
               <Grid item
@@ -807,7 +861,7 @@ const VideoCameraDetails = () => {
                         onClick = {async ()=> {
                           setPreviewMode('live');
                           await preview_recorder(sdk_handle, {
-                            ip: videoRecorderInfo.recorderIpAddress, rtsp_port: videoRecorderInfo.rstp_port,
+                            ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                             stream_type: 1, channel_id:  1, zero_channel: false
                           });
                         }}>
@@ -821,7 +875,7 @@ const VideoCameraDetails = () => {
                           } else {
                             setPreviewMode('live')
                             await preview_recorder(sdk_handle, {
-                              ip: videoRecorderInfo.recorderIpAddress, rtsp_port: videoRecorderInfo.rstp_port,
+                              ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                               stream_type: 1, channel_id:  1, zero_channel: false
                             });
                           }
@@ -1266,7 +1320,7 @@ value = {value}>{value}</MenuItem>))
                               onClick={async () => {
                                 const results = await search_video(sdkHandle, {
                                   type: 1,
-                                  ip: videoRecorderInfo.recorderIpAddress,
+                                  ip: videoRecorderInfo.recorderPublicIp,
                                   port: videoRecorderInfo.recorderPortNumber,
                                   stream_type, start_time, end_time
                                 });
@@ -1315,7 +1369,7 @@ value = {value}>{value}</MenuItem>))
                                     } = playback_files[0];
 
                                     await download_video(sdkHandle, {
-                                        ip: videoRecorderInfo.recorderIpAddress,
+                                        ip: videoRecorderInfo.recorderPublicIp,
                                         file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                       })
                                   }
@@ -1348,7 +1402,7 @@ value = {value}>{value}</MenuItem>))
                                   <td>
                                     <div onClick = {async () => {
                                       await download_video(sdkHandle, {
-                                        ip: videoRecorderInfo.recorderIpAddress,
+                                        ip: videoRecorderInfo.recorderPublicIp,
                                         file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                       })
                                     }}>
@@ -1374,7 +1428,7 @@ value = {value}>{value}</MenuItem>))
                                 variant="contained"
                                 onClick={async () => {
                                   await play(sdkHandle, {
-                                    ip: videoRecorderInfo.recorderIpAddress,
+                                    ip: videoRecorderInfo.recorderPublicIp,
                                     rtsp_port: videoRecorderInfo.rstp_port,
                                     type: 1,
                                     stream_type, start_time, end_time

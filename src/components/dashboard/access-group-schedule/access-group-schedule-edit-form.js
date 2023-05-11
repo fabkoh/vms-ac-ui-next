@@ -21,7 +21,7 @@ import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
-const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditAccGrpSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         accessGroupScheduleId,
         accessGroupScheduleName,
@@ -33,6 +33,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
     const {
         accessGroupScheduleNameBlank,
         timeEndInvalid,
+        beginInvalid,
         untilInvalid,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
@@ -83,11 +84,17 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
         descriptionHandler(rule)
     }, [rrulestring,start,end])
     
-    //blocker for invalid until date
+    //blocker for invalid begin and until date
     const [untilHolder, setUntilHolder] = useState(false)
+
     const handleInvalidUntil = (bool) => {
         setUntilHolder(bool)
     }
+
+    const handleInvalidBegin = (bool) => {
+        checkBegin(bool)
+    }
+
     useEffect(() => {
         checkUntil(untilHolder)
     }, [untilHolder])
@@ -114,12 +121,13 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                 action={
                     // action are children flushed to the right
                     (
-                        <Grid item container>
-                            { edit && (
+                        <Grid item
+container>
+                            {/* { edit && (
                                 <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
@@ -128,7 +136,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                             >
                                 Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -138,7 +146,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }
@@ -198,6 +206,7 @@ const EditAccGrpSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRru
                                     getEnd={getEnd}
                                     timeEndInvalid={timeEndInvalid}
                                     handleInvalidUntil={handleInvalidUntil}
+                                    handleInvalidBegin={handleInvalidBegin}
                                 />
                             </Grid>         
                             <Divider />

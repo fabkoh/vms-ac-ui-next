@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { useState } from "react";
 
 export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, handleDialogClose, handleStatusUpdate}) {
-    const action = updateStatus ? "activate" : "unlock";
+    const action = updateStatus ? "Activate" : "De-Activate";
     const helperText = `Type in ${action.toUpperCase()} to proceed`;
 
     // for text field
@@ -32,17 +32,16 @@ export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, ha
         >
             <DialogTitle>
                 {" "}
-                <InfoOutlined sx={{ color: "#1976D2", m: -0.5, width: 50 }}/>
-                {" "}
-                &#8288;
+                <InfoOutlined sx={{ color: "#1976D2", m: -0.6, width: 30, marginRight: 1 }}/>
                 {"Confirm " + action + "?"}
             </DialogTitle>
             <form onSubmit={handleAction}>
                 <DialogContent>
                     <DialogContentText>
-                        { "Are you sure you want to " + action + " entrance(s)?\n" }
+                        { "Are you sure you want to " + action.toLowerCase() + ` ${requireTextField ? "these" :"this"} entrance${requireTextField ? "s" :""}?\n` }
                         { requireTextField && 
                             <TextField 
+                                sx={{marginTop: 2}}
                                 variant="filled"
                                 fullWidth
                                 onChange={handleTextChange}
@@ -53,18 +52,18 @@ export default function ConfirmStatusUpdate({entranceIds, updateStatus, open, ha
                         }  
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{ marginBottom: 2}}>
                     <Button
                         type="submit"
                         disabled={requireTextField && buttonDisabled}
                         variant="contained"
-                        sx={{ borderRadius: 8 }}
+                        sx={{ borderRadius: 8, marginRight: 1.7}}
                     >
                         { action[0].toUpperCase() + action.substring(1) }
                     </Button>
                     <Button
                         variant="outlined"
-                        sx={{ borderRadius: 8, color: "main.primary" }}
+                        sx={{ borderRadius: 8, color: "main.primary", marginRight: 1.7 }}
                         onClick={handleClose}
                     >
                         Cancel    

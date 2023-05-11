@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { DashboardNavbar } from './dashboard-navbar';
@@ -15,26 +15,38 @@ const DashboardLayoutRoot = styled('div')(({ theme }) => ({
   }
 }));
 
+export const TheaterModeContext = createContext(false);
+
 export const DashboardLayout = (props) => {
   const { children } = props;
+  const [theaterMode, setTheaterMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <>
-      <DashboardLayoutRoot>
-        <Box
-          sx={{
-            display: 'flex',
-            flex: '1 1 auto',
-            flexDirection: 'column',
-            width: '100%'
-          }}
-        >
-          {children}
-        </Box>
+      <DashboardLayoutRoot style={ theaterMode ? { paddingLeft: 0 } : {}}>
+        <TheaterModeContext.Provider value={{ theaterMode, setTheaterMode}}>
+          <Box
+            sx={{
+              display: 'flex',
+              flex: '1 1 auto',
+              flexDirection: 'column',
+              width: '100%'
+            }}
+          >
+            {children}
+          </Box>
+        </TheaterModeContext.Provider>
       </DashboardLayoutRoot>
-      <DashboardNavbar onOpenSidebar={() => setIsSidebarOpen(true)} />
+      <DashboardNavbar 
+        theaterMode={theaterMode} 
+        onOpenSidebar={() => {
+          if(theaterMode) { 
+            setTheaterMode(false); 
+          } else setIsSidebarOpen(true)}} 
+      />
       <DashboardSidebar
+        theaterMode={theaterMode}
         onClose={() => setIsSidebarOpen(false)}
         open={isSidebarOpen}
       />

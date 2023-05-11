@@ -14,7 +14,7 @@ import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import Alert from "@mui/material/Alert";
 
 export const Confirmdelete = (props) => {
-	const { open, handleDialogClose, deleteControllers } = props;
+	const { open, message, handleDialogClose,  deleteFunc } = props;
 
 	//text field
 	const [value, setValue] = useState("");
@@ -28,8 +28,8 @@ export const Confirmdelete = (props) => {
 	}
 
 	// delete action
-	const handleDeleteControllers = (e) => {
-		deleteControllers(e);
+	const handleDelete = (e) => {
+		deleteFunc(e);
 		handleClose();
 	}
 
@@ -49,14 +49,10 @@ export const Confirmdelete = (props) => {
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Are you sure you want to delete controller(s)? This action cannot
-						be undone.
-					</DialogContentText>
-					<DialogContentText>
-						Authentication devices of selected controller(s) will be deleted.
+						{message}
 					</DialogContentText>
 
-					<form onSubmit={handleDeleteControllers}>
+					<form onSubmit={handleDelete}>
 						<TextField
 							variant="filled"
 							fullWidth
@@ -72,7 +68,7 @@ export const Confirmdelete = (props) => {
 								variant="contained"
 								sx={{ borderRadius: 8, marginRight: 1}}
 								onClick={() => {
-									deleteControllers();
+									deleteFunc();
 									props.setActionAnchor(null);
 								}}
 							>

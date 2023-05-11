@@ -58,6 +58,14 @@ class AuthMethodScheduleApi {
     deleteAuthDeviceSchedule(authMethodScheduleId) {
         if (useApi) { return sendApi(`/api/authentication-schedule/${authMethodScheduleId}`, { method: 'DELETE' }); }
     }
+
+    activateAuthDeviceSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/authentication-schedule/enable/${scheduleId}`, {method: 'PUT'}); }
+    }
+
+    deactivateAuthDeviceSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/authentication-schedule/disable/${scheduleId}`, {method: 'PUT'}); }
+    }
 }
 
 export const authMethodScheduleApi = new AuthMethodScheduleApi();

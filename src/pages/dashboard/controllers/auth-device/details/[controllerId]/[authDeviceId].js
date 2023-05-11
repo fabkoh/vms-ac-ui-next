@@ -221,7 +221,7 @@ const AuthDeviceDetails = () => {
 	}
 	const deleteAuthDevice = async() => {
         toast.loading("Removing Authentication Device...");
-        authDeviceApi.deleteAuthdevice(authDeviceId)
+        Promise.resolve(authDeviceApi.deleteAuthdevice(authDeviceId))
         .then(res => {
             toast.dismiss();
             if(res.status != 200) {

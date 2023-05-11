@@ -1,33 +1,39 @@
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
-import { useMounted } from "../../../hooks/use-mounted";
+import { useMounted } from "../../../../hooks/use-mounted";
 import Head from "next/head";
 import { Link, Box, Container, Typography, Stack, Button, Grid, TextField, Alert, Tooltip } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
-import { AuthGuard } from '../../../components/authentication/auth-guard';
-import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
+import { AuthGuard } from '../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
 import Add from "@mui/icons-material/Add";
-import { accessGroupApi } from "../../../api/access-groups";
+import { accessGroupApi } from "../../../../api/access-groups";
 import toast from "react-hot-toast";
 import router, { useRouter } from "next/router";
-import formUtils from "../../../utils/form-utils";
-import EditEventManagementForm from "../../../components/dashboard/events-management/edit/events-management-edit-form";
-import MultipleSelectInput from "../../../components/dashboard/shared/multi-select-input"
+import formUtils from "../../../../utils/form-utils";
+import EditEventManagementForm from "../../../../components/dashboard/events-management/edit/events-management-edit-form";
+import MultipleSelectInput from "../../../../components/dashboard/shared/multi-select-input"
 import { Info } from "@mui/icons-material";
-import { controllerApi } from "../../../api/controllers";
-import entranceApi from "../../../api/entrance";
-import { eventsManagementApi } from "../../../api/events-management";
-import EventsManagementAddOnError from "../../../components/dashboard/events-management/events-management-add-on-error";
-import { Confirmdelete } from "../../../components/dashboard/events-management/confirm-delete";
+import { controllerApi } from "../../../../api/controllers";
+import entranceApi from "../../../../api/entrance";
+import { eventsManagementApi } from "../../../../api/events-management";
+import EventsManagementAddOnError from "../../../../components/dashboard/events-management/events-management-add-on-error";
+import { Confirmdelete } from "../../../../components/dashboard/events-management/confirm-delete";
 import { input } from "aws-amplify";
-import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
-import { serverDownCode } from "../../../api/api-helpers";
+import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { serverDownCode } from "../../../../api/api-helpers";
+import { validatePhoneNumber, validateEmail } from "../../../../utils/utils";
+import { ConfirmNotificationDisabledSubmit } from "../../../../components/dashboard/events-management/confirm-notification-disabled-submit";
+import notificationConfigApi from "../../../../api/notifications-config";
 
-const ModifyEventManagement = () => {
+const EditEventManagement = () => {
+
     const router = useRouter();
     const isMounted = useMounted();
-    const temp = router.query;
-    const accessGroupId = temp.accessGroupId;
+    const emId = JSON.parse(decodeURIComponent(router.query.id));
+    const [eventManagement, setEventManagement] = useState({}); 
+    const [isLoaded, setLoaded] = useState(false)
+
 
     const [allEntrances, setAllEntrances] = useState([]);
     const [allControllers, setAllControllers] = useState([]);
@@ -36,13 +42,21 @@ const ModifyEventManagement = () => {
     const [controllers, setControllers] = useState([]);
     const [inputEvents, setInputEvents] = useState([]);
     const [outputEvents, setOutputEvents] = useState([]);
+    const [smsConfig, setSMSConfig] = useState({});
+    const [emailConfig, setEmailConfig] = useState({});
     const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState({});
     const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState({});
     const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
     const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
 
+    // dictionary, key is event management ID, value is the email {recipient (an array), content}
+    const [notificationEmails, setNotificationEmails] = useState({});
+    // dictionary, key is event management ID, value is the SMS {recipient (an array), content}
+    const [notificationSMSs, setNotificationSMSs] = useState({});
+
     const [open, setOpen] = useState(false);
     const [serverDownOpen, setServerDownOpen] = useState(false);
+    const [notificationDisabledOpen, setNotificationDisabledOpen] = useState(false);
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [singleErrorMessage, setSingleErrorMessage] = useState([]);
@@ -61,6 +75,11 @@ const ModifyEventManagement = () => {
             setSelectedEventsManagement([ ...selectedEventsManagement, eventsManagementId ]);
         }
     }
+
+
+
+
+    const [action, setAction] = useState("");
     const handleClose = () => {
         setOpen(false);
         setErrorMessages([]);
@@ -74,14 +93,14 @@ const ModifyEventManagement = () => {
     }
 
     //for delete action button
-	const [deleteOpen, setDeleteOpen] = useState(false); 
+    const [deleteOpen, setDeleteOpen] = useState(false); 
 
     const handleDeleteOpen = () => {        
-		setDeleteOpen(true);           
-	};
+        setDeleteOpen(true);           
+    };
     const handleDeleteClose = () => {
         handleClose();
-		setDeleteOpen(false);
+        setDeleteOpen(false);
     }
 
 
@@ -92,21 +111,108 @@ const ModifyEventManagement = () => {
 
     const deleteEventsManagement = async (e) => {
         e.preventDefault();
-		Promise.all(selectedEventsManagement.map(id=>{
-			return eventsManagementApi.deleteEventsManagement(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 200){
-					toast.success('Delete success',{duration:2000},);
-				}
-				else{
-					toast.error('Delete unsuccessful' )
-				}
-			})
-		})
+        Promise.all(selectedEventsManagement.map(id=>{
+            return eventsManagementApi.deleteEventsManagement(id)
+        })).then( resArr => {
+            resArr.filter(res=>{
+                if(res.status == 200){
+                    toast.success('Delete success',{duration:2000},);
+                }
+                else{
+                    toast.error('Delete unsuccessful' )
+                }
+            })
+        })
         setDeleteOpen(false);
         setSelectedEventsManagement([])
     };
+    const getEventManagementbyId = useCallback(async(emId) => {
+        const res = await eventsManagementApi.getIndividualEventsManagement(emId);
+        
+        if(res.status != 200) { // person not found
+            toast.error("Event Management not found");
+            setEventManagement({})
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            return;
+        }else{
+            let body = {};
+            // let trigger = {};
+            await res.json().then(temp=> body = temp);
+            // await res.json().then(temp=> trigger = temp.triggerSchedules);
+            // console.log(body);
+            // body.triggerSchedules = trigger;
+            console.log(body, 333)
+            if (isMounted()) {
+            body.eventsManagementId=0;
+            setEventManagement({body});
+            console.log(body, 335)
+            if (body.controller){
+                setEntrancesControllers([body.controller])
+            }
+            else if (body.entrance){
+                setEntrancesControllers([body.entrance])
+            }
+
+            //render input actions
+            setInputEventsWithoutTimer( {[0] : body.inputEvents.filter(e => e.timerDuration==null)[0].eventActionInputType.eventActionInputId} )
+            let inputWithTimerArr = body.inputEvents.filter(e => e.timerDuration!=null);
+            let inputWithArr =[]; 
+            for (let i=0;i<inputWithTimerArr.length;i++){
+                inputWithArr.push({eventActionInputType: inputWithTimerArr[i].eventActionInputType,
+                                inputId: i,
+                                timerDuration: inputWithTimerArr[i].timerDuration
+                })
+                setInputEventsWithTimer({...inputEventsWithTimer, [0]: inputWithArr })
+                
+            }
+            
+            //render output actions
+            let outputWithoutTimerArr = body.outputActions.filter(e => e.timerDuration==null);
+            let outputWithoutArr = [];
+            for (let i=0;i<outputWithoutTimerArr.length;i++){
+                outputWithoutArr.push(outputWithoutTimerArr[i].eventActionOutputType)
+                setOutputActionsWithoutTimer({...outputActionsWithoutTimer, [0]: outputWithoutArr })
+                
+            }
+            let outputWithTimerArr = body.outputActions.filter(e => e.timerDuration!=null);
+            let outputWithArr = [];
+            for (let i=0;i<outputWithTimerArr.length;i++){
+                outputWithArr.push({eventActionOutputType: outputWithTimerArr[i].eventActionOutputType,
+                    outputId: i,
+                    timerDuration: outputWithTimerArr[i].timerDuration
+    })
+                setOutputEventsWithTimer({...outputEventsWithTimer, [0]: outputWithArr })
+                
+            }
+            
+            //render notifications
+            let notifications = body.eventsManagementNotification
+            for (let notif of notifications){
+                if (notif.eventsManagementNotificationType == "EMAIL"){
+                    let emailNotifRender = {
+                        eventsManagementEmailRecipients: notif.eventsManagementNotificationRecipients.split(","),
+                        eventsManagementEmailContent: notif.eventsManagementNotificationContent,
+                        eventsManagementEmailTitle: notif.eventsManagementNotificationTitle,
+                        useDefaultEmails: false
+                        }
+                    setNotificationEmails({ ...notificationEmails, [0]: emailNotifRender });
+                }
+                else{
+                    let smsNotifRender = {
+                        eventsManagementSMSRecipients: notif.eventsManagementNotificationRecipients.split(","),
+                        eventsManagementSMSContent: notif.eventsManagementNotificationContent,
+                        useDefaultSMS: false
+                    };
+                    setNotificationSMSs({ ...notificationSMSs, [0]: smsNotifRender });
+                }
+            }
+            
+
+        }
+    }
+        }, [isMounted]);
     
     const getAllControllers = useCallback(async() => {
         const controllersRes = await controllerApi.getControllers();
@@ -147,6 +253,33 @@ const ModifyEventManagement = () => {
         if (isMounted()){
             setInputEvents(inputEventsJson);
             setOutputEvents(outputEventsJson);
+            setLoaded(true);
+        }
+    }, [isMounted]);
+
+    const getSMSEmailConfig = useCallback(async() => {
+        const smsNotificationConfig= await notificationConfigApi.getNotificationSMSConfig();
+        const emailNotificationConfig = await notificationConfigApi.getNotificationEmailConfig();
+        if (smsNotificationConfig.status !== 200) {
+            toast.error("Error loading SMS config");
+            setSMSConfig({});
+            if (smsNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+        }
+        if (emailNotificationConfig.status !== 200) {
+            toast.error("Error loading email config");
+            setEmailConfig({});
+            if (emailNotificationConfig.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            return;
+        }
+        const smsConfigJson = await smsNotificationConfig.json();
+        const emailConfigJson = await emailNotificationConfig.json();
+        if (isMounted()){
+            setSMSConfig(smsConfigJson);
+            setEmailConfig(emailConfigJson);
         }
     }, [isMounted]);
 
@@ -171,18 +304,27 @@ const ModifyEventManagement = () => {
         try {
             getAllControllers();
             getAllEntrances();
+            getEventManagementbyId(emId);
         } catch (error) {
             console.log(error)
         }
     }, [])
 
+    useEffect(() => {
+        setEventsManagementInfoArr([getEmptyEventsManagementInfo(eventManagement)]);
+    },[eventManagement])
+
     // empty objects for initialisation of new card
     const getEmptyEventsManagementInfo = (eventsManagementId) => ({
-        eventsManagementId,
-        eventsManagementName:"",
-        triggerSchedules: [],
-        inputEvents: [],
-        outputActions: [],
+        eventsManagementId: 0,
+        eventsManagementName: eventManagement.eventsManagementName,
+        triggerSchedules: eventManagement.triggerSchedules,
+        inputEvents: eventManagement.inputEvents,
+        outputActions: eventManagement.outputActions,
+        eventsManagementEmail: eventManagement.eventsManagementEmail,
+        eventsManagementSMS: eventManagement.eventsManagementSMS,
+        eventsManagementDefaultTitle: eventManagement.eventsManagementNotification,
+        eventsManagementDefaultContent: eventManagement.eventsManagementNotification,
     });
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
@@ -194,14 +336,20 @@ const ModifyEventManagement = () => {
         eventsManagementOutputActionsInvalidId: false,
         eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
+        eventsManagementInvalidEmailRecipients: false,
+        eventsManagementInvalidSMSRecipients: false,
+        eventsManagementEmailRecipientsEmpty: false,
+        eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,
         timeStartInvalid:false,
+        beginInvalid:false,
         untilInvalid:false,
         submitFailed: false
     });
 
     const [eventsManagementInfoArr, 
-        setEventsManagementInfoArr] = useState([getEmptyEventsManagementInfo(0)]);
+        setEventsManagementInfoArr] = useState([getEmptyEventsManagementInfo(0) ]);
+        console.log(eventManagement, eventsManagementInfoArr, 9999)
     const [eventsManagementValidationsArr, 
         setEventsManagementValidationsArr] = useState([getEmptyEventsManagementValidations(0)]);
 
@@ -213,9 +361,13 @@ const ModifyEventManagement = () => {
         }
     }, [controllers])
 
+    useEffect(() => {
+        getSMSEmailConfig();
+    }, [])
+
     // add card logic
     const getNewId = () => eventsManagementInfoArr.map(info => info.eventsManagementId)
-                                             .reduce((a, b) => Math.max(a, b), -1) + 1
+                                                .reduce((a, b) => Math.max(a, b), -1) + 1
 
     const addCard = () => {
         const newId = getNewId();
@@ -224,14 +376,6 @@ const ModifyEventManagement = () => {
     }
 
 
-    // remove card logic
-    const removeCard = (id) => {
-        const newEventsManagementInfoArr = eventsManagementInfoArr.filter(info => info.eventsManagementId != id);
-        const newValidations = eventsManagementValidationsArr.filter(validation => validation.eventsManagementId != id);
-
-        setEventsManagementInfoArr(newEventsManagementInfoArr);
-        setEventsManagementValidationsArr(newValidations);       
-    }
     
     // update methods for form inputs
     const changeTextField = (e, id) => {
@@ -290,6 +434,7 @@ const ModifyEventManagement = () => {
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
+        updateEventManagementDefaultTitle();
     }
     const checkAnyUntilForEventManagement = (id) => (bool) => {
         const newValidations = [...eventsManagementValidationsArr];
@@ -299,52 +444,154 @@ const ModifyEventManagement = () => {
 
     }
 
-    const replaceAll = (e) => {
-        e.preventDefault();
+    const checkAnyBeginForEventManagement = (id) => (bool) => {
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.beginInvalid = bool
+        setEventsManagementValidationsArr(newValidations);
+    }
+
+    const submitReplaceAll = () => {
         Promise.resolve(eventsManagementApi.replaceEventsManagement(eventsManagementInfoArr, entrances, controllers))
         .then(res =>{
             if (res.status!=201){ 
                 (res.json()).then(data => {
                     const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
-                            // console.log(key, singleData))
-                            array.push(singleData))
-                    })
+                    if (data[0]) {
+                        Object.entries(data[0]).map(([key, value]) => {
+                            value.map(singleData =>
+                                // console.log(key, singleData))
+                                array.push(singleData))
+                        })
+                    }
                     setSingleErrorMessage(array)
                     handleErrorMessages(data)
                     // getClashingEventsManagement
                 })     
             }
-            else{
+            else {
+                getSMSEmailConfig();
                 toast.success("Successfully replaced all event managements")
                 router.replace(`/dashboard/events-management`)
             }
-        })
-        
+        }).finally(() => setAction(""))
     }
-    const addOn = (e) => {
-        e.preventDefault();
-        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr, entrances, controllers))
-        .then(res =>{
-            if (res.status!=201){ 
-                (res.json()).then(data => {
-                    const array = [];
-                    Object.entries(data[0]).map(([key,value]) => {
-                        value.map( singleData => 
+
+    const replaceAll = (fromNotificationDisabledSubmit) => {
+        setAction("replaceall");
+        let isOpeningNotificationDisabled = false;
+        if (!fromNotificationDisabledSubmit) {
+            getSMSEmailConfig();
+            let hasEmailNotif = false;
+            let hasSMSNotif = false;
+            for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+                if (i.eventsManagementEmail) {
+                    hasEmailNotif = true;
+                }
+                if (i.eventsManagementSMS) {
+                    hasSMSNotif = true;
+                }
+            }
+            let notifDisabledOpen;
+            if (hasEmailNotif && hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasEmailNotif) {
+                notifDisabledOpen = !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            }
+            if (notifDisabledOpen) {
+                isOpeningNotificationDisabled = true;
+            }
+        }
+        if (!isOpeningNotificationDisabled) {
+        submitReplaceAll();
+        }
+
+    }
+
+    const submitAddAll = () => {
+        eventsManagementApi.deleteById(emId)
+		.then(async res => {
+			toast.dismiss();
+
+			if (res.status != 200) {
+				toast.error('Delete unsuccessful', {duration:3000})
+			}
+			else {
+				toast.success('Delete success');
+                setTimeout(submitAddingAfterDeleting(), 5000)
+			}
+		})
+
+    const submitAddingAfterDeleting = () => {
+        console.log("emsInfoArr",eventsManagementInfoArr);
+        Promise.resolve(eventsManagementApi.addEventsManagement(eventsManagementInfoArr,entrances, controllers))
+        .then(res => {
+        if (res.status!=201){ 
+            (res.json()).then(data => {
+                const array = [];
+                if (data[0]) {
+                    Object.entries(data[0]).map(([key, value]) => {
+                        value.map(singleData =>
                             // console.log(key, singleData))
                             array.push(singleData))
-                    })
-                    setSingleErrorMessage(array)
-                    handleErrorMessages(data)
-                    // getClashingEventsManagement
-                })
+                    }) 
+                }
+                setSingleErrorMessage(array)
+                handleErrorMessages(data)
+                // getClashingEventsManagement
+            })
+        }
+        else {
+            getSMSEmailConfig();
+            toast.success("Event managements successfully added")
+            router.replace(`/dashboard/events-management`)
+        }
+        }).finally(() => setAction(""))
+    }
+
+    }
+    const addOn = (fromNotificationDisabledSubmit) => {
+        setAction("addon");
+        let isOpeningNotificationDisabled = false;
+        if (!fromNotificationDisabledSubmit) {
+            getSMSEmailConfig();
+            let hasEmailNotif = false;
+            let hasSMSNotif = false;
+            for (let i = 0; i < eventsManagementInfoArr.length; i++) {
+                let currEventManagement = eventsManagementInfoArr[i];
+                if (currEventManagement.eventsManagementEmail) {
+                    hasEmailNotif = true;
+                }
+                if (currEventManagement.eventsManagementSMS) {
+                    hasSMSNotif = true;
+                }
             }
-            else{
-                toast.success("Event managements successfully added")
-                router.replace(`/dashboard/events-management`)
+            let notifDisabledOpen;
+            if (hasEmailNotif && hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasEmailNotif) {
+                notifDisabledOpen = !emailConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
+            } else if (hasSMSNotif) {
+                notifDisabledOpen = !smsConfig.enabled || !emailConfig.enabled;
+                console.log("smsConfigEnabled: ", smsConfig.enabled, "emailConfigEnabled: ", emailConfig.enabled)
+                console.log("notifDisabledOpen: ", notifDisabledOpen)
+                notifDisabledOpen = !smsConfig.enabled;
+                setNotificationDisabledOpen(notifDisabledOpen);
             }
-        })
+            if (notifDisabledOpen) {
+                isOpeningNotificationDisabled = true;
+            }
+        }
+        if (!isOpeningNotificationDisabled) {
+            submitAddAll();
+        }
 
     }
 
@@ -372,6 +619,39 @@ const ModifyEventManagement = () => {
         ))
     }
     const getEventActionOutputName = (e) => e.eventActionOutputName;
+
+    const updateEventManagementDefaultTitle = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            updatedInfo[i].eventsManagementDefaultTitle = "Event Management " + updatedInfo[i].eventsManagementName + " Triggered";
+            
+        }
+        setEventsManagementInfoArr(updatedInfo);
+    }
+
+    const updateEventManagementDefaultContent = () => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        for (let i = 0; i < updatedInfo.length; i++) {
+            const currEventManagement = eventsManagementInfoArr[i];
+            let currInputEvents = currEventManagement.inputEvents;
+            console.log(currInputEvents, 88899)
+            let inputStr = ""
+            for (let j = 0; j < currInputEvents.length; j++) {
+                const inputEventId = currInputEvents[j].eventActionInputType.eventActionInputId;
+                const inputEventEntity = inputEvents.find(e => e.eventActionInputId == inputEventId);
+                console.log(inputEventEntity, 444445)
+                if (currInputEvents[j].timerDuration) {
+                    inputStr += inputEventEntity.eventActionInputName + " for " + currInputEvents[j].timerDuration + " second(s), ";
+                } else {
+                    inputStr += inputEventEntity.eventActionInputName + ", "
+                }
+            }
+            let toBeAdded = inputStr == "" ? "..." : inputStr.substring(0, inputStr.length - 2);
+            updatedInfo[i].eventsManagementDefaultContent = "Event Management " + updatedInfo[i].eventsManagementName + " with the following triggers: " + toBeAdded + " has been triggered.";
+            
+        }
+        setEventsManagementInfoArr(updatedInfo);
+    }
 
     const changeEntranceController = (newValue) => {
         setEntrancesControllers(newValue);
@@ -444,7 +724,7 @@ const ModifyEventManagement = () => {
 
         console.log(selectedOutputEvents, "selectedOutputEvents");
         setCustomOutputEventsSelected(selectedOutputEvents);
-  
+    
         const selectedInputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
@@ -513,7 +793,7 @@ const ModifyEventManagement = () => {
                     }
                 }
             } else if (key == 'GEN_IN_3') {
-               let genOut3s = selectedOutputEvents['GEN_OUT_3'];
+                let genOut3s = selectedOutputEvents['GEN_OUT_3'];
                 if (genOut3s != undefined) {
                     for (let i = 0; i < value.length; i++) {
                         const validation = newValidations.find(v => v.eventsManagementId == value[i]);
@@ -542,54 +822,28 @@ const ModifyEventManagement = () => {
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (!newValue) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+            validation.eventsManagementInputEventsInvalidId = false;
         }
 
-        // else {
-
-        //     validation.eventsManagementInputEventsConflict = false;
-        //     console.log(inputEventToBeAdded.eventActionInputName, "inputEventToBeAddedInChangeInputEventsWithoutTimer");
-        //     if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
-        //         if (selectedOutputEvents.has('GEN_OUT_1')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
-        //         if (selectedOutputEvents.has('GEN_OUT_2')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
-        //         if (selectedOutputEvents.has('GEN_OUT_3')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     }
-        // }
-
-        // validation.eventsManagementOutputActionsConflict = false;
-        // const eventManagementsToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
-        // for (let i = 0; i < eventManagementsToBeUpdatedOutputActions.length; i++) {
-        //     const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === eventManagementsToBeUpdatedOutputActions[i].eventActionOutputType.eventActionOutputId);
-        //     if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
-        //         if (selectedInputEvents.has('GEN_IN_1')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     }
-        //     else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
-        //         if (selectedInputEvents.has('GEN_IN_2')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
-        //         if (selectedInputEvents.has('GEN_IN_3')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     }
-        // }
-
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
     const changeOutputActionsWithoutTimer = (newValue, id) => {
-        const updatedInfo = [...eventsManagementInfoArr];
-        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        updateEventManagementDefaultContent();
+        updateEventManagementDefaultTitle();
+
+        let updatedInfo = [...eventsManagementInfoArr];
+        let eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
         const eventManagementToBeUpdatedOutputActions = eventManagementToBeUpdated['outputActions'];
+        let hasNotificationEmailsOutput = false;
+        let hasNotificationSMSsOutput = false;
         const newValueMapped = newValue.map(i => {
+            if (i.eventActionOutputName === 'NOTIFICATION (EMAIL)') {
+                hasNotificationEmailsOutput = true;
+            } else if (i.eventActionOutputName === 'NOTIFICATION (SMS)') {
+                hasNotificationSMSsOutput = true;
+            }
             return {
                 timerDuration: null,
                 eventActionOutputType: {
@@ -605,6 +859,50 @@ const ModifyEventManagement = () => {
         }
         newOutputActions.push(...newValueMapped);
         eventManagementToBeUpdated['outputActions'] = newOutputActions;
+
+        if (!hasNotificationEmailsOutput) {
+            eventManagementToBeUpdated['eventsManagementEmail'] = null;
+            let newNotificationEmails = { ...notificationEmails };
+            delete newNotificationEmails[id];
+            setNotificationEmails(newNotificationEmails);
+        } else {
+            if (eventManagementToBeUpdated['eventsManagementEmail'] === null) {
+                eventManagementToBeUpdated['eventsManagementEmail'] = '';
+                eventManagementToBeUpdated['eventsManagementEmail'] = {
+                    eventsManagementEmailRecipients: "",
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle
+                };
+                let newNotificationEmails = { ...notificationEmails };
+                newNotificationEmails[id] = {
+                    eventsManagementEmailRecipients: [],
+                    eventsManagementEmailContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    eventsManagementEmailTitle: eventManagementToBeUpdated.eventsManagementDefaultTitle,
+                    useDefaultEmails: true
+                };
+                setNotificationEmails(newNotificationEmails);
+            }
+        }
+        if (!hasNotificationSMSsOutput) {
+            eventManagementToBeUpdated['eventsManagementSMS'] = null;
+            let newNotificationSMSs = { ...notificationSMSs };
+            delete newNotificationSMSs[id];
+            setNotificationSMSs(newNotificationSMSs);
+        } else {
+            if (eventManagementToBeUpdated['eventsManagementSMS'] === null) {
+                eventManagementToBeUpdated['eventsManagementSMS'] = {
+                    eventsManagementSMSRecipients: "",
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                };
+                let newNotificationSMSs = { ...notificationSMSs };
+                newNotificationSMSs[id] = {
+                    eventsManagementSMSRecipients: [],
+                    eventsManagementSMSContent: eventManagementToBeUpdated.eventsManagementDefaultContent,
+                    useDefaultSMS: true
+                };
+                setNotificationSMSs(newNotificationSMSs);
+            }
+        }
         setEventsManagementInfoArr(updatedInfo);
         setOutputActionsWithoutTimer({ ...outputActionsWithoutTimer, [id]: newValue });
         
@@ -614,6 +912,20 @@ const ModifyEventManagement = () => {
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValueMapped.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
+        } else {
+            validation.eventsManagementOutputActionsInvalidId = false;
+        }
+        if (!hasNotificationEmailsOutput) {
+            validation.eventsManagementInvalidEmailRecipients = false;
+            validation.eventsManagementEmailRecipientsEmpty = false;
+        } else {
+            validation.eventsManagementEmailRecipientsEmpty = notificationEmails[id]?.eventsManagementEmailRecipients.length === 0 || notificationEmails[id] === undefined;
+        }
+        if (!hasNotificationSMSsOutput) {
+            validation.eventsManagementInvalidSMSRecipients = false;
+            validation.eventsManagementSMSRecipientsEmpty = false;
+        } else {
+            validation.eventsManagementSMSRecipientsEmpty = notificationSMSs[id]?.eventsManagementSMSRecipients.length === 0 || notificationSMSs[id] === undefined;
         }
         setEventsManagementValidationsArr(newValidations);
     }
@@ -639,8 +951,11 @@ const ModifyEventManagement = () => {
         validation.eventsManagementInputEventsEmpty = newInputEvents.length === 0;
         if (newValue.filter(i => i.eventActionInputType.eventActionInputId == null || i.eventActionInputType.eventActionInputId == undefined).length > 0) {
             validation.eventsManagementInputEventsInvalidId = true;
+        } else {
+            validation.eventsManagementInputEventsInvalidId = false;
         }
         setEventsManagementValidationsArr(newValidations);
+        updateEventManagementDefaultContent();
     }
 
     const changeOutputActionsWithTimer = (newValue, id) => {
@@ -691,7 +1006,7 @@ const ModifyEventManagement = () => {
 
         console.log(selectedOutputEvents, "selectedOutputEvents");
         setCustomOutputEventsSelected(selectedOutputEvents);
-  
+    
         const selectedInputEvents = {};
         for (let i = 0; i < eventsManagementInfoArr.length; i++) {
             const currEventManagement = eventsManagementInfoArr[i];
@@ -762,7 +1077,7 @@ const ModifyEventManagement = () => {
                     }
                 }
             } else if (key == 'GEN_IN_3') {
-               let genOut3s = selectedOutputEvents['GEN_OUT_3'];
+                let genOut3s = selectedOutputEvents['GEN_OUT_3'];
                 if (genOut3s != undefined) {
                     for (let i = 0; i < value.length; i++) {
                         const validation = newValidations.find(v => v.eventsManagementId == value[i]);
@@ -776,69 +1091,71 @@ const ModifyEventManagement = () => {
             }
         }
 
-        // for (const [key, value] of Object.entries(selectedOutputEvents)) {
-        //     console.log(key, value);
-        //     if (value.length > 1) {
-        //         for (let i = 0; i < value.length; i++) {
-        //             const newValidations = [...eventsManagementValidationsArr];
-        //             const validation = newValidations.find(v => v.eventsManagementId == value[i]);
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     }
-        // }
 
         const validation = newValidations.find(v => v.eventsManagementId == id);
         validation.eventsManagementOutputActionsEmpty = newOutputActions.length === 0;
         if (newValue.filter(i => i.eventActionOutputType.eventActionOutputId == null || i.eventActionOutputType.eventActionOutputId == undefined).length > 0) {
             validation.eventsManagementOutputActionsInvalidId = true;
+        } else {
+            validation.eventsManagementOutputActionsInvalidId = false;
         }
-
-        // validation.eventsManagementOutputActionsConflict = false;
-        // for (let i = 0; i < newValue.length; i++) {
-        //     const outputActionToBeAdded = outputEvents.find(e=> e.eventActionOutputId === newValue[i].eventActionOutputType.eventActionOutputId);
-        //     if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_1') {
-        //         if (selectedInputEvents.has('GEN_IN_1')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     }
-        //     else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_2') {
-        //         if (selectedInputEvents.has('GEN_IN_2')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     } else if (outputActionToBeAdded?.eventActionOutputName === 'GEN_OUT_3') {
-        //         if (selectedInputEvents.has('GEN_IN_3')) {
-        //             validation.eventsManagementOutputActionsConflict = true;
-        //         }
-        //     }
-        // }
-
-        // validation.eventsManagementInputEventsConflict = false;
-        // const eventManagementsToBeUpdatedInputEvents = eventManagementToBeUpdated['inputEvents'];
-        // for (let i = 0; i < eventManagementsToBeUpdatedInputEvents.length; i++) {
-        //     const inputEventToBeAdded = inputEvents.find(e=> e.eventActionInputId === eventManagementsToBeUpdatedInputEvents[i].eventActionInputType.eventActionInputId);
-        //     if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_1') {
-        //         if (selectedOutputEvents.has('GEN_OUT_1')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_2') {
-        //         if (selectedOutputEvents.has('GEN_OUT_2')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     } else if (inputEventToBeAdded?.eventActionInputName === 'GEN_IN_3') {
-        //         if (selectedOutputEvents.has('GEN_OUT_3')) {
-        //             validation.eventsManagementInputEventsConflict = true;
-        //         }
-        //     }
-        // }
 
         setEventsManagementValidationsArr(newValidations);
     }
- 
+    
+    const changeNotificationEmails = (newValue, id) => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const newRecipients = newValue.eventsManagementEmailRecipients;
+        const newRecipientsCSV = newRecipients.join(',');
+        const newEmailValue = { eventsManagementEmailRecipients: newRecipientsCSV, eventsManagementEmailContent: newValue.eventsManagementEmailContent, eventsManagementEmailTitle: newValue.eventsManagementEmailTitle, useDefaultEmails: newValue.useDefaultEmails };
+        eventManagementToBeUpdated['eventsManagementEmail'] = newEmailValue;
+        setEventsManagementInfoArr(updatedInfo);
+        setNotificationEmails({ ...notificationEmails, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementEmailRecipientsEmpty = newRecipients.length === 0 && eventManagementToBeUpdated['eventsManagementEmail'];
+        validation.eventsManagementInvalidEmailRecipients = false;
+        for (let j = 0; j < newRecipients.length; j++) {
+            if (validateEmail(newRecipients[j]) === null) {
+                validation.eventsManagementInvalidEmailRecipients = true;
+            }
+        }
+        setEventsManagementValidationsArr(newValidations);
+    }
+
+    const changeNotificationSMSs = (newValue, id) => {
+        const updatedInfo = [...eventsManagementInfoArr];
+        const eventManagementToBeUpdated = updatedInfo.find(info => info.eventsManagementId == id);
+        const newRecipients = newValue.eventsManagementSMSRecipients;
+        const newRecipientsCSV = newRecipients.join(',');
+        const newSMSValue = { eventsManagementSMSRecipients: newRecipientsCSV, eventsManagementSMSContent: newValue.eventsManagementSMSContent, useDefaultSMS: newValue.useDefaultSMS };
+        eventManagementToBeUpdated['eventsManagementSMS'] = newSMSValue;
+        setEventsManagementInfoArr(updatedInfo);
+        setNotificationSMSs({ ...notificationEmails, [id]: newValue });
+        
+        // validations
+        const newValidations = [...eventsManagementValidationsArr];
+        const validation = newValidations.find(v => v.eventsManagementId == id);
+        validation.eventsManagementSMSRecipientsEmpty = newRecipients.length === 0 && eventManagementToBeUpdated['eventsManagementSMS'];
+        validation.eventsManagementInvalidSMSRecipients = false;
+        for (let j = 0; j < newRecipients.length; j++) {
+            if (!validatePhoneNumber(newRecipients[j])) {
+                validation.eventsManagementInvalidSMSRecipients = true;
+            }
+        }
+        setEventsManagementValidationsArr(newValidations);
+    }
+    // console.log(eventsManagementValidationsArr)
+    // console.log(eventsManagementInfoArr, 9995)
+
     return(
         <>
             <Head>
                 <title>
-                    Etlas: Modify Events Management
+                    Etlas: Edit Events Management
                 </title>
             </Head>
             <Box
@@ -871,6 +1188,14 @@ const ModifyEventManagement = () => {
                             open={serverDownOpen}
                             handleDialogClose={() => setServerDownOpen(false)}
                         />
+                        <ConfirmNotificationDisabledSubmit
+                            action={action}
+                            open={notificationDisabledOpen}
+                            smsEnable={smsConfig.enabled}
+                            emailEnable={emailConfig.enabled}
+                            submitEventsManagement={action === 'addon' ? () => addOn(true) : () => replaceAll(true)}
+                            handleDialogClose={() => setNotificationDisabledOpen(false)}
+                        />
                         <NextLink
                             href={`/dashboard/events-management`}
                             passHref
@@ -895,7 +1220,7 @@ const ModifyEventManagement = () => {
                     </Box>
                     <Box marginBottom={3}>
                         <Typography variant="h3">
-                            Modify Events Management
+                            Edit Events Management
                         </Typography>
                         {/* <Grid container
                             marginLeft={0.5}
@@ -951,76 +1276,42 @@ const ModifyEventManagement = () => {
                             />
                         </Grid>
                     </Grid>
-                    <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
                         <Stack spacing={3}>
-                            {eventsManagementInfoArr.map((eventsManagementInfo, i) => {
+                        {isLoaded && eventsManagementInfoArr && (eventsManagementInfoArr.map((eventsManagementInfo, i) => {
                                 return (
-                                    <EditEventManagementForm
-                                        key={eventsManagementInfo.eventsManagementId}
-                                        eventsManagementInfo={eventsManagementInfo}
-                                        removeCard={removeCard}
-                                        eventsManagementValidations={eventsManagementValidationsArr[i]}
-                                        changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
-                                        changeNameCheck={changeNameCheck}
-                                        changeTriggerSchedules={changeTriggerSchedules}
-                                        checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                        checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                        checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
-                                        changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
-                                        changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
-                                        eventActionOutputEqual={eventActionOutputEqual}
-                                        eventActionOutputFilter={eventActionOutputFilter}
-                                        getEventActionOutputName={getEventActionOutputName}
-                                        changeInputEventsWithTimer={changeInputEventsWithTimer}
-                                        changeOutputActionsWithTimer={changeOutputActionsWithTimer}
-                                        inputEventsValueWithoutTimer={inputEventsWithoutTimer}
-                                        outputActionsValueWithoutTimer={outputActionsWithoutTimer}
-                                        allInputEvents={inputEvents}
-                                        allOutputEvents={outputEvents}
-                                    />
+                                <EditEventManagementForm
+                                    key={eventsManagementInfo.eventsManagementId}
+                                    originalEM={eventManagement}
+                                    eventsManagementInfo={eventsManagementInfo}
+                                    eventsManagementValidations={eventsManagementValidationsArr[i]}
+                                    changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
+                                    changeNameCheck={changeNameCheck}
+                                    changeTriggerSchedules={changeTriggerSchedules}
+                                    checkAnyBeginForEventManagement={checkAnyBeginForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyTimeStartForEventManagement={checkAnyTimeStartForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    checkAnyTimeEndForEventManagement={checkAnyTimeEndForEventManagement(eventsManagementInfo.eventsManagementId)}
+                                    changeInputEventsWithoutTimer={changeInputEventsWithoutTimer}
+                                    changeOutputActionsWithoutTimer={changeOutputActionsWithoutTimer}
+                                    eventActionOutputEqual={eventActionOutputEqual}
+                                    eventActionOutputFilter={eventActionOutputFilter}
+                                    getEventActionOutputName={getEventActionOutputName}
+                                    changeInputEventsWithTimer={changeInputEventsWithTimer}
+                                    changeOutputActionsWithTimer={changeOutputActionsWithTimer}
+                                    changeNotificationEmails={changeNotificationEmails}
+                                    changeNotificationSMSs={changeNotificationSMSs}
+                                    inputEventsValueWithoutTimer={inputEventsWithoutTimer}
+                                    outputActionsValueWithoutTimer={outputActionsWithoutTimer}
+                                    notificationEmails={notificationEmails}
+                                    notificationSMSs={notificationSMSs}
+                                    allInputEvents={inputEvents}
+                                    allOutputEvents={outputEvents}
+                                    currInputEventsWithTimer={inputEventsWithTimer}
+                                    currOutputEventsWithTimer={outputEventsWithTimer}
+                                />
                                 )
-                            })}
-                            <div>
-                                <Button
-                                    size="large"
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                    onClick={addCard}
-                                >
-                                    Add events management
-                                </Button>
-                            </div>
+                            }))}
                             <Grid container>
-                                <Grid item
-                                    marginRight={3}
-                                    mb={2}>
-                                    <Button
-                                        type="submit"
-                                        size="large"
-                                        variant="contained"
-                                        name="replace"
-                                        id="replace all"
-                                        // onClick={replaceAll}
-                                        disabled={
-                                            entrancesControllers.length == 0 ||
-                                            eventsManagementValidationsArr.some( // check if validations fail
-                                                validation => validation.eventsManagementNameBlank        ||
-                                                validation.timeEndInvalid ||
-                                                validation.untilInvalid ||
-                                                validation.timeStartInvalid ||
-                                                validation.eventsManagementInputEventsEmpty ||
-                                                validation.eventsManagementInputEventsInvalidId ||
-                                                validation.eventsManagementInputEventsConflict ||
-                                                validation.eventsManagementOutputActionsEmpty ||
-                                                validation.eventsManagementOutputActionsInvalidId ||
-                                                validation.eventsManagementOutputActionsConflict ||
-                                                validation.eventsManagementTriggerSchedulesEmpty
-                                            )
-                                        }
-                                    >
-                                        Replace all
-                                    </Button>
-                                </Grid>
                                 <Grid item
                                     marginRight={3}
                                     mb={2}>
@@ -1030,12 +1321,13 @@ const ModifyEventManagement = () => {
                                         variant="contained"
                                         name="add"
                                         value="add button"
-                                        // onClick={addOn}
+                                        onClick={() => addOn(false)}
                                         disabled={
                                             entrancesControllers.length == 0 ||
                                             eventsManagementValidationsArr.some( // check if validations fail
                                                 validation => validation.eventsManagementNameBlank        ||
                                                 validation.timeEndInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.untilInvalid ||
                                                 validation.timeStartInvalid ||
                                                 validation.eventsManagementInputEventsEmpty ||
@@ -1044,11 +1336,15 @@ const ModifyEventManagement = () => {
                                                 validation.eventsManagementOutputActionsEmpty ||
                                                 validation.eventsManagementOutputActionsInvalidId ||
                                                 validation.eventsManagementOutputActionsConflict ||
-                                                validation.eventsManagementTriggerSchedulesEmpty
+                                                validation.eventsManagementTriggerSchedulesEmpty ||
+                                                validation.eventsManagementInvalidEmailRecipients ||
+                                                validation.eventsManagementInvalidSMSRecipients ||
+                                                validation.eventsManagementEmailRecipientsEmpty ||
+                                                validation.eventsManagementSMSRecipientsEmpty
                                             )
                                         }
                                     >
-                                        Add on
+                                        Save Changes
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -1067,19 +1363,18 @@ const ModifyEventManagement = () => {
                                 </Grid>                              
                             </Grid>
                         </Stack>
-                    </form>
                 </Container>
             </Box>
         </>
     )
 }
-
-ModifyEventManagement.getLayout = (page) => (
+    
+EditEventManagement.getLayout = (page) => (
     <AuthGuard>
         <DashboardLayout>
             { page }
         </DashboardLayout>
     </AuthGuard>
 )
-
-export default ModifyEventManagement;
+    
+export default EditEventManagement;

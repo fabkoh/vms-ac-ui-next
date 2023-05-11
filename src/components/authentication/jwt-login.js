@@ -11,8 +11,8 @@ export const JWTLogin = (props) => {
   const { login } = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: 'ISSAdmin@isssecurity.sg',
+      password: 'ISSAdmin',
       submit: null
     },
     validationSchema: Yup.object({
@@ -27,22 +27,19 @@ export const JWTLogin = (props) => {
         .required('Password is required')
     }),
     onSubmit: async (values, helpers) => {
-      try {
-        await login(values.email, values.password);
-
+      const res = await login(values.email, values.password);
+      if(res.type === "success"){
         if (isMounted()) {
           const returnUrl = router.query.returnUrl || '/dashboard';
           router.push(returnUrl);
         }
-      } catch (err) {
-        console.error(err);
-
-        if (isMounted()) {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: err.message });
-          helpers.setSubmitting(false);
-        }
       }
+      else {
+        helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: res.response.message });
+        helpers.setSubmitting(false);
+      }
+      
     }
   });
 
@@ -99,11 +96,11 @@ export const JWTLogin = (props) => {
           <div>
             Use
             {' '}
-            <b>demo@devias.io</b>
+            <b>ISSAdmin@isssecurity.sg</b>
             {' '}
             and password
             {' '}
-            <b>Password123!</b>
+            <b>ISSAdmin</b>
           </div>
         </Alert>
       </Box>

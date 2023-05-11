@@ -124,7 +124,7 @@ const Home = () => {
   
   const handleLogin = () => {
     // Email and password
-    signInWithEmailAndPassword('demo@devias.io', 'Password123!');
+    signInWithEmailAndPassword('ISSAdmin@isssecurity.sg	', 'ISSAdmin');
   };
 
   return (

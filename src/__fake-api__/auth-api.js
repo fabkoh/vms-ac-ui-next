@@ -1,14 +1,15 @@
 import { createResourceId } from '../utils/create-resource-id';
 import { sign, decode, JWT_SECRET, JWT_EXPIRES_IN } from '../utils/jwt';
 import { wait } from '../utils/wait';
+import { authGetProfile } from '../api/auth-api';
 
 const users = [
   {
     id: '5e86809283e28b96d2d38537',
     avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    email: 'demo@devias.io',
+    email: 'ISSAdmin@isssecurity.sg	',
     name: 'Anika Visser',
-    password: 'Password123!',
+    password: 'ISSAdmin',
     plan: 'Premium'
   }
 ];
@@ -73,14 +74,15 @@ class AuthApi {
   }
 
   me(accessToken) {
+    // return authGetProfile();
     return new Promise((resolve, reject) => {
       try {
         // Decode access token
-        const { userId } = decode(accessToken);
+        const { userId } = decode();
 
         // Find the user
         const user = users.find((_user) => _user.id === userId);
-
+        console.log("executing me func")
         if (!user) {
           reject(new Error('Invalid authorization token'));
           return;

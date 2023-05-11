@@ -6,10 +6,13 @@ class VideoRecorderApi {
     createVideoRecorder({
         recorderName,
         recorderSerialNumber,
-        recorderIpAddress,
+        recorderPublicIp,
+        recorderPrivateIp,
         recorderPortNumber,
+        recorderIWSPort,
         recorderUsername,
-        recorderPassword
+        recorderPassword,
+        autoPortForwarding
     }) {
         if (useApi) {
             return sendApi("/api/videorecorder", {
@@ -20,28 +23,32 @@ class VideoRecorderApi {
                 body: JSON.stringify({
                     recorderName,
                     recorderSerialNumber,
-                    recorderIpAddress,
+                    recorderPublicIp,
+                    recorderPrivateIp,
                     recorderPortNumber,
+                    recorderIWSPort,
                     recorderUsername,
-                    recorderPassword
+                    recorderPassword,
+                    autoPortForwarding
                 })
             })
         }
 
-        const newRecorder = {
-            recorderId: fakeVideoRecorders.map(group => group.recorderId)
-                                           .reduce((a, b) => Math.max(a, b), 0) + 1,
-            recorderName,
-            recorderSerialNumber,
-            recorderIpAddress,
-            recorderPortNumber,
-            recorderUsername,
-            recorderPassword
-        }
+        // const newRecorder = {
+        //     recorderId: fakeVideoRecorders.map(group => group.recorderId)
+        //                                    .reduce((a, b) => Math.max(a, b), 0) + 1,
+        //     recorderName,
+        //     recorderSerialNumber,
+        //     recorderIpAddress,
+        //     recorderPortNumber,
+        //     recorderIWSPort,
+        //     recorderUsername,
+        //     recorderPassword
+        // }
 
-        fakeVideoRecorders.push(newRecorder);
+        // fakeVideoRecorders.push(newRecorder);
 
-        return Promise.resolve(new Response(JSON.stringify(newRecorder), { status: 201 }));
+        // return Promise.resolve(new Response(JSON.stringify(newRecorder), { status: 201 }));
     }
 
     getRecorders() {
@@ -53,23 +60,26 @@ class VideoRecorderApi {
     getRecorder(id) {
         if (useApi) { return sendApi(`/api/videorecorder/${id}`); }
 
-        const recorder = { ...fakeVideoRecorders.find(recorder => recorder.recorderId == id) };
+        // const recorder = { ...fakeVideoRecorders.find(recorder => recorder.recorderId == id) };
 
-        if (recorder) {
-            return Promise.resolve(new Response(JSON.stringify(recorder), { status: 200 }));
-        }
+        // if (recorder) {
+        //     return Promise.resolve(new Response(JSON.stringify(recorder), { status: 200 }));
+        // }
 
-        return Promise.resolve(new Response(null, { status: 404 }));
+        // return Promise.resolve(new Response(null, { status: 404 }));
     }
 
     updateRecorder({
         recorderId,
         recorderName,
         recorderSerialNumber,
-        recorderIpAddress,
+        recorderPublicIp,
+        recorderPrivateIp,
         recorderPortNumber,
         recorderUsername,
-        recorderPassword
+        recorderPassword,
+        recorderIWSPort,
+        autoPortForwarding
     }) {
         if (useApi) {
             return sendApi("/api/videorecorder", {
@@ -81,33 +91,16 @@ class VideoRecorderApi {
                     recorderId,
                     recorderName,
                     recorderSerialNumber,
-                    recorderIpAddress,
+                    recorderPublicIp,
+                    recorderPrivateIp,
                     recorderPortNumber,
                     recorderUsername,
-                    recorderPassword
+                    recorderPassword,
+                    recorderIWSPort,
+                    autoPortForwarding
                 })
             });
         }
-        const updatedRecorder = {
-            recorderId,
-            recorderName,
-            recorderSerialNumber,
-            recorderIpAddress,
-            recorderPortNumber,
-            recorderUsername,
-            recorderPassword
-        };
-        const index = fakeVideoRecorders.findIndex(e => e.recorderId == recorderId);
-
-        if (index == -1) {
-            // no error message as not needed
-            return Promise.resolve(new Response(null, { status: 404 }));
-        }
-
-        fakeVideoRecorders[index] = updatedRecorder;
-        
-        // did not populate person field as not needed
-        return Promise.resolve(new Response(JSON.stringify(updatedRecorder), { status: 200 }));
     }
 
     deleteRecorder(recorderId){
@@ -120,3 +113,4 @@ class VideoRecorderApi {
 const videoRecorderApi = new VideoRecorderApi();
 
 export default videoRecorderApi;
+

@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Chip } from '@mui/material';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -30,7 +30,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 see mui docs https://mui.com/api/autocomplete/
 */
-export default function CheckboxesTags({  
+export default function CheckboxesTags({
     label = "Select",
     placeholder = "Enter text to search",
     getOptionLabel,
@@ -48,7 +48,8 @@ export default function CheckboxesTags({
 
     // search bar value
     const [inputValue, setInputValue] = useState('');
-
+    const [val, setVal] = useState(value);
+    useEffect(() => { setVal(value) }, [value]);
     return (
         <Autocomplete
             multiple
@@ -61,43 +62,47 @@ export default function CheckboxesTags({
                         style={{ marginRight: 8 }}
                         checked={selected}
                     />
-                    { getOptionLabel(option) }
+                    {getOptionLabel(option)}
                 </li>
 
 
             )}
             fullWidth
             renderInput={(params) => (
-                <TextField {...params} label={label} placeholder={placeholder} helperText={Boolean(helperText) && helperText} error={Boolean(error)} />
+                <TextField {...params}
+                    label={label}
+                    placeholder={placeholder}
+                    helperText={Boolean(helperText) && helperText}
+                    error={Boolean(error)} />
             )}
             onChange={(e, newValue) => setSelected(newValue)}
-            { ...other }
+            {...other}
             filterOptions={filterOptions}
             inputValue={inputValue}
             onInputChange={(event, value, reason) => {
                 // on exit
-                if (event && event.type=='blur') {
+                if (event && event.type == 'blur') {
                     setInputValue('')
-                } 
+                }
                 // on every event other than reset (reset is clicking on clear button)
                 else if (reason != 'reset') {
                     setInputValue(value)
                 }
             }}
-            renderTags={(value, getTagProps) => 
-                value.map((option, index) => (
-                    <Chip
+            renderTags={(val, getTagProps) =>
+                val.map((option, index) => {
+                    return (<Chip
                         color={
                             (!!isError && isError(option)) ? "error" : // doing this allows isError and isWarning to be optional arguments
-                            (!!isWarning && isWarning(option)) ? "warning" : "default"
+                                (!!isWarning && isWarning(option)) ? "warning" : "default"
                         }
                         label={getOptionLabel(option)}
-                        { ...getTagProps({ index })}
+                        {...getTagProps({ index })}
                         key={index}
-                    />
-                ))}
+                    />)
+                })}
             getOptionLabel={getOptionLabel}
-            value={value}
+            value={val}
             isOptionEqualToValue={isOptionEqualToValue}
             options={options}
         />

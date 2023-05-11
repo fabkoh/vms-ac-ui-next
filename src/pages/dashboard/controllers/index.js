@@ -262,7 +262,7 @@ const ControllerList = () => {
                                 </StyledMenu>
                             </Grid>
                         </Grid>
-                        <Box
+                        {/* <Box
                             sx={{
                                 m: -1,
                                 mt: 3
@@ -291,7 +291,7 @@ const ControllerList = () => {
                             >
                                 <HelpOutline />
                             </Tooltip>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Card>
                         <Divider />
@@ -350,7 +350,9 @@ const ControllerList = () => {
 }
 
 ControllerList.getLayout = (page) => (
-    <AuthGuard>
+    // follow this for all the pages where role based authorization has to be performed
+    // add the page props so that authguard can perform the check along with checking the roles
+    <AuthGuard page={"Controllers"}>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>
 );

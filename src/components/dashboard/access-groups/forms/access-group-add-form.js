@@ -64,12 +64,13 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                 action={
                     // action are children flushed to the right
                     (
-                        <Grid item container>
-                            { edit && (
+                        <Grid item
+                            container>
+                            {/* { edit && (
                                 <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
@@ -77,7 +78,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                             >
                                 Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -87,7 +88,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }

@@ -40,10 +40,12 @@ import WarningIcon from "@mui/icons-material/Warning";
 import { useRouter } from "next/router";
 import { width } from "@mui/system";
 
-export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') => {
+export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
     return(
         <BasicDetailsCard
-        	title = "Cameras"
+        	title =  {(recorder && "cameras" in recorder) 
+					? "Cameras"
+					: "Warning : Unable to connect to video recorder"}
         	subtitle = "Click on camera name below to go to live view">
 
 		<div>
@@ -65,7 +67,7 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 							<TableCell>NAME</TableCell>
 							<TableCell>IP ADDRESS</TableCell>
 							<TableCell>MODEL</TableCell>
-							<TableCell>SERIA NO.</TableCell>
+							<TableCell>SERIAL NO.</TableCell>
 							<TableCell>STATUS</TableCell>
 							<TableCell>LAST ONLINE</TableCell>
 							<TableCell align="left"></TableCell>
@@ -77,6 +79,13 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 							return (
 								<TableRow
 									hover
+									onClick = {() => {
+										if (camera.online)
+											window.location.href = 
+											`/dashboard/video-recorders/preview/${recorderId}/${index + 1}`
+										else
+											alert("Camera is offline")
+									}}
 									key={index}
 								>
 									<TableCell width="10%">
@@ -119,17 +128,22 @@ export const VideoRecorderCameras = ({recorder, cameras = []}, recorderid = '') 
 											<SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill>
 										) }
 									</TableCell>
+									<TableCell width="20%">
+										-
+										{/* <Typography width={180} noWrap>
+											{recorder.created}
+										</Typography> */}
+									</TableCell>
 									<TableCell width="10%" align="left">
 											
-											<IconButton component="a">
+											{/* <IconButton component="a">
 												<PencilAltIcon fontSize="small" />
-											</IconButton>
+											</IconButton> */}
 									
 											<div onClick ={() => {
 												if (camera.online)
-													router.push({
-													     pathname: `/dashboard/video-recorders/preview/3/${index + 1}`,
-													  })
+													window.location.href = 
+													`/dashboard/video-recorders/preview/${recorderId}/${index + 1}`
 												else
 													alert("Camera is offline")
 											}}>

@@ -17,6 +17,7 @@ import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
 import { Info } from "@mui/icons-material";
 import { controllerApi } from "../../../../api/controllers";
 import { serverDownCode } from "../../../../api/api-helpers";
+import { getAccessGroupDetailsLink, accessGroupListLink } from "../../../../utils/access-group";
 
 const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
@@ -84,12 +85,13 @@ const ModifyAccessGroupSchedule = () => {
     });
     const getEmptyAccessGroupScheduleValidations = (accessGroupScheduleId) => ({
         accessGroupScheduleId,
-        accessGroupScheduleNameBlank: false,
+        accessGroupScheduleNameBlank: true,
 
         timeEndInvalid:false,
         timeStartInvalid:false,
         //Entrance valid(might not need as field is select. cannot custom add)
         untilInvalid:false,
+        beginInvalid:true,
         // submit failed
         submitFailed: false
     });
@@ -210,8 +212,16 @@ const ModifyAccessGroupSchedule = () => {
         setAccessGroupScheduleValidationsArr(newValidations);
 
     }
-    const [submitted, setSubmitted] = useState(false);
 
+    const checkBegin = (id) =>(e) => {
+        const newValidations = [ ...accessGroupScheduleValidationsArr ];
+        const validation = newValidations.find(v => v.accessGroupScheduleId == id);
+        validation.beginInvalid = e
+        // console.log("newValidations",newValidations)
+        setAccessGroupScheduleValidationsArr(newValidations);
+    }
+
+    const [submitted, setSubmitted] = useState(false);
 
     const replaceAll = (e) => {
         e.preventDefault();
@@ -226,7 +236,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Successfully replaced all schedules")
-                router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
+                router.back()
             }
         })
         
@@ -243,7 +253,7 @@ const ModifyAccessGroupSchedule = () => {
             }
             else{
                 toast.success("Schedules successfully added")
-                router.replace(`/dashboard/access-groups/details/${accessGroupId}`)
+                router.back()
             }
         })
 
@@ -383,6 +393,7 @@ md={7}>
                                     changeNameCheck={changeNameCheck}
                                     changeRrule={changeRrule}
                                     checkUntil={checkUntil(accessGroupScheduleInfo.accessGroupScheduleId)}
+                                    checkBegin={checkBegin(accessGroupScheduleInfo.accessGroupScheduleId)}
                                 />
                             ))}
                             <div>
@@ -414,6 +425,7 @@ mb={2}>
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
@@ -442,6 +454,7 @@ mb={2}>
                                                 validation => validation.accessGroupScheduleNameBlank        ||
                                                 validation.timeEndInvalid ||
                                                 validation.untilInvalid ||
+                                                validation.beginInvalid ||
                                                 validation.timeStartInvalid
                                         //                       validation.accessGroupNameExists       ||
                                         //                       validation.accessGroupNameDuplicated   ||
@@ -454,7 +467,7 @@ mb={2}>
                                 </Grid>
                                 <Grid item>
                                     <NextLink
-                                        href="/dashboard/access-groups/"
+                                        href={accGrp? getAccessGroupDetailsLink(accGrp) : accessGroupListLink}
                                         passHref
                                     >
                                         <Button

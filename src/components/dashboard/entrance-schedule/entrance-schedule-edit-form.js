@@ -21,7 +21,7 @@ import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
-const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditEntSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         entranceScheduleId,
         entranceSchedule,
@@ -31,9 +31,10 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
     } = accessGroupScheduleInfo;
 
     const {
-        entranceScheduleBlank,
+        entranceScheduleNameBlank,
         timeEndInvalid,
         untilInvalid,
+        beginInvalid,
         accessGroupNameDuplicated,
         accessGroupPersonHasAccessGroup,
         accessGroupPersonDuplicated,
@@ -83,11 +84,16 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
         descriptionHandler(rule)
     }, [rrulestring,start,end])
     
-    //blocker for invalid until date
+    //blocker for invalid begin and until date
     const [untilHolder, setUntilHolder] = useState(false)
     const handleInvalidUntil = (bool) => {
         setUntilHolder(bool)
     }
+
+    const handleInvalidBegin = (bool) => {
+        checkBegin(bool)
+    }
+
     useEffect(() => {
         checkUntil(untilHolder)
     }, [untilHolder])
@@ -98,6 +104,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
             // accessGroupNameExists       ||
             // accessGroupNameDuplicated   ||
             // accessGroupPersonDuplicated ||
+            entranceScheduleNameBlank ||
             submitFailed
         }>
             <CardHeader
@@ -114,12 +121,13 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                 action={
                     // action are children flushed to the right
                     (
-                        <Grid item container>
-                            { edit && (
+                        <Grid item
+                            container>
+                            {/* { edit && (
                                 <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
@@ -128,7 +136,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                             >
                                 Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -138,7 +146,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }
@@ -162,12 +170,12 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                             value={entranceSchedule}
                             onChange={(e)=>{changeTextField(e,entranceScheduleId)}}
                             helperText={ 
-                                (entranceScheduleBlank && 'Error: entrance schedule name cannot be blank')
+                                (entranceScheduleNameBlank && 'Error: entrance schedule name cannot be blank')
                                 // (entranceScheduleBlank && 'Error: access group name cannot be blank') ||
                             //     (accessGroupNameExists && 'Error: access group name taken') ||
                             //     (accessGroupNameDuplicated && 'Error: duplicate access group name in form')
                             }
-                            error={ Boolean(entranceScheduleBlank)}
+                            error={ Boolean(entranceScheduleNameBlank)}
                         />
                     </Grid>
                     <Collapse in={expanded}>
@@ -198,6 +206,7 @@ const EditEntSchedForm = ({checkUntil,changeTimeStart,changeTimeEnd,changeRrule,
                                     getEnd={getEnd}
                                     timeEndInvalid={timeEndInvalid}
                                     handleInvalidUntil={handleInvalidUntil}
+                                    handleInvalidBegin={handleInvalidBegin}
                                 />
                             </Grid>         
                             <Divider />

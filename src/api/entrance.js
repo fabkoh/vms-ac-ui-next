@@ -117,18 +117,26 @@ class EntranceApi {
         return Promise.resolve(new Response(JSON.stringify(updatedEntrance), { status: 200 }));
     }
 
-    updateEntranceStatus(entranceId, isActive) {
+    updateEntranceActiveStatus(entranceId, isActive) {
         if (useApi) {
             if (isActive) {
                 return sendApi(`/api/entrance/enable/${entranceId}`, { method: 'PUT' })
             } else {
-                return sendApi(`/api/entrance/unlock/${entranceId}`, { method: 'PUT' })
+                return sendApi(`/api/entrance/disable/${entranceId}`, { method: 'PUT' })
             }
         }
 
         fakeEntrances.find(entrance => entrance.entranceId == entranceId).isActive = isActive;
 
         return Promise.resolve(new Response(isActive, { status: 200 }));
+    }
+
+    manuallyUnlockEntrance(entranceId) {
+        if (useApi) {
+            return sendApi(`/api/entrance/unlock/${entranceId}`, { method: 'GET' })
+        }
+        // When not using api, unlock will always succeed
+        return Promise.resolve(new Response({ status: 200 }));
     }
 
     deleteEntrance(entranceId){

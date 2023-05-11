@@ -69,12 +69,13 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                 action={
                     // action are children flushed to the right
                     (
-                        <Grid item container>
-                            { edit && (
+                        <Grid item
+container>
+                            {/* { edit && (
                                 <Grid item sx={{display: "flex", justifyContent: "center", alignItems: "center", paddingRight: 1, paddingLeft: 1}}>
                                     <EditFormTooltip />
                                 </Grid>
-                            )}
+                            )} */}
                             <Button
                                 variant="outlined"
                                 color="error"
@@ -82,7 +83,7 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                             >
                                 Clear
                             </Button>
-                            { edit && (
+                            {/* { edit && (
                                 <Box ml={2}>
                                     <Button
                                         variant="contained"
@@ -92,7 +93,7 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                                         Delete
                                     </Button>
                                 </Box>
-                            )}
+                            )} */}
                         </Grid>
                     )
                 }
@@ -141,7 +142,10 @@ const EntranceForm = ({ entranceInfo, entranceValidations, removeCard, onNameCha
                             </Grid>
 
                             <Stack spacing={3}>
-							<Grid container alignItems="center" xs={12} md={6}>
+							<Grid container
+alignItems="center"
+xs={12}
+md={6}>
 							<SingleSelect
 								label="Third Party Options"
 								value={thirdPartyOption}

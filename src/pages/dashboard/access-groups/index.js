@@ -33,16 +33,23 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { accessGroupApi } from "../../../api/access-groups";
+import { accessGroupScheduleApi } from "../../../api/access-group-schedules";
 import accessGroupEntranceApi from "../../../api/access-group-entrance-n-to-n";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip'
 import toast from "react-hot-toast";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 import { Confirmdelete } from "../../../components/dashboard/access-groups/confirm-delete";
+import ConfirmStatusUpdate from "../../../components/dashboard/access-groups/confirm-status-update";
 import { filterAccessGroupByStringPlaceholder, filterAccessGroupByString, accessGroupCreateLink, getAccessGroupEditLink } from "../../../utils/access-group";
 import { applyPagination, createFilter } from "../../../utils/list-utils";
 import { controllerApi } from "../../../api/controllers";
 import { serverDownCode } from "../../../api/api-helpers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { _ } from "numeral";
 
 const tabs = [
 	{
@@ -181,9 +188,22 @@ const AccessGroupList = () => {
 		gtm.push({ event: "page_view" });
 	}, []);
 
+	const getAccessGroupInScheduleStatus = async () => {
+        const res = await accessGroupScheduleApi.getAllAccessGroupStatus();
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    }
+
 	const getAccessGroupLocal = useCallback(async () => {
 		try {
-      		//const data = await personApi.getFakePersons() 
+			//const data = await personApi.getFakePersons() 
 			const res = await accessGroupApi.getAccessGroups();
 			const data = await res.json();
 			const entrancesRes = await Promise.all(data.map(group => accessGroupEntranceApi.getEntranceWhereAccessGroupId(group.accessGroupId)));
@@ -194,11 +214,18 @@ const AccessGroupList = () => {
 				setAccessGroup([]);
 				return;
 			}
+			const accessGroupWithScheduleStatus = await getAccessGroupInScheduleStatus();
+			const accGroupWithSchedStatus = data.map(accessGroup=> {
+                    return {
+                        ...accessGroup,
+                        isInSchedule: accessGroupWithScheduleStatus[accessGroup.accessGroupId]
+                    }
+                });
 			const entrancesData = await Promise.all(entrancesRes.map(res => res.json()));
 			if (isMounted()) {
-				data.forEach((group, i) => group.entrances = entrancesData[i]);
-				console.log(data);
-				setAccessGroup(data);
+				accGroupWithSchedStatus.forEach((group, i) => group.entrances = entrancesData[i]);
+				console.log(accGroupWithSchedStatus, "accessGroupWithScheduleStatus");
+				setAccessGroup(accGroupWithSchedStatus);
 			}
 		} catch (err) {
 			console.error(err);
@@ -302,6 +329,49 @@ const AccessGroupList = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[accessGroup]
 	);
+	
+	// for updating status of access group (active/ non-active)
+	const [statusUpdateIds, setStatusUpdateIds] = useState([]);
+	const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+	const [updateStatus, setUpdateStatus] = useState(null);
+    const openStatusUpdateDialog = (accessGroupIds, updatedStatus) => {
+        setStatusUpdateIds(accessGroupIds);
+        setUpdateStatus(updatedStatus);
+        setStatusUpdateDialogOpen(true);
+    }
+    const handleStatusUpdateDialogClose = () => {
+        setStatusUpdateDialogOpen(false);
+    }
+    const handleMultipleUpdate = (updateStatus) => openStatusUpdateDialog([ ...selectedAccessGroup ], updateStatus);
+    const handleMultiActivate = () => handleMultipleUpdate(true);
+    const handleMultiDeactivate = () => handleMultipleUpdate(false);
+    const handleStatusUpdate = async (accessGroupIds, updatedStatus) => {
+        handleStatusUpdateDialogClose();
+
+        const resArr = await Promise.all(accessGroupIds.map(accessGroupId => accessGroupApi.updateAccessGroupStatus(accessGroupId, updatedStatus)));
+        
+        let successCount = 0;
+        const someFailed = false;
+        resArr.forEach(res => {
+            if (res.status == 200) {
+                successCount++;
+            } else {
+                someFailed = true;
+            }
+        })
+
+        if (someFailed) { toast.error("Failed to " + (updatedStatus ? "activate" : "deactivate") + " some access groups"); }
+        if (successCount) { toast.success("Successfully " + (updatedStatus ? "activated" : "deactivate") + " " + (successCount > 1 ? successCount + " access groups" : "1 access group")); }
+
+        const newAccessGroups = [ ...accessGroup ];
+        newAccessGroups.forEach(acc => {
+            if (accessGroupIds.includes(acc.accessGroupId)) {
+                //TODO: look into this logic again, I believe regardless of whether this is successful or not, it will be updated
+                acc.isActive = updatedStatus;
+            }
+        })
+        setAccessGroup(newAccessGroups);
+    }
 
 	//for delete action button
 	const [deleteOpen, setDeleteOpen] = React.useState(false);  
@@ -370,6 +440,13 @@ const AccessGroupList = () => {
 			<Head>
 				<title>Etlas : Access-Group List</title>
 			</Head>
+            <ConfirmStatusUpdate
+                accessGroupIds={statusUpdateIds}
+                open={statusUpdateDialogOpen}
+                handleDialogClose={handleStatusUpdateDialogClose}
+                updateStatus={updateStatus}
+                handleStatusUpdate={handleStatusUpdate}
+            />
 			<Box
 				component="main"
 				sx={{
@@ -422,7 +499,18 @@ const AccessGroupList = () => {
 											&#8288;Edit
 										</MenuItem>
 									</NextLink>
-									
+									<MenuItem disableRipple
+										onClick={handleMultiActivate}
+										disabled={buttonBlock}>
+										<CloudDone />
+										&#8288;Activate
+									</MenuItem>
+									<MenuItem disableRipple
+										onClick={handleMultiDeactivate}
+										disabled={buttonBlock}>
+										<CloudOff />
+										&#8288;De-Activate
+									</MenuItem>
 									<MenuItem disableRipple
 										onClick={handleDeleteOpen}
 										disabled={buttonBlock}>
@@ -437,7 +525,7 @@ const AccessGroupList = () => {
 								</StyledMenu>
 							</Grid>
 						</Grid>
-						<Box
+						{/* <Box
 							sx={{
 								m: -1,
 								mt: 3,
@@ -462,7 +550,7 @@ const AccessGroupList = () => {
 								}}>
 								<HelpOutlineIcon />
 							</Tooltip>
-						</Box>
+						</Box> */}
 					</Box>
 					<Card>
 						{/* <Tabs

@@ -83,7 +83,7 @@ const Home = () => {
   
   const handleLogin = () => {
     // Email/username and password
-    login('demo@devias.io', 'Password123!');
+    login('ISSAdmin@isssecurity.sg', 'ISSAdmin');
   };
 
   return (

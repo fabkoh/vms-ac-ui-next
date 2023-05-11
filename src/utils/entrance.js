@@ -26,6 +26,7 @@ const filterEntranceByString = (entrance, queryString) => stringFilterHelper(ent
 // returns true if status == null or
 //                 isActive == status
 const filterEntranceByStatus = (entrance, status) => status == null || entrance.isActive == status;
+const filterEntranceByCurrStatus = (entrance, currStatus) => currStatus == null || entrance.isLocked == !currStatus;
 
 const getEntranceDetailsLink = (entrance) => isObject(entrance) && `/dashboard/entrances/details/${entrance.entranceId}`;
 
@@ -50,4 +51,4 @@ const filterEntrancesByState = filterByState(filterEntrancesByString);
 
 const isEntranceEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.entranceId != null && e1.entranceId === e2.entranceId;
 
-export { filterEntranceByStringPlaceholder, filterEntranceByString, filterEntranceByStatus, entranceListLink, entranceCreateLink, getEntranceEditLink, getEntranceIdsEditLink, getEntranceDetailsLink, getEntranceLabel, filterEntrancesByString, filterEntrancesByState, isEntranceEqual }
+export { filterEntranceByStringPlaceholder, filterEntranceByString, filterEntranceByStatus, filterEntranceByCurrStatus, entranceListLink, entranceCreateLink, getEntranceEditLink, getEntranceIdsEditLink, getEntranceDetailsLink, getEntranceLabel, filterEntrancesByString, filterEntrancesByState, isEntranceEqual }

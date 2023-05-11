@@ -83,6 +83,26 @@ class AccessGroupScheduleApi {
     deleteAccessGroupSchedule(accessGroupScheduleId) {
         if (useApi) { return sendApi(`/api/access-group-schedule/${accessGroupScheduleId}`, { method: 'DELETE' }); }
     }
+
+    getAccessGroupStatusForSingleAccessGroup(accessGroupId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/current/${accessGroupId}`); }
+    }
+
+    getAccessGroupStatusForOneEntrance(entranceId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/current-entrance/${entranceId}`); }
+    }
+
+    getAllAccessGroupStatus() {
+        if (useApi) { return sendApi(`/api/access-group-schedule/current`); }
+    }
+
+    activateAccessGroupSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/enable/${scheduleId}`, {method: 'PUT'}); }
+    }
+
+    deactivateAccessGroupSchedule(scheduleId) {
+        if (useApi) { return sendApi(`/api/access-group-schedule/disable/${scheduleId}`, {method: 'PUT'}); }
+    }
 }
 
 export const accessGroupScheduleApi = new AccessGroupScheduleApi();

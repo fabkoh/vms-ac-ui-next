@@ -26,10 +26,11 @@ import { DashboardLayout } from "../../../../components/dashboard/dashboard-layo
 import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from '../../../../components/dashboard/entrances/confirm-delete';
-import { set } from "date-fns";
+import { set } from "date-fns"; 
 import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
+import ConfirmUnlock from "../../../../components/dashboard/entrances/list/confirm-unlock";
 import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
 import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
@@ -40,6 +41,11 @@ import { eventsManagementCreateLink } from "../../../../utils/eventsManagement";
 import { eventsManagementApi } from "../../../../api/events-management";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../../api/api-helpers";
+import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import {
+    CloudDone,
+    CloudOff,
+} from "@mui/icons-material";
 
 const EntranceDetails = () => {
 
@@ -59,6 +65,7 @@ const EntranceDetails = () => {
     const [entranceEventManagements, setEntranceEventManagements] = useState([]);
     const [accessGroup, setAccessGroup] = useState([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
+    const [entranceIsLocked, setEntranceIsLocked] = useState(true);
     const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
 
     const getControllers = async() => {
@@ -93,8 +100,20 @@ const EntranceDetails = () => {
             const res = await accessGroupEntranceApi.getAccessGroupWhereEntranceId(entranceId);
             if (res.status == 200) {
                 const body = await res.json();
+                const accessGroupCurrentStatus = await getAccessGroupStatusForOneEntrance();
+                const accessGroupDataWithCurrentStatus = body.map(accessGroupEntrance=> {
+                    console.log(accessGroupCurrentStatus[accessGroupEntrance.accessGroup.accessGroupId], "status")
+                    return {
+                        ...accessGroupEntrance,
+                        accessGroup: {
+                            ...accessGroupEntrance.accessGroup,
+                            isInSchedule: accessGroupCurrentStatus[accessGroupEntrance.accessGroup.accessGroupId]
+                        }
+                    }
+                });
                 if (isMounted()) {
-                    setAccessGroup(body);
+                    console.log(accessGroupDataWithCurrentStatus, "accessGroupWithCurrentStatus")
+                    setAccessGroup(accessGroupDataWithCurrentStatus);
                 }
             } else {
                 if (res.status == serverDownCode) {
@@ -109,6 +128,32 @@ const EntranceDetails = () => {
         }
     }
 
+    const getAccessGroupStatusForOneEntrance = async () => {
+        const res = await accessGroupScheduleApi.getAccessGroupStatusForOneEntrance(entranceId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading access group current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        return data;
+    }
+
+    const getEntranceCurrentStatus = async () => {
+        const res = await entranceScheduleApi.getCurrentEntranceStatusForOneEntrance(entranceId);
+        if (res.status != 200) {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
+            toast.error("Error loading entrance current statuses info");
+            return {};
+        }
+        const data = await res.json();
+        setEntranceIsLocked(!data);
+        return data;
+    };
 
     const getEntrance = useCallback(async() => {
         try {
@@ -123,9 +168,13 @@ const EntranceDetails = () => {
                 return;
             }
             const body = await res.json();
-
+            const entranceCurrentStatus = await getEntranceCurrentStatus();
+            const dataWithCurrentStatus = {
+                    ... body,
+                    isLocked: !entranceCurrentStatus
+                };
             if (isMounted()) {
-                setEntrance(body);
+                setEntrance(dataWithCurrentStatus);
                 getAccessGroups(body.entranceId);
                 setEntranceIsActive(body.isActive);
             }
@@ -227,7 +276,8 @@ const getEntranceEventsManagement = useCallback(async () => {
 	const handleDeleteClose = () => {
 		setDeleteOpen(false);
 	}
-	const deleteEntrance = async() => {
+	const deleteEntrance = async(e) => {
+        e.preventDefault();
         Promise.resolve(
             entranceApi.deleteEntrance(entranceId)
         ).then((res)=>{
@@ -279,11 +329,23 @@ const getEntranceEventsManagement = useCallback(async () => {
     const [statusUpdateId, setStatusUpdateId] = useState([]);
     const [updateStatus, setUpdateStatus] = useState(null);
     const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
+    const [unlockDialogOpen, setUnlockDialogOpen] = useState(false);
     const openStatusUpdateDialog = (entranceId, updatedStatus) => {
         setStatusUpdateId(entranceId);
         setUpdateStatus(updatedStatus);
         setStatusUpdateDialogOpen(true);
     }
+
+    const openUnlockDialog = (entranceId) => {
+        setStatusUpdateId(entranceId);
+        setUnlockDialogOpen(true);
+    }
+
+    const handleUnlockDialogClose = () => {
+        setUnlockDialogOpen(false);
+        handleActionClose();
+    }
+
     const handleStatusUpdateDialogClose = () => {
         setStatusUpdateDialogOpen(false);
         handleActionClose();
@@ -293,17 +355,26 @@ const getEntranceEventsManagement = useCallback(async () => {
     const entranceActive = entranceIsActive == true;
 
     const handleMultiEnable = () => openStatusUpdateDialog(entranceId, true);
-    const handleMultiUnlock = () => openStatusUpdateDialog(entranceId, false);
+    const handleMultiDisable = () => openStatusUpdateDialog(entranceId, false);
+    const handleMultiUnlock = () => openUnlockDialog(entranceId);
+    const handleUnlockApiCall= async (entranceId) => {
+        handleStatusUpdateDialogClose();
+
+        const res = await Promise.resolve(entranceApi.manuallyUnlockEntrance(entranceId));
+    
+        if (res.status !== 200) { toast.error("Failed to unlock entrance"); }
+        else { toast.success("Successfully unlock entrance"); }
+    }
     const handleStatusUpdate = async (entranceId, updatedStatus) => {
         handleStatusUpdateDialogClose();
 
         Promise.resolve(
-            entranceApi.updateEntranceStatus(entranceId, updatedStatus)
+            entranceApi.updateEntranceActiveStatus(entranceId, updatedStatus)
         ).then((res)=>{
             if (res.status == 200) {
-                toast.success("Successfully " + (updatedStatus ? "activated" : "unlocked") + " entrance");
+                toast.success("Successfully " + (updatedStatus ? "activated" : "deactivated") + " entrance");
             } else {
-                toast.error("Failed to " + (updatedStatus ? "activate" : "unlock") + " entrance");
+                toast.error("Failed to " + (updatedStatus ? "activate" : "deactivate") + " entrance");
             }
         })
 
@@ -333,6 +404,12 @@ const getEntranceEventsManagement = useCallback(async () => {
                 handleDialogClose={handleStatusUpdateDialogClose}
                 updateStatus={updateStatus}
                 handleStatusUpdate={handleStatusUpdate}
+            />
+            <ConfirmUnlock
+                entranceIds={statusUpdateId}
+                open={unlockDialogOpen}
+                handleDialogClose={handleUnlockDialogClose}
+                handleStatusUpdate={handleUnlockApiCall}
             />
             <Box
                 component="main"
@@ -443,13 +520,21 @@ const getEntranceEventsManagement = useCallback(async () => {
                                         onClick={handleMultiEnable}
                                         disabled={entranceActive}
                                     >
-                                        <DoorFront />
+                                        <CloudDone />
                                         &#8288;Activate
                                     </MenuItem>
                                     <MenuItem 
                                         disableRipple
-                                        onClick={handleMultiUnlock}
+                                        onClick={handleMultiDisable}
                                         disabled={!entranceActive}
+                                    >
+                                        <CloudOff />
+                                        &#8288;De-Activate
+                                    </MenuItem>
+                                    <MenuItem 
+                                        disableRipple
+                                        onClick={handleMultiUnlock}
+                                        disabled={!entranceIsLocked}
                                     >
                                         <LockOpen />
                                         &#8288;Unlock
