@@ -68,7 +68,8 @@ class AccessGroupEntranceNtoNApi {
                     .map(groupEntrance => {
                         return {
                             groupToEntranceId: groupEntrance.groupToEntranceId,
-                            accessGroup: fakeAccessGroups.find(group => group.accessGroupId == groupEntrance.accessGroupId)
+                            accessGroup: fakeAccessGroups.find(group => group.accessGroupId == groupEntrance.accessGroupId),
+                            isActive: groupEntrance.entrance.isActive
                         }
                     })),
                 { status: 200 })

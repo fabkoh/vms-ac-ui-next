@@ -88,6 +88,7 @@ export default function DetailsCardWithSearchField({
       return (
         <>
           {entities.map((e, i) => (
+            console.log(1, e, e.isActive),
             <Grid item paddingRight={3} paddingBottom={3} key={i}>
               <NextLink href={getLink(e)} passHref>
                 <Link component="a">
@@ -95,10 +96,16 @@ export default function DetailsCardWithSearchField({
                     color={
                       // don't show error color apparently, just groups that are in use currently
                       // showErr ? errFunction(e) ? "default" : "error" : "default"
-                      showSucc
-                        ? succFunction(e)
-                          ? "success"
-                          : "error"
+                      // showSucc
+                      //   ? succFunction(e)
+                      //     ? "error"
+                      //     : "success"
+                      //   : "error"
+                      // Access each entrance e to check if isActive
+                      e.isActive == undefined 
+                      ? "success" 
+                      : e.isActive 
+                        ? "success" 
                         : "error"
                     }
                     // icon={icon}

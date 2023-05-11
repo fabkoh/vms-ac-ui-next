@@ -40,7 +40,18 @@ const getEntranceIdsEditLink = (ids) =>  '/dashboard/entrances/edit?ids=' + enco
 const entranceListLink = '/dashboard/entrances';
 const entranceCreateLink = '/dashboard/entrances/create';
 
-const getEntranceLabel = (entrance) => isObject(entrance) && entrance.entranceName;
+const getEntranceLabel = (entrance) => {
+  if (isObject(entrance) && entrance.entranceName) {
+    return (
+      <span>
+        <span className={entrance.isActive ? 'green-button' : 'default-button'}>
+          {entrance.entranceName}
+        </span>
+      </span>
+    );
+  }
+  return null;
+};
 
 const filterEntrancesByString = (entrances, queryString) => {
     const query = queryString.toLowerCase();
