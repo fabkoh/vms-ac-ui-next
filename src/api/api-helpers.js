@@ -35,23 +35,29 @@ export function sendApi(path, init = {}, contentType = "application/json") {
     return promise;
   }
 
-  return helper(contentType).then((response) => {
-    if (response.status === 401 || response.status === 404) {
-      // Renew the token and try again
-      console.log("renew");
-      //console.log("before", localStorage.getItem("accessToken"));
-      return authRenewToken().then(() => {
-        //console.log("after", localStorage.getItem("accessToken"));
-        return helper(contentType);
-      });
-    } else {
-      // Return the original response
-      return response;
-    }
+  return authRenewToken().then(() => {
+    //console.log("after", localStorage.getItem("accessToken"));
+    return helper(contentType);
   });
+
+//   return helper(contentType).then((response) => {
+//     if (response.status === 401 || response.status === 404) {
+//       // Renew the token and try again
+//       console.log("renew");
+//       //console.log("before", localStorage.getItem("accessToken"));
+//       return authRenewToken().then(() => {
+//         //console.log("after", localStorage.getItem("accessToken"));
+//         return helper(contentType);
+//       });
+//     } else {
+//       // Return the original response
+//       return response;
+//     }
+//   }
+// );
 }
 
-const authRenewToken = async (contentType) => {
+const authRenewToken = async (contentType = "application/json") => {
   const res = await fetch(apiUri + "/api/auth/refreshtoken", {
     method: "POST",
     headers: { "Content-Type": contentType },
