@@ -11,54 +11,54 @@ export const JWTLogin = (props) => {
   const isMounted = useMounted();
   const router = useRouter();
   const { login } = useAuth();
-  const [isPolling, setIsPolling] = useState(false);
+  // const [isPolling, setIsPolling] = useState(false);
 
-  useEffect(
-    () => {
-      let timer;
-      console.log("refreshToken useEffect");
-      console.log(isPolling);
+  // useEffect(
+  //   () => {
+  //     let timer;
+  //     console.log("refreshToken useEffect");
+  //     console.log(isPolling);
 
-      if (isPolling) {
-        console.log("isPolling is true")
-        timer = setInterval(() => {
-          refreshTokenChecker();
-        }, 5 * 1000);
-      } else {
-        return () => clearInterval(timer);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isPolling]
-  );
+  //     if (isPolling) {
+  //       console.log("isPolling is true")
+  //       timer = setInterval(() => {
+  //         refreshTokenChecker();
+  //       }, 5 * 1000);
+  //     } else {
+  //       return () => clearInterval(timer);
+  //     }
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [isPolling]
+  // );
 
   
 
-  const refreshTokenChecker = async () => {
-    try {
-      console.log("refreshTokenChecker");
+  // const refreshTokenChecker = async () => {
+  //   try {
+  //     console.log("refreshTokenChecker");
 
-      const response = await sendApi("/api/auth/refreshTokenChecker", {
-        method: "POST",
-        body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") })
-      },
-        false);
+  //     const response = await sendApi("/api/auth/refreshTokenChecker", {
+  //       method: "POST",
+  //       body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") })
+  //     },
+  //       false);
 
-      if (response.status === 404) {
-        console.log("refreshTokenChecker 404");
-        // Stop the interval when refreshTokenChecker API returns 404
-        setIsPolling(false);
+  //     if (response.status === 404) {
+  //       console.log("refreshTokenChecker 404");
+  //       // Stop the interval when refreshTokenChecker API returns 404
+  //       setIsPolling(false);
 
-        // // Redirect to login page
-        router.replace("");
-      }
-    } catch (error) {
-      console.error("Error here")
-      console.error("Error:", error);
-      // Stop the interval when an error occurs
-      setIsPolling(false);
-    }
-  }
+  //       // // Redirect to login page
+  //       router.replace("");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error here")
+  //     console.error("Error:", error);
+  //     // Stop the interval when an error occurs
+  //     setIsPolling(false);
+  //   }
+  // }
 
   const formik = useFormik({
     initialValues: {
@@ -81,8 +81,8 @@ export const JWTLogin = (props) => {
       const res = await login(values.email, values.password);
       if (res.type === "success") {
         if (isMounted()) {
-          console.log("JWTLogin onSubmit");
-          setIsPolling(true);
+          // console.log("JWTLogin onSubmit");
+          // setIsPolling(true);
           const returnUrl = router.query.returnUrl || '/dashboard';
           router.push(returnUrl);
         }
