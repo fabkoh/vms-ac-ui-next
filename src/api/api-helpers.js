@@ -62,7 +62,8 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
 // );
 }
 
-const authRenewToken = async (contentType = "application/json") => {
+export const authRenewToken = async (contentType = "application/json") => {
+  console.log("authRenewToken");
   const res = await fetch(apiUri + "/api/auth/refreshtoken", {
     method: "POST",
     headers: { "Content-Type": contentType },
