@@ -51,6 +51,7 @@ import { serverDownCode } from "../../api/api-helpers";
 import toast from "react-hot-toast";
 import AuthenticationAddOnError from "./authentication-schedule/authentication-add-on-error";
 import { useAuth } from "../../hooks/use-auth";
+import { sendApi } from "../../api/api-helpers";
 
 const getSections = (t) => [
   {
@@ -450,6 +451,39 @@ export const DashboardSidebar = (props) => {
   const [syncErrorMessages, setSyncErrorMessages] = useState([]);
   const [syncErrorOpen, setSyncErrorOpen] = useState(false);
   const { user } = useAuth();
+
+  useEffect(
+    () => {  
+      const timer = setInterval(() => {
+          refreshTokenChecker();
+        }, 30 * 1000);
+      return () => clearInterval(timer);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const refreshTokenChecker = async () => {
+    try {
+      const response = await sendApi("/api/auth/refreshTokenChecker", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") })
+      },
+        false);
+
+      if (response.status === 404) {
+        // Redirect to login page, use of router.push can further improve this feature for "stack" concept of returnURL
+        window.location.href = "/authentication/login";
+        // router.push({
+        //   pathname: '/authentication/login',
+        //   query: { returnUrl: router.asPath }
+        // });
+      }
+    } catch (error) {
+      console.error("Error here")
+      console.error("Error:", error);
+    }
+  }
 
   const getSections = (t) => [
     {

@@ -7,7 +7,7 @@ export function encodeArrayForSpring(array) {
 
 export const serverDownCode = 599;
 
-export function sendApi(path, init = {}, contentType = "application/json") {
+export function sendApi(path, init = {}, refresh = true, contentType = "application/json") {
   // 1. try once with access token
   // 2. if cannot, try once again after renewing token
 
@@ -35,10 +35,15 @@ export function sendApi(path, init = {}, contentType = "application/json") {
     return promise;
   }
 
-  return authRenewToken().then(() => {
-    //console.log("after", localStorage.getItem("accessToken"));
-    return helper(contentType);
-  });
+  if (refresh === true) {
+    console.log("Renews");
+    return authRenewToken().then(() => {
+      return helper(contentType);
+    })
+  }
+
+  console.log("Does not renew");
+  return helper(contentType);
 
 //   return helper(contentType).then((response) => {
 //     if (response.status === 401 || response.status === 404) {
@@ -57,7 +62,8 @@ export function sendApi(path, init = {}, contentType = "application/json") {
 // );
 }
 
-const authRenewToken = async (contentType = "application/json") => {
+export const authRenewToken = async (contentType = "application/json") => {
+  console.log("authRenewToken");
   const res = await fetch(apiUri + "/api/auth/refreshtoken", {
     method: "POST",
     headers: { "Content-Type": contentType },
