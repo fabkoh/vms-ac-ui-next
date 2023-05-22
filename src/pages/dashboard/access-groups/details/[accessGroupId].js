@@ -189,7 +189,7 @@ const AccessGroupDetails = () => {
     setDeleteOpen(false);
   };
   const deleteAccessGroup = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     accessGroupApi
       .deleteAccessGroup(accessGroup.accessGroupId)
       .then((res) => {
