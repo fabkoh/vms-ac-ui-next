@@ -47,6 +47,7 @@ import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../
 import {VideoRecorderCameras} from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { serverDownCode } from "../../../../api/api-helpers";
 import {ServerDownError} from "../../../../components/dashboard/errors/server-down-error";
+import { authRenewToken } from "../../../../api/api-helpers";
 
 function formatDate(date) {
   var d = new Date(date),
@@ -67,6 +68,27 @@ const VideoRecorderPreview = () => {
     const { theaterMode, setTheaterMode} = useContext(TheaterModeContext);
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
+
+    // Begin indefinite polling for refresh token
+    useEffect(
+      () => {  
+        const timer = setInterval(() => {
+            refreshToken();
+          }, 5 * 60 * 1000);
+        return () => clearInterval(timer);
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+  
+    const refreshToken = async () => {
+      try {  
+        authRenewToken();
+        } catch (error) {
+        console.error("Error here")
+        console.error("Error:", error);
+      }
+    }
 
     useEffect(() => {
         gtm.push({ event: 'page_view' });
