@@ -84,6 +84,7 @@ export const AccessGroupListTable = (props) => {
   // 	const handleSelectId = (event,personId) => {
   //   setSelectId(personId)
   //   }, [selectId]);
+  const reversedAccessGroup = accessGroup.slice().reverse();
 
   return (
     <div {...other}>
@@ -131,7 +132,7 @@ export const AccessGroupListTable = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {accessGroup.map((accGroup) => {
+            {reversedAccessGroup.map((accGroup) => {
               const isAccessGroupselected = props.selectedAccessGroup.includes(
                 accGroup.accessGroupId
               );

@@ -90,6 +90,7 @@ export const PersonsListTable = (props) => {
   // 	const handleSelectId = (event,personId) => {
   //   setSelectId(personId)
   //   }, [selectId]);
+  const reversedPersons = Persons.slice().reverse();
 
   return (
     <div {...other}>
@@ -141,7 +142,7 @@ export const PersonsListTable = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Persons.map((person) => {
+            {reversedPersons.map((person) => {
               const isPersonselected = props.selectedPersons.includes(
                 person.personId
               );

@@ -376,27 +376,41 @@ const PersonList = () => {
 
   // json data from csv file
   const [csvData, setCsvData] = useState([]);
+
   const importCSVIndex = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file, "file.csv");
     try {
-      const res = await personApi.postCSV(formData);
-      if (res.status == 200) {
-        toast.success("File uploaded successfully");
-        handleOpenImport();
-        const jsonResultRes = await personApi.getCSVJson();
-        setCsvData(await jsonResultRes.json());
-      } else {
-        toast.error(
-          "Failed to upload file, excel first row headers need to match import template"
-        );
-      }
-      console.log(csvData);
+      const formData = new FormData();
+      formData.append("file", file, "file.csv");
+
+      const fileReader = new FileReader();
+      fileReader.readAsText(file); // Read file content as text
+
+      fileReader.onload = async () => {
+        const fileContent = fileReader.result; // Get the file content
+
+        // Append the file content as a Blob to the FormData
+        const csvBlob = new Blob([fileContent], { type: "text/csv" });
+        formData.append("file", csvBlob, "file.csv");
+
+        try {
+          const res = await personApi.postCSV(formData);
+          if (res.status === 200) {
+            toast.success("File uploaded successfully");
+            handleOpenImport();
+            const jsonResultRes = await personApi.getCSVJson();
+            setCsvData(await jsonResultRes.json());
+          } else {
+            toast.error("Failed to upload file. Please check the file format.");
+          }
+          console.log(csvData);
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to upload file. Please check the file format.");
+        }
+      };
     } catch (error) {
       console.error(error);
-      toast.error(
-        "Failed to upload file, excel first row headers need to match import template"
-      );
+      toast.error("Failed to read file. Please try again.");
     }
   };
 
@@ -479,6 +493,7 @@ const PersonList = () => {
 
   const handleQueryChange = (event) => {
     event.preventDefault();
+    // onSelect();
     setFilters((prevState) => ({
       ...prevState,
       query: queryRef.current?.value,
@@ -608,11 +623,15 @@ const PersonList = () => {
   // access group filtering
   const onSelect = (i) => {
     const newFilters = { ...filters };
+    const query = newFilters.query;
     if (i == -1) {
       newFilters.accessGroup = null;
     } else {
-      newFilters.accessGroup = accessGroupNames[i];
+      // if (accessGroupNames[i].includes(query)) {
+      //   newFilters.accessGroup = accessGroupNames[i];
+      // }
     }
+    console.log(newFilters);
     setFilters(newFilters);
   };
 
@@ -902,7 +921,7 @@ const PersonList = () => {
                   </Button>
                 </CSVLink>
                 <Tooltip
-                  title="Note: Expiry date format is mm-dd-yyyy  leave it empty if it is permanent. Only Card and Pin type credentials can be added through the excel import."
+                  title="Note: Import requires the use of import template with 8 columns of first and last name, UID, Email, Unique mobile number, Access group, Credential type, Credential pin and Credential expiry."
                   enterTouchDelay={0}
                   placement="top"
                   sx={{

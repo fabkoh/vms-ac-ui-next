@@ -145,7 +145,7 @@ const EditPersonsTwo = () => {
         credentialRepeatedIds: [],
         credentialUidRepeatedIds: [],
         credentialSubmitFailed: {},
-
+        numberInvalid: false,
         // note
         numberInUse: false,
         numberRepeated: false,
