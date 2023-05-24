@@ -173,7 +173,8 @@ const EditPersonsTwo = () => {
         v.uidBlank ||
         v.credentialRepeatedIds.length > 0 ||
         v.credentialUidRepeatedIds.length > 0 ||
-        Object.keys(v.credentialSubmitFailed).length > 0)
+        Object.keys(v.credentialSubmitFailed).length > 0 ||
+        v.numberInvalid)
     );
   };
 
@@ -336,7 +337,19 @@ const EditPersonsTwo = () => {
 
     return toChange;
   };
+  // check if phone number is a valid Singapore phone numnber
+  const checkInvalidNumberHelper = (personId, number, key, validArr) => {
+    const personValidation = validArr.find((p) => p.personId === personId);
+    const invalid = number.startsWith("+65 ") && number.length !== 13;
+    console.log("invalid phone number is " + invalid);
 
+    if (isObject(personValidation) && personValidation[key] != invalid) {
+      personValidation[key] = invalid;
+      return true;
+    }
+
+    return false;
+  };
   // returns if validArr is changed
   const checkCredRepeatedHelper = (infoArr, validArr) => {
     let toChange = false;
@@ -466,8 +479,14 @@ const EditPersonsTwo = () => {
       "numberInUse",
       "numberRepeated"
     );
+    const b2 = checkInvalidNumberHelper(
+      id,
+      ref.current?.value,
+      "numberInvalid",
+      personsValidation
+    );
 
-    if (b1) {
+    if (b1 || b2) {
       setPersonsValidation([...personsValidation]);
     }
   };
