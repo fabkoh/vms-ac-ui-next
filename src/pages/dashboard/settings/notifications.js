@@ -54,7 +54,7 @@ const NotificationSettings = () => {
   const [expandedEmail, setExpandedEmail] = useState(false);
   const [expandedSMS, setExpandedSMS] = useState(false);
   const [SMSCredits, setSMSCredits] = useState(0);
-  const [enableCustom, setEnableCustom] = useState(true);
+  const [enableCustom, setEnableCustom] = useState(false);
   const [emailSettings, setEmailSettings] = useState({ isTLS: false });
   const [isUpdated, setIsUpdated] = useState(false);
   const [smsSettings, setSMSSettings] = useState([]);
