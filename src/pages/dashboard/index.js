@@ -31,6 +31,7 @@ import { Reports as ReportsIcon } from '../../icons/reports';
 import { Users as UsersIcon } from '../../icons/users';
 import { gtm } from '../../lib/gtm';
 import useExternalScripts from '../../__fake-api__/config';
+import { ComponentList } from './dashboard-components/list-of-components';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);
@@ -89,14 +90,14 @@ const Overview = () => {
                   m: -1
                 }}
               >
-                {/* <Button
+                <Button
                   startIcon={<ReportsIcon fontSize="small" />}
                   sx={{ m: 1 }}
                   variant="outlined"
                 >
                   Reports
-                </Button> */}
-                {/* <TextField
+                </Button>
+                <TextField
                   defaultValue="week"
                   label="Period"
                   select
@@ -112,7 +113,7 @@ const Overview = () => {
                   <MenuItem value="year">
                     Last year
                   </MenuItem>
-                </TextField> */}
+                </TextField>
               </Grid>
             </Grid>
           </Box>
@@ -128,19 +129,26 @@ const Overview = () => {
                 <OverviewBanner onDismiss={handleDismissBanner} />
               </Grid>
             )}
-            <Grid
+            {/* <Grid
               item
-              md={6}
+              md={4}
               xs={12}
             >
-              {/* <OverviewCryptoWallet />
+              <OverviewCryptoWallet />
             </Grid>
             <Grid
               item
-              md={6}
+              md={4}
               xs={12}
             >
               <OverviewPrivateWallet />
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <OverviewCryptoWallet />
             </Grid>
             <Grid
               item
@@ -148,27 +156,29 @@ const Overview = () => {
               xs={12}
             >
               <OverviewTotalTransactions />
+            </Grid> */}
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <ComponentList name="Controllers" link="controllers"/>
             </Grid>
             <Grid
               item
               md={4}
               xs={12}
             >
-              <OverviewTotalBalance />
-            </Grid>
-            <Grid
-              item
-              md={8}
-              xs={12}
-            >
-              <OverviewLatestTransactions />
+              <ComponentList name="Video Recorders" link="video-recorders"/>
+              {/* <OverviewLatestTransactions /> */}
             </Grid>
             <Grid
               item
               md={4}
               xs={12}
             >
-              <OverviewInbox />
+              <ComponentList name="Persons" link="persons"/>
+              {/* <OverviewInbox /> */}
             </Grid>
             <Grid
               item
@@ -362,7 +372,7 @@ const Overview = () => {
                     My Contacts
                   </Button>
                 </CardActions>
-              </Card>*/}
+              </Card>
             </Grid>
           </Grid> 
         </Container>
