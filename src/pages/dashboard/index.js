@@ -177,7 +177,22 @@ const Overview = () => {
               md={4}
               xs={12}
             >
-              <ComponentList name="Persons" link="persons"/>
+              <ComponentList name="Entrances" link="entrances"/>
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <ComponentList name="Persons" link="access-groups"/>
+              {/* <OverviewInbox /> */}
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <ComponentList name="Access Groups" link="persons"/>
               {/* <OverviewInbox /> */}
             </Grid>
             <Grid

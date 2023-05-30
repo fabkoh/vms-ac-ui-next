@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Typography } from '@mui/material';
 import { controllerApi } from '../../../api/controllers'; 
 import videoRecorderApi from '../../../api/videorecorder';
+import { personApi } from '../../../api/person';
+import entranceApi from '../../../api/entrance';
+import { accessGroupApi } from '../../../api/access-groups';
 
 export const ComponentNumbers = (props) => {
     const {
@@ -31,6 +34,39 @@ export const ComponentNumbers = (props) => {
         const recordersJson = await recordersRes.json();
         setCountType(recordersJson.length);
     };
+  
+    // Set number of persons
+    const getPersons = async () => {
+        const personsRes = await personApi.getPersons();
+        if (personsRes.status !== 200) {
+          toast.error("Error loading persons");
+          return;
+        }
+        const personsJson = await personsRes.json();
+        setCountType(personsJson.length);
+    };
+
+    // Set number of entrances
+    const getEntrances = async () => {
+      const entrancesRes = await entranceApi.getEntrances();
+      if (entrancesRes.status !== 200) {
+        toast.error("Error loading entrances");
+        return;
+      }
+      const entrancesJson = await entrancesRes.json();
+      setCountType(entrancesJson.length);
+    };
+
+    // Set number of access groups
+    const getAccessGroups = async () => {
+      const accessGroupRes = await accessGroupApi.getAccessGroups();
+      if (accessGroupRes.status !== 200) {
+        toast.error("Error loading entrances");
+        return;
+      }
+      const accessGroupJson = await accessGroupRes.json();
+      setCountType(accessGroupJson.length);
+    };
 
     // Renders based on numberType
     useEffect(() => {
@@ -38,8 +74,12 @@ export const ComponentNumbers = (props) => {
           getControllers();
         } else if (numberType === 'Video Recorders') {
           getVideoRecorders();
-        } else {
-          setCountType(0);
+        } else if (numberType === 'Persons') {
+          getPersons();
+        } else if (numberType === 'Entrances') {
+          getEntrances();
+        } else if (numberType === 'Access Groups') {
+          getAccessGroups();
         }
       }, [numberType]);
 
