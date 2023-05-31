@@ -83,6 +83,7 @@ export const OverviewCryptoWallet = (props) => {
               flexGrow: 1,
               mr: 3
             }}
+            paddingLeft={3}
           >
             <Typography
               color="primary"

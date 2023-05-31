@@ -32,6 +32,8 @@ import { Users as UsersIcon } from '../../icons/users';
 import { gtm } from '../../lib/gtm';
 import useExternalScripts from '../../__fake-api__/config';
 import { ComponentList } from './dashboard-components/list-of-components';
+import { ControllerDeviceCondition } from './dashboard-components/controller-device-condition';
+import { VideoRecorderDeviceCondition } from './dashboard-components/video-recorder-device-condition';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);
@@ -129,28 +131,28 @@ const Overview = () => {
                 <OverviewBanner onDismiss={handleDismissBanner} />
               </Grid>
             )}
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <ControllerDeviceCondition />
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <VideoRecorderDeviceCondition />
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <OverviewCryptoWallet />
+            </Grid>
             {/* <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <OverviewCryptoWallet />
-            </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <OverviewPrivateWallet />
-            </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <OverviewCryptoWallet />
-            </Grid>
-            <Grid
               item
               md={8}
               xs={12}
@@ -159,14 +161,14 @@ const Overview = () => {
             </Grid> */}
             <Grid
               item
-              md={4}
+              md={3}
               xs={12}
             >
               <ComponentList name="Controllers" link="controllers"/>
             </Grid>
             <Grid
               item
-              md={4}
+              md={3}
               xs={12}
             >
               <ComponentList name="Video Recorders" link="video-recorders"/>
@@ -174,14 +176,14 @@ const Overview = () => {
             </Grid>
             <Grid
               item
-              md={4}
+              md={3}
               xs={12}
             >
               <ComponentList name="Entrances" link="entrances"/>
             </Grid>
             <Grid
               item
-              md={4}
+              md={3}
               xs={12}
             >
               <ComponentList name="Persons" link="access-groups"/>
@@ -189,13 +191,13 @@ const Overview = () => {
             </Grid>
             <Grid
               item
-              md={4}
+              md={3}
               xs={12}
             >
               <ComponentList name="Access Groups" link="persons"/>
               {/* <OverviewInbox /> */}
             </Grid>
-            <Grid
+            {/* <Grid
               item
               md={6}
               xs={12}
@@ -244,8 +246,8 @@ const Overview = () => {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
-            <Grid
+            </Grid> */}
+            {/* <Grid
               item
               md={6}
               xs={12}
@@ -291,8 +293,8 @@ const Overview = () => {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
-            <Grid
+            </Grid> */}
+            {/* <Grid
               item
               md={6}
               xs={12}
@@ -340,8 +342,8 @@ const Overview = () => {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
-            <Grid
+            </Grid> */}
+            {/* <Grid
               item
               md={6}
               xs={12}
@@ -388,7 +390,7 @@ const Overview = () => {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
+            </Grid> */}
           </Grid> 
         </Container>
       </Box>
