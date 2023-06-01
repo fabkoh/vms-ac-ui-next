@@ -116,6 +116,12 @@ class ControllerApi {
       return sendApi(`/api/controller/currentAuthMethod/${controllerId}`);
     }
   }
+
+  getPiProperty(controllerId) {
+    if (useApi) {
+      return sendApi(`/api/controller/piProperty/${controllerId}`);
+    }
+  }
 }
 
 export const controllerApi = new ControllerApi();

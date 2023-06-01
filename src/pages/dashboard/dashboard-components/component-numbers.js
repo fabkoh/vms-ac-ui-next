@@ -68,6 +68,17 @@ export const ComponentNumbers = (props) => {
       setCountType(accessGroupJson.length);
     };
 
+    // Set number of event logs
+    // const getEventLogs = async () => {
+    //   const accessGroupRes = await accessGroupApi.getAccessGroups();
+    //   if (accessGroupRes.status !== 200) {
+    //     toast.error("Error loading event logs");
+    //     return;
+    //   }
+    //   const accessGroupJson = await accessGroupRes.json();
+    //   setCountType(accessGroupJson.length);
+    // };
+
     // Renders based on numberType
     useEffect(() => {
         if (numberType === 'Controllers') {
