@@ -5,6 +5,7 @@ import { ChevronUp as ChevronUpIcon } from '../../../icons/chevron-up';
 import { Chart } from '../../../components/chart';
 import { React, useState, useEffect } from 'react';
 import videoRecorderApi from '../../../api/videorecorder';
+import toast from "react-hot-toast";
 
 export const VideoRecorderDeviceCondition = () => {
   const theme = useTheme();

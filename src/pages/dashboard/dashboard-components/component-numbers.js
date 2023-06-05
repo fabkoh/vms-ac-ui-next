@@ -5,6 +5,9 @@ import videoRecorderApi from '../../../api/videorecorder';
 import { personApi } from '../../../api/person';
 import entranceApi from '../../../api/entrance';
 import { accessGroupApi } from '../../../api/access-groups';
+import { eventslogsApi } from '../../../api/events';
+import { notificationLogsApi } from '../../../api/notifications-log';
+import toast from "react-hot-toast";
 
 export const ComponentNumbers = (props) => {
     const {
@@ -69,15 +72,26 @@ export const ComponentNumbers = (props) => {
     };
 
     // Set number of event logs
-    // const getEventLogs = async () => {
-    //   const accessGroupRes = await accessGroupApi.getAccessGroups();
-    //   if (accessGroupRes.status !== 200) {
-    //     toast.error("Error loading event logs");
-    //     return;
-    //   }
-    //   const accessGroupJson = await accessGroupRes.json();
-    //   setCountType(accessGroupJson.length);
-    // };
+    const getEventLogs = async () => {
+      const eventsRes = await eventslogsApi.getEventsCount();
+      if (eventsRes.status !== 200) {
+        toast.error("Error loading event logs");
+        return;
+      }
+      const eventsJson = await eventsRes.json();
+      setCountType(eventsJson);
+    };
+
+    // Set number of notification logs
+    const getNotificationLogs = async () => {
+      const notifRes = await notificationLogsApi.getNotifsCount();
+      if (notifRes.status !== 200) {
+        toast.error("Error loading notification logs");
+        return;
+      }
+      const notifJson = await notifRes.json();
+      setCountType(notifJson);
+    };
 
     // Renders based on numberType
     useEffect(() => {
@@ -91,6 +105,10 @@ export const ComponentNumbers = (props) => {
           getEntrances();
         } else if (numberType === 'Access Groups') {
           getAccessGroups();
+        } else if (numberType === 'Event Logs') {
+          getEventLogs();
+        } else if (numberType === 'Notification Logs') {
+          getNotificationLogs();
         }
       }, [numberType]);
 

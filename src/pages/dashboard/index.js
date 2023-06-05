@@ -34,6 +34,7 @@ import useExternalScripts from '../../__fake-api__/config';
 import { ComponentList } from './dashboard-components/list-of-components';
 import { ControllerDeviceCondition } from './dashboard-components/controller-device-condition';
 import { VideoRecorderDeviceCondition } from './dashboard-components/video-recorder-device-condition';
+import { ControllerDeviceProperty } from './dashboard-components/controller-device-property';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);
@@ -150,7 +151,7 @@ const Overview = () => {
               md={4}
               xs={12}
             >
-              <OverviewCryptoWallet />
+              <ControllerDeviceProperty />
             </Grid>
             {/* <Grid
               item
@@ -171,7 +172,7 @@ const Overview = () => {
               md={3}
               xs={12}
             >
-              <ComponentList name="Video Recorders" link="video-recorders"/>
+              <ComponentList name="Recorders" link="video-recorders"/>
               {/* <OverviewLatestTransactions /> */}
             </Grid>
             <Grid
@@ -187,7 +188,6 @@ const Overview = () => {
               xs={12}
             >
               <ComponentList name="Persons" link="access-groups"/>
-              {/* <OverviewInbox /> */}
             </Grid>
             <Grid
               item
@@ -195,7 +195,20 @@ const Overview = () => {
               xs={12}
             >
               <ComponentList name="Access Groups" link="persons"/>
-              {/* <OverviewInbox /> */}
+            </Grid>
+            <Grid
+              item
+              md={3}
+              xs={12}
+            >
+              <ComponentList name="Events" link="logs/eventlog"/>
+            </Grid>
+            <Grid
+              item
+              md={3}
+              xs={12}
+            >
+              <ComponentList name="Notifications" link="logs/notificationlog"/>
             </Grid>
             {/* <Grid
               item
