@@ -6,6 +6,7 @@ import {
     Typography,
     TableRow,
     TableCell,
+    Chip
   } from '@mui/material';
 import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { useRouter } from 'next/router';
@@ -14,17 +15,16 @@ import { useEffect, useState } from 'react';
 import toast from "react-hot-toast";
 
   
-  export const ControllerDevicePropertyRow = (controller) => {
+  export const ControllerDevicePropertyRow = ({controller}) => {
       const {
         controllerId,
         controllerName,
-        controllerIP,
-        created,
-        lastSync,
       } = controller;
   
       const router = useRouter();
-      const [properties, setProperties] = useState("Controller is okay.");
+      const [temp, setTemp] = useState(0);
+      const [cpu, setCpu] = useState(0);
+      const [mem, setMem] = useState(0);
 
       const getProperties = async () => {
         const propertiesRes = await controllerApi.getPiProperty(controllerId);
@@ -33,17 +33,42 @@ import toast from "react-hot-toast";
           return;
         }
         const propertiesJson = await propertiesRes.json();
-        setProperties(propertiesJson);
+        // setTemp(propertiesJson.cpu_temperature);
+        // setCpu(propertiesJson.cpu_usage_percentage);
+        // setMem(propertiesJson.ram_usage_percentage);
+        setTemp(100);
+        setCpu(100);
       };
+
+      // mem above 90% util
+      // cpu above 90% util
+      // temperature past 90 degrees
 
       useEffect(() => {
         getProperties();
       }, []);
-  
-      return (
-                        <TableRow>
-                            <TableCell>{controllerName}</TableCell>
-                            <TableCell>{properties}</TableCell>
-                        </TableRow>
-      );
+
+      // Determine labels based on conditions
+      const labels = [];
+      if (temp >= 90) labels.push("CPU Temperature: " + temp);
+      if (cpu >= 90) labels.push("CPU Usage: " + cpu);
+      if (mem >= 90) labels.push("Memory Usage: " + mem);
+
+      // piProperties are normal, no rendering of rows required
+      if (labels.length === 0) {
+        return null;
+      } else {
+        return (
+          <TableRow>
+            <TableCell>{controllerName}</TableCell>
+            <TableCell>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {labels.map((label) => (
+                <Chip key={label} label={label} color="error" />
+              ))}
+            </div>
+            </TableCell>
+          </TableRow>
+        );
+      }
   }

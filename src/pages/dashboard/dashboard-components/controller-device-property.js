@@ -48,13 +48,9 @@ import toast from "react-hot-toast";
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {
-                                controllers.map(controller => (
-                                    <ControllerDevicePropertyRow 
-                                        controller={controller}
-                                    />
-                                ))
-                            }
+                        {controllers.map((controller) => (
+                            <ControllerDevicePropertyRow key={controller.controllerId} controller={controller} />
+                        ))}
                         </TableBody>
                     </Table>
                 </Scrollbar>
