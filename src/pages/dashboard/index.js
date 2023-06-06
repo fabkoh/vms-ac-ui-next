@@ -74,207 +74,126 @@ const Overview = () => {
         }}
       >
         <Container maxWidth="xl">
-          <Box sx={{ mb: 4 }}>
-            <Grid
-              container
-              justifyContent="space-between"
-              spacing={3}
-            >
-              <Grid item>
+          <Grid container spacing={4}>
+              <Grid container item>
+                <Grid item xs={12}>
                 <Typography variant="h4">
-                  Good Morning
+                  Dashboard
                 </Typography>
+                <Divider variant="middle" sx={{marginTop: '20px'}}/>
+                </Grid>
+                {displayBanner && (
+                  <Grid
+                    item
+                    xs={12}
+                  >
+                    <OverviewBanner onDismiss={handleDismissBanner} />
+                  </Grid>
+                )}
               </Grid>
+            <Grid container item xs={12} spacing={4}>
+              <Grid container item xs={12} md={7} spacing={4}>
+                <Grid item xs={12}>
+                  <Typography variant={"h5"}>
+                    Alerts
+                  </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                >
+                  <AlertCard name="Unauthenticated scans"/>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                >
+                  <AlertCard name="Unauthorised door openings"/>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant={"h5"}>
+                    Device Conditions
+                  </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                >
+                <ControllerDeviceCondition />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                >
+                <VideoRecorderDeviceCondition />
+                </Grid>
+              </Grid>
+                <Grid container item xs={12} md={5}>
+                  <Grid item xs={12}>
+                    <Typography variant={"h5"} marginBottom={"25px"}>
+                      Controller Properties
+                    </Typography>
+                    <ControllerDeviceProperty />
+                  </Grid>
+                </Grid>
+              </Grid>
+            <Grid container item spacing={4} xs={12}>
               <Grid
                 item
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  m: -1
-                }}
-              >
-                <Button
-                  startIcon={<ReportsIcon fontSize="small" />}
-                  sx={{ m: 1 }}
-                  variant="outlined"
-                >
-                  Reports
-                </Button>
-                <TextField
-                  defaultValue="week"
-                  label="Period"
-                  select
-                  size="small"
-                  sx={{ m: 1 }}
-                >
-                  <MenuItem value="week">
-                    Last week
-                  </MenuItem>
-                  <MenuItem value="month">
-                    Last month
-                  </MenuItem>
-                  <MenuItem value="year">
-                    Last year
-                  </MenuItem>
-                </TextField>
-              </Grid>
-            </Grid>
-          </Box>
-          <Grid
-            container
-            spacing={4}
-          >
-            {displayBanner && (
-              <Grid
-                item
+                md={3}
                 xs={12}
               >
-                <OverviewBanner onDismiss={handleDismissBanner} />
+                <ComponentList name="Controllers" link="controllers"/>
               </Grid>
-            )}
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <AlertCard name="Unauthenticated scans"/>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Recorders" link="video-recorders"/>
+                {/* <OverviewLatestTransactions /> */}
+              </Grid>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Entrances" link="entrances"/>
+              </Grid>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Persons" link="access-groups"/>
+              </Grid>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Access Groups" link="persons"/>
+              </Grid>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Events" link="logs/eventlog"/>
+              </Grid>
+              <Grid
+                item
+                md={3}
+                xs={12}
+              >
+                <ComponentList name="Notifications" link="logs/notificationlog"/>
+              </Grid>
             </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <AlertCard name="Unauthorised door openings"/>
             </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <ControllerDeviceCondition />
-            </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <VideoRecorderDeviceCondition />
-            </Grid>
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
-              <ControllerDeviceProperty />
-            </Grid>
-            {/* <Grid
-              item
-              md={8}
-              xs={12}
-            >
-              <OverviewTotalTransactions />
-            </Grid> */}
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Controllers" link="controllers"/>
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Recorders" link="video-recorders"/>
-              {/* <OverviewLatestTransactions /> */}
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Entrances" link="entrances"/>
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Persons" link="access-groups"/>
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Access Groups" link="persons"/>
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Events" link="logs/eventlog"/>
-            </Grid>
-            <Grid
-              item
-              md={3}
-              xs={12}
-            >
-              <ComponentList name="Notifications" link="logs/notificationlog"/>
-            </Grid>
-            {/* <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex'
-                    }}
-                  >
-                    <BriefcaseIcon
-                      color="primary"
-                      fontSize="small"
-                    />
-                    <Typography
-                      color="primary.main"
-                      sx={{ pl: 1 }}
-                      variant="subtitle2"
-                    >
-                      Jobs
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{ mt: 2 }}
-                  >
-                    Find your dream job
-                  </Typography>
-                  <Typography
-                    color="textSecondary"
-                    variant="body2"
-                  >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing
-                    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </Typography>
-                </CardContent>
-                <Divider />
-                <CardActions>
-                  <Button
-                    endIcon={<ArrowRightIcon fontSize="small" />}
-                    size="small"
-                  >
-                    Search Jobs
-                  </Button>
-                </CardActions>
-              </Card>
-                  </Grid> */}
-          </Grid> 
         </Container>
       </Box>
     </>
