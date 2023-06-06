@@ -73,12 +73,15 @@ export const ComponentNumbers = (props) => {
 
     // Set number of event logs
     const getEventLogs = async () => {
+      console.log("event is checked");
       const eventsRes = await eventslogsApi.getEventsCount();
       if (eventsRes.status !== 200) {
         toast.error("Error loading event logs");
         return;
       }
       const eventsJson = await eventsRes.json();
+      console.log("events");
+      console.log(eventsJson);
       setCountType(eventsJson);
     };
 
@@ -97,7 +100,7 @@ export const ComponentNumbers = (props) => {
     useEffect(() => {
         if (numberType === 'Controllers') {
           getControllers();
-        } else if (numberType === 'Video Recorders') {
+        } else if (numberType === 'Recorders') {
           getVideoRecorders();
         } else if (numberType === 'Persons') {
           getPersons();
@@ -105,9 +108,9 @@ export const ComponentNumbers = (props) => {
           getEntrances();
         } else if (numberType === 'Access Groups') {
           getAccessGroups();
-        } else if (numberType === 'Event Logs') {
+        } else if (numberType === 'Events') {
           getEventLogs();
-        } else if (numberType === 'Notification Logs') {
+        } else if (numberType === 'Notifications') {
           getNotificationLogs();
         }
       }, [numberType]);

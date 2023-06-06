@@ -22,7 +22,6 @@ import { OverviewLatestTransactions } from '../../components/dashboard/overview/
 import { OverviewPrivateWallet } from '../../components/dashboard/overview/overview-private-wallet';
 import { OverviewTotalBalance } from '../../components/dashboard/overview/overview-total-balance';
 import { OverviewTotalTransactions } from '../../components/dashboard/overview/overview-total-transactions';
-import { ArrowRight as ArrowRightIcon } from '../../icons/arrow-right';
 import { Briefcase as BriefcaseIcon } from '../../icons/briefcase';
 import { Download as DownloadIcon } from '../../icons/download';
 import { ExternalLink as ExternalLinkIcon } from '../../icons/external-link';
@@ -35,6 +34,7 @@ import { ComponentList } from './dashboard-components/list-of-components';
 import { ControllerDeviceCondition } from './dashboard-components/controller-device-condition';
 import { VideoRecorderDeviceCondition } from './dashboard-components/video-recorder-device-condition';
 import { ControllerDeviceProperty } from './dashboard-components/controller-device-property';
+import { AlertCard } from './dashboard-components/alert-card';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);
@@ -132,6 +132,20 @@ const Overview = () => {
                 <OverviewBanner onDismiss={handleDismissBanner} />
               </Grid>
             )}
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <AlertCard name="Unauthenticated scans"/>
+            </Grid>
+            <Grid
+              item
+              md={4}
+              xs={12}
+            >
+              <AlertCard name="Unauthorised door openings"/>
+            </Grid>
             <Grid
               item
               md={4}
