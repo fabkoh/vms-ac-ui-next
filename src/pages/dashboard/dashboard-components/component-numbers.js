@@ -80,8 +80,6 @@ export const ComponentNumbers = (props) => {
         return;
       }
       const eventsJson = await eventsRes.json();
-      console.log("events");
-      console.log(eventsJson);
       setCountType(eventsJson);
     };
 

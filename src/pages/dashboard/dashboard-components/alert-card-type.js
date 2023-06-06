@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import toast from "react-hot-toast";
 import { eventslogsApi } from '../../../api/events';
-import { FlipTwoTone } from '@mui/icons-material';
+import { FlipTwoTone, MeetingRoom } from '@mui/icons-material';
 
   
   export const AlertCardType = (props) => {
@@ -18,6 +18,7 @@ import { FlipTwoTone } from '@mui/icons-material';
         cardType
     } = props;
     const [count, setCount] = useState([]);
+    const [alertIcon, setIcon] = useState(null);
 
     // Sets number of unauthenticated scans in the last 24 hours
     const getUnauthenticatedScans = async () => {
@@ -44,14 +45,16 @@ import { FlipTwoTone } from '@mui/icons-material';
     useEffect(() => {
         if (cardType == "Unauthenticated scans") {
             getUnauthenticatedScans();
+            setIcon(<FlipTwoTone style={{ marginRight: '10px', fontSize: '36px' }} />);
         } else if (cardType == "Unauthorised door openings") {
             getUnauthorisedDoorOpens();
+            setIcon(<MeetingRoom style={{ marginRight: '10px', fontSize: '36px' }} />);
         }
     }, [cardType]);
 
     return (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-            <FlipTwoTone style={{ marginRight: '10px', fontSize: '36px' }} />
+            {alertIcon}
             <Typography
                 fontSize={30}
                 color="textPrimary"

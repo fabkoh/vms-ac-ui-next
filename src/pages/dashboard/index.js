@@ -16,18 +16,7 @@ import {
 import { AuthGuard } from '../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../components/dashboard/dashboard-layout';
 import { OverviewBanner } from '../../components/dashboard/overview/overview-banner';
-import { OverviewCryptoWallet } from '../../components/dashboard/overview/overview-crypto-wallet';
-import { OverviewInbox } from '../../components/dashboard/overview/overview-inbox';
-import { OverviewLatestTransactions } from '../../components/dashboard/overview/overview-latest-transactions';
-import { OverviewPrivateWallet } from '../../components/dashboard/overview/overview-private-wallet';
-import { OverviewTotalBalance } from '../../components/dashboard/overview/overview-total-balance';
-import { OverviewTotalTransactions } from '../../components/dashboard/overview/overview-total-transactions';
-import { Briefcase as BriefcaseIcon } from '../../icons/briefcase';
-import { Download as DownloadIcon } from '../../icons/download';
-import { ExternalLink as ExternalLinkIcon } from '../../icons/external-link';
-import { InformationCircleOutlined as InformationCircleOutlinedIcon } from '../../icons/information-circle-outlined';
-import { Reports as ReportsIcon } from '../../icons/reports';
-import { Users as UsersIcon } from '../../icons/users';
+import { NotificationImportantOutlined, VideogameAsset } from '@mui/icons-material';
 import { gtm } from '../../lib/gtm';
 import useExternalScripts from '../../__fake-api__/config';
 import { ComponentList } from './dashboard-components/list-of-components';
@@ -95,7 +84,7 @@ const Overview = () => {
               <Grid container item xs={12} md={7} spacing={4}>
                 <Grid item xs={12}>
                   <Typography variant={"h5"}>
-                    Alerts
+                    Alerts (24hrs)<Button endIcon={<NotificationImportantOutlined />} href="dashboard/logs/eventlog">View Alerts</Button>
                   </Typography>
                 </Grid>
                 <Grid
@@ -142,6 +131,11 @@ const Overview = () => {
                 </Grid>
               </Grid>
             <Grid container item spacing={4} xs={12}>
+              <Grid item xs={12}>
+                  <Typography variant={"h5"}>
+                    Overview
+                  </Typography>
+                </Grid>
               <Grid
                 item
                 md={3}
@@ -155,7 +149,6 @@ const Overview = () => {
                 xs={12}
               >
                 <ComponentList name="Recorders" link="video-recorders"/>
-                {/* <OverviewLatestTransactions /> */}
               </Grid>
               <Grid
                 item
