@@ -19,11 +19,11 @@ import { OverviewBanner } from '../../components/dashboard/overview/overview-ban
 import { NotificationImportantOutlined, VideogameAsset } from '@mui/icons-material';
 import { gtm } from '../../lib/gtm';
 import useExternalScripts from '../../__fake-api__/config';
-import { ComponentList } from './dashboard-components/list-of-components';
-import { ControllerDeviceCondition } from './dashboard-components/controller-device-condition';
-import { VideoRecorderDeviceCondition } from './dashboard-components/video-recorder-device-condition';
-import { ControllerDeviceProperty } from './dashboard-components/controller-device-property';
-import { AlertCard } from './dashboard-components/alert-card';
+import ComponentList from './dashboard-components/list-of-components';
+import ControllerDeviceCondition from './dashboard-components/controller-device-condition';
+import VideoRecorderDeviceCondition from './dashboard-components/video-recorder-device-condition';
+import ControllerDeviceProperty from './dashboard-components/controller-device-property';
+import AlertCard from './dashboard-components/alert-card';
 
 const Overview = () => {
   const [displayBanner, setDisplayBanner] = useState(true);

@@ -5,12 +5,7 @@ import {
     Divider,
     Typography,
   } from '@mui/material';
-import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
-import toast from "react-hot-toast";
-import { eventslogsApi } from '../../../api/events';
-import { useRouter } from 'next/router';
-import { AlertCardType } from './alert-card-type';
+import AlertCardType from './alert-card-type';
 
 const AlertCard = (props) => {
     const {

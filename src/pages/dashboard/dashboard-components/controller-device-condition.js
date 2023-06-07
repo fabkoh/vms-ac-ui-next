@@ -6,7 +6,7 @@ import { Chart } from '../../../components/chart';
 import { controllerApi } from '../../../api/controllers';
 import { React, useState, useEffect } from 'react';
 
-export const ControllerDeviceCondition = () => {
+const ControllerDeviceCondition = () => {
   const theme = useTheme();
   const test = 1;
 
@@ -81,7 +81,7 @@ export const ControllerDeviceCondition = () => {
           size: '50%'
         },
         track: {
-          background: healthPercentage == 0 ? theme.palette.error.light : theme.palette.grey[100],
+          background: healthPercentage == 0 ? theme.palette.error.light : theme.palette.grey[199],
         }
       }
     },
