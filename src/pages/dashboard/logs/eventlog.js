@@ -309,6 +309,9 @@ const Logs = () => {
               <Grid item sx={{ m: 2.5 }}>
                 <Typography variant="h4">Event Logs</Typography>
               </Grid>
+            </Grid>
+
+            <Grid container justifyContent="space-between" spacing={3}>
               <Grid item sx={{ m: 2.5 }}>
                 <Button
                   variant="contained"
@@ -318,11 +321,19 @@ const Logs = () => {
                 >
                   Refresh
                 </Button>
+                <SingleSelect
+                  label="seconds"
+                  getLabel={getPollingDisplay}
+                  onChange={onPollingTimeChange}
+                  value={pollingTime}
+                  options={pollingOptions}
+                  getValue={getPollingValue}
+                  noclear
+                  required
+                  helperText="Auto Refresh "
+                />
               </Grid>
-            </Grid>
-
-            <Grid container justifyContent="space-between" spacing={3}>
-              <Box
+              {/* <Box
                 sx={{
                   m: 2.5,
                   mt: 3,
@@ -345,9 +356,9 @@ const Logs = () => {
                 >
                   <HelpOutline />
                 </Tooltip>
-              </Box>
+              </Box> */}
 
-              <Box
+              {/* <Box
                 sx={{
                   m: 2.5,
                   mt: 3,
@@ -365,7 +376,7 @@ const Logs = () => {
                   required
                   helperText="Auto Refresh "
                 />
-              </Box>
+              </Box> */}
             </Grid>
           </Box>
           <Card>
