@@ -6,6 +6,7 @@ import { Chart } from '../../chart';
 
 export const OverviewCryptoWallet = (props) => {
   const theme = useTheme();
+  const test = 1;
 
   const chartOptions = {
     chart: {
@@ -15,7 +16,7 @@ export const OverviewCryptoWallet = (props) => {
         show: false
       }
     },
-    colors: [theme.palette.primary.light],
+    colors: [test == 1 ? theme.palette.error.dark : theme.palette.primary.dark],
     fill: {
       opacity: 1
     },
@@ -29,7 +30,7 @@ export const OverviewCryptoWallet = (props) => {
           size: '40%'
         },
         track: {
-          background: theme.palette.primary.dark
+          background: test == 1 ? theme.palette.error.light : theme.palette.primary.light
         }
       }
     },
@@ -38,7 +39,7 @@ export const OverviewCryptoWallet = (props) => {
     }
   };
 
-  const chartSeries = [76];
+  const chartSeries = [30/10];
 
   return (
     <Card {...props}>
@@ -82,6 +83,7 @@ export const OverviewCryptoWallet = (props) => {
               flexGrow: 1,
               mr: 3
             }}
+            paddingLeft={3}
           >
             <Typography
               color="primary"

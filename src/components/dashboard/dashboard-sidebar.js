@@ -1086,6 +1086,9 @@ export const DashboardSidebar = (props) => {
             }}
           />
           <Box sx={{ p: 2 }}>
+          <Typography color="neutral.500" variant="body2">
+              {t("v1.0.0")}
+            </Typography>
             <Typography color="neutral.100" variant="subtitle2">
               {t("Need Help?")}
             </Typography>
