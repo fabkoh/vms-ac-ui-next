@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { ControllerDevicePropertyRow } from './controller-device-property-row';
 import toast from "react-hot-toast";
   
-  export const ControllerDeviceProperty = () => {
+  const ControllerDeviceProperty = () => {
       const router = useRouter();
       const [controllers, setControllers] = useState([]);
 
@@ -58,3 +58,5 @@ import toast from "react-hot-toast";
         </Card>
       );
   }
+
+  export default ControllerDeviceProperty;

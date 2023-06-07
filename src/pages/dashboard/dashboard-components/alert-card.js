@@ -12,7 +12,7 @@ import { eventslogsApi } from '../../../api/events';
 import { useRouter } from 'next/router';
 import { AlertCardType } from './alert-card-type';
 
-export const AlertCard = (props) => {
+const AlertCard = (props) => {
     const {
         name
     } = props;
@@ -41,3 +41,5 @@ export const AlertCard = (props) => {
             </Card>
     );
 }
+
+export default AlertCard;

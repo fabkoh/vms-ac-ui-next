@@ -8,7 +8,7 @@ import videoRecorderApi from '../../../api/videorecorder';
 import { useMounted } from "../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 
-export const VideoRecorderDeviceCondition = () => {
+const VideoRecorderDeviceCondition = () => {
   const theme = useTheme();
   const isMounted = useMounted();
 
@@ -310,3 +310,5 @@ export const VideoRecorderDeviceCondition = () => {
     </Card>
   );
 };
+
+export default VideoRecorderDeviceCondition;

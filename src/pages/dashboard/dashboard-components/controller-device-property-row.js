@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react';
 import toast from "react-hot-toast";
 
   
-  export const ControllerDevicePropertyRow = ({controller}) => {
+  const ControllerDevicePropertyRow = ({controller}) => {
       const {
         controllerId,
         controllerName,
@@ -70,3 +70,5 @@ import toast from "react-hot-toast";
         );
       }
   }
+
+  export default ControllerDevicePropertyRow;

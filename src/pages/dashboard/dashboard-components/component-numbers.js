@@ -9,7 +9,7 @@ import { eventslogsApi } from '../../../api/events';
 import { notificationLogsApi } from '../../../api/notifications-log';
 import toast from "react-hot-toast";
 
-export const ComponentNumbers = (props) => {
+const ComponentNumbers = (props) => {
     const {
         numberType
     } = props;
@@ -122,3 +122,5 @@ export const ComponentNumbers = (props) => {
         </Typography>
     );
 }
+
+export default ComponentNumbers;

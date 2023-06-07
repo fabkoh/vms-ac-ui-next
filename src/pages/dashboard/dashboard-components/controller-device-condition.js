@@ -131,3 +131,5 @@ export const ControllerDeviceCondition = () => {
     </Card>
   );
 };
+
+export default ControllerDeviceCondition;
