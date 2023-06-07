@@ -33,11 +33,9 @@ import toast from "react-hot-toast";
           return;
         }
         const propertiesJson = await propertiesRes.json();
-        // setTemp(propertiesJson.cpu_temperature);
-        // setCpu(propertiesJson.cpu_usage_percentage);
-        // setMem(propertiesJson.ram_usage_percentage);
-        setTemp(100);
-        setCpu(100);
+        setTemp(propertiesJson.cpu_temperature);
+        setCpu(propertiesJson.cpu_usage_percentage);
+        setMem(propertiesJson.ram_usage_percentage);
       };
 
       // mem above 90% util

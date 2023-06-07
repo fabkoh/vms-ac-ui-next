@@ -15,6 +15,7 @@ export const ControllerDeviceCondition = () => {
   const [connected,    setConnected]    = useState(false);
   const [upCounter,   setUpCounter]    = useState(0);
   const [controllers, setControllers] = useState([]);
+  // const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const getControllers = async () => {
     const controllersRes = await controllerApi.getControllers();
@@ -25,29 +26,38 @@ export const ControllerDeviceCondition = () => {
     const controllersJson = await controllersRes.json();
     setControllers(controllersJson);
     };
-  
-  useEffect(async() => {
-    getControllers();
-    // setStatusLoaded(false);
-        controllers.map(async (controller) => {
-            try {
-                const res = await controllerApi.getAuthStatus(controller.controllerId);
-                if(res.status == 200) {
-                    const body = await res.json();
-                    // setDeviceStatus(body);
-                    // setConnected(true);
-                    setUpCounter(upCounter + 1);
-                } else {
-                    throw new Error("controller not connected");
-                }
-            } catch(e) {
-                // setConnected(false);
-            }
-        });
-        console.log(upCounter);
-    // setStatusLoaded(true);
-    }, []);
 
+    useEffect(() => {
+      const getControllersHelper = async () => {
+        await getControllers();
+      }
+
+      getControllersHelper();
+    }, []);
+    
+    // Only called after getControllers() is called
+    useEffect(() => {
+      const count = async () => {
+        const promises = controllers.map(async (controller) => {
+          try {
+              const res = await controllerApi.getAuthStatus(controller.controllerId);
+              if (res.status == 200) {
+                  setUpCounter(prevUpCounter => prevUpCounter + 1);
+              } else {
+                  throw new Error("controller not connected");
+              }
+          } catch(e) {
+              // Handle error
+              console.error(e);
+          }
+        });
+        await Promise.all(promises);
+      }
+      
+      count();
+    }, [controllers]);
+
+  const healthPercentage = (upCounter*100)/controllers.length;
 
   const chartOptions = {
     chart: {
@@ -57,7 +67,7 @@ export const ControllerDeviceCondition = () => {
         show: false
       }
     },
-    colors: [theme.palette.text.secondary],
+    colors: healthPercentage == 100 ? [theme.palette.success.light] : [theme.palette.warning.light],
     fill: {
       opacity: 1
     },
@@ -71,7 +81,7 @@ export const ControllerDeviceCondition = () => {
           size: '50%'
         },
         track: {
-          background: theme.palette.grey[100]
+          background: healthPercentage == 0 ? theme.palette.error.light : theme.palette.grey[100],
         }
       }
     },
@@ -80,7 +90,7 @@ export const ControllerDeviceCondition = () => {
     }
   };
 
-  const chartSeries = [(upCounter*100)/controllers.length];
+  const chartSeries = [healthPercentage];
 
   return (
     <Card>

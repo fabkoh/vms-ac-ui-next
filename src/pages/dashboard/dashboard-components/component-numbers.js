@@ -73,7 +73,6 @@ export const ComponentNumbers = (props) => {
 
     // Set number of event logs
     const getEventLogs = async () => {
-      console.log("event is checked");
       const eventsRes = await eventslogsApi.getEventsCount();
       if (eventsRes.status !== 200) {
         toast.error("Error loading event logs");

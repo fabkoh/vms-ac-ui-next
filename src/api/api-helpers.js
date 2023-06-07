@@ -36,13 +36,11 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
   }
 
   if (refresh === true) {
-    console.log("Renews");
     return authRenewToken().then(() => {
       return helper(contentType);
     })
   }
 
-  console.log("Does not renew");
   return helper(contentType);
 
 //   return helper(contentType).then((response) => {
@@ -63,7 +61,7 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
 }
 
 export const authRenewToken = async (contentType = "application/json") => {
-  console.log("authRenewToken");
+  console.log("Token is renewed.");
   const res = await fetch(apiUri + "/api/auth/refreshtoken", {
     method: "POST",
     headers: { "Content-Type": contentType },
@@ -73,7 +71,6 @@ export const authRenewToken = async (contentType = "application/json") => {
   });
   const token = await res.json();
   const newToken = token["accessToken"];
-  //console.log("new token", newToken);
   if (res.status === 200) {
     localStorage.setItem("accessToken", newToken);
   }
