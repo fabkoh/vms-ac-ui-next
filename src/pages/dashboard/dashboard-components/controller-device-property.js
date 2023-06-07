@@ -11,7 +11,7 @@ import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { controllerApi } from '../../../api/controllers';
 import { useEffect, useState } from 'react';
-import { ControllerDevicePropertyRow } from './controller-device-property-row';
+import ControllerDevicePropertyRow from './controller-device-property-row';
 import toast from "react-hot-toast";
   
   const ControllerDeviceProperty = () => {

@@ -24,7 +24,7 @@ const VideoRecorderDeviceCondition = () => {
             console.log("inside sdkhandle if")
               return window.WebVideoCtrl
           }
-          console.log("outside sdkhandle")
+          console.log("outside")
           await new Promise(resolve => setTimeout(resolve, 50));
       }
   }

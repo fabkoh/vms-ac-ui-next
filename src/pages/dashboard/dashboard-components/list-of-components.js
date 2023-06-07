@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { useRouter } from 'next/router';
-import { ComponentNumbers } from './component-numbers';
+import ComponentNumbers from './component-numbers';
 
 const ComponentList = (props) => {
     const {
@@ -41,8 +41,6 @@ const ComponentList = (props) => {
             </Card>
     );
 }
-
-export default ComponentList;
 
 {/* <Card {...props}>
 <CardContent>
@@ -139,3 +137,5 @@ export default ComponentList;
   </Box>
 </CardContent>
 </Card> */}
+
+export default ComponentList;

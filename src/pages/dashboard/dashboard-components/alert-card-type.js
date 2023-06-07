@@ -13,7 +13,7 @@ import { eventslogsApi } from '../../../api/events';
 import { FlipTwoTone, MeetingRoom } from '@mui/icons-material';
 
   
-  const AlertCardType = (props) => {
+const AlertCardType = (props) => {
     const {
         cardType
     } = props;

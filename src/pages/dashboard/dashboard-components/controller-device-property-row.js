@@ -48,9 +48,9 @@ import toast from "react-hot-toast";
 
       // Determine labels based on conditions
       const labels = [];
-      if (temp >= 90) labels.push("CPU Temperature: " + temp);
-      if (cpu >= 90) labels.push("CPU Usage: " + cpu);
-      if (mem >= 90) labels.push("Memory Usage: " + mem);
+      if (temp >= 10) labels.push("CPU Temperature: " + temp);
+      if (cpu >= 10) labels.push("CPU Usage: " + cpu);
+      if (mem >= 10) labels.push("Memory Usage: " + mem);
 
       // piProperties are normal, no rendering of rows required
       if (labels.length === 0) {
