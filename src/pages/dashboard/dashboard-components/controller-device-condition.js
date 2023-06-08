@@ -8,14 +8,10 @@ import { React, useState, useEffect } from 'react';
 
 const ControllerDeviceCondition = () => {
   const theme = useTheme();
-  const test = 1;
 
-  const [deviceStatus, setDeviceStatus] = useState({});
-  const [statusLoaded, setStatusLoaded] = useState(false);
-  const [connected,    setConnected]    = useState(false);
   const [upCounter,   setUpCounter]    = useState(0);
   const [controllers, setControllers] = useState([]);
-  // const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [healthPercentage, setHealthPercentage] = useState(0);
 
   const getControllers = async () => {
     const controllersRes = await controllerApi.getControllers();
@@ -57,7 +53,9 @@ const ControllerDeviceCondition = () => {
       count();
     }, [controllers]);
 
-  const healthPercentage = (upCounter*100)/controllers.length;
+  if (controllers.length != 0) {
+    setHealthPercentage((upCounter*100)/controllers.length);
+  }
 
   const chartOptions = {
     chart: {
@@ -67,7 +65,8 @@ const ControllerDeviceCondition = () => {
         show: false
       }
     },
-    colors: healthPercentage == 100 ? [theme.palette.success.light] 
+    colors: controllers.length == 0 ? [theme.palette.text.primary]
+            : healthPercentage == 100 ? [theme.palette.success.light] 
             : healthPercentage < 100 ? [theme.palette.warning.light]
             : [theme.palette.text.primary],
     fill: {
@@ -83,7 +82,8 @@ const ControllerDeviceCondition = () => {
           size: '50%'
         },
         track: {
-          background: healthPercentage == 0 ? theme.palette.error.light 
+          background: controllers.length == 0 ? theme.palette.grey[100]
+                    : healthPercentage == 0 ? theme.palette.error.light 
                     : theme.palette.grey[100],
         }
       }

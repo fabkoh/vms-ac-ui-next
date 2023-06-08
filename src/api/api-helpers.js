@@ -8,15 +8,14 @@ export function encodeArrayForSpring(array) {
 export const serverDownCode = 599;
 
 export function sendApi(path, init = {}, refresh = true, contentType = "application/json") {
-  // 1. try once with access token
-  // 2. if cannot, try once again after renewing token
-
-  //console.log("token before",localStorage.getItem("accessToken"));
-  //console.log("token after", localStorage.getItem("accessToken"));
 
   function helper(contentType) {
-    const token = localStorage.getItem("accessToken");
+    let token = localStorage.getItem("accessToken");
     var auth = {};
+    if (path = "/api/auth/signin") {
+      token = null;
+    }
+
     if (contentType == "multipart/form-data") {
       auth = token ? { Authorization: `Bearer ${token}` } : {};
     } else {
@@ -26,7 +25,6 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
     }
 
     init["headers"] = auth;
-    //console.log(init);
     const promise = fetch(apiUri + path, init).catch((error) => {
       console.error("Error:", error);
       console.log("server is down!!");
@@ -42,22 +40,6 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
   }
 
   return helper(contentType);
-
-//   return helper(contentType).then((response) => {
-//     if (response.status === 401 || response.status === 404) {
-//       // Renew the token and try again
-//       console.log("renew");
-//       //console.log("before", localStorage.getItem("accessToken"));
-//       return authRenewToken().then(() => {
-//         //console.log("after", localStorage.getItem("accessToken"));
-//         return helper(contentType);
-//       });
-//     } else {
-//       // Return the original response
-//       return response;
-//     }
-//   }
-// );
 }
 
 export const authRenewToken = async (contentType = "application/json") => {
