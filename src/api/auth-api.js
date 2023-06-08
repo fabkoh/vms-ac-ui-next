@@ -12,10 +12,11 @@ const sendApiHelper = async(path,init={},refresh=true) =>{
 }
 
 export const authLogin = async( {email, password}) => {
+    console.log("authlogin")
     const res = await sendApiHelper("/api/auth/signin", {
                                    method: 'POST',
                                    body: JSON.stringify({email, password})
-                               }, false)
+                               })
         if(res.type === "success") { 
             localStorage.setItem("accessToken", res.response.accessToken)
             localStorage.setItem("refreshToken", res.response.refreshToken);

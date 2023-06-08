@@ -5,6 +5,7 @@ import { ChevronUp as ChevronUpIcon } from '../../../icons/chevron-up';
 import { Chart } from '../../../components/chart';
 import { controllerApi } from '../../../api/controllers';
 import { React, useState, useEffect } from 'react';
+import toast from "react-hot-toast";
 
 const ControllerDeviceCondition = () => {
   const theme = useTheme();

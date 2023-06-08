@@ -12,9 +12,10 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
   function helper(contentType) {
     let token = localStorage.getItem("accessToken");
     var auth = {};
-    if (path = "/api/auth/signin") {
-      token = null;
-    }
+
+    // if (path = "/api/auth/signin") {
+    //   token = null;
+    // }
 
     if (contentType == "multipart/form-data") {
       auth = token ? { Authorization: `Bearer ${token}` } : {};
