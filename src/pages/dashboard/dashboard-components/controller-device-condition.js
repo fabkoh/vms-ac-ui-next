@@ -67,7 +67,9 @@ const ControllerDeviceCondition = () => {
         show: false
       }
     },
-    colors: healthPercentage == 100 ? [theme.palette.success.light] : [theme.palette.warning.light],
+    colors: healthPercentage == 100 ? [theme.palette.success.light] 
+            : healthPercentage < 100 ? [theme.palette.warning.light]
+            : [theme.palette.text.primary],
     fill: {
       opacity: 1
     },
@@ -81,7 +83,8 @@ const ControllerDeviceCondition = () => {
           size: '50%'
         },
         track: {
-          background: healthPercentage == 0 ? theme.palette.error.light : theme.palette.grey[199],
+          background: healthPercentage == 0 ? theme.palette.error.light 
+                    : theme.palette.grey[100],
         }
       }
     },
