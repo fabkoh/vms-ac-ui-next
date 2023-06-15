@@ -57,9 +57,11 @@ const ControllerDeviceCondition = () => {
       count();
     }, [controllers]);
 
-  if (controllers.length != 0) {
-    setHealthPercentage((upCounter*100)/controllers.length);
-  }
+    useEffect(() => {
+      if (controllers.length !== 0) {
+        setHealthPercentage((upCounter * 100) / controllers.length);
+      }
+    }, [controllers, upCounter]);
 
   const chartOptions = {
     chart: {

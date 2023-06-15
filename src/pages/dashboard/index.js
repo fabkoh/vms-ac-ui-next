@@ -118,7 +118,7 @@ const Overview = () => {
                   xs={12}
                   md={6}
                 >
-                {/* <ControllerDeviceCondition /> */}
+                  <ControllerDeviceCondition />
                 </Grid>
                 <Grid
                   item
