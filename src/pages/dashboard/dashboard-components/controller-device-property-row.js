@@ -33,7 +33,6 @@ import toast from "react-hot-toast";
           return;
         }
         const propertiesJson = await propertiesRes.json();
-        console.log(propertiesJson);
         setTemp(Math.ceil(propertiesJson.cpu_temperature));
         setCpu(Math.ceil(propertiesJson.cpu_usage_percentage));
         setMem(Math.ceil(propertiesJson.ram_usage_percentage));

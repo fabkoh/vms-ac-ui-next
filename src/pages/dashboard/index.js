@@ -125,7 +125,7 @@ const Overview = () => {
                   xs={12}
                   md={6}
                 >
-                {/* <VideoRecorderDeviceCondition /> */}
+                <VideoRecorderDeviceCondition />
                 </Grid>
               </Grid>
                 <Grid container item xs={12} md={5}>

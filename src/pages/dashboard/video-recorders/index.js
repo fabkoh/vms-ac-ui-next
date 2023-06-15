@@ -49,8 +49,10 @@ const RecorderList = () => {
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
+                console.log("inside sdk handle if")
                 return window.WebVideoCtrl
             }
+            console.log("outside")
             await new Promise(resolve => setTimeout(resolve, 50));
         }
     }

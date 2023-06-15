@@ -45,7 +45,6 @@ const ControllerDeviceCondition = () => {
               } else {
                   throw new Error("controller not connected");
               }
-              console.log(controllers.length)
           } catch(e) {
               // Handle error
               console.error(e);
