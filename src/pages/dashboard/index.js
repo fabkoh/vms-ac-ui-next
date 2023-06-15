@@ -90,16 +90,23 @@ const Overview = () => {
                 <Grid
                   item
                   xs={12}
-                  md={6}
+                  md={4}
                 >
                   <AlertCard name="Unauthenticated scans"/>
                 </Grid>
                 <Grid
                   item
                   xs={12}
-                  md={6}
+                  md={4}
                 >
                   <AlertCard name="Unauthorised door openings"/>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={4}
+                >
+                  <AlertCard name="Fire alarms"/>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant={"h5"}>
@@ -111,7 +118,7 @@ const Overview = () => {
                   xs={12}
                   md={6}
                 >
-                <ControllerDeviceCondition />
+                {/* <ControllerDeviceCondition /> */}
                 </Grid>
                 <Grid
                   item

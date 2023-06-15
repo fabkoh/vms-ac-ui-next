@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import toast from "react-hot-toast";
 import { eventslogsApi } from '../../../api/events';
-import { FlipTwoTone, MeetingRoom } from '@mui/icons-material';
+import { FlipTwoTone, MeetingRoom, LocalFireDepartmentOutlined } from '@mui/icons-material';
 
   
 const AlertCardType = (props) => {
@@ -42,6 +42,17 @@ const AlertCardType = (props) => {
         setCount(unauthorisedJson.length);
     };
 
+    // Sets number of unauthorised door opens in the last 24 hours
+    const getFireAlarms = async () => {
+        const fireRes = await eventslogsApi.getFireAlarms();
+        if (fireRes.status !== 200) {
+            toast.error("Error loading unauthorised door opens");
+            return;
+        }
+        const fireJson = await fireRes.json();
+        setCount(fireJson.length);
+    };
+
     useEffect(() => {
         if (cardType == "Unauthenticated scans") {
             getUnauthenticatedScans();
@@ -49,6 +60,9 @@ const AlertCardType = (props) => {
         } else if (cardType == "Unauthorised door openings") {
             getUnauthorisedDoorOpens();
             setIcon(<MeetingRoom style={{ marginRight: '10px', fontSize: '36px' }} />);
+        } else if (cardType == "Fire alarms") {
+            getFireAlarms();
+            setIcon(<LocalFireDepartmentOutlined style={{ marginRight: '10px', fontSize: '36px' }} />);
         }
     }, [cardType]);
 

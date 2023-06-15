@@ -20,6 +20,7 @@ const ControllerDeviceCondition = () => {
       toast.error("Error loading controllers");
       return;
     }
+
     const controllersJson = await controllersRes.json();
     setControllers(controllersJson);
     };
@@ -29,6 +30,7 @@ const ControllerDeviceCondition = () => {
         await getControllers();
       }
 
+      console.log("Controller helper")
       getControllersHelper();
     }, []);
     
@@ -43,6 +45,7 @@ const ControllerDeviceCondition = () => {
               } else {
                   throw new Error("controller not connected");
               }
+              console.log(controllers.length)
           } catch(e) {
               // Handle error
               console.error(e);
