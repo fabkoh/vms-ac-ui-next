@@ -47,7 +47,6 @@ import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../
 import {VideoRecorderCameras} from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { serverDownCode } from "../../../../api/api-helpers";
 import {ServerDownError} from "../../../../components/dashboard/errors/server-down-error";
-import { authRenewToken } from "../../../../api/api-helpers";
 
 function formatDate(date) {
   var d = new Date(date),
@@ -68,27 +67,6 @@ const VideoRecorderPreview = () => {
     const { theaterMode, setTheaterMode} = useContext(TheaterModeContext);
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
-
-    // Begin indefinite polling for refresh token
-    useEffect(
-      () => {  
-        const timer = setInterval(() => {
-            refreshToken();
-          }, 5 * 60 * 1000);
-        return () => clearInterval(timer);
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
-  
-    const refreshToken = async () => {
-      try {  
-        authRenewToken();
-        } catch (error) {
-        console.error("Error here")
-        console.error("Error:", error);
-      }
-    }
 
     useEffect(() => {
         gtm.push({ event: 'page_view' });
@@ -152,6 +130,30 @@ const VideoRecorderPreview = () => {
         });
     }
 
+// Function: I_GetIPInfoByMode (iMode, szAddress, iPort, szDeviceInfo)
+// Instruction: Get IP basing on DNS
+// Parameter: iMode DNS server mode, 0-IP_Domain 1-IPServer 2-HIDDNS
+// szAddress DNS server IP
+// iPort DNS server port
+// szDeviceInfo device serial number or device name(or HiDDNS)
+// Return value: success: return “device IP address-device SDK port”(“-” is used to serve as 
+// separator between IP and port); failure: return “”(null string). I_Login is called after getting the IP 
+// address of device.
+
+
+    const convert_DNS_sdk = async function(handle, {ip, port, device_serial_number}) {
+      return await new Promise((resolve, reject) => {
+          handle.I_GetIPInfoByMode(0, ip, port, device_serial_number, {
+            success: function(ipInfo) {
+                resolve(ipInfo);
+            },
+            error: function() {
+                reject("Failed to get IP info");
+            }
+        });
+      });
+  }
+
     const login_sdk = async function(handle, {ip, port, username, password}) {
       return await new Promise((resolve, reject) => {
           handle.I_Login(ip, 1, port, username, password, {
@@ -164,179 +166,6 @@ const VideoRecorderPreview = () => {
           });
       });
   }
-
-    // time format
-// function dateFormat(oDate, fmt) {
-//   var o = {
-//       "M+": oDate.getMonth() + 1, //month
-//       "d+": oDate.getDate(), //day
-//       "h+": oDate.getHours(), //hour
-//       "m+": oDate.getMinutes(), //minute
-//       "s+": oDate.getSeconds(), //second
-//       "q+": Math.floor((oDate.getMonth() + 3) / 3), //quarter
-//       "S": oDate.getMilliseconds()//millisecond
-//   };
-//   if (/(y+)/.test(fmt)) {
-//       fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
-//   }
-//   for (var k in o) {
-//       if (new RegExp("(" + k + ")").test(fmt)) {
-//           fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-//       }
-//   }
-//   return fmt;
-// }
-
-//     function showOPInfo(szInfo, status, xmlDoc) {
-//     var szTip = "<div>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo;
-//     if (typeof status != "undefined" && status != 200) {
-//         var szStatusString = $(xmlDoc).find("statusString").eq(0).text();
-//         var szSubStatusCode = $(xmlDoc).find("subStatusCode").eq(0).text();
-//         if ("" === szSubStatusCode) {
-//             if("" === szSubStatusCode && "" === szStatusString){
-//                 szTip += "(" + status + ")";
-//             }
-//             else{
-//                 szTip += "(" + status + ", " + szStatusString + ")";
-//             }
-//         } else {
-//             szTip += "(" + status + ", " + szSubStatusCode + ")";
-//         }
-//     }
-//     szTip += "</div>";
-
-//     $("#opinfo").html(szTip + $("#opinfo").html());
-// }
-
-//     const login_sdk = async function(handle, {ip, port, username, password}) {
-//       var szDeviceIdentify = ip + "_" + port;
-//       var iRet = handle.I_Login(ip, 1, port, username, password, {
-//           success: function (xmlDoc) {            
-//               showOPInfo(szDeviceIdentify + " 登录成功！");
-//               $(ip).prepend("<option value='" + szDeviceIdentify + "'>" + szDeviceIdentify + "</option>");
-//               setTimeout(function () {
-//                 $(ip).val(szDeviceIdentify);
-//                   getChannelInfo(handle,ip);
-//                   getDevicePort(handle,ip);
-//               }, 10);
-//           },
-//           error: function (status, xmlDoc) {
-//               console.log(xmlDoc);
-//               showOPInfo(szDeviceIdentify + " 登录失败！", status, xmlDoc);
-//           }
-//       });
-  
-//       if (-1 == iRet) {
-//           showOPInfo(szDeviceIdentify + " 已登录过！");
-//       }
-//   }
-//   // {
-//   //       return await new Promise((resolve, reject) => {
-//   //           handle.I_Login(ip, 1, port, username, password, {
-//   //               success: function (xmlDoc) {
-//   //                   resolve();
-//   //               }, error: function (status, xmlDoc) {
-//   //                   reject();
-//   //                   alert("login failed");
-//   //               }
-//   //           });
-//   //       });
-//   //   }
-
-//   function getChannelInfo(handle,ip) {
-//     var szDeviceIdentify =ip,
-//         oSel = $("#channels").empty();
-
-//     if (null == szDeviceIdentify) {
-//         return;
-//     }
-
-//     // analog channel
-//     handle.I_GetAnalogChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("VideoInputChannel");
-
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text();
-//                 if ("" == name) {
-//                     name = "Camera " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
-//             });
-//             showOPInfo(szDeviceIdentify + " get analog channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get analog channel failed！", status, xmlDoc);
-//         }
-//     });
-//     // IP channel
-//     handle.I_GetDigitalChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("InputProxyChannelStatus");
-
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text(),
-//                     online = $(this).find("online").eq(0).text();
-//                 if ("false" == online) {// filter the forbidden IP channel
-//                     return true;
-//                 }
-//                 if ("" == name) {
-//                     name = "IPCamera " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
-//             });
-//             showOPInfo(szDeviceIdentify + " get IP channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get IP channel failed！", status, xmlDoc);
-//         }
-//     });
-//     // zero-channel info
-//     handle.I_GetZeroChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("ZeroVideoChannel");
-            
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text();
-//                 if ("" == name) {
-//                     name = "Zero Channel " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 if ("true" == $(this).find("enabled").eq(0).text()) {//  filter the forbidden zero-channel
-//                     oSel.append("<option value='" + id + "' bZero='true'>" + name + "</option>");
-//                 }
-//             });
-//             showOPInfo(szDeviceIdentify + " get zero-channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get zero-channel failed！", status, xmlDoc);
-//         }
-//     });
-// }
-
-// // get port
-// function getDevicePort(handle,ip) {
-//     var szDeviceIdentify = ip;
-
-//     if (null == szDeviceIdentify) {
-//         return;
-//     }
-
-//     var oPort = WebVideoCtrl.I_GetDevicePort(szDeviceIdentify);
-//     if (oPort != null) {
-//         $("#deviceport").val(oPort.iDevicePort);
-//         $("#rtspport").val(oPort.iRtspPort);
-
-//         showOPInfo(szDeviceIdentify + " get port success！");
-//     } else {
-//         showOPInfo(szDeviceIdentify + " get port failed！");
-//     }
-// }
 
     const get_device_info = async function(handle, {ip}) {
         return await new Promise((resolve, reject) => {
@@ -471,10 +300,25 @@ const VideoRecorderPreview = () => {
                     const data              = await res.json()
 
                     if (!loadedSDK) {
+                      // code for the sdk needs to load first
                         const sdk_handle        = await get_sdk_handle();
                         setSDKHandle(sdk_handle);
 
                         await attach_sdk(sdk_handle);
+
+                      const convertDNS = await convert_DNS_sdk(sdk_handle, {
+                        ip: data.recorderPublicIp,
+                        port: 853,
+                        device_serial_number: "DS-7616NI-I21620210923CCRRG74241239WCVU"
+                      })
+
+                      if (typeof convertDNS === 'string' && convertDNS.includes('-')) {
+                        const [deviceIp, devicePort] = convertDNS.split("-");
+                        console.log("Device IP:", deviceIp);
+                        console.log("Device Port:", devicePort);
+                      } else {
+                        console.log('Unexpected format for convertDNS:', convertDNS);
+                      }
 
                         const login             = await login_sdk(sdk_handle, {
                             ip:         data.recorderPublicIp,

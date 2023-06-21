@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<style>
+.plugin {
+    width: 600px;
+    height: 400px;
+}
+</style>
+<body>
+<div>
+    <div id="divPlugin" class="plugin"></div>
+</div>
+</body>
+<script src="../jquery-1.7.1.min.js"></script>
+<script src="../codebase/webVideoCtrl.js"></script>
+<script>
+
+$(function () {
+    // check the installation status of plugin
+    var iRet = WebVideoCtrl.I_CheckPluginInstall();
+    if (-1 == iRet) {
+        alert("If the plugin is uninstalled, please install the WebComponentsKit.exe!");
+        return;
+    }
+
+    var oPlugin = {
+        iWidth: 600,             // plugin width
+        iHeight: 400             // plugin height
+    };
+
+    var oLiveView = {
+        iProtocol: 1,            // protocol 1£ºhttp, 2:https
+        szIP: "172.10.18.59",    // protocol ip
+        szPort: "80",            // protocol port
+        szUsername: "admin",     // device username
+        szPassword: "12345678q", // device password
+        iStreamType: 1,          // stream 1£ºmain stream  2£ºsub-stream  3£ºthird stream  4£ºtranscode stream
+        iChannelID: 1,           // channel no
+        bZeroChannel: false      // zero channel
+    };
+
+    // Init plugin parameters and insert the plugin
+    WebVideoCtrl.I_InitPlugin(oPlugin.iWidth, oPlugin.iHeight, {
+        bWndFull: true,//Wether support doule clicking to switch the full-screen mode: it's supported by default; true:support, false:not support
+        iWndowType: 1,
+        cbInitPluginComplete: function () {
+            WebVideoCtrl.I_InsertOBJECTPlugin("divPlugin");
+
+            // check plugin to see whether it is the latest
+            if (-1 == WebVideoCtrl.I_CheckPluginVersion()) {
+                alert("Detect the latest version, please double click WebComponentsKit.exe to update!");
+                return;
+            }
+
+            // login
+            WebVideoCtrl.I_Login(oLiveView.szIP, oLiveView.iProtocol, oLiveView.szPort, oLiveView.szUsername, oLiveView.szPassword, {
+                success: function (xmlDoc) {
+                    // strat real play
+                    var szDeviceIdentify = oLiveView.szIP + "_" + oLiveView.szPort;
+                    setTimeout(function () {
+                        WebVideoCtrl.I_StartRealPlay(szDeviceIdentify, {
+                            iStreamType: oLiveView.iStreamType,
+                            iChannelID: oLiveView.iChannelID,
+                            bZeroChannel: oLiveView.bZeroChannel
+                        });
+                    }, 1000);
+                }
+            });
+        }
+    });
+
+    // unload
+    $(window).unload(function () {
+        WebVideoCtrl.I_Stop();
+    });
+});
+
+</script>
+</html>
