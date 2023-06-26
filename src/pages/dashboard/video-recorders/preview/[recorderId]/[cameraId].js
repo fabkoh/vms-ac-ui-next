@@ -149,7 +149,7 @@ const VideoCameraDetails = () => {
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
         return await new Promise((resolve, reject) => {
-            handle.I_Login(ip, 1, port, username, password, {
+            handle.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
                 }, error: function (status, xmlDoc) {
@@ -321,16 +321,23 @@ const VideoCameraDetails = () => {
     }
 
     const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
+      console.log('preview_recorder', ip, rtsp_port, stream_type, channel_id, zero_channel, port);
         return await new Promise((resolve, reject) => {
           handle.I_StartRealPlay(ip, {
             iRtspPort:      rtsp_port,
             iStreamType:    stream_type,
             iChannelID:     channel_id,
             bZeroChannel:   zero_channel,
-            iWSPort: port
+            iWSPort: port,
+            success: function () {
+              resolve();
+              console.log("preview_recorder success");
+            }, error: function () {
+              reject();
+              console.log("preview_recorder error");
+            }
           });
-
-          resolve();
+          console.log("startrealplay didnt resolve or reject")
         });
     }
 
@@ -717,10 +724,13 @@ const VideoCameraDetails = () => {
 
                         data.rtsp_port = device_ports.iRtspPort;
 
+                        console.log("preview recorder pre");
+
                         await preview_recorder(sdk_handle, {
                             ip: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
                             stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
+                        console.log("preview recorder hit");
                         data.recorderSerialNumber = device_info["serial_number"];
                         videoRecorderApi.updateRecorder(data);
                         setVideoRecorderInfo(data);

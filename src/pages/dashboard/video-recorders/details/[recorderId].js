@@ -234,24 +234,11 @@ const VideoRecorderDetails = () => {
 
               await attach_sdk(sdk_handle);
               console.log("sdk attached");
-              // const convertDNS = await convert_DNS_sdk(sdk_handle, {
-              //   ip: data.recorderPublicIp,
-              //   port: 853,
-              //   device_serial_number: "DS-7616NI-I21620210923CCRRG74241239WCVU"
-              // })
-
-              // if (typeof convertDNS === 'string' && convertDNS.includes('-')) {
-              //   const [deviceIp, devicePort] = convertDNS.split("-");
-              //   console.log("Device IP:", deviceIp);
-              //   console.log("Device Port:", devicePort);
-              // } else {
-              //   console.log('Unexpected format for convertDNS:', convertDNS);
-              // }
               console.log("Login");
 
               const login = await login_sdk(sdk_handle, {
-                ip: "fe.etlas.sg",
-                port: 443,
+                ip: data.recorderPublicIp,
+                port: data.recorderPortNumber,
                 username: data.recorderUsername,
                 password: data.recorderPassword,
               });

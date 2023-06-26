@@ -130,33 +130,10 @@ const VideoRecorderPreview = () => {
         });
     }
 
-// Function: I_GetIPInfoByMode (iMode, szAddress, iPort, szDeviceInfo)
-// Instruction: Get IP basing on DNS
-// Parameter: iMode DNS server mode, 0-IP_Domain 1-IPServer 2-HIDDNS
-// szAddress DNS server IP
-// iPort DNS server port
-// szDeviceInfo device serial number or device name(or HiDDNS)
-// Return value: success: return “device IP address-device SDK port”(“-” is used to serve as 
-// separator between IP and port); failure: return “”(null string). I_Login is called after getting the IP 
-// address of device.
-
-
-    const convert_DNS_sdk = async function(handle, {ip, port, device_serial_number}) {
-      return await new Promise((resolve, reject) => {
-          handle.I_GetIPInfoByMode(0, ip, port, device_serial_number, {
-            success: function(ipInfo) {
-                resolve(ipInfo);
-            },
-            error: function() {
-                reject("Failed to get IP info");
-            }
-        });
-      });
-  }
-
     const login_sdk = async function(handle, {ip, port, username, password}) {
       return await new Promise((resolve, reject) => {
-          handle.I_Login(ip, 1, port, username, password, {
+        console.log(1);
+          handle.I_Login(ip, 2, port, username, password, {
               success: function (xmlDoc) {
                   resolve();
               }, error: function (status, xmlDoc) {
@@ -306,20 +283,7 @@ const VideoRecorderPreview = () => {
 
                         await attach_sdk(sdk_handle);
 
-                      // const convertDNS = await convert_DNS_sdk(sdk_handle, {
-                      //   ip: data.recorderPublicIp,
-                      //   port: 853,
-                      //   device_serial_number: "DS-7616NI-I21620210923CCRRG74241239WCVU"
-                      // })
-
-                      // if (typeof convertDNS === 'string' && convertDNS.includes('-')) {
-                      //   const [deviceIp, devicePort] = convertDNS.split("-");
-                      //   console.log("Device IP:", deviceIp);
-                      //   console.log("Device Port:", devicePort);
-                      // } else {
-                      //   console.log('Unexpected format for convertDNS:', convertDNS);
-                      // }
-
+                        // Note IP is public IP and port is port to access recorder 
                         const login             = await login_sdk(sdk_handle, {
                             ip:         data.recorderPublicIp,
                             port:       data.recorderPortNumber,

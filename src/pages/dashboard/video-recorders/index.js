@@ -80,9 +80,15 @@ const RecorderList = () => {
         });
     }
 
-    const login_sdk = async function(handle, {ip, port, username, password}) {
+    // window.webVideoCtrl <- sdk_handle <- name
+    // name.I_login == window.webVideoCtrl.I_login
+    // login_sdk(sdk_handle, ...)
+
+    const login_sdk = async function(name, {ip, port, username, password}) {
         return await new Promise((resolve, reject) => {
-            handle.I_Login(ip, 1, port, username, password, {
+            console.log("ip:", ip);
+            console.log("port:", port);
+            name.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
                 }, error: function (status, xmlDoc) {
