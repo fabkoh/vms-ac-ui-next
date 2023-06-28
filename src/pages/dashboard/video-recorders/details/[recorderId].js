@@ -237,14 +237,14 @@ const VideoRecorderDetails = () => {
               console.log("Login");
 
               const login = await login_sdk(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
                 port: data.recorderPortNumber,
                 username: data.recorderUsername,
                 password: data.recorderPassword,
               });
 
               const device_info = await get_device_info(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
               });
 
               for (const key of Object.keys(device_info)) {
@@ -254,12 +254,12 @@ const VideoRecorderDetails = () => {
               const analogue_channels = await get_analogue_channels(
                 sdk_handle,
                 {
-                  ip: data.recorderPublicIp,
+                  ip: data.recorderPrivateIp,
                 }
               );
 
               const digital_channels = await get_digital_channels(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
               });
 
               data.cameras = digital_channels;

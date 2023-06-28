@@ -343,7 +343,8 @@
             }
               , B = function(e) {
                 var t = location.hostname
-                  , n = location.port || "80";
+                  , n = location.port || "443";
+                  // No proxyAddress generally, so the original URL will be put into the cookie
                 return p.proxyAddress && (t = p.proxyAddress.ip,
                 n = p.proxyAddress.port),
                 /^(http|https):\/\/([^\/]+)(.+)$/.test(e) && (e = e.replace(RegExp.$2, t + ":" + n)),
@@ -677,7 +678,7 @@
                 }, 3e4)
             }
             ,
-            this.I_LoginV1 = function(n, r, publicIp, protocol, port, username, password, options) {
+            this.I_LoginV1 = function(n, r, s, o, i, a, u, c) {
                 var l = this
                   , e = {
                     success: null,
@@ -691,17 +692,17 @@
                         };
                         v.extend(t, {
                             success: function(e) {
-                                options.success && (options.success(e),
-                                l.successV1cb(n, r, publicIp, protocol, port, e, password, username))
+                                c.success && (c.success(e),
+                                l.successV1cb(n, r, s, o, i, e, u, a))
                             },
                             error: function(e, t) {
-                                options.error && options.error(e, t)
+                                c.error && c.error(e, t)
                             }
                         }),
-                        n.sessionLogin(publicIp, protocol, port, username, password, e, t)
+                        n.sessionLogin(s, o, i, a, u, e, t)
                     },
                     error: function(e, t) {
-                        options.error && options.error(e, t)
+                        c.error && c.error(e, t)
                     }
                 }),
                 e
@@ -737,120 +738,120 @@
                 e
             }
             ,
-            this.I_Login = function(publicIp, protocol, port, username, password, options) {
-                var e = publicIp + "_" + port;
+            this.I_Login = function(r, s, o, i, a, u) {
+                var e = r + "_" + o;
                 if (-1 != this.findDeviceIndexByIP(e))
                     return b("设备已经登录过"),
                     -1;
                 var c = S
                   , l = x;
-                if (M(options.cgi) || (l = x == options.cgi ? (c = S,
+                if (M(u.cgi) || (l = x == u.cgi ? (c = S,
                 x) : (c = C,
                 2)),
                 Z())
                     if (x == l) {
                         var d = new O;
-                        this.getAuthType(d, publicIp, protocol, port, username, function() {
-                            var e = d.oAuthType[publicIp];
+                        this.getAuthType(d, r, s, o, i, function() {
+                            var e = d.oAuthType[r];
                             if (2 < e)
-                                options.error && options.error(e);
+                                u.error && u.error(e);
                             else if (e < 2) {
-                                var t = this.I_LoginV1(c, d, publicIp, protocol, port, username, password, options);
-                                c.getSessionCap(publicIp, protocol, port, username, t)
+                                var t = this.I_LoginV1(c, d, r, s, o, i, a, u);
+                                c.getSessionCap(r, s, o, i, t)
                             } else {
                                 var n = MD5((new Date).getTime().toString()).substring(0, 8);
                                 n = parseInt(n.replace("#", ""), 16).toString().substring(0, 8);
-                                t = this.I_LoginV2(n, c, d, publicIp, protocol, port, username, password, options);
-                                c.getSessionV2Cap(n, publicIp, protocol, port, username, t)
+                                t = this.I_LoginV2(n, c, d, r, s, o, i, a, u);
+                                c.getSessionV2Cap(n, r, s, o, i, t)
                             }
                         })
                     } else
-                        options.error && options.error(403, N());
+                        u.error && u.error(403, N());
                 else {
                     var p = "";
                     if (x == l) {
-                        p = v.Base64.encode(":" + username + ":" + password);
+                        p = v.Base64.encode(":" + i + ":" + a);
                         var t = {
                             success: null,
                             error: null
                         };
-                        v.extend(t, options),
+                        v.extend(t, u),
                         v.extend(t, {
                             error: function(t, n) {
-                                p = v.Base64.encode(username + ":" + password),
+                                p = v.Base64.encode(i + ":" + a),
                                 l = x,
                                 c = S;
                                 var e = {
                                     success: null,
                                     error: null
                                 };
-                                v.extend(e, options),
+                                v.extend(e, u),
                                 v.extend(e, {
                                     error: function() {
-                                        if (M(options.cgi)) {
-                                            p = v.Base64.encode(":" + username + ":" + password),
+                                        if (M(u.cgi)) {
+                                            p = v.Base64.encode(":" + i + ":" + a),
                                             l = 2,
                                             c = C;
                                             var e = {
                                                 success: null,
                                                 error: null
                                             };
-                                            v.extend(e, options),
+                                            v.extend(e, u),
                                             v.extend(e, {
                                                 error: function(e, t) {
-                                                    p = v.Base64.encode(username + ":" + password),
+                                                    p = v.Base64.encode(i + ":" + a),
                                                     l = 2,
                                                     c = C;
                                                     var n = {
                                                         success: null,
                                                         error: null
                                                     };
-                                                    v.extend(n, options),
+                                                    v.extend(n, u),
                                                     v.extend(n, {
                                                         error: function() {
-                                                            options.error && options.error(e, t)
+                                                            u.error && u.error(e, t)
                                                         }
                                                     }),
-                                                    F(publicIp, protocol, port, p, l, c, n)
+                                                    F(r, s, o, p, l, c, n)
                                                 }
                                             }),
-                                            F(publicIp, protocol, port, p, l, c, e)
+                                            F(r, s, o, p, l, c, e)
                                         } else
-                                            options.error && options.error(t, n)
+                                            u.error && u.error(t, n)
                                     }
                                 }),
-                                F(publicIp, protocol, port, p, l, c, e)
+                                F(r, s, o, p, l, c, e)
                             }
                         }),
-                        F(publicIp, protocol, port, p, l, c, t)
+                        F(r, s, o, p, l, c, t)
                     } else {
-                        p = v.Base64.encode(":" + username + ":" + password),
+                        p = v.Base64.encode(":" + i + ":" + a),
                         l = 2,
                         c = C;
                         t = {
                             success: null,
                             error: null
                         };
-                        v.extend(t, options),
+                        v.extend(t, u),
                         v.extend(t, {
                             error: function(e, t) {
-                                p = v.Base64.encode(username + ":" + password),
+                                p = v.Base64.encode(i + ":" + a),
                                 l = 2,
                                 c = C;
                                 var n = {
                                     success: null,
                                     error: null
                                 };
-                                v.extend(n, options),
+                                v.extend(n, u),
                                 v.extend(n, {
                                     error: function() {
-                                        options.error && options.error(e, t)
+                                        u.error && u.error(e, t)
                                     }
                                 }),
-                                F(publicIp, protocol, port, p, l, c, n)
+                                F(r, s, o, p, l, c, n)
                             }
                         }),
-                        F(publicIp, protocol, port, p, l, c, t)
+                        F(r, s, o, p, l, c, t)
                     }
                 }
             }
@@ -957,8 +958,8 @@
                 r
             }
             ,
-            this.I_StartRealPlay = function(e, t) {
-                var n = this.findDeviceIndexByIP(e)
+            this.I_StartRealPlay = function(privateIP, publicIP, details) {
+                var n = this.findDeviceIndexByIP(privateIP)
                   , r = ""
                   , s = ""
                   , o = -1
@@ -969,44 +970,47 @@
                     iWndIndex: P,
                     iStreamType: 1,
                     iChannelID: 1,
-                    bZeroChannel: !1
+                    bZeroChannel: !1,
+                    iWSPort: details.port,
                 };
-                if (v.extend(c, t),
+                if (v.extend(c, details),
                 -1 != n) {
                     E(I[n]);
-                    var l = I[n];
+                    var deviceObject = I[n];
                     if (Z()) {
-                        if (!l.bSupportWebsocket)
-                            return void (t.error && t.error(403, N()));
-                        r = l.oProtocolInc.CGI.startWsRealPlay;
+                        if (!deviceObject.bSupportWebsocket)
+                            return void (details.error && details.error(403, N()));
+                        // Command to start the realPlay
+                        r = deviceObject.oProtocolInc.CGI.startWsRealPlay;
                         var d = location.protocol;
                         s = /^(https)(.*)$/.test(d) ? "wss://" : "ws://",
-                        M(c.iWSPort) ? l.iWSPort = 7681 : l.iWSPort = c.iWSPort,
-                        o = l.iWSPort,
+                        M(c.iWSPort) ? deviceObject.iWSPort = c.iWSPort : deviceObject.iWSPort = c.iWSPort,
+                        console.log("iWSPort: " + deviceObject.iWSPort);
+                        o = deviceObject.iWSPort,
                         a = c.iStreamType,
-                        i = c.iChannelID <= l.iAnalogChannelNum ? c.iChannelID : l.oStreamCapa.iIpChanBase + parseInt(c.iChannelID, 10) - l.iAnalogChannelNum - 1,
+                        i = c.iChannelID <= deviceObject.iAnalogChannelNum ? c.iChannelID : deviceObject.oStreamCapa.iIpChanBase + parseInt(c.iChannelID, 10) - deviceObject.iAnalogChannelNum - 1,
                         u = !0
                     } else {
-                        o = 0 == parseInt(re.$XML(g).find("ProtocolType").eq(0).text(), 10) && l.oStreamCapa.bSupportShttpPlay ? (b("SHTTP RealPlay"),
-                        r = l.oProtocolInc.CGI.startShttpRealPlay,
+                        o = 0 == parseInt(re.$XML(g).find("ProtocolType").eq(0).text(), 10) && deviceObject.oStreamCapa.bSupportShttpPlay ? (b("SHTTP RealPlay"),
+                        r = deviceObject.oProtocolInc.CGI.startShttpRealPlay,
                         s = "http://",
                         a = c.iStreamType - 1,
-                        i = c.iChannelID <= l.iAnalogChannelNum ? c.iChannelID : l.oStreamCapa.iIpChanBase + parseInt(c.iChannelID, 10) - l.iAnalogChannelNum - 1,
+                        i = c.iChannelID <= deviceObject.iAnalogChannelNum ? c.iChannelID : deviceObject.oStreamCapa.iIpChanBase + parseInt(c.iChannelID, 10) - deviceObject.iAnalogChannelNum - 1,
                         u = !0,
-                        M(c.iPort) ? "https://" == l.szHttpProtocol ? (-1 == l.iHttpPort && (l.iHttpPort = W(l).iHttpPort),
-                        l.iHttpPort) : l.iCGIPort : (l.iHttpPort = c.iPort,
+                        M(c.iPort) ? "https://" == deviceObject.szHttpProtocol ? (-1 == deviceObject.iHttpPort && (deviceObject.iHttpPort = W(deviceObject).iHttpPort),
+                        deviceObject.iHttpPort) : deviceObject.iCGIPort : (deviceObject.iHttpPort = c.iPort,
                         c.iPort)) : (b("RTSP RealPlay"),
-                        r = l.oProtocolInc.CGI.startRealPlay,
+                        r = deviceObject.oProtocolInc.CGI.startRealPlay,
                         s = "rtsp://",
                         a = c.iStreamType,
                         i = c.iChannelID,
-                        M(c.iRtspPort) || (l.iRtspPort = c.iRtspPort),
-                        -1 == l.iRtspPort && (l.iRtspPort = W(l).iRtspPort),
-                        l.iRtspPort)
+                        M(c.iRtspPort) || (deviceObject.iRtspPort = c.iRtspPort),
+                        -1 == deviceObject.iRtspPort && (deviceObject.iRtspPort = W(deviceObject).iRtspPort),
+                        deviceObject.iRtspPort)
                     }
                     if (-1 == o)
                         return b("获取端口号失败"),
-                        void (t.error && t.error());
+                        void (details.error && details.error());
                     v.extend(c, {
                         urlProtocol: s,
                         cgi: r,
@@ -1016,16 +1020,22 @@
                     }),
                     n = this.findWndIndexByIndex(c.iWndIndex);
                     var p = this;
-                    -1 == n && l.oProtocolInc.startRealPlay(l, c).then(function() {
+                    // Here is where the connection is done
+                    console.log("runs startRealPlay");
+                    -1 == n && deviceObject.oProtocolInc.startRealPlay(deviceObject, c, publicIP).then(
+                    // If connect successfully, go through here
+                    function() {
                         n = p.findWndIndexByIndex(c.iWndIndex),
                         m[n].bShttpIPChannel = u,
-                        t.success && t.success()
-                    }, function() {
-                        Z() || (l.iRtspPort = -1),
-                        t.error && t.error()
+                        details.success && details.success()
+                    }, 
+                    // If connect unsuccessfully, go thorugh here
+                    function() {
+                        Z() || (deviceObject.iRtspPort = -1),
+                        details.error && details.error()
                     })
                 } else
-                    t.error && t.error()
+                    details.error && details.error()
             }
             ,
             this.I_CloseWin = function(e) {
@@ -1346,7 +1356,8 @@
                     iStreamType: 1,
                     iChannelID: 1,
                     szStartTime: u + " 00:00:00",
-                    szEndTime: u + " 23:59:59"
+                    szEndTime: u + " 23:59:59",
+                    iWSPort: t.port
                 };
                 if (v.extend(c, t),
                 -1 != n) {
@@ -1360,7 +1371,7 @@
                         r = l.oProtocolInc.CGI.startWsPlayback;
                         var d = location.protocol;
                         s = /^(https)(.*)$/.test(d) ? "wss://" : "ws://",
-                        M(c.iWSPort) ? l.iWSPort = 7681 : l.iWSPort = c.iWSPort,
+                        M(c.iWSPort) ? l.iWSPort = c.iWSPort : l.iWSPort = c.iWSPort,
                         o = l.iWSPort,
                         a = c.iStreamType,
                         i = 100 * (i = c.iChannelID <= l.iAnalogChannelNum ? c.iChannelID : l.oStreamCapa.iIpChanBase + parseInt(c.iChannelID, 10) - l.iAnalogChannelNum - 1) + a
@@ -2111,9 +2122,12 @@
             K.prototype.submitRequest = function() {
                 var e, t = null, n = this;
                 if (Z()) {
+                    // If logged in and authenticated, then start WebSession
                     this.options.auth ? v.cookie("WebSession", this.options.auth) : v.cookie("WebSession", null);
+                    // B replaces url for proxying but still stores domain in the WebVideoCtrlCookie
                     var r = B(this.options.url)
                       , s = new window.XMLHttpRequest;
+                    console.log("Proxy url:", r);
                     s.open(this.options.type, r, this.options.async);
                     if (p.proxyAddress) {
                         s.withCredentials = !0;
@@ -2694,15 +2708,18 @@
                 r.submitRequest()
             }
             ,
-            e.prototype.startRealPlay = function(t, n) {
+            e.prototype.startRealPlay = function(deviceObject, n, publicIP) {
+                console.log("e realplay");
+                console.log("n.iPort", n.iPort);
                 var e = 100 * n.iChannelID + n.iStreamType
                   , r = ""
-                  , s = t.szIP;
+                  , s = publicIP; // change to pub
                 if ("rtsp://" === n.urlProtocol && (s = A(s)),
                 r = n.bZeroChannel ? (Z() && (e = 0),
+                // iPort need to change to 8443?
                 T(n.cgi.zeroChannels, n.urlProtocol, s, n.iPort, e)) : T(n.cgi.channels, n.urlProtocol, s, n.iPort, e),
                 p.proxyAddress && Z()) {
-                    v.cookie("webVideoCtrlProxy", s + ":" + n.iPort, {
+                    v.cookie("webVideoCtrlProxy", s + ":" + n.iwsPort, {
                         raw: !0
                     }),
                     r = T(n.cgi.zeroChannels, n.urlProtocol, p.proxyAddress.ip, p.proxyAddress.wsport, e);
@@ -2712,9 +2729,9 @@
                 var i = function() {
                     var e = new J;
                     e.iIndex = n.iWndIndex,
-                    e.szIP = t.szIP,
-                    e.iCGIPort = t.iCGIPort,
-                    e.szDeviceIdentify = t.szDeviceIdentify,
+                    e.szIP = publicIP, // change to pub
+                    e.iCGIPort = deviceObject.iCGIPort,
+                    e.szDeviceIdentify = deviceObject.szDeviceIdentify,
                     e.iChannelID = n.iChannelID,
                     e.iPlayStatus = 1,
                     m.push(e)
@@ -2722,8 +2739,8 @@
                   , a = $.Deferred();
                 if (Z()) {
                     var u = {
-                        sessionID: t.szAuth,
-                        token: L(0, t.szDeviceIdentify)
+                        sessionID: deviceObject.szAuth,
+                        token: L(0, deviceObject.szDeviceIdentify)
                     };
                     y.JS_Play(r, u, n.iWndIndex).then(function() {
                         i(),
@@ -2732,7 +2749,7 @@
                         a.reject()
                     })
                 } else
-                    0 == y.HWP_Play(r, t.szAuth, n.iWndIndex, "", "") ? (i(),
+                    0 == y.HWP_Play(r, deviceObject.szAuth, n.iWndIndex, "", "") ? (i(),
                     a.resolve()) : a.reject();
                 return a
             }
@@ -3353,8 +3370,8 @@
             ,
             e.prototype.sessionV2Login = function(e, t, n, r, s, o, i, a) {
                 var u = "";
-                u = 2 == n ? "https://" : "http://";
                 console.log("Ip for sessionV2Login: ", t);
+                u = 2 == n ? "https://" : "http://";
                 var c = parseInt(re.$XML(i).find("sessionIDVersion").eq(0).text(), 10)
                   , l = "true" === re.$XML(i).find("isSessionIDValidLongTerm").eq(0).text()
                   , d = T(this.CGI.sessionLogin, u, t, r)
@@ -3386,6 +3403,7 @@
                 S += "<sessionIDVersion>" + c + "</sessionIDVersion>",
                 S += "</SessionLogin>";
                 var C = new K
+                // y is what will be sent to the NVR after proxying
                   , y = {
                     type: "POST",
                     url: d,
@@ -3403,16 +3421,18 @@
                         a.error && a.error(e, t)
                     }
                 }),
+                // Set the data to be transferred
                 C.setRequestParam(y),
+
+                // Submits the request, note that there may be replace of hostname and etc.
                 C.submitRequest()
             }
             ,
-            e.prototype.sessionLogin = function(publicIp, protocol, port, username, password, o, i) {
+            e.prototype.sessionLogin = function(e, t, n, r, s, o, i) {
                 var a = "";
-                console.log("IP for Session Login:", publicIp)
-                a = 2 == protocol ? "https://" : "http://";
-                // T replaces %s with the arguments passed in
-                var u = T(this.CGI.sessionLogin, a, publicIp, port)
+                console.log("IP for Session Login:", publicIp);
+                a = 2 == t ? "https://" : "http://";
+                var u = T(this.CGI.sessionLogin, a, e, n)
                   , c = re.$XML(o).find("sessionID").eq(0).text()
                   , l = re.$XML(o).find("challenge").eq(0).text()
                   , d = parseInt(re.$XML(o).find("iterations").eq(0).text(), 10)
@@ -3422,17 +3442,17 @@
                 h = re.$XML(o).find("salt").eq(0).text());
                 var f = "";
                 if (p) {
-                    f = v.sha256(username + h + password),
+                    f = v.sha256(r + h + s),
                     f = v.sha256(f + l);
                     for (P = 2; P < d; P++)
                         f = v.sha256(f)
                 } else {
-                    f = v.sha256(password) + l;
+                    f = v.sha256(s) + l;
                     for (var P = 1; P < d; P++)
                         f = v.sha256(f)
                 }
                 var I = "<SessionLogin>";
-                I += "<userName>" + v.escape(username) + "</userName>",
+                I += "<userName>" + v.escape(r) + "</userName>",
                 I += "<password>" + f + "</password>",
                 I += "<sessionID>" + c + "</sessionID>",
                 I += "</SessionLogin>";
@@ -4098,6 +4118,7 @@
             }
             ,
             n.prototype.startRealPlay = function(e, t) {
+                console.log("n realPlay");
                 var n = 100 * t.iChannelID + t.iStreamType
                   , r = ""
                   , s = e.szIP;

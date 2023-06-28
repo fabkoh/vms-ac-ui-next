@@ -221,28 +221,30 @@ const VideoRecorderPreview = () => {
         });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
-        return await new Promise((resolve, reject) => {
-            handle.I_StartRealPlay(ip, {
-            iRtspPort:      rtsp_port,
-            iStreamType:    stream_type,
-            iChannelID:     channel_id,
-            bZeroChannel:   zero_channel,
+    const preview_recorder     = async function(handle, {privateIP, publicIP, rtsp_port, stream_type, channel_id, zero_channel, port}) {
+      try {
+        await new Promise((resolve, reject) => {
+          handle.I_StartRealPlay(privateIP, publicIP, {
+            iRtspPort: rtsp_port,
+            iStreamType: stream_type,
+            iChannelID: channel_id,
+            bZeroChannel: zero_channel,
             iWSPort: port,
             success: function () {
-              console.log("started the preview", selectedWindow)
-            },
-            error: function (status, xmlDoc) {
-              if (status === 403) {
-                  console.log("Device do not support Websocket extracting the flow！");
-              } else {
-                  console.log("start real play failed！");
-              }
+              resolve();
+              console.log("preview_recorder success");
+            }, 
+            error: function () {
+              reject();
+              console.log("preview_recorder error");
             }
           });
-
-          resolve();
+          console.log("startrealplay didn't resolve or reject");
         });
+      } catch (error) {
+        console.log(error);  // Will log: "Error: An error occurred in preview_recorder"
+      }
+      
     }
 
     const stop_preview_recorder = async function(handle) {
@@ -285,7 +287,7 @@ const VideoRecorderPreview = () => {
 
                         // Note IP is public IP and port is port to access recorder 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderPublicIp,
+                            ip:         data.recorderPrivateIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
@@ -300,23 +302,24 @@ const VideoRecorderPreview = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         setAvailableChannels([...digital_channels]);
                         data.rtsp_port = device_ports.iRtspPort;
                         // channel_id to switch cam
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderPublicIp, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id: 1, zero_channel: false, port: 7681
+                          privateIP: data.recorderPrivateIp,
+                            publicIP: data.recorderPublicIp, rtsp_port: 8443,
+                            stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
                         data.recorderSerialNumber = device_info["serial_number"];
                         videoRecorderApi.updateRecorder(data);
@@ -519,7 +522,8 @@ const VideoRecorderPreview = () => {
                                 // if something is already running then close it to play the current choice
                                 await stop_preview_recorder(sdkHandle) 
                                 await preview_recorder(sdkHandle, {
-                                  ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
+                                  privateIP: videoRecorderInfo.recorderPrivateIp,
+                                  publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
                                   stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: 7681
                                 });
                               }}>Start Preview</Button>

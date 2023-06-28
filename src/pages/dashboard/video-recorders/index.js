@@ -195,14 +195,14 @@ const RecorderList = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         recorder.recorderPublicIp,
+                            ip:         recorder.recorderPrivateIp,
                             port:       recorder.recorderPortNumber,
                             username:   recorder.recorderUsername,
                             password:   recorder.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: recorder.recorderPublicIp
+                            ip: recorder.recorderPrivateIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -210,11 +210,11 @@ const RecorderList = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: recorder.recorderPublicIp
+                            ip: recorder.recorderPrivateIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: recorder.recorderPublicIp
+                            ip: recorder.recorderPrivateIp
                         })
 
                         // recorder = {...recorder,

@@ -17,6 +17,7 @@ function forward(req, res) {
 	const cookies 					= new Cookies(req, res)
 	const webVideoCtrlProxy = cookies.get('webVideoCtrlProxy')
 
+	// Handles the response from the API call to the NVR
 	function process_response(error, response, body) {
 		console.log('error:', error);
 		console.log('statusCode:', response && response.statusCode);
@@ -31,7 +32,9 @@ function forward(req, res) {
 	}
 
 	if(webVideoCtrlProxy) {
+		console.log("webVideoCtrlProxy", webVideoCtrlProxy);
 		const keys = {
+			// webVideoCtrlProxy is the domain of the original url
 			url: 			`http://${webVideoCtrlProxy}${req.url}`,
 			headers: 	req.headers,
 			method: 	req.method 
@@ -59,6 +62,7 @@ app.prepare().then(() => {
 			// Be sure to pass `true` as the second argument to `url.parse`.
 			// This tells it to parse the query portion of the URL.
 			const parsedUrl = parse(req.url, true)
+			// This will be the URL at the back of the entire URL
 			const { pathname, query } = parsedUrl
 
 			if (pathname.indexOf("ISAPI/") !== -1 || pathname.indexOf("/SDK") !== -1) {
