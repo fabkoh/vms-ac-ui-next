@@ -149,7 +149,7 @@ const VideoCameraDetails = () => {
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
         return await new Promise((resolve, reject) => {
-            handle.I_Login(ip, 1, port, username, password, {
+            handle.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
                 }, error: function (status, xmlDoc) {
@@ -320,18 +320,30 @@ const VideoCameraDetails = () => {
       });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
-        return await new Promise((resolve, reject) => {
-          handle.I_StartRealPlay(ip, {
-            iRtspPort:      rtsp_port,
-            iStreamType:    stream_type,
-            iChannelID:     channel_id,
-            bZeroChannel:   zero_channel,
-            iWSPort: port
+    const preview_recorder     = async function(handle, {privateIP, publicIP, rtsp_port, stream_type, channel_id, zero_channel, port}) {
+      try {
+        await new Promise((resolve, reject) => {
+          handle.I_StartRealPlay(privateIP, publicIP, {
+            iRtspPort: rtsp_port,
+            iStreamType: stream_type,
+            iChannelID: channel_id,
+            bZeroChannel: zero_channel,
+            iWSPort: port,
+            success: function () {
+              resolve();
+              console.log("preview_recorder success");
+            }, 
+            error: function () {
+              reject(new Error("Error in preview_recorder"));
+              console.log("preview_recorder error");
+            }
           });
-
-          resolve();
+          console.log("startrealplay didn't resolve or reject");
         });
+      } catch (error) {
+        console.log(error);  // Will log: "Error: An error occurred in preview_recorder"
+      }
+      
     }
 
     const stop_preview_recorder = async function(handle) {
@@ -686,14 +698,14 @@ const VideoCameraDetails = () => {
                         await attach_sdk(sdk_handle);
 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderPublicIp,
+                            ip:         data.recorderPrivateIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -701,26 +713,28 @@ const VideoCameraDetails = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         console.log(digital_channels,333);
                         data.recorderCameras = [...digital_channels];
 
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         data.rtsp_port = device_ports.iRtspPort;
 
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
+                          privateIP: data.recorderPrivateIp,
+                            publicIP: data.recorderPublicIp, rtsp_port: 8443,
                             stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
+
                         data.recorderSerialNumber = device_info["serial_number"];
                         videoRecorderApi.updateRecorder(data);
                         setVideoRecorderInfo(data);
@@ -884,7 +898,8 @@ const VideoCameraDetails = () => {
                         onClick = {async ()=> {
                           setPreviewMode('live');
                           await preview_recorder(sdk_handle, {
-                            ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
+                            privateIP: videoRecorderInfo.recorderPrivateIp,
+                            publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                             stream_type: 1, channel_id:  1, zero_channel: false
                           });
                         }}>
@@ -898,7 +913,8 @@ const VideoCameraDetails = () => {
                           } else {
                             setPreviewMode('live')
                             await preview_recorder(sdk_handle, {
-                              ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
+                              privateIP: videoRecorderInfo.recorderPrivateIp,
+                              publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                               stream_type: 1, channel_id:  1, zero_channel: false
                             });
                           }

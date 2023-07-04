@@ -100,14 +100,20 @@ const VideoRecorderDetails = () => {
   };
 
   const login_sdk = async function (handle, { ip, port, username, password }) {
+    console.log(ip);
+    console.log(port);
     return await new Promise((resolve, reject) => {
-      handle.I_Login(ip, 1, port, username, password, {
+      handle.I_Login(ip, 2, port, username, password, {
         success: function (xmlDoc) {
           resolve();
+          console.log("success");
         },
         error: function (status, xmlDoc) {
           reject();
           alert("login failed");
+          console.log("failure");
+          console.log("Status Code:", status);
+          console.log("XML response:", xmlDoc);
         },
       });
     });
@@ -200,6 +206,19 @@ const VideoRecorderDetails = () => {
     });
   };
 
+  const convert_DNS_sdk = async function(handle, {ip, port, device_serial_number}) {
+    return await new Promise((resolve, reject) => {
+        handle.I_GetIPInfoByMode(0, ip, port, device_serial_number, {
+          success: function(ipInfo) {
+              resolve(ipInfo);
+          },
+          error: function() {
+              reject("Failed to get IP info");
+          }
+      });
+    });
+}
+
   const getVideoRecorder = async (recorderId) => {
     try {
       Promise.resolve(videoRecorderApi.getRecorder(recorderId)).then(
@@ -211,18 +230,21 @@ const VideoRecorderDetails = () => {
             if (!loadedSDK) {
               const sdk_handle = await get_sdk_handle();
               setSDKHandle(sdk_handle);
+              console.log("sdk set");
 
               await attach_sdk(sdk_handle);
+              console.log("sdk attached");
+              console.log("Login");
 
               const login = await login_sdk(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
                 port: data.recorderPortNumber,
                 username: data.recorderUsername,
                 password: data.recorderPassword,
               });
 
               const device_info = await get_device_info(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
               });
 
               for (const key of Object.keys(device_info)) {
@@ -232,12 +254,12 @@ const VideoRecorderDetails = () => {
               const analogue_channels = await get_analogue_channels(
                 sdk_handle,
                 {
-                  ip: data.recorderPublicIp,
+                  ip: data.recorderPrivateIp,
                 }
               );
 
               const digital_channels = await get_digital_channels(sdk_handle, {
-                ip: data.recorderPublicIp,
+                ip: data.recorderPrivateIp,
               });
 
               data.cameras = digital_channels;
