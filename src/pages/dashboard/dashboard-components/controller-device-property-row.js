@@ -29,13 +29,12 @@ import toast from "react-hot-toast";
       const getProperties = async () => {
         const propertiesRes = await controllerApi.getPiProperty(controllerId);
         if (propertiesRes.status !== 200) {
-          toast.error("Error loading properties");
           return;
         }
         const propertiesJson = await propertiesRes.json();
-        setTemp(propertiesJson.Math.ceil(cpu_temperature));
-        setCpu(propertiesJson.Math.ceil(cpu_usage_percentage));
-        setMem(propertiesJson.Math.ceil(ram_usage_percentage));
+        setTemp(Math.ceil(propertiesJson.cpu_temperature));
+        setCpu(Math.ceil(propertiesJson.cpu_usage_percentage));
+        setMem(Math.ceil(propertiesJson.ram_usage_percentage));
       };
 
       // mem above 90% util
@@ -48,9 +47,9 @@ import toast from "react-hot-toast";
 
       // Determine labels based on conditions
       const labels = [];
-      if (temp >= 10) labels.push("CPU Temperature: " + temp + "°C");
-      if (cpu >= 10) labels.push("CPU Usage: " + cpu + "%");
-      if (mem >= 10) labels.push("Memory Usage: " + mem + "%");
+      if (temp >= 90) labels.push("CPU Temperature: " + temp + "°C");
+      if (cpu >= 90) labels.push("CPU Usage: " + cpu + "%");
+      if (mem >= 90) labels.push("Memory Usage: " + mem + "%");
 
       // piProperties are normal, no rendering of rows required
       if (labels.length === 0) {

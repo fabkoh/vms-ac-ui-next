@@ -47,6 +47,7 @@ import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../
 import {VideoRecorderCameras} from "../../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { ServerDownError } from "../../../../../components/dashboard/errors/server-down-error";
 import {serverDownCode} from "../../../../../api/api-helpers";
+import { authRenewToken } from "../../../../../api/api-helpers";
 
 function formatDate(date) {
   var d = new Date(date),
@@ -87,6 +88,28 @@ const VideoCameraDetails = () => {
     const [playback_files, setPlaybackFiles] = useState([]);
     
     const [serverDownOpen, setServerDownOpen] = useState(false);
+
+    // Begin indefinite polling for refresh token
+    useEffect(
+      () => {  
+        const timer = setInterval(() => {
+            refreshToken();
+          }, 5 * 60 * 1000);
+        return () => clearInterval(timer);
+        
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+  
+    const refreshToken = async () => {
+      try {  
+        authRenewToken();
+        } catch (error) {
+        console.error("Error here")
+        console.error("Error:", error);
+      }
+    }
 
     const get_sdk_handle = async function() {
         while (true) {

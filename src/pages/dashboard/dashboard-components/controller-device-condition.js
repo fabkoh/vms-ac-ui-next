@@ -20,6 +20,7 @@ const ControllerDeviceCondition = () => {
       toast.error("Error loading controllers");
       return;
     }
+
     const controllersJson = await controllersRes.json();
     setControllers(controllersJson);
     };
@@ -29,6 +30,7 @@ const ControllerDeviceCondition = () => {
         await getControllers();
       }
 
+      console.log("Controller helper")
       getControllersHelper();
     }, []);
     
@@ -54,9 +56,11 @@ const ControllerDeviceCondition = () => {
       count();
     }, [controllers]);
 
-  if (controllers.length != 0) {
-    setHealthPercentage((upCounter*100)/controllers.length);
-  }
+    useEffect(() => {
+      if (controllers.length !== 0) {
+        setHealthPercentage((upCounter * 100) / controllers.length);
+      }
+    }, [controllers, upCounter]);
 
   const chartOptions = {
     chart: {

@@ -64,7 +64,7 @@
     "lodash.debounce": "^4.0.8",
     "material-ui-phone-number": "^3.0.0",
     "moment": "^2.29.4",
-    "next": "^12.2.1-canary.2",
+    "next": "^12.3.4",
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
     "prop-types": "^15.7.2",

@@ -503,7 +503,7 @@ export const DashboardSidebar = (props) => {
               title: "My Account",
               path: "/dashboard/settings/account",
             },
-            ...(!user?.authorities.some(
+            ...(!user.authorities.some(
               (pair) => pair.authority === "ROLE_USER_ADMIN"
             )
               ? [
@@ -541,7 +541,7 @@ export const DashboardSidebar = (props) => {
       // check whether the logged in user has this role if yes then add this item in navbar
       title: t("Devices"),
       items: [
-        ...(user?.authorities.some(
+        ...(user.authorities.some(
           (pair) =>
             pair.authority === "ROLE_SYSTEM_ADMIN" ||
             pair.authority === "ROLE_TECH_ADMIN"

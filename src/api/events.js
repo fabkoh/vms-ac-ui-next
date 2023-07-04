@@ -29,6 +29,12 @@ class EventslogsApi {
         if (useApi) { return sendApi(`/api/events/unauthorised`); }
         return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
     }
+
+    // Get fire alarms in the last 24 hours
+    getFireAlarms() {
+        if (useApi) { return sendApi(`/api/events/fire`); }
+        return Promise.resolve(new Response(JSON.stringify(controllers), { status: 200 }));
+    }
 }
 
 export const eventslogsApi = new EventslogsApi();
