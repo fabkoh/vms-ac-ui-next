@@ -92,7 +92,6 @@ export default function VideoListTable({
                 recorderIWSPort,
                 recorderSerialNumber,
                 autoPortForwarding,
-                isActive,
                 cameras,
                 created,
               } = recorder;
@@ -101,6 +100,7 @@ export default function VideoListTable({
               const handleSelect = handleSelectFactory(recorderId);
               const detailsLink = getVideoRecorderDetailsLink(recorder);
               const editLink = getVideoRecorderEditLink(recorderId);
+              console.log(recorder, "recorder");
               return (
                 <TableRow
                   hover
@@ -131,8 +131,8 @@ export default function VideoListTable({
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={isActive ? "ACTIVE" : "NON-ACTIVE"}
-                      color={isActive ? "success" : "error"}
+                      label={(recorder && "cameras" in recorder)  ? "ACTIVE" : "NON-ACTIVE"}
+                      color={(recorder && "cameras" in recorder)  ? "success" : "error"}
                       sx={{
                         fontSize: "12px",
                         fontWeight: 600,

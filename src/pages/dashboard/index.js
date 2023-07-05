@@ -125,7 +125,7 @@ const Overview = () => {
                   xs={12}
                   md={6}
                 >
-                {/* <VideoRecorderDeviceCondition /> */}
+                <VideoRecorderDeviceCondition />
                 </Grid>
               </Grid>
                 <Grid container item xs={12} md={5}>
@@ -202,6 +202,13 @@ const Overview = () => {
 
 Overview.getLayout = (page) => (
   <AuthGuard>
+    <Head>
+             <script src="/static/sdk/codebase/jquery-1.12.1.min.js"></script>
+             <script src="/static/sdk/codebase/encryption/AES.js"></script>
+             <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
+             <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
+             <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+    </Head>
     <DashboardLayout>
       {page}
     </DashboardLayout>
