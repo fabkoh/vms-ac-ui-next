@@ -90,6 +90,28 @@ const VideoRecorderPreview = () => {
     const [selectedChannel, setSelectedChannel] = useState('1');
     const [availableChannels, setAvailableChannels] = useState([]);
 
+    // Begin indefinite polling for refresh token
+    useEffect(
+      () => {  
+        const timer = setInterval(() => {
+            refreshToken();
+          }, 5 * 60 * 1000);
+        return () => clearInterval(timer);
+        
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+  
+    const refreshToken = async () => {
+      try {  
+        authRenewToken();
+        } catch (error) {
+        console.error("Error here")
+        console.error("Error:", error);
+      }
+    }
+
     const get_sdk_handle = async function() {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
@@ -132,10 +154,10 @@ const VideoRecorderPreview = () => {
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
       return await new Promise((resolve, reject) => {
-        console.log(1);
           handle.I_Login(ip, 2, port, username, password, {
               success: function (xmlDoc) {
                   resolve();
+                  console.log("login success");
               }, error: function (status, xmlDoc) {
                   reject();
                   alert("login failed");
@@ -294,7 +316,7 @@ const VideoRecorderPreview = () => {
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         for (const key of Object.keys(device_info)) {

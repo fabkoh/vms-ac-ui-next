@@ -897,7 +897,7 @@ const VideoCameraDetails = () => {
                         }}
                         onClick = {async ()=> {
                           setPreviewMode('live');
-                          await preview_recorder(sdk_handle, {
+                          await preview_recorder(sdkHandle, {
                             privateIP: videoRecorderInfo.recorderPrivateIp,
                             publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                             stream_type: 1, channel_id:  1, zero_channel: false
@@ -912,7 +912,7 @@ const VideoCameraDetails = () => {
                             setPreviewMode('playback');
                           } else {
                             setPreviewMode('live')
-                            await preview_recorder(sdk_handle, {
+                            await preview_recorder(sdkHandle, {
                               privateIP: videoRecorderInfo.recorderPrivateIp,
                               publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
                               stream_type: 1, channel_id:  1, zero_channel: false
