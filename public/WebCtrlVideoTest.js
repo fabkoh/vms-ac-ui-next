@@ -1226,7 +1226,6 @@
                     iPTZIndex: e,
                     iPTZSpeed: 4
                 };
-                console.log(P);
                 v.extend(r, n),
                 v.extend(r, {
                     async: !1
