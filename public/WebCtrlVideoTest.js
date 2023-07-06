@@ -959,6 +959,7 @@
             }
             ,
             this.I_StartRealPlay = function(privateIP, publicIP, details) {
+                console.log("P in SRP", P);
                 var n = this.findDeviceIndexByIP(privateIP)
                   , r = ""
                   , s = ""
@@ -1219,20 +1220,23 @@
                 return e
             }
             ,
-            this.I_PTZControl = function(e, t, n) {
+            this.I_PTZControl = function(privateIP, e, t, n) {
                 var r = {
                     iWndIndex: P,
                     iPTZIndex: e,
                     iPTZSpeed: 4
                 };
+                console.log(P);
                 v.extend(r, n),
                 v.extend(r, {
                     async: !1
                 });
                 var s = this.findWndIndexByIndex(r.iWndIndex);
+                console.log(s);
                 if (-1 != s) {
                     var o = m[s];
-                    if (-1 != (s = this.findDeviceIndexByIP(o.szIP))) {
+                    console.log(o.szIP);
+                    if (-1 != (s = this.findDeviceIndexByIP(privateIP))) {
                         var i = I[s];
                         9 == e ? i.oProtocolInc.ptzAutoControl(i, t, o, r) : i.oProtocolInc.ptzControl(i, t, o, r)
                     }
