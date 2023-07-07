@@ -283,7 +283,7 @@ const VideoCameraDetails = () => {
 
     const zoom_in      = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(10, false, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 10, false, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                   resolve(xmlDoc)
@@ -296,7 +296,7 @@ const VideoCameraDetails = () => {
 
     const zoom_out      = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(11, false, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 11, false, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                   resolve(xmlDoc)
@@ -309,7 +309,7 @@ const VideoCameraDetails = () => {
 
     const zoom_stop      = async function(handle) {
       return await new Promise((resolve, reject) => {
-        handle.I_PTZControl(11, true, {
+        handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 11, true, {
           iWndIndex: 0,
           success: function (xmlDoc) {
             resolve(xmlDoc)
@@ -331,14 +331,11 @@ const VideoCameraDetails = () => {
             iWSPort: port,
             success: function () {
               resolve();
-              console.log("preview_recorder success");
             }, 
             error: function () {
               reject(new Error("Error in preview_recorder"));
-              console.log("preview_recorder error");
             }
           });
-          console.log("startrealplay didn't resolve or reject");
         });
       } catch (error) {
         console.log(error);  // Will log: "Error: An error occurred in preview_recorder"
@@ -360,11 +357,12 @@ const VideoCameraDetails = () => {
 
     const move_ptz            = async function(handle, ptz_index, ptz_speed) {
       return await new Promise((resolve, reject) => {
-          handle.I_PTZControl(ptz_index, false, {
+          handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, ptz_index, false, {
             iPTZSpeed: ptz_speed,
             success: function (xmlDoc) {
               resolve(xmlDoc);
             }, error: function (status, xmlDoc) {
+              reject();
             }
         });
       });
@@ -372,7 +370,7 @@ const VideoCameraDetails = () => {
 
     const stop_ptz            = async function(handle) {
       return await new Promise((resolve, reject) => {
-        handle.I_PTZControl(1, true, {
+        handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 1, true, {
           success: function (xmlDoc) {
             resolve(xmlDoc);
           }, error: function (status, xmlDoc) {
@@ -384,7 +382,7 @@ const VideoCameraDetails = () => {
 
     const focus_in = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(12, false, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 12, false, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                     resolve(xmlDoc)
@@ -397,7 +395,7 @@ const VideoCameraDetails = () => {
 
     const focus_out = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(13, false, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 13, false, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                     resolve(xmlDoc)
@@ -410,7 +408,7 @@ const VideoCameraDetails = () => {
 
     const focus_stop = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(12, true, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 12, true, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                     resolve(xmlDoc)
@@ -423,7 +421,7 @@ const VideoCameraDetails = () => {
 
     const iris_in = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(14, true, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 14, true, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                     resolve(xmlDoc)
@@ -436,7 +434,7 @@ const VideoCameraDetails = () => {
 
     const iris_out = async function(handle) {
         return await new Promise((resolve, reject) => {
-            handle.I_PTZControl(15, true, {
+            handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 15, true, {
                 iWndIndex: 0,
                 success: function (xmlDoc) {
                     resolve(xmlDoc)
@@ -449,7 +447,7 @@ const VideoCameraDetails = () => {
 
     const iris_stop = async function(handle) {
       return await new Promise((resolve, reject) => {
-        handle.I_PTZControl(14, true, {
+        handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 14, true, {
             iWndIndex: 0,
             success: function (xmlDoc) {
               resolve(xmlDoc)
@@ -720,7 +718,6 @@ const VideoCameraDetails = () => {
                             ip: data.recorderPrivateIp
                         })
 
-                        console.log(digital_channels,333);
                         data.recorderCameras = [...digital_channels];
 
                         const device_ports      = await get_device_ports(sdk_handle, {
