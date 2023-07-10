@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted";
 import { gtm } from "../../../../lib/gtm";
-import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
-import entranceApi from "../../../../api/entrance";
 import NextLink from "next/link";
 import Head from "next/head";
-import router from "next/router";
+import { useRouter } from "next/router";
 import {
   Box,
   Grid,
@@ -20,24 +18,11 @@ import { ChevronDown } from "../../../../icons/chevron-down";
 import StyledMenu from "../../../../components/dashboard/styled-menu";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import { EntranceBasicDetails } from "../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
 import { Confirmdelete } from "../../../../components/dashboard/video-recorders/confirm-delete";
-import { set } from "date-fns";
-import AccessGroupDetails from "../../../../components/dashboard/entrances/details/entrance-access-group-details";
-import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
-import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
-import {
-  entranceCreateLink,
-  entranceListLink,
-  getEntranceEditLink,
-} from "../../../../utils/entrance";
-import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
-import { entranceScheduleApi } from "../../../../api/entrance-schedule";
-import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
+import {  Camera, Refresh } from "@mui/icons-material";
 import videoRecorderApi from "../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
 import {
@@ -48,20 +33,20 @@ import {
 import { VideoRecorderCameras } from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../../api/api-helpers";
+import router from 'next/router';
 
 const VideoRecorderDetails = () => {
   const isMounted = useMounted();
-  const [entrance, setEntrance] = useState(null);
-  const { recorderId } = router.query;
   useEffect(() => {
     gtm.push({ event: "page_view" });
   }, []);
+  
 
   const [videoRecorderInfo, setVideoRecorderInfo] = useState(null);
   const [loadedSDK, setLoadedSDK] = useState(false);
-  const [authStatus, setAuthStatus] = useState({});
-  const [sdkHandle, setSDKHandle] = useState(null);
   const [serverDownOpen, setServerDownOpen] = useState(false);
+  const [sdkHandle, setSDKHandle] = useState(null);
+  const { recorderId }  = router.query;
 
   const [count, setCount] = useState(0);
 
@@ -376,6 +361,16 @@ const VideoRecorderDetails = () => {
                 </div>
               </Grid>
               <Grid item sx={{ m: -1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ m: 1 }}
+                  onClick={() => {
+                    window.location.href = `/dashboard/video-recorders/preview/${recorderId}`;
+                  }}
+                  endIcon={<Camera fontSize="small" />}
+                >
+                  Multicam View
+                </Button>
                 <Button
                   variant="contained" // add refresh fn here. refetch or refresh entire page?
                   sx={{ m: 1 }}
