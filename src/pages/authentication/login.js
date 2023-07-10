@@ -33,7 +33,7 @@ const Login = () => {
     <>
       <Head>
         <title>
-          Login | Material Kit Pro
+          Login
         </title>
       </Head>
       <Box
