@@ -515,6 +515,10 @@ export const DashboardSidebar = (props) => {
                     title: "Notifications",
                     path: "/dashboard/settings/notifications",
                   },
+                  {
+                    title: "Data Management",
+                    path: "/dashboard/settings/data-management",
+                  }
                 ]
               : []),
           ],

@@ -49,7 +49,7 @@ import { EditAccountDetails } from "../../../components/account/edit-details";
 import { UsersList } from "../../../components/account/users-list";
 import { authGetProfile, authGetAccounts } from "../../../api/auth-api";
 
-const AccountManagement = () => {
+const DataManagement = () => {
   const router = useRouter();
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [errorPopUp, setErrorPopUp] = useState(false);
@@ -57,22 +57,28 @@ const AccountManagement = () => {
   const [errorMessageValue, setErrorMessageValue] = useState("");
   const isMounted = useMounted();
 
-  const [expandedAccount, setExpandedAccount] = useState(false);
   const [expandedUsers, setExpandedUsers] = useState(false);
-  const [userSettings, setUserSettings] = useState(false);
+  const [usersList, setUsersList] = useState([]);
   const [isUpdated, setIsUpdated] = useState(false);
 
-  const handleExpandedAccount = () => setExpandedAccount(!expandedAccount);
+  const handleExpandedUsers = () => setExpandedUsers(!expandedUsers);
 
-  const getUser = async () => {
+  const getUserList = async () => {
     try {
-      const res = await authGetProfile();
-      console.log(res);
+      const res = await authGetAccounts();
       if (res.type == "success") {
         const body = res.response;
-        const settings = { ...body };
-        setUserSettings(settings);
+        console.log(body);
+        const newList = [];
+        for (const role of Object.keys(body)) {
+          for (const user of body[role]) {
+            user["role"] = role;
+            newList.push(user);
+          }
+        }
+        setUsersList(newList);
         setIsUpdated(true);
+        console.log(usersList);
       } else {
         if (res.status == serverDownCode) {
           setServerDownOpen(true);
@@ -84,7 +90,7 @@ const AccountManagement = () => {
   };
 
   const getInfo = useCallback(() => {
-    getUser();
+    getUserList();
   }, [isMounted]);
 
   useEffect(() => {
@@ -98,7 +104,7 @@ const AccountManagement = () => {
   return (
     <>
       <Head>
-        <title>Etlas: My Account</title>
+        <title>Etlas: Data Management</title>
       </Head>
       <Box
         component="main"
@@ -120,36 +126,23 @@ const AccountManagement = () => {
             />
           </Box>
           <div>
-            <Typography variant="h3">My Account Settings</Typography>
+            <Typography variant="h3">Data Management</Typography>
           </div>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <Card defaultExpanded>
+            <Card>
               <CardHeader
-                title="Update My Account Details"
+                title="Data Backup"
                 avatar={
                   <ExpandMore
-                    expand={expandedAccount}
-                    onClick={handleExpandedAccount}
+                    expand={expandedUsers}
+                    onClick={handleExpandedUsers}
                   >
                     <ExpandMoreIcon />
                   </ExpandMore>
                 }
               />
-              <Collapse in={expandedAccount}>
-                {userSettings && isUpdated ? (
-                  <CardContent sx={[{ mx: 7 }, { mt: -4 }, { mb: 2 }]}>
-                    <Grid
-                      container
-                      alignItems="center"
-                      spacing={3}
-                      justifyContent="flex-start"
-                    >
-                      <Grid item md={6}>
-                        <EditAccountDetails props={userSettings} />
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                ) : null}
+              <Collapse in={expandedUsers}>
+                {usersList && isUpdated ? <UsersList /> : null}
               </Collapse>
             </Card>
           </Stack>
@@ -159,10 +152,10 @@ const AccountManagement = () => {
   );
 };
 
-AccountManagement.getLayout = (page) => (
+DataManagement.getLayout = (page) => (
   <AuthGuard>
     <DashboardLayout>{page}</DashboardLayout>
   </AuthGuard>
 );
 
-export default AccountManagement;
+export default DataManagement;
