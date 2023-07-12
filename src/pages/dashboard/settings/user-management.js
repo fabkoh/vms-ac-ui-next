@@ -104,7 +104,7 @@ const AccountManagement = () => {
   return (
     <>
       <Head>
-        <title>Etlas: Notifications</title>
+        <title>Etlas: User Management</title>
       </Head>
       <Box
         component="main"

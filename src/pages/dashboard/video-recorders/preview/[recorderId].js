@@ -245,6 +245,9 @@ const VideoRecorderPreview = () => {
 
     const preview_recorder     = async function(handle, {privateIP, publicIP, rtsp_port, stream_type, channel_id, zero_channel, port}) {
       try {
+        console.log("handle", handle);
+        console.log("privateIP", privateIP);
+        console.log("publicIP", publicIP);
         await new Promise((resolve, reject) => {
           handle.I_StartRealPlay(privateIP, publicIP, {
             iRtspPort: rtsp_port,
@@ -546,7 +549,7 @@ const VideoRecorderPreview = () => {
                                 await preview_recorder(sdkHandle, {
                                   privateIP: videoRecorderInfo.recorderPrivateIp,
                                   publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
-                                  stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: 7681
+                                  stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: videoRecorderInfo.recorderIWSPort
                                 });
                               }}>Start Preview</Button>
                               <Button onClick={async () => {

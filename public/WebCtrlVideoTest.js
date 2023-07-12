@@ -959,7 +959,6 @@
             }
             ,
             this.I_StartRealPlay = function(privateIP, publicIP, details) {
-                console.log("P in SRP", P);
                 var n = this.findDeviceIndexByIP(privateIP)
                   , r = ""
                   , s = ""
