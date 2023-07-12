@@ -1,105 +1,71 @@
-import { Add, ArrowBack } from "@mui/icons-material";
 import {
   Box,
   Button,
   Card,
-  CardContent,
-  CardHeader,
-  RadioGroup,
-  FormControl,
-  FormLabel,
-  Radio,
-  FormControlLabel,
-  Collapse,
-  Divider,
   Container,
-  Link,
   Stack,
-  Item,
-  Table,
-  TableRow,
-  TableCell,
-  TextField,
   Typography,
-  Switch,
-  Grid,
+  CardHeader,
+  Collapse,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import Head from "next/head";
-import NextLink from "next/link";
 import { AuthGuard } from "../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../components/dashboard/dashboard-layout";
-import formUtils, {
-  createCounterObject,
-  createNegativeCounterObject,
-  getDuplicates,
-} from "../../../utils/form-utils";
-import { useCallback, useEffect, useState } from "react";
-import { useMounted } from "../../../hooks/use-mounted";
-import { arraySameContents, isObject } from "../../../utils/utils";
-import router, { useRouter } from "next/router";
-import { serverDownCode } from "../../../api/api-helpers";
-import { notificationsApi } from "../../../api/notifications";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
+import { ErrorPopUp } from "../../../components/dashboard/errors/error-popup";
+import { dataManagementApi } from "../../../api/data-management";
+import { useState } from "react";
 import ExpandMore from "../../../components/dashboard/shared/expand-more";
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
-import SMTPForm from "../../../components/dashboard/notifications/SMTP-form";
-import { ErrorPopUp } from "../../../components/dashboard/errors/error-popup";
-import { EditAccountDetails } from "../../../components/account/edit-details";
-import { UsersList } from "../../../components/account/users-list";
-import { authGetProfile, authGetAccounts } from "../../../api/auth-api";
 
 const DataManagement = () => {
-  const router = useRouter();
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [errorPopUp, setErrorPopUp] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageValue, setErrorMessageValue] = useState("");
-  const isMounted = useMounted();
+  const [expanded, setExpanded] = useState(false);
 
-  const [expandedUsers, setExpandedUsers] = useState(false);
-  const [usersList, setUsersList] = useState([]);
-  const [isUpdated, setIsUpdated] = useState(false);
-
-  const handleExpandedUsers = () => setExpandedUsers(!expandedUsers);
-
-  const getUserList = async () => {
-    try {
-      const res = await authGetAccounts();
-      if (res.type == "success") {
-        const body = res.response;
-        console.log(body);
-        const newList = [];
-        for (const role of Object.keys(body)) {
-          for (const user of body[role]) {
-            user["role"] = role;
-            newList.push(user);
-          }
-        }
-        setUsersList(newList);
-        setIsUpdated(true);
-        console.log(usersList);
-      } else {
-        if (res.status == serverDownCode) {
-          setServerDownOpen(true);
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    }
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
   };
 
-  const getInfo = useCallback(() => {
-    getUserList();
-  }, [isMounted]);
+  const handleBackupDownload = () => {
+    dataManagementApi.downloadBackup()
+      .then((blob) => {
+        if (blob) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result;
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.setAttribute('download', 'backup.sql'); // Or use a dynamic name if provided by the server
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          };
+          reader.readAsDataURL(blob);
+        } else {
+          console.log('No backup file available.');
+          toast.error('Failed to download backup.');
+        }
+      })
+      .catch((error) => {
+        console.log('Error during backup download:', error);
+        toast.error('Failed to download backup.');
+      });
+  };
 
-  useEffect(() => {
-    getInfo();
-  }, []);
-
-  useEffect(() => {
-    setErrorMessageValue(errorMessage);
-  }, [errorPopUp]);
+  const handleDeleteBackup = () => {
+    dataManagementApi.deleteBackup()
+      .then(() => {
+        console.log('Backup deleted successfully.');
+        toast.success('Backup deleted successfully.');
+      })
+      .catch((error) => {
+        console.log('Error during backup deletion:', error);
+        toast.error('Failed to delete backup.');
+      });
+  };
 
   return (
     <>
@@ -131,18 +97,25 @@ const DataManagement = () => {
           <Stack spacing={4} sx={{ mt: 4 }}>
             <Card>
               <CardHeader
-                title="Data Backup"
+                title="Database Backup"
                 avatar={
                   <ExpandMore
-                    expand={expandedUsers}
-                    onClick={handleExpandedUsers}
+                    expand={expanded}
+                    onClick={handleExpandClick}
                   >
                     <ExpandMoreIcon />
                   </ExpandMore>
                 }
               />
-              <Collapse in={expandedUsers}>
-                {usersList && isUpdated ? <UsersList /> : null}
+              <Collapse in={expanded}>
+                <div style={{ padding: '16px', display: 'flex', justifyContent: 'left' }}>
+                  <Button variant="contained" onClick={handleBackupDownload}>
+                    Download Backup
+                  </Button>
+                  <Button variant="contained" onClick={handleDeleteBackup} style={{ marginLeft: '16px' }}>
+                    Delete Backup
+                  </Button>
+                </div>
               </Collapse>
             </Card>
           </Stack>
