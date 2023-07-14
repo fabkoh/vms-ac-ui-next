@@ -255,9 +255,9 @@ const VideoRecorderAddForm = ({ recorderInfo, recorderValidations,
                                                 //(recorderPortNumberExists && 'Error: Recorder port number taken') ||
                                                 //(recorderPortNumberDuplicated && 'Error: Duplicate recorder port number in form') ||
                                                 (recorderPortNumberError && 'Error: ' + recorderPortNumberError) ||
-                                                "Public port number of the video recorder. Auto-generated if empty."
+                                                "Private port number of the video recorder. Auto-generated if empty."
                                             }
-                                        label="Public Port Number"
+                                        label="Private Port Number"
                                         name="recorderPortNumber"
                                         onChange={onPortNumberChange}
                                         value={recorderPortNumber}

@@ -286,8 +286,8 @@ const EditVideoRecorder = () => {
     const updatedInfo = [...recorderInfoArr];
     // this method is reliant on text field having a name field == key in info object ie recorderName, recorderPrivateIp, etc
     updatedInfo.find((info) => info.recorderId == id)["defaultIP"] =
-      !updatedInfo.find((info) => info.recorderId == id)["defaultIP"];
-    e.target.value = process.env.NEXT_PUBLIC_URI;
+    !updatedInfo.find((info) => info.recorderId == id)["defaultIP"];
+    e.target.value = process.env.NEXT_PUBLIC_URI.replace('https://', '');
     // e.target.value = "118.201.255.164";
     e.target.name = "recorderPublicIp";
     onPublicIpChangeFactory(id)(e);
