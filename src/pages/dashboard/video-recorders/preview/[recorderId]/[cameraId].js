@@ -460,7 +460,7 @@ const VideoCameraDetails = () => {
 
   const set_preset = async function (handle, preset_id) {
     return await new Promise((resolve, reject) => {
-      handle.I_SetPreset(preset_id, {
+      handle.I_SetPreset(videoRecorderInfo.recorderPrivateIp, preset_id, {
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
@@ -472,7 +472,7 @@ const VideoCameraDetails = () => {
 
   const go_preset = async function (handle, preset_id) {
     return await new Promise((resolve, reject) => {
-      handle.I_GoPreset(preset_id, {
+      handle.I_GoPreset(videoRecorderInfo.recorderPrivateIp, preset_id, {
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
