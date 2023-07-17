@@ -185,7 +185,7 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                     xs={6}
                 >
 
-                    <FormControl>
+                    {/* <FormControl>
                         <FormGroup>
                             <FormControlLabel
                                 label={<Typography fontWeight="bold">Enable uPnP</Typography>}
@@ -193,7 +193,7 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                 control={<Switch value={autoPortForwarding} checked={autoPortForwarding} onChange={handleToggleAutoPortForwarding}></Switch>}
                             />
                         </FormGroup>
-                    </FormControl>
+                    </FormControl> */}
                 </Grid>
                     <Grid
                         item
@@ -255,7 +255,7 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                                 //(recorderPortNumberExists && 'Error: Recorder port number taken') ||
                                                 //(recorderPortNumberDuplicated && 'Error: Duplicate recorder port number in form') ||
                                                 (recorderPortNumberError && 'Error: ' + recorderPortNumberError) ||
-                                                "Private port number of the video recorder. Auto-generated if empty."
+                                                "Private port number of the video recorder."
                                             }
                                         label="Private Port Number"
                                         name="recorderPortNumber"
@@ -276,7 +276,7 @@ const VideoRecorderEditForm = ({ recorderInfo, recorderValidations,
                                                 //(recorderIWSPortExists && 'Error: Recorder IWS port taken') ||
                                                 //(recorderIWSPortDuplicated && 'Error: Duplicate port number in form') ||
                                                 (recorderIWSPortError && 'Error: ' + recorderIWSPortError) ||
-                                                "Public IWS Port of the video recorder. Auto-generated if empty."
+                                                "Public IWS Port of the video recorder."
                                             }
                                         label="Public IWS Port"
                                         name="recorderIWSPort"
