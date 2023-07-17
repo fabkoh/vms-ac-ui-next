@@ -510,7 +510,6 @@ const VideoCameraDetails = () => {
   const enable_audio = async function (handle) {
     return await new Promise((resolve, reject) => {
       var res = handle.I_OpenSound();
-      console.log("res:", res);
       if (res == 0) {
         console.log("Audio Enabled");
       } else {
