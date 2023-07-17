@@ -830,7 +830,7 @@ const VideoCameraDetails = () => {
                 }}>
                 <div>
                   <Typography variant="h4">
-                    {videoRecorderInfo ? `Live View/Playback: 
+                    {videoRecorderInfo ? `Live View: 
                       ${videoRecorderInfo.recorderCameras
                       [parseInt(cameraId) - 1].name}` : " Camera Not Found"}
                   </Typography>
@@ -880,7 +880,7 @@ const VideoCameraDetails = () => {
 
               <Grid item
                 xs={12}>
-                <div>
+                {/* <div>
                   <div>
 
                     <div style={{
@@ -933,392 +933,450 @@ const VideoCameraDetails = () => {
                       }}>
                       <label style={{ color: "#6B7280", cursor: 'pointer' }}>Playback</label>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div style={{ display: (previewMode === 'live') ? null : 'none' }}>
-                    <div style={{
-                      padding: '.6em',
-                      margin: '.2em',
-                      border: '1px solid #D1D5DB',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      display: 'inline-block'
-                    }}>
-                      <label style={{ display: 'block', color: "#6B7280", padding: '0.5em' }}>PTZ Controls</label>
-                      <div style={{ display: 'flex' }}>
-                        <div>
-                          <InputLabel id="ptz_speed">Speed</InputLabel>
-                          <Select
-                            labelId="ptz_speed"
-                            onChange={({ target: { value } }) => {
-                              setPtzSpeed(value)
-                            }}
-                            sx={{ width: 100 }}
-                            value={ptz_speed}
-                            label="Speed">
-                            {
-                              [1, 2, 3, 4, 5, 6, 7].map((value) => (<MenuItem key={value}
-                                value={value}>{value}</MenuItem>))
-                            }
-                          </Select>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', maxWidth: '225px', marginBottom: '8px' }}>
-                            <Button
-                              sx={{ m: 1 }}
-                              style={{ color: 'transparent', margin: 5 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 5, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ⯆
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              style={{ margin: 5 }}
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 1, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ⯅
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              style={{ color: 'transparent', margin: 5 }}
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 7, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ⯅
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              style={{ margin: 5 }}
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 3, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ⯇
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              style={{ color: 'transparent', margin: 5 }}
-                              variant="contained"
-                              onClick={async () => {
-                                //await stop_recording(sdkHandle);
-                              }}>
-                              ⯆
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              style={{ margin: 5 }}
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 4, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ⯈
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              style={{ color: 'transparent', margin: 5 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 6, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ▼
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              style={{ margin: 5 }}
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 2, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ▼
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              style={{ color: 'transparent', margin: 5 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await move_ptz(sdkHandle, 8, ptz_speed);
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                await stop_ptz(sdkHandle);
-                              }}>
-                              ▼
-                            </Button>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Zoom:</label>
-                            <div style={{ display: 'flex', gap: '1px' }}>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await zoom_out(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await zoom_stop(sdkHandle);
-                                }}
-                              >
-                                -
-                              </Button>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await zoom_in(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await zoom_stop(sdkHandle);
-                                }}
-                              >
-                                +
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Focus:</label>
-                            <div style={{ display: 'flex', gap: '1px' }}>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await focus_out(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await focus_stop(sdkHandle);
-                                }}
-                              >
-                                -
-                              </Button>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await focus_in(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await focus_stop(sdkHandle);
-                                }}
-                              >
-                                +
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Iris:</label>
-                            <div style={{ display: 'flex', gap: '1px' }}>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await iris_out(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await iris_stop(sdkHandle);
-                                }}
-                              >
-                                -
-                              </Button>
-                              <Button
-                                sx={{ m: 1 }}
-                                variant="contained"
-                                onClick={async () => {
-                                  await iris_in(sdkHandle);
-                                  await new Promise(resolve => setTimeout(resolve, 500));
-                                  await iris_stop(sdkHandle);
-                                }}
-                              >
-                                +
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
+                <div style={{ display: (previewMode === 'live') ? null : 'none' }}>
+                  <div style={{
+                    padding: '.6em',
+                    margin: '.2em',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: 4,
+                    cursor: 'pointer',
+                    display: 'inline-block'
+                  }}>
+                    <label style={{ display: 'block', color: "#6B7280", padding: '0.5em' }}>PTZ Controls</label>
+                    <div style={{ display: 'flex' }}>
                       <div>
-                        <InputLabel id="preset_view">Preset View</InputLabel>
+                        <InputLabel id="ptz_speed">Speed</InputLabel>
                         <Select
-                          labelId="preset_view"
+                          labelId="ptz_speed"
                           onChange={({ target: { value } }) => {
-                            setPresetView(value)
+                            setPtzSpeed(value)
                           }}
                           sx={{ width: 100 }}
-                          value={preset_view}
-                          label="Preset View">
+                          value={ptz_speed}
+                          label="Speed">
                           {
                             [1, 2, 3, 4, 5, 6, 7].map((value) => (<MenuItem key={value}
                               value={value}>{value}</MenuItem>))
                           }
                         </Select>
                       </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', maxWidth: '225px', marginBottom: '8px' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            style={{ color: 'transparent', margin: 5 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 5, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ⯆
+                          </Button>
 
-                      <div>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            style={{ margin: 5 }}
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 1, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ⯅
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            style={{ color: 'transparent', margin: 5 }}
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 7, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ⯅
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            style={{ margin: 5 }}
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 3, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ⯇
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            style={{ color: 'transparent', margin: 5 }}
+                            variant="contained"
+                            onClick={async () => {
+                              //await stop_recording(sdkHandle);
+                            }}>
+                            ⯆
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            style={{ margin: 5 }}
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 4, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ⯈
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            style={{ color: 'transparent', margin: 5 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 6, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ▼
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            style={{ margin: 5 }}
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 2, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ▼
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            style={{ color: 'transparent', margin: 5 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await move_ptz(sdkHandle, 8, ptz_speed);
+                              await new Promise(resolve => setTimeout(resolve, 500));
+                              await stop_ptz(sdkHandle);
+                            }}>
+                            ▼
+                          </Button>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Zoom:</label>
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await zoom_out(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await zoom_stop(sdkHandle);
+                              }}
+                            >
+                              -
+                            </Button>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await zoom_in(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await zoom_stop(sdkHandle);
+                              }}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Focus:</label>
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await focus_out(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await focus_stop(sdkHandle);
+                              }}
+                            >
+                              -
+                            </Button>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await focus_in(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await focus_stop(sdkHandle);
+                              }}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <label style={{ width: 80, fontWeight: "bold", alignSelf: 'center' }}>Iris:</label>
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await iris_out(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await iris_stop(sdkHandle);
+                              }}
+                            >
+                              -
+                            </Button>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await iris_in(sdkHandle);
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await iris_stop(sdkHandle);
+                              }}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <InputLabel id="preset_view">Preset View</InputLabel>
+                      <Select
+                        labelId="preset_view"
+                        onChange={({ target: { value } }) => {
+                          setPresetView(value)
+                        }}
+                        sx={{ width: 100 }}
+                        value={preset_view}
+                        label="Preset View">
+                        {
+                          [1, 2, 3, 4, 5, 6, 7].map((value) => (<MenuItem key={value}
+                            value={value}>{value}</MenuItem>))
+                        }
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Button
+                        sx={{ m: 1 }}
+                        variant="contained"
+                        onClick={async () => {
+                          await set_preset(sdkHandle, preset_view);
+                        }}>
+                        Save
+                      </Button>
+
+                      <Button
+                        sx={{ m: 1 }}
+                        variant="contained"
+                        onClick={async () => {
+                          await go_preset(sdkHandle, preset_view);
+                        }}>
+                        Retrieve
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{
+                    padding: '.6em',
+                    margin: '.2em',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: 4,
+                    cursor: 'pointer',
+                    display: 'inline-block'
+                  }}>
+                    <label style={{ display: 'block', color: "#6B7280", padding: '0.5em' }}>Recording</label>
+                    <div style={{ display: 'flex' }}>
+                      <label style={{
+                        width: 120, fontWeight: "bold",
+                        alignSelf: 'center'
+                      }}>Picture:</label>
+
+                      <div style={{ flex: 1 }}>
                         <Button
                           sx={{ m: 1 }}
                           variant="contained"
                           onClick={async () => {
-                            await set_preset(sdkHandle, preset_view);
+                            await take_picture(sdkHandle);
                           }}>
-                          Save
-                        </Button>
-
-                        <Button
-                          sx={{ m: 1 }}
-                          variant="contained"
-                          onClick={async () => {
-                            await go_preset(sdkHandle, preset_view);
-                          }}>
-                          Retrieve
+                          Snapshot
                         </Button>
                       </div>
                     </div>
-                  </div>
 
+                    <div style={{ display: 'flex' }}>
+                      <label style={{
+                        width: 120, fontWeight: "bold",
+                        alignSelf: 'center'
+                      }}>
+                        Recording:
+                      </label>
+                      <div style={{ display: 'flex' }}>
+                        <Button
+                          sx={{ m: 1 }}
+                          variant="contained"
+                          onClick={async () => {
+                            await start_recording(sdkHandle);
+                          }}>
+                          Start
+                        </Button>
+
+                        <Button
+                          sx={{ m: 1 }}
+                          variant="contained"
+                          onClick={async () => {
+                            await stop_recording(sdkHandle);
+                          }}>
+                          Stop
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex' }}>
+                      <label style={{
+                        width: 120, fontWeight: "bold",
+                        alignSelf: 'center'
+                      }}>
+                        Audio:
+                      </label>
+
+                      <div style={{ display: 'flex' }}>
+                        <Button
+                          sx={{ m: 1 }}
+                          variant="contained"
+                          onClick={async () => {
+                            await enable_audio(sdkHandle);
+                          }}>
+                          Start
+                        </Button>
+
+                        <Button
+                          sx={{ m: 1 }}
+                          variant="contained"
+                          onClick={async () => {
+                            await disable_audio(sdkHandle);
+                          }}>
+                          Stop
+                        </Button>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: "center" }}>
+                      <Button
+                        sx={{ m: 1 }}
+                        variant="contained"
+                        onClick={() => {
+                          window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
+                        }}>
+                        Playback
+                      </Button>
+
+                      <Typography color="neutral.500" variant="body2">
+                        To access this feature, please ensure that you are connected to the local wifi
+                      </Typography>
+                    </div>
+                  </div>
+                </div>
+                {/* 
+                <div style={{ display: (previewMode === 'playback') ? null : 'none' }}>
                   <div>
                     <div style={{
                       padding: '.6em',
                       margin: '.2em',
                       border: '1px solid #D1D5DB',
                       borderRadius: 4,
-                      cursor: 'pointer',
                       display: 'inline-block'
                     }}>
-                      <label style={{ display: 'block', color: "#6B7280", padding: '0.5em' }}>Playback</label>
-                      <div style={{ display: 'flex' }}>
-                        <label style={{
-                          width: 120, fontWeight: "bold",
-                          alignSelf: 'center'
-                        }}>Picture:</label>
-
-                        <div style={{ flex: 1 }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await take_picture(sdkHandle);
-                            }}>
-                            Snapshot
-                          </Button>
-                        </div>
+                      <div>
+                        <InputLabel id="ptz_speed">Stream type</InputLabel>
+                        <Select
+                          labelId="ptz_speed"
+                          onChange={({ target: { value } }) => {
+                            setStreamType(value)
+                          }}
+                          sx={{ width: 200 }}
+                          value={stream_type}
+                          label="Stream type">
+                          {
+                            [
+                              { "name": "Main stream", "value": 1 },
+                              { "name": "Sub stream", "value": 2 }
+                            ].map(({ name, value }) => (<MenuItem key={value}
+                              value={value}>{name}</MenuItem>))
+                          }
+                        </Select>
                       </div>
 
-                      <div style={{ display: 'flex' }}>
-                        <label style={{
-                          width: 120, fontWeight: "bold",
-                          alignSelf: 'center'
-                        }}>
-                          Recording:
-                        </label>
-                        <div style={{ display: 'flex' }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await start_recording(sdkHandle);
-                            }}>
-                            Start
-                          </Button>
-
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await stop_recording(sdkHandle);
-                            }}>
-                            Stop
-                          </Button>
+                      <div style={{ padding: '1em 0', display: 'flex' }}>
+                        <div style={{ display: 'inline-block' }}>
+                          <div style={{ padding: '1em 0' }}>
+                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                              <DateTimePicker
+                                label="Start Time"
+                                value={start_time}
+                                onChange={(newValue) => {
+                                  setStartTime(newValue);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </LocalizationProvider>
+                          </div>
+                          <div style={{ padding: '1em 0' }}>
+                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                              <DateTimePicker
+                                label="End Time"
+                                value={end_time}
+                                onChange={(newValue) => {
+                                  setStartTime(newValue);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </LocalizationProvider>
+                          </div>
                         </div>
-                      </div>
+                        <Button
+                          style={{ alignSelf: 'center' }}
+                          sx={{ m: 1 }}
+                          variant="contained"
+                          onClick={async () => {
+                            const results = await search_video(sdkHandle, {
+                              type: 1,
+                              ip: videoRecorderInfo.recorderPublicIp,
+                              port: videoRecorderInfo.recorderPortNumber,
+                              stream_type, start_time, end_time
+                            });
 
-                      <div style={{ display: 'flex' }}>
-                        <label style={{
-                          width: 120, fontWeight: "bold",
-                          alignSelf: 'center'
-                        }}>
-                          Audio:
-                        </label>
-
-                        <div style={{ display: 'flex' }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await enable_audio(sdkHandle);
-                            }}>
-                            Start
-                          </Button>
-
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await disable_audio(sdkHandle);
-                            }}>
-                            Stop
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: (previewMode === 'playback') ? null : 'none' }}>
-                    <div>
-                      <div style={{
-                        padding: '.6em',
-                        margin: '.2em',
-                        border: '1px solid #D1D5DB',
-                        borderRadius: 4,
-                        display: 'inline-block'
-                      }}>
-                        <div>
-                          <InputLabel id="ptz_speed">Stream type</InputLabel>
-                          <Select
-                            labelId="ptz_speed"
-                            onChange={({ target: { value } }) => {
-                              setStreamType(value)
-                            }}
-                            sx={{ width: 200 }}
-                            value={stream_type}
-                            label="Stream type">
-                            {
-                              [
-                                { "name": "Main stream", "value": 1 },
-                                { "name": "Sub stream", "value": 2 }
-                              ].map(({ name, value }) => (<MenuItem key={value}
-                                value={value}>{name}</MenuItem>))
-                            }
-                          </Select>
-                        </div>
+                            setPlaybackFiles(results);
+                          }}>
+                          Search
+                        </Button>
 
                         <div style={{ padding: '1em 0', display: 'flex' }}>
                           <div style={{ display: 'inline-block' }}>
-                            <div style={{ padding: '1em 0' }}>
+                            <div>
                               <LocalizationProvider dateAdapter={AdapterMoment}>
                                 <DateTimePicker
-                                  label="Start Time"
-                                  value={start_time}
+                                  label="Download Start Time"
+                                  value={download_start_time}
                                   onChange={(newValue) => {
                                     setStartTime(newValue);
                                   }}
@@ -1326,11 +1384,12 @@ const VideoCameraDetails = () => {
                                 />
                               </LocalizationProvider>
                             </div>
+
                             <div style={{ padding: '1em 0' }}>
                               <LocalizationProvider dateAdapter={AdapterMoment}>
                                 <DateTimePicker
-                                  label="End Time"
-                                  value={end_time}
+                                  label="Download end Time"
+                                  value={download_end_time}
                                   onChange={(newValue) => {
                                     setStartTime(newValue);
                                   }}
@@ -1344,234 +1403,184 @@ const VideoCameraDetails = () => {
                             sx={{ m: 1 }}
                             variant="contained"
                             onClick={async () => {
-                              const results = await search_video(sdkHandle, {
-                                type: 1,
-                                ip: videoRecorderInfo.recorderPublicIp,
-                                port: videoRecorderInfo.recorderPortNumber,
-                                stream_type, start_time, end_time
-                              });
+                              if (playback_files.length >= 1) {
+                                const {
+                                  start_time, end_time, file_name, playbackURI
+                                } = playback_files[0];
 
-                              setPlaybackFiles(results);
-                            }}>
-                            Search
-                          </Button>
-
-                          <div style={{ padding: '1em 0', display: 'flex' }}>
-                            <div style={{ display: 'inline-block' }}>
-                              <div>
-                                <LocalizationProvider dateAdapter={AdapterMoment}>
-                                  <DateTimePicker
-                                    label="Download Start Time"
-                                    value={download_start_time}
-                                    onChange={(newValue) => {
-                                      setStartTime(newValue);
-                                    }}
-                                    renderInput={(params) => <TextField {...params} />}
-                                  />
-                                </LocalizationProvider>
-                              </div>
-
-                              <div style={{ padding: '1em 0' }}>
-                                <LocalizationProvider dateAdapter={AdapterMoment}>
-                                  <DateTimePicker
-                                    label="Download end Time"
-                                    value={download_end_time}
-                                    onChange={(newValue) => {
-                                      setStartTime(newValue);
-                                    }}
-                                    renderInput={(params) => <TextField {...params} />}
-                                  />
-                                </LocalizationProvider>
-                              </div>
-                            </div>
-                            <Button
-                              style={{ alignSelf: 'center' }}
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                if (playback_files.length >= 1) {
-                                  const {
-                                    start_time, end_time, file_name, playbackURI
-                                  } = playback_files[0];
-
-                                  await download_video(sdkHandle, {
-                                    ip: videoRecorderInfo.recorderPublicIp,
-                                    file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
-                                  })
-                                }
-                                await download_file(sdkHandle);
-                              }}>
-                              Download
-                            </Button>
-                          </div>
-
-                        </div>
-
-                        <div style={{ maxWidth: 800 }}>
-                          <table style={{ maxWidth: 800 }}>
-                            <tr>
-                              <th>id</th>
-                              <th>file name</th>
-                              <th>start date</th>
-                              <th>end date</th>
-                              <th>download</th>
-                            </tr>
-                            {
-                              playback_files.map(({
-                                start_time, end_time, file_name, playbackURI
-                              }, index) => (
-                                <tr key={index}>
-                                  <td>{index + 1}</td>
-                                  <td>{file_name}</td>
-                                  <td>{formatDate(start_time)}</td>
-                                  <td>{formatDate(end_time)}</td>
-                                  <td>
-                                    <div onClick={async () => {
-                                      await download_video(sdkHandle, {
-                                        ip: videoRecorderInfo.recorderPublicIp,
-                                        file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
-                                      })
-                                    }}>
-                                      <a href="#">Download</a>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))
-                            }
-                          </table>
-                        </div>
-
-                        <div style={{ display: 'flex' }}>
-                          <label style={{
-                            width: 120, fontWeight: "bold",
-                            alignSelf: 'center'
-                          }}>
-                            Media:
-                          </label>
-                          <div style={{ display: 'flex' }}>
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await play(sdkHandle, {
+                                await download_video(sdkHandle, {
                                   ip: videoRecorderInfo.recorderPublicIp,
-                                  rtsp_port: videoRecorderInfo.rstp_port,
-                                  type: 1,
-                                  stream_type, start_time, end_time
+                                  file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                 })
-                              }}>
-                              Play
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await stop(sdkHandle);
-                              }}>
-                              Stop
-                            </Button>
-                          </div>
-
-                          <div style={{ display: 'flex' }}>
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await pause(sdkHandle);
-                              }}>
-                              Pause
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await resume(sdkHandle);
-                              }}>
-                              Resume
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex' }}>
-                          <label style={{
-                            width: 120, fontWeight: "bold",
-                            alignSelf: 'center'
-                          }}>
-                            Media 2:
-                          </label>
-                          <div style={{ display: 'flex' }}>
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await slow_forward(sdkHandle);
-                              }}>
-                              Slow forward
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await fast_forward(sdkHandle);
-                              }}>
-                              Fast forward
-                            </Button>
-                          </div>
-
-                        </div>
-
-                        <div style={{ display: 'flex' }}>
-                          <label style={{
-                            width: 120, fontWeight: "bold",
-                            alignSelf: 'center'
-                          }}>
-                            Media 3:
-                          </label>
-                          <div style={{ display: 'flex' }}>
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await take_picture(sdkHandle);
-                              }}>
-                              Capture
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await start_recording(sdkHandle);
-                              }}>
-                              Start Clip
-                            </Button>
-
-                            <Button
-                              sx={{ m: 1 }}
-                              variant="contained"
-                              onClick={async () => {
-                                await stop_recording(sdkHandle);
-                              }}>
-                              Stop Clip
-                            </Button>
-                          </div>
-
+                              }
+                              await download_file(sdkHandle);
+                            }}>
+                            Download
+                          </Button>
                         </div>
 
                       </div>
+
+                      <div style={{ maxWidth: 800 }}>
+                        <table style={{ maxWidth: 800 }}>
+                          <tr>
+                            <th>id</th>
+                            <th>file name</th>
+                            <th>start date</th>
+                            <th>end date</th>
+                            <th>download</th>
+                          </tr>
+                          {
+                            playback_files.map(({
+                              start_time, end_time, file_name, playbackURI
+                            }, index) => (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{file_name}</td>
+                                <td>{formatDate(start_time)}</td>
+                                <td>{formatDate(end_time)}</td>
+                                <td>
+                                  <div onClick={async () => {
+                                    await download_video(sdkHandle, {
+                                      ip: videoRecorderInfo.recorderPublicIp,
+                                      file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                                    })
+                                  }}>
+                                    <a href="#">Download</a>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          }
+                        </table>
+                      </div>
+
+                      <div style={{ display: 'flex' }}>
+                        <label style={{
+                          width: 120, fontWeight: "bold",
+                          alignSelf: 'center'
+                        }}>
+                          Media:
+                        </label>
+                        <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await play(sdkHandle, {
+                                ip: videoRecorderInfo.recorderPublicIp,
+                                rtsp_port: videoRecorderInfo.rstp_port,
+                                type: 1,
+                                stream_type, start_time, end_time
+                              })
+                            }}>
+                            Play
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await stop(sdkHandle);
+                            }}>
+                            Stop
+                          </Button>
+                        </div>
+
+                        <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await pause(sdkHandle);
+                            }}>
+                            Pause
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await resume(sdkHandle);
+                            }}>
+                            Resume
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex' }}>
+                        <label style={{
+                          width: 120, fontWeight: "bold",
+                          alignSelf: 'center'
+                        }}>
+                          Media 2:
+                        </label>
+                        <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await slow_forward(sdkHandle);
+                            }}>
+                            Slow forward
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await fast_forward(sdkHandle);
+                            }}>
+                            Fast forward
+                          </Button>
+                        </div>
+
+                      </div>
+
+                      <div style={{ display: 'flex' }}>
+                        <label style={{
+                          width: 120, fontWeight: "bold",
+                          alignSelf: 'center'
+                        }}>
+                          Media 3:
+                        </label>
+                        <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await take_picture(sdkHandle);
+                            }}>
+                            Capture
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await start_recording(sdkHandle);
+                            }}>
+                            Start Clip
+                          </Button>
+
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await stop_recording(sdkHandle);
+                            }}>
+                            Stop Clip
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-
-                </div>
+                </div> */}
               </Grid>
             </Grid>
           </Box>
-        </Container>
-      </Box>
+        </Container >
+      </Box >
     </>
   )
 }

@@ -25,14 +25,6 @@ class DataManagementApi {
       // Fallback action when API is not available
       return Promise.resolve(null);
     }
-
-    deleteBackup() {
-        if (useApi) { return sendApi(`/api/backup`, {
-            method: 'DELETE',
-          }); }
-        // Fallback action when API is not available
-        return Promise.resolve(null);
-    }
 }
   
   export const dataManagementApi = new DataManagementApi();

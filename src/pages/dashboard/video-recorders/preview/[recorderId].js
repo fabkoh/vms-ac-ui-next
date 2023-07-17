@@ -444,7 +444,7 @@ const VideoRecorderPreview = () => {
                   }}>
                   <div>
                     <Typography variant="h4">
-                      { videoRecorderInfo? `Live View/Playback: ${videoRecorderInfo.recorderName}`: " Camera Not Found" }    
+                      { videoRecorderInfo? `Live View: ${videoRecorderInfo.recorderName}`: " Camera Not Found" }    
                     </Typography>    
                   </div>    
                 </Grid>
@@ -558,6 +558,20 @@ const VideoRecorderPreview = () => {
                               }}>Stop Preview</Button>
                             </div> 
                           }
+                          <div style={{ display: 'flex', alignItems: "center" }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={() => {
+                                window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
+                              }}>
+                              Playback
+                            </Button>
+
+                            <Typography color="neutral.500" variant="body2">
+                              To access this feature, please ensure that you are connected to the local wifi
+                            </Typography>
+                          </div>
                         </div>
                       </div>
                     </div>
