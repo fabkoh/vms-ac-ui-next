@@ -88,6 +88,27 @@ const VideoCameraDetails = () => {
   const [playback_files, setPlaybackFiles] = useState([]);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      await stop_recording(sdkHandle);
+    } else {
+      await start_recording(sdkHandle);
+    }
+    setIsRecording(!isRecording);
+  };
+
+  const toggleAudio = async () => {
+    if (audioEnabled) {
+      await disable_audio(sdkHandle);
+    } else {
+      await enable_audio(sdkHandle);
+    }
+    setAudioEnabled(!audioEnabled);
+  };
+
 
   // Begin indefinite polling for refresh token
   useEffect(
@@ -262,8 +283,10 @@ const VideoCameraDetails = () => {
         bDateDir: true,
         success: function () {
           resolve();
-        }, error: function () {
-          reject();
+        },
+        error: function (error) {
+          console.error("Start Recording Error: ", error);
+          reject(error);
         }
       });
     });
@@ -274,8 +297,10 @@ const VideoCameraDetails = () => {
       handle.I_StopRecord({
         success: function () {
           resolve();
-        }, error: function () {
-          reject();
+        },
+        error: function (error) {
+          console.error("Stop Recording Error: ", error);
+          reject(error);
         }
       });
     });
@@ -482,27 +507,26 @@ const VideoCameraDetails = () => {
     });
   }
 
-  const enable_audio = async function () {
+  const enable_audio = async function (handle) {
     return await new Promise((resolve, reject) => {
-      handle.I_OpenSound(); (preset_id, {
-        success: function (xmlDoc) {
-          resolve(xmlDoc)
-        }, error: function (status, xmlDoc) {
-          reject();
-        }
-      });
+      var res = handle.I_OpenSound();
+      console.log("res:", res);
+      if (res == 0) {
+        console.log("Audio Enabled");
+      } else {
+        console.log("Audio Enable Failed");
+      }
     });
   }
 
-  const disable_audio = async function () {
+  const disable_audio = async function (handle) {
     return await new Promise((resolve, reject) => {
-      handle.I_CloseSound(); (preset_id, {
-        success: function (xmlDoc) {
-          resolve(xmlDoc)
-        }, error: function (status, xmlDoc) {
-          reject();
-        }
-      });
+      var res = handle.I_CloseSound();
+      if (res == 0) {
+        console.log("Audio Disabled");
+      } else {
+        console.log("Audio Disable Failed");
+      }
     });
   }
 
@@ -1235,19 +1259,9 @@ const VideoCameraDetails = () => {
                         <Button
                           sx={{ m: 1 }}
                           variant="contained"
-                          onClick={async () => {
-                            await start_recording(sdkHandle);
-                          }}>
-                          Start
-                        </Button>
-
-                        <Button
-                          sx={{ m: 1 }}
-                          variant="contained"
-                          onClick={async () => {
-                            await stop_recording(sdkHandle);
-                          }}>
-                          Stop
+                          onClick={toggleRecording}
+                        >
+                          {isRecording ? 'Stop' : 'Start'}
                         </Button>
                       </div>
                     </div>
@@ -1259,24 +1273,13 @@ const VideoCameraDetails = () => {
                       }}>
                         Audio:
                       </label>
-
                       <div style={{ display: 'flex' }}>
                         <Button
                           sx={{ m: 1 }}
                           variant="contained"
-                          onClick={async () => {
-                            await enable_audio(sdkHandle);
-                          }}>
-                          Start
-                        </Button>
-
-                        <Button
-                          sx={{ m: 1 }}
-                          variant="contained"
-                          onClick={async () => {
-                            await disable_audio(sdkHandle);
-                          }}>
-                          Stop
+                          onClick={toggleAudio}
+                        >
+                          {audioEnabled ? 'Disable' : 'Enable'}
                         </Button>
                       </div>
                     </div>
