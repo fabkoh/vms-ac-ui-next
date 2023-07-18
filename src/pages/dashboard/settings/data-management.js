@@ -7,6 +7,8 @@ import {
   Typography,
   CardHeader,
   Collapse,
+  CardContent,
+  Grid,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import Head from "next/head";
@@ -35,10 +37,16 @@ const DataManagement = () => {
         if (blob) {
           const reader = new FileReader();
           reader.onload = () => {
+            // Get today's date
+            let today = new Date();
+
+            // Format today's date in YYYY-MM-DD format
+            let dateString = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+
             const dataUrl = reader.result;
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.setAttribute('download', 'backup.sql'); // Or use a dynamic name if provided by the server
+            link.setAttribute('download', `backup${dateString}.sql`); // Or use a dynamic name if provided by the server
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -52,18 +60,6 @@ const DataManagement = () => {
       .catch((error) => {
         console.log('Error during backup download:', error);
         toast.error('Failed to download backup.');
-      });
-  };
-
-  const handleDeleteBackup = () => {
-    dataManagementApi.deleteBackup()
-      .then(() => {
-        console.log('Backup deleted successfully.');
-        toast.success('Backup deleted successfully.');
-      })
-      .catch((error) => {
-        console.log('Error during backup deletion:', error);
-        toast.error('Failed to delete backup.');
       });
   };
 
@@ -108,14 +104,20 @@ const DataManagement = () => {
                 }
               />
               <Collapse in={expanded}>
-                <div style={{ padding: '16px', display: 'flex', justifyContent: 'left' }}>
-                  <Button variant="contained" onClick={handleBackupDownload}>
-                    Download Backup
-                  </Button>
-                  <Button variant="contained" onClick={handleDeleteBackup} style={{ marginLeft: '16px' }}>
-                    Delete Backup
-                  </Button>
-                </div>
+                <CardContent>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={3}
+                    justifyContent="flex-start"
+                    padding="10px">
+                    <Grid item>
+                      <Button variant="contained" onClick={handleBackupDownload}>
+                        Download Backup
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </CardContent>
               </Collapse>
             </Card>
           </Stack>

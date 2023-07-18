@@ -31,7 +31,7 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                     label="Private IP Address"
                     value={(recorder) ? recorder.recorderPrivateIp : <CircularProgress size='1rem'/>}
                 />
-                <PropertyListItem
+                {/* <PropertyListItem
                     align={align}
                     divider
                     label="uPnP enabled"
@@ -39,7 +39,7 @@ export const VideoRecorderBasicDetails = ({count,recorder}) => {
                             ? <SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill>
                             : <SeverityPill color="error" style={{color: 'transparent'}}>_.</SeverityPill> 
                         : <CircularProgress size='1rem'/>}
-                />
+                /> */}
                 <PropertyListItem
                     align={align}
                     divider

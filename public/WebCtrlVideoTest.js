@@ -1,3 +1,5 @@
+import { isConstructorDeclaration } from "typescript";
+
 !function() {
     if (!window.WebVideoCtrl) {
         var e = function() {
@@ -1295,7 +1297,7 @@
                 Z() ? y.JS_FullScreenSingle(P) : y.HWP_FullScreenDisplay(e)
             }
             ,
-            this.I_SetPreset = function(e, t) {
+            this.I_SetPreset = function(privateIP, e, t) {
                 var n = {
                     iWndIndex: P,
                     iPresetID: e
@@ -1304,14 +1306,14 @@
                 var r = this.findWndIndexByIndex(n.iWndIndex);
                 if (-1 != r) {
                     var s = m[r];
-                    if (-1 != (r = this.findDeviceIndexByIP(s.szIP))) {
+                    if (-1 != (r = this.findDeviceIndexByIP(privateIP))) {
                         var o = I[r];
                         o.oProtocolInc.setPreset(o, s, n)
                     }
                 }
             }
             ,
-            this.I_GoPreset = function(e, t) {
+            this.I_GoPreset = function(privateIP, e, t) {
                 var n = {
                     iWndIndex: P,
                     iPresetID: e
@@ -1320,7 +1322,7 @@
                 var r = this.findWndIndexByIndex(n.iWndIndex);
                 if (-1 != r) {
                     var s = m[r];
-                    if (-1 != (r = this.findDeviceIndexByIP(s.szIP))) {
+                    if (-1 != (r = this.findDeviceIndexByIP(privateIP))) {
                         var o = I[r];
                         o.oProtocolInc.goPreset(o, s, n)
                     }
@@ -2920,10 +2922,11 @@
                 c.submitRequest()
             }
             ,
-            e.prototype.setPreset = function(e, t, n) {
+            e.prototype.setPreset = function(privateIP, e, t, n) {
                 var r = ""
                   , s = "";
-                r = t.iChannelID <= e.iAnalogChannelNum ? T(this.CGI.setPreset.analog, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID) : t.bShttpIPChannel ? T(this.CGI.setPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID - e.oStreamCapa.iIpChanBase + 1 + e.iAnalogChannelNum, n.iPresetID) : T(this.CGI.setPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID),
+                console.log(e.iCGIPort);
+                r = t.iChannelID <= e.iAnalogChannelNum ? T(this.CGI.setPreset.analog, e.szHttpProtocol, privateIP, e.iCGIPort, t.iChannelID, n.iPresetID) : t.bShttpIPChannel ? T(this.CGI.setPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID - e.oStreamCapa.iIpChanBase + 1 + e.iAnalogChannelNum, n.iPresetID) : T(this.CGI.setPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID),
                 s = "<?xml version='1.0' encoding='UTF-8'?>",
                 s += "<PTZPreset>",
                 s += "<id>" + n.iPresetID + "</id>",
@@ -2951,9 +2954,9 @@
                 o.submitRequest()
             }
             ,
-            e.prototype.goPreset = function(e, t, n) {
+            e.prototype.goPreset = function(privateIP, e, t, n) {
                 var r = "";
-                r = t.iChannelID <= e.iAnalogChannelNum ? T(this.CGI.goPreset.analog, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID) : t.bShttpIPChannel ? T(this.CGI.goPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID - e.oStreamCapa.iIpChanBase + 1 + e.iAnalogChannelNum, n.iPresetID) : T(this.CGI.goPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID);
+                r = t.iChannelID <= e.iAnalogChannelNum ? T(this.CGI.goPreset.analog, e.szHttpProtocol, privateIP, e.iCGIPort, t.iChannelID, n.iPresetID) : t.bShttpIPChannel ? T(this.CGI.goPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID - e.oStreamCapa.iIpChanBase + 1 + e.iAnalogChannelNum, n.iPresetID) : T(this.CGI.goPreset.digital, e.szHttpProtocol, e.szIP, e.iCGIPort, t.iChannelID, n.iPresetID);
                 var s = new K
                   , o = {
                     type: "PUT",

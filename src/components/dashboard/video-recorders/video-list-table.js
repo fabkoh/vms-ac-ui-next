@@ -76,7 +76,7 @@ export default function VideoListTable({
               <TableCell>Private IP Address</TableCell>
               <TableCell>Port Number</TableCell>
               <TableCell>IWS Port</TableCell>
-              <TableCell>uPnP enabled</TableCell>
+              {/* <TableCell>uPnP enabled</TableCell> */}
               <TableCell>Created</TableCell>
               <TableCell align="left">Actions</TableCell>
             </TableRow>
@@ -200,7 +200,7 @@ export default function VideoListTable({
                                                 )
                                             }
                                         </TableCell> */}
-                  <TableCell>
+                  {/* <TableCell>
                     {autoPortForwarding ? (
                       <SeverityPill
                         color="success"
@@ -216,7 +216,7 @@ export default function VideoListTable({
                         _.
                       </SeverityPill>
                     )}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>
                     <NextLink href={detailsLink} passHref>
                       <Link color="inherit">

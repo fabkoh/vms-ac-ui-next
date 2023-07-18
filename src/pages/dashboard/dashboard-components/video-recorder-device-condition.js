@@ -190,10 +190,10 @@ const VideoRecorderDeviceCondition = () => {
               username: recorder.recorderUsername,
               password: recorder.recorderPassword
             }),
-            timeout(4000)
+            timeout(3000)
           ]).catch((error) => {
             if (error.message === "Timeout") {
-              console.log("Login function call timed out after 4 seconds");
+              console.log("Login function call timed out after 3 seconds");
             } else {
               console.error(error);
             }
