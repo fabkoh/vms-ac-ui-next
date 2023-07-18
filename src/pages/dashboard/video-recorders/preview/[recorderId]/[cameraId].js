@@ -607,9 +607,9 @@ const VideoCameraDetails = () => {
     });
   }
 
-  const play = async function (handle, { ip, rtsp_port, type, stream_type, start_time, end_time }) {
+  const play = async function (handle, { ip, port, IWSPort, rtsp_port, type, stream_type, start_time, end_time }) {
     return await new Promise((resolve, reject) => {
-      var szDeviceIdentify = `${ip}`,
+      var szDeviceIdentify = `${ip}_${port}`,
         iChannelID = 1,
         bZeroChannel = false,
         iStreamType = stream_type,
@@ -622,7 +622,6 @@ const VideoCameraDetails = () => {
         iChannelID: 1,
         szStartTime: szStartTime,
         szEndTime: szEndTime,
-        port: 7681,
         success: function () {
           resolve();
         }, error: function (status, xmlDoc) {
@@ -903,7 +902,7 @@ const VideoCameraDetails = () => {
 
               <Grid item
                 xs={12}>
-                {/* <div>
+                <div>
                   <div>
 
                     <div style={{
@@ -956,7 +955,8 @@ const VideoCameraDetails = () => {
                       }}>
                       <label style={{ color: "#6B7280", cursor: 'pointer' }}>Playback</label>
                     </div>
-                  </div> */}
+                  </div>
+                </div>
 
                 <div style={{ display: (previewMode === 'live') ? null : 'none' }}>
                   <div style={{
@@ -1298,7 +1298,7 @@ const VideoCameraDetails = () => {
                     </div>
                   </div>
                 </div>
-                {/* 
+                
                 <div style={{ display: (previewMode === 'playback') ? null : 'none' }}>
                   <div>
                     <div style={{
@@ -1362,7 +1362,7 @@ const VideoCameraDetails = () => {
                           onClick={async () => {
                             const results = await search_video(sdkHandle, {
                               type: 1,
-                              ip: videoRecorderInfo.recorderPublicIp,
+                              ip: videoRecorderInfo.recorderPrivateIp,
                               port: videoRecorderInfo.recorderPortNumber,
                               stream_type, start_time, end_time
                             });
@@ -1411,7 +1411,7 @@ const VideoCameraDetails = () => {
                                 } = playback_files[0];
 
                                 await download_video(sdkHandle, {
-                                  ip: videoRecorderInfo.recorderPublicIp,
+                                  ip: videoRecorderInfo.recorderPrivateIp,
                                   file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                 })
                               }
@@ -1444,7 +1444,7 @@ const VideoCameraDetails = () => {
                                 <td>
                                   <div onClick={async () => {
                                     await download_video(sdkHandle, {
-                                      ip: videoRecorderInfo.recorderPublicIp,
+                                      ip: videoRecorderInfo.recorderPrivateIp,
                                       file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                     })
                                   }}>
@@ -1470,8 +1470,10 @@ const VideoCameraDetails = () => {
                             variant="contained"
                             onClick={async () => {
                               await play(sdkHandle, {
-                                ip: videoRecorderInfo.recorderPublicIp,
+                                ip: videoRecorderInfo.recorderPrivateIp,
+                                port: videoRecorderInfo.recorderPortNumber,
                                 rtsp_port: videoRecorderInfo.rstp_port,
+                                IWSPort: videoRecorderInfo.recorderIWSPort,
                                 type: 1,
                                 stream_type, start_time, end_time
                               })
@@ -1577,7 +1579,7 @@ const VideoCameraDetails = () => {
                       </div>
                     </div>
                   </div>
-                </div> */}
+                </div>
               </Grid>
             </Grid>
           </Box>
