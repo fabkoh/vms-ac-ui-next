@@ -1347,7 +1347,7 @@ import { isConstructorDeclaration } from "typescript";
                 }
             }
             ,
-            this.I_StartPlayback = function(e, t) {
+            this.I_StartPlayback = function(publicIP, e, t) {
                 var n = this.findDeviceIndexByIP(e)
                   , r = ""
                   , s = ""
@@ -1406,13 +1406,13 @@ import { isConstructorDeclaration } from "typescript";
                     }),
                     -1 == (n = this.findWndIndexByIndex(c.iWndIndex)) && (Z() ? (c.szStartTime = c.szStartTime.replace(" ", "T") + "Z",
                     c.szEndTime = c.szEndTime.replace(" ", "T") + "Z",
-                    l.oProtocolInc.startPlayback(l, c).then(function() {
+                    l.oProtocolInc.startPlayback(publicIP, l, c).then(function() {
                         t.success && t.success()
                     }, function() {
                         t.error && t.error()
                     })) : (c.szStartTime = c.szStartTime.replace(/[-:]/g, "").replace(" ", "T") + "Z",
                     c.szEndTime = c.szEndTime.replace(/[-:]/g, "").replace(" ", "T") + "Z",
-                    l.oProtocolInc.startPlayback(l, c).then(function() {
+                    l.oProtocolInc.startPlayback(publicIP, l, c).then(function() {
                         t.success && t.success()
                     }, function() {
                         l.iRtspPort = -1,
@@ -3028,7 +3028,7 @@ import { isConstructorDeclaration } from "typescript";
                 u.submitRequest()
             }
             ,
-            e.prototype.startPlayback = function(t, n) {
+            e.prototype.startPlayback = function(publicIP, t, n) {
                 var r = n.iWndIndex
                   , e = ""
                   , s = n.szStartTime
