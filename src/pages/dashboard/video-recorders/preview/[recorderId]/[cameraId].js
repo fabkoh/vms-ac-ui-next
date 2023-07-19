@@ -851,8 +851,8 @@ const VideoCameraDetails = () => {
                 }}>
                 <div>
                   <Typography variant="h4">
-                    {videoRecorderInfo ? `Live View: 
-                      ${videoRecorderInfo.recorderCameras
+                    {videoRecorderInfo ? `${previewMode === 'live' ? 'Live View' : 'Playback'}: 
+    ${videoRecorderInfo.recorderCameras
                       [parseInt(cameraId) - 1].name}` : " Camera Not Found"}
                   </Typography>
                 </div>
@@ -1307,215 +1307,215 @@ const VideoCameraDetails = () => {
                   borderRadius: 4,
                 }}>
                   <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <InputLabel id="ptz_speed">Stream type</InputLabel>
-                    <Select
-                      labelId="ptz_speed"
-                      onChange={({ target: { value } }) => { setStreamType(value) }}
-                      sx={{ width: 200 }}
-                      value={stream_type}
-                      label="Stream type"
-                    >
-                      {[
-                        { "name": "Main stream", "value": 1 },
-                        { "name": "Sub stream", "value": 2 }
-                      ].map(({ name, value }) => (<MenuItem key={value} value={value}>{name}</MenuItem>))}
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <div>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <DateTimePicker
-                          label="Start Time"
-                          value={start_time}
-                          onChange={(newValue) => { setStartTime(newValue); }}
-                          renderInput={(params) => <TextField {...params} />}
-                        />
-                      </LocalizationProvider>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <DateTimePicker
-                          label="End Time"
-                          value={end_time}
-                          onChange={(newValue) => { setEndTime(newValue); }}
-                          renderInput={(params) => <TextField {...params} />}
-                        />
-                      </LocalizationProvider>
-                    </div>
-                    <div style={{ padding: '10px' }}>
-                      <Button
-                        style={{ alignSelf: 'start', marginTop: '1em' }}
-                        variant="contained"
-                        onClick={async () => {
-                          const results = await search_video(sdkHandle, {
-                            type: 1,
-                            ip: videoRecorderInfo.recorderPrivateIp,
-                            port: videoRecorderInfo.recorderPortNumber,
-                            stream_type, start_time, end_time
-                          });
-                          setPlaybackFiles(results);
-                        }}
+                    <Grid item xs={12}>
+                      <InputLabel id="ptz_speed">Stream type</InputLabel>
+                      <Select
+                        labelId="ptz_speed"
+                        onChange={({ target: { value } }) => { setStreamType(value) }}
+                        sx={{ width: 200 }}
+                        value={stream_type}
+                        label="Stream type"
                       >
-                        Search
-                      </Button>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                  <div>
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DateTimePicker
-                        label="Download Start Time"
-                        value={download_start_time}
-                        onChange={(newValue) => { setDownloadStartTime(newValue); }}
-                        renderInput={(params) => <TextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DateTimePicker
-                        label="Download End Time"
-                        value={download_end_time}
-                        onChange={(newValue) => { setDownloadEndTime(newValue); }}
-                        renderInput={(params) => <TextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                    <div style={{ padding: '10px' }}>
-                      <Button
-                        style={{ alignSelf: 'start', marginTop: '1em' }}
-                        variant="contained"
-                        onClick={async () => {
-                          if (playback_files.length >= 1) {
-                            const { start_time, end_time, file_name, playbackURI } = playback_files[0];
-                            await download_video(sdkHandle, {
+                        {[
+                          { "name": "Main stream", "value": 1 },
+                          { "name": "Sub stream", "value": 2 }
+                        ].map(({ name, value }) => (<MenuItem key={value} value={value}>{name}</MenuItem>))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <div>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DateTimePicker
+                            label="Start Time"
+                            value={start_time}
+                            onChange={(newValue) => { setStartTime(newValue); }}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </LocalizationProvider>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DateTimePicker
+                            label="End Time"
+                            value={end_time}
+                            onChange={(newValue) => { setEndTime(newValue); }}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </LocalizationProvider>
+                      </div>
+                      <div style={{ padding: '10px' }}>
+                        <Button
+                          style={{ alignSelf: 'start', marginTop: '1em' }}
+                          variant="contained"
+                          onClick={async () => {
+                            const results = await search_video(sdkHandle, {
+                              type: 1,
                               ip: videoRecorderInfo.recorderPrivateIp,
-                              file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                              port: videoRecorderInfo.recorderPortNumber,
+                              stream_type, start_time, end_time
                             });
+                            setPlaybackFiles(results);
+                          }}
+                        >
+                          Search
+                        </Button>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <div>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DateTimePicker
+                            label="Download Start Time"
+                            value={download_start_time}
+                            onChange={(newValue) => { setDownloadStartTime(newValue); }}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </LocalizationProvider>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DateTimePicker
+                            label="Download End Time"
+                            value={download_end_time}
+                            onChange={(newValue) => { setDownloadEndTime(newValue); }}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </LocalizationProvider>
+                        <div style={{ padding: '10px' }}>
+                          <Button
+                            style={{ alignSelf: 'start', marginTop: '1em' }}
+                            variant="contained"
+                            onClick={async () => {
+                              if (playback_files.length >= 1) {
+                                const { start_time, end_time, file_name, playbackURI } = playback_files[0];
+                                await download_video(sdkHandle, {
+                                  ip: videoRecorderInfo.recorderPrivateIp,
+                                  file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                                });
+                              }
+                              await download_file(sdkHandle);
+                            }}
+                          >
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <div style={{ maxWidth: 800 }}>
+                        <table style={{ maxWidth: 800 }}>
+                          <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Download</th>
+                          </tr>
+                          {
+                            playback_files.map(({
+                              start_time, end_time, file_name, playbackURI
+                            }, index) => (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{file_name}</td>
+                                <td>{new Date(start_time).toLocaleString()}</td>
+                                <td>{new Date(end_time).toLocaleString()}</td>
+                                <td>
+                                  <div onClick={async () => {
+                                    await download_video(sdkHandle, {
+                                      ip: videoRecorderInfo.recorderPrivateIp,
+                                      file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                                    })
+                                  }}>
+                                    <a href="#">Download</a>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
                           }
-                          await download_file(sdkHandle);
-                        }}
-                      >
-                        Download
-                      </Button>
-                    </div>
-                  </div>
-                  </Grid>
-                
-                <Grid item xs={12}>
-                <div style={{ maxWidth: 800 }}>
-                  <table style={{ maxWidth: 800 }}>
-                    <tr>
-                      <th>ID</th>
-                      <th>File Name</th>
-                      <th>Start Time</th>
-                      <th>End Time</th>
-                      <th>Download</th>
-                    </tr>
-                    {
-                      playback_files.map(({
-                        start_time, end_time, file_name, playbackURI
-                      }, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{file_name}</td>
-                          <td>{new Date(start_time).toLocaleString()}</td>
-                          <td>{new Date(end_time).toLocaleString()}</td>
-                          <td>
-                            <div onClick={async () => {
-                              await download_video(sdkHandle, {
-                                ip: videoRecorderInfo.recorderPrivateIp,
-                                file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
-                              })
+                        </table>
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <div style={{ display: 'flex' }}>
+                        <label style={{
+                          width: 120, fontWeight: "bold",
+                          alignSelf: 'center'
+                        }}>
+                          Media:
+                        </label>
+                        <div style={{ display: 'flex' }}>
+                          {!isPlaying ? (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={handlePlay}
+                            >
+                              Play
+                            </Button>
+                          ) : (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={handleStop}
+                            >
+                              Stop
+                            </Button>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex' }}>
+                          {isPaused ? (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await resume(sdkHandle);
+                                setIsPaused(false);
+                              }}>
+                              Resume
+                            </Button>
+                          ) : (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await pause(sdkHandle);
+                                setIsPaused(true);
+                              }}>
+                              Pause
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <div style={{ display: 'flex' }}>
+                        <label style={{
+                          width: 120, fontWeight: "bold",
+                          alignSelf: 'center'
+                        }}>
+                          Media 2:
+                        </label>
+                        <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await slow_forward(sdkHandle);
                             }}>
-                              <a href="#">Download</a>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    }
-                  </table>
-                </div>
-                </Grid>
+                            Slow forward
+                          </Button>
 
-                <Grid item xs={12}>
-                <div style={{ display: 'flex' }}>
-                  <label style={{
-                    width: 120, fontWeight: "bold",
-                    alignSelf: 'center'
-                  }}>
-                    Media:
-                  </label>
-                  <div style={{ display: 'flex' }}>
-                    {!isPlaying ? (
-                      <Button
-                        sx={{ m: 1 }}
-                        variant="contained"
-                        onClick={handlePlay}
-                      >
-                        Play
-                      </Button>
-                    ) : (
-                      <Button
-                        sx={{ m: 1 }}
-                        variant="contained"
-                        onClick={handleStop}
-                      >
-                        Stop
-                      </Button>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex' }}>
-                    {isPaused ? (
-                      <Button
-                        sx={{ m: 1 }}
-                        variant="contained"
-                        onClick={async () => {
-                          await resume(sdkHandle);
-                          setIsPaused(false);
-                        }}>
-                        Resume
-                      </Button>
-                    ) : (
-                      <Button
-                        sx={{ m: 1 }}
-                        variant="contained"
-                        onClick={async () => {
-                          await pause(sdkHandle);
-                          setIsPaused(true);
-                        }}>
-                        Pause
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                </Grid>
-
-                <Grid item xs={12}>
-                <div style={{ display: 'flex' }}>
-                  <label style={{
-                    width: 120, fontWeight: "bold",
-                    alignSelf: 'center'
-                  }}>
-                    Media 2:
-                  </label>
-                  <div style={{ display: 'flex' }}>
-                    <Button
-                      sx={{ m: 1 }}
-                      variant="contained"
-                      onClick={async () => {
-                        await slow_forward(sdkHandle);
-                      }}>
-                      Slow forward
-                    </Button>
-
-                    <Button
-                      sx={{ m: 1 }}
-                      variant="contained"
-                      onClick={async () => {
-                        await fast_forward(sdkHandle);
-                      }}>
-                      Fast forward
-                    </Button>
-                  </div>
-                  {/* <div style={{ display: 'flex' }}>
+                          <Button
+                            sx={{ m: 1 }}
+                            variant="contained"
+                            onClick={async () => {
+                              await fast_forward(sdkHandle);
+                            }}>
+                            Fast forward
+                          </Button>
+                        </div>
+                        {/* <div style={{ display: 'flex' }}>
                           <label style={{
                             width: 120, fontWeight: "bold",
                             alignSelf: 'center'
@@ -1551,11 +1551,11 @@ const VideoCameraDetails = () => {
                             </Button>
                           </div>
                         </div> */}
-                        
-                </div>
-                </Grid>
-                
-                </Grid>
+
+                      </div>
+                    </Grid>
+
+                  </Grid>
                 </div>
 
               </Grid>
