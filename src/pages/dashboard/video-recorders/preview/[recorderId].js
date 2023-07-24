@@ -565,11 +565,11 @@ const VideoRecorderPreview = () => {
                               onClick={() => {
                                 window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
                               }}>
-                              Playback
+                              Detailed Interface
                             </Button>
 
                             <Typography color="neutral.500" variant="body2">
-                              To access this feature, please ensure that you are connected to the local wifi
+                              To access this feature, please ensure that you are connected to the local network
                             </Typography>
                           </div>
                         </div>

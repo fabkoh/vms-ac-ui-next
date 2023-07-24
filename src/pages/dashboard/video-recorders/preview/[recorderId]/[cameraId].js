@@ -89,6 +89,7 @@ const VideoCameraDetails = () => {
   };
 
   const handlePlay = async () => {
+    console.log("handlePlay", start_time);
     await play(sdkHandle, {
       publicIP: videoRecorderInfo.recorderPublicIp,
       privateIP: videoRecorderInfo.recorderPrivateIp,
@@ -99,6 +100,7 @@ const VideoCameraDetails = () => {
       stream_type,
       start_time,
       end_time
+
     });
     setIsPlaying(true);
   };
@@ -529,16 +531,18 @@ const VideoCameraDetails = () => {
 
   const search_video = async function (handle, { ip, port, type, stream_type, start_time, end_time }) {
     return await new Promise((resolve, reject) => {
+
       var szDeviceIdentify = `${ip}_${port}`,
         iChannelID = 1,
         bZeroChannel = false,
         iStreamType = stream_type,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
 
       let iSearchTimes = 0;
       let g_iSearchTimes = 0;
       const results = [];
+
 
       handle.I_RecordSearch(szDeviceIdentify, iChannelID, szStartTime, szEndTime, {
         iStreamType: iStreamType,
@@ -596,8 +600,8 @@ const VideoCameraDetails = () => {
         szChannelID = 1,
         szFileName = file_name,
         szPlaybackURI = playbackURI,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
 
       const g_iDownloadID = handle.I_StartDownloadRecordByTime(szDeviceIdentify, szPlaybackURI, szFileName, szStartTime, szEndTime, {
         bDateDir: true
@@ -607,12 +611,16 @@ const VideoCameraDetails = () => {
 
   const play = async function (handle, { publicIP, privateIP, port, IWSPort, rtsp_port, type, stream_type, start_time, end_time }) {
     return await new Promise((resolve, reject) => {
-      var szDeviceIdentify = `${privateIP}_${port}`,
+      console.log("handlePlay", start_time);
+      var szDeviceIdentify = `${publicIP}`,
         iChannelID = 1,
         bZeroChannel = false,
         iStreamType = stream_type,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
+
+      console.log("startTimelocal", szStartTime);
+
 
       handle.I_StartPlayback(publicIP, privateIP, {
         iRtspPort: rtsp_port,
@@ -1290,11 +1298,11 @@ const VideoCameraDetails = () => {
                         onClick={() => {
                           window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
                         }}>
-                        Playback
+                        Detailed Interface
                       </Button>
 
                       <Typography color="neutral.500" variant="body2">
-                        To access this feature, please ensure that you are connected to the local wifi
+                        To access this feature, please ensure that you are connected to the local network
                       </Typography>
                     </div>
                   </div>
@@ -1324,26 +1332,22 @@ const VideoCameraDetails = () => {
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <div>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <DateTimePicker
-                            label="Start Time"
-                            value={start_time}
-                            onChange={(newValue) => { setStartTime(newValue); }}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <DateTimePicker
-                            label="End Time"
-                            value={end_time}
-                            onChange={(newValue) => { setEndTime(newValue); }}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
+                        <DateTimePicker
+                          label="Start Time"
+                          value={start_time}
+                          onChange={(newValue) => { setStartTime(newValue); }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                        <DateTimePicker
+                          label="End Time"
+                          value={end_time}
+                          onChange={(newValue) => { setEndTime(newValue); }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
                       </div>
-                      <div style={{ padding: '10px' }}>
+                      <div style={{ display: 'flex', padding: '10px' }}>
                         <Button
-                          style={{ alignSelf: 'start', marginTop: '1em' }}
+                          style={{ alignSelf: 'start', marginTop: '1em', marginRight: '10px' }}
                           variant="contained"
                           onClick={async () => {
                             const results = await search_video(sdkHandle, {
@@ -1357,44 +1361,24 @@ const VideoCameraDetails = () => {
                         >
                           Search
                         </Button>
-                      </div>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <div>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <DateTimePicker
-                            label="Download Start Time"
-                            value={download_start_time}
-                            onChange={(newValue) => { setDownloadStartTime(newValue); }}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <DateTimePicker
-                            label="Download End Time"
-                            value={download_end_time}
-                            onChange={(newValue) => { setDownloadEndTime(newValue); }}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                        <div style={{ padding: '10px' }}>
-                          <Button
-                            style={{ alignSelf: 'start', marginTop: '1em' }}
-                            variant="contained"
-                            onClick={async () => {
-                              if (playback_files.length >= 1) {
-                                const { start_time, end_time, file_name, playbackURI } = playback_files[0];
-                                await download_video(sdkHandle, {
-                                  ip: videoRecorderInfo.recorderPrivateIp,
-                                  file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
-                                });
-                              }
-                              await download_file(sdkHandle);
-                            }}
-                          >
-                            Download
-                          </Button>
-                        </div>
+                        <Button
+                          style={{ alignSelf: 'start', marginTop: '1em' }}
+                          variant="contained"
+                          onClick={async () => {
+                            if (playback_files.length >= 1) {
+                              const {
+                                start_time, end_time, file_name, playbackURI
+                              } = playback_files[0];
+
+                              await download_video(sdkHandle, {
+                                ip: videoRecorderInfo.recorderPublicIp,
+                                file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                              })
+                            }
+                          }}
+                        >
+                          Download
+                        </Button>
                       </div>
                     </Grid>
 
@@ -1506,14 +1490,14 @@ const VideoCameraDetails = () => {
                             Slow forward
                           </Button>
 
-                          <Button
+                          {/* <Button
                             sx={{ m: 1 }}
                             variant="contained"
                             onClick={async () => {
                               await fast_forward(sdkHandle);
                             }}>
                             Fast forward
-                          </Button>
+                          </Button> */}
                         </div>
                         {/* <div style={{ display: 'flex' }}>
                           <label style={{
