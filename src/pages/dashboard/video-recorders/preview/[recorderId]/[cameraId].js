@@ -1,9 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";
-import accessGroupEntranceApi from "../../../../../api/access-group-entrance-n-to-n";
-import entranceApi from "../../../../../api/entrance";
-import NextLink from 'next/link';
 import Head from 'next/head';
 import router from 'next/router';
 import {
@@ -17,34 +14,16 @@ import {
   Container,
   TextField,
   Link,
-  Button
+  Button,
 } from "@mui/material";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ChevronDown } from "../../../../../icons/chevron-down";
-import StyledMenu from "../../../../../components/dashboard/styled-menu";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import { AuthGuard } from "../../../../../components/authentication/auth-guard";
 import { DashboardLayout, TheaterModeContext } from "../../../../../components/dashboard/dashboard-layout";
-import { EntranceBasicDetails } from "../../../../../components/dashboard/entrances/details/entrance-basic-details";
 import toast from "react-hot-toast";
-import { Confirmdelete } from '../../../../../components/dashboard/video-recorders/confirm-delete';
-import { set } from "date-fns";
-import AccessGroupDetails from "../../../../../components/dashboard/entrances/details/entrance-access-group-details";
-import { BuildCircle, DoorFront, LockOpen, Refresh } from "@mui/icons-material";
-import ConfirmStatusUpdate from "../../../../../components/dashboard/entrances/list/confirm-status-update";
-import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../../utils/entrance";
-import EntranceSchedules from "../../../../../components/dashboard/entrances/details/entrance-schedules";
-import { entranceScheduleApi } from "../../../../../api/entrance-schedule";
-import { getEntranceScheduleEditLink } from "../../../../../utils/entrance-schedule";
 import videoRecorderApi from "../../../../../api/videorecorder";
-import { VideoRecorderBasicDetails } from "../../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
-import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../../utils/video-recorder";
-import { VideoRecorderCameras } from "../../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { ServerDownError } from "../../../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../../../api/api-helpers";
 import { authRenewToken } from "../../../../../api/api-helpers";
@@ -65,7 +44,6 @@ function formatDate(date) {
 
 const VideoCameraDetails = () => {
   const isMounted = useMounted();
-  const [entrance, setEntrance] = useState(null);
   const { cameraId, recorderId } = router.query;
   const { theaterMode, setTheaterMode } = useContext(TheaterModeContext)
 
@@ -74,7 +52,6 @@ const VideoCameraDetails = () => {
   }, [])
   const [videoRecorderInfo, setVideoRecorderInfo] = useState(null)
   const [loadedSDK, setLoadedSDK] = useState(false)
-  const [authStatus, setAuthStatus] = useState({})
   const [sdkHandle, setSDKHandle] = useState(null)
   const [previewMode, setPreviewMode] = useState("live")
   const [ptz_speed, setPtzSpeed] = useState(4)
@@ -90,6 +67,8 @@ const VideoCameraDetails = () => {
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const toggleRecording = async () => {
     if (isRecording) {
@@ -109,6 +88,27 @@ const VideoCameraDetails = () => {
     setAudioEnabled(!audioEnabled);
   };
 
+  const handlePlay = async () => {
+    console.log("handlePlay", start_time);
+    await play(sdkHandle, {
+      publicIP: videoRecorderInfo.recorderPublicIp,
+      privateIP: videoRecorderInfo.recorderPrivateIp,
+      port: videoRecorderInfo.recorderPortNumber,
+      rtsp_port: videoRecorderInfo.rstp_port,
+      IWSPort: videoRecorderInfo.recorderIWSPort,
+      type: 1,
+      stream_type,
+      start_time,
+      end_time
+
+    });
+    setIsPlaying(true);
+  };
+
+  const handleStop = async () => {
+    await stop(sdkHandle);
+    setIsPlaying(false);
+  };
 
   // Begin indefinite polling for refresh token
   useEffect(
@@ -531,16 +531,18 @@ const VideoCameraDetails = () => {
 
   const search_video = async function (handle, { ip, port, type, stream_type, start_time, end_time }) {
     return await new Promise((resolve, reject) => {
+
       var szDeviceIdentify = `${ip}_${port}`,
         iChannelID = 1,
         bZeroChannel = false,
         iStreamType = stream_type,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
 
       let iSearchTimes = 0;
       let g_iSearchTimes = 0;
       const results = [];
+
 
       handle.I_RecordSearch(szDeviceIdentify, iChannelID, szStartTime, szEndTime, {
         iStreamType: iStreamType,
@@ -598,8 +600,8 @@ const VideoCameraDetails = () => {
         szChannelID = 1,
         szFileName = file_name,
         szPlaybackURI = playbackURI,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
 
       const g_iDownloadID = handle.I_StartDownloadRecordByTime(szDeviceIdentify, szPlaybackURI, szFileName, szStartTime, szEndTime, {
         bDateDir: true
@@ -607,22 +609,26 @@ const VideoCameraDetails = () => {
     });
   }
 
-  const play = async function (handle, { ip, rtsp_port, type, stream_type, start_time, end_time }) {
+  const play = async function (handle, { publicIP, privateIP, port, IWSPort, rtsp_port, type, stream_type, start_time, end_time }) {
     return await new Promise((resolve, reject) => {
-      var szDeviceIdentify = `${ip}`,
+      console.log("handlePlay", start_time);
+      var szDeviceIdentify = `${publicIP}`,
         iChannelID = 1,
         bZeroChannel = false,
         iStreamType = stream_type,
-        szStartTime = start_time.toISOString(),
-        szEndTime = end_time.toISOString();
+        szStartTime = (new Date(start_time.getTime() - start_time.getTimezoneOffset() * 60000)).toISOString(),
+        szEndTime = (new Date(end_time.getTime() - end_time.getTimezoneOffset() * 60000)).toISOString();
 
-      handle.I_StartPlayback(ip, {
+      console.log("startTimelocal", szStartTime);
+
+
+      handle.I_StartPlayback(publicIP, privateIP, {
         iRtspPort: rtsp_port,
         iStreamType: type,
         iChannelID: 1,
         szStartTime: szStartTime,
         szEndTime: szEndTime,
-        port: 7681,
+        port: IWSPort,
         success: function () {
           resolve();
         }, error: function (status, xmlDoc) {
@@ -751,7 +757,7 @@ const VideoCameraDetails = () => {
 
               await preview_recorder(sdk_handle, {
                 privateIP: data.recorderPrivateIp,
-                publicIP: data.recorderPublicIp, rtsp_port: 8443,
+                publicIP: data.recorderPublicIp, rtsp_port: data.recorderPortNumber,
                 stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
               });
 
@@ -853,8 +859,8 @@ const VideoCameraDetails = () => {
                 }}>
                 <div>
                   <Typography variant="h4">
-                    {videoRecorderInfo ? `Live View: 
-                      ${videoRecorderInfo.recorderCameras
+                    {videoRecorderInfo ? `${previewMode === 'live' ? 'Live View' : 'Playback'}: 
+    ${videoRecorderInfo.recorderCameras
                       [parseInt(cameraId) - 1].name}` : " Camera Not Found"}
                   </Typography>
                 </div>
@@ -903,7 +909,7 @@ const VideoCameraDetails = () => {
 
               <Grid item
                 xs={12}>
-                {/* <div>
+                <div>
                   <div>
 
                     <div style={{
@@ -920,7 +926,7 @@ const VideoCameraDetails = () => {
                         await preview_recorder(sdkHandle, {
                           privateIP: videoRecorderInfo.recorderPrivateIp,
                           publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
-                          stream_type: 1, channel_id: 1, zero_channel: false
+                          stream_type: 1, channel_id: 1, zero_channel: false, port: videoRecorderInfo.recorderIWSPort
                         });
                       }}>
                       <label style={{ color: "#6B7280", cursor: 'pointer' }}>Live View</label>
@@ -930,13 +936,15 @@ const VideoCameraDetails = () => {
                         if (previewMode === "live") {
                           await stop_preview_recorder(sdkHandle);
                           setPreviewMode('playback');
+                          console.log(previewMode);
                         } else {
-                          setPreviewMode('live')
                           await preview_recorder(sdkHandle, {
                             privateIP: videoRecorderInfo.recorderPrivateIp,
                             publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rstp_port,
-                            stream_type: 1, channel_id: 1, zero_channel: false
+                            stream_type: 1, channel_id: 1, zero_channel: false, port: videoRecorderInfo.recorderIWSPort
                           });
+                          setPreviewMode('live')
+                          console.log(previewMode);
                         }
                       }}
                       checked={(previewMode === 'live') ? false : true}
@@ -956,7 +964,8 @@ const VideoCameraDetails = () => {
                       }}>
                       <label style={{ color: "#6B7280", cursor: 'pointer' }}>Playback</label>
                     </div>
-                  </div> */}
+                  </div>
+                </div>
 
                 <div style={{ display: (previewMode === 'live') ? null : 'none' }}>
                   <div style={{
@@ -1289,148 +1298,99 @@ const VideoCameraDetails = () => {
                         onClick={() => {
                           window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
                         }}>
-                        Playback
+                        Detailed Interface
                       </Button>
 
                       <Typography color="neutral.500" variant="body2">
-                        To access this feature, please ensure that you are connected to the local wifi
+                        To access this feature, please ensure that you are connected to the local network
                       </Typography>
                     </div>
                   </div>
                 </div>
-                {/* 
-                <div style={{ display: (previewMode === 'playback') ? null : 'none' }}>
-                  <div>
-                    <div style={{
-                      padding: '.6em',
-                      margin: '.2em',
-                      border: '1px solid #D1D5DB',
-                      borderRadius: 4,
-                      display: 'inline-block'
-                    }}>
-                      <div>
-                        <InputLabel id="ptz_speed">Stream type</InputLabel>
-                        <Select
-                          labelId="ptz_speed"
-                          onChange={({ target: { value } }) => {
-                            setStreamType(value)
-                          }}
-                          sx={{ width: 200 }}
-                          value={stream_type}
-                          label="Stream type">
-                          {
-                            [
-                              { "name": "Main stream", "value": 1 },
-                              { "name": "Sub stream", "value": 2 }
-                            ].map(({ name, value }) => (<MenuItem key={value}
-                              value={value}>{name}</MenuItem>))
-                          }
-                        </Select>
-                      </div>
 
-                      <div style={{ padding: '1em 0', display: 'flex' }}>
-                        <div style={{ display: 'inline-block' }}>
-                          <div style={{ padding: '1em 0' }}>
-                            <LocalizationProvider dateAdapter={AdapterMoment}>
-                              <DateTimePicker
-                                label="Start Time"
-                                value={start_time}
-                                onChange={(newValue) => {
-                                  setStartTime(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                              />
-                            </LocalizationProvider>
-                          </div>
-                          <div style={{ padding: '1em 0' }}>
-                            <LocalizationProvider dateAdapter={AdapterMoment}>
-                              <DateTimePicker
-                                label="End Time"
-                                value={end_time}
-                                onChange={(newValue) => {
-                                  setStartTime(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                              />
-                            </LocalizationProvider>
-                          </div>
-                        </div>
+                <div style={{
+                  display: (previewMode === 'playback') ? 'grid' : 'none',
+                  padding: '1em',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: 4,
+                }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <InputLabel id="ptz_speed">Stream type</InputLabel>
+                      <Select
+                        labelId="ptz_speed"
+                        onChange={({ target: { value } }) => { setStreamType(value) }}
+                        sx={{ width: 200 }}
+                        value={stream_type}
+                        label="Stream type"
+                      >
+                        {[
+                          { "name": "Main stream", "value": 1 },
+                          { "name": "Sub stream", "value": 2 }
+                        ].map(({ name, value }) => (<MenuItem key={value} value={value}>{name}</MenuItem>))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <div>
+                        <DateTimePicker
+                          label="Start Time"
+                          value={start_time}
+                          onChange={(newValue) => { setStartTime(newValue); }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                        <DateTimePicker
+                          label="End Time"
+                          value={end_time}
+                          onChange={(newValue) => { setEndTime(newValue); }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', padding: '10px' }}>
                         <Button
-                          style={{ alignSelf: 'center' }}
-                          sx={{ m: 1 }}
+                          style={{ alignSelf: 'start', marginTop: '1em', marginRight: '10px' }}
                           variant="contained"
                           onClick={async () => {
                             const results = await search_video(sdkHandle, {
                               type: 1,
-                              ip: videoRecorderInfo.recorderPublicIp,
+                              ip: videoRecorderInfo.recorderPrivateIp,
                               port: videoRecorderInfo.recorderPortNumber,
                               stream_type, start_time, end_time
                             });
-
                             setPlaybackFiles(results);
-                          }}>
+                          }}
+                        >
                           Search
                         </Button>
+                        <Button
+                          style={{ alignSelf: 'start', marginTop: '1em' }}
+                          variant="contained"
+                          onClick={async () => {
+                            if (playback_files.length >= 1) {
+                              const {
+                                start_time, end_time, file_name, playbackURI
+                              } = playback_files[0];
 
-                        <div style={{ padding: '1em 0', display: 'flex' }}>
-                          <div style={{ display: 'inline-block' }}>
-                            <div>
-                              <LocalizationProvider dateAdapter={AdapterMoment}>
-                                <DateTimePicker
-                                  label="Download Start Time"
-                                  value={download_start_time}
-                                  onChange={(newValue) => {
-                                    setStartTime(newValue);
-                                  }}
-                                  renderInput={(params) => <TextField {...params} />}
-                                />
-                              </LocalizationProvider>
-                            </div>
-
-                            <div style={{ padding: '1em 0' }}>
-                              <LocalizationProvider dateAdapter={AdapterMoment}>
-                                <DateTimePicker
-                                  label="Download end Time"
-                                  value={download_end_time}
-                                  onChange={(newValue) => {
-                                    setStartTime(newValue);
-                                  }}
-                                  renderInput={(params) => <TextField {...params} />}
-                                />
-                              </LocalizationProvider>
-                            </div>
-                          </div>
-                          <Button
-                            style={{ alignSelf: 'center' }}
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              if (playback_files.length >= 1) {
-                                const {
-                                  start_time, end_time, file_name, playbackURI
-                                } = playback_files[0];
-
-                                await download_video(sdkHandle, {
-                                  ip: videoRecorderInfo.recorderPublicIp,
-                                  file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
-                                })
-                              }
-                              await download_file(sdkHandle);
-                            }}>
-                            Download
-                          </Button>
-                        </div>
-
+                              await download_video(sdkHandle, {
+                                ip: videoRecorderInfo.recorderPublicIp,
+                                file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
+                              })
+                            }
+                          }}
+                        >
+                          Download
+                        </Button>
                       </div>
+                    </Grid>
 
+                    <Grid item xs={12}>
                       <div style={{ maxWidth: 800 }}>
                         <table style={{ maxWidth: 800 }}>
                           <tr>
-                            <th>id</th>
-                            <th>file name</th>
-                            <th>start date</th>
-                            <th>end date</th>
-                            <th>download</th>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Download</th>
                           </tr>
                           {
                             playback_files.map(({
@@ -1439,12 +1399,12 @@ const VideoCameraDetails = () => {
                               <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{file_name}</td>
-                                <td>{formatDate(start_time)}</td>
-                                <td>{formatDate(end_time)}</td>
+                                <td>{new Date(start_time).toLocaleString()}</td>
+                                <td>{new Date(end_time).toLocaleString()}</td>
                                 <td>
                                   <div onClick={async () => {
                                     await download_video(sdkHandle, {
-                                      ip: videoRecorderInfo.recorderPublicIp,
+                                      ip: videoRecorderInfo.recorderPrivateIp,
                                       file_name, playbackURI, start_time: new Date(start_time), end_time: new Date(end_time)
                                     })
                                   }}>
@@ -1456,7 +1416,9 @@ const VideoCameraDetails = () => {
                           }
                         </table>
                       </div>
+                    </Grid>
 
+                    <Grid item xs={12}>
                       <div style={{ display: 'flex' }}>
                         <label style={{
                           width: 120, fontWeight: "bold",
@@ -1465,51 +1427,52 @@ const VideoCameraDetails = () => {
                           Media:
                         </label>
                         <div style={{ display: 'flex' }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await play(sdkHandle, {
-                                ip: videoRecorderInfo.recorderPublicIp,
-                                rtsp_port: videoRecorderInfo.rstp_port,
-                                type: 1,
-                                stream_type, start_time, end_time
-                              })
-                            }}>
-                            Play
-                          </Button>
-
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await stop(sdkHandle);
-                            }}>
-                            Stop
-                          </Button>
+                          {!isPlaying ? (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={handlePlay}
+                            >
+                              Play
+                            </Button>
+                          ) : (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={handleStop}
+                            >
+                              Stop
+                            </Button>
+                          )}
                         </div>
 
                         <div style={{ display: 'flex' }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await pause(sdkHandle);
-                            }}>
-                            Pause
-                          </Button>
-
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await resume(sdkHandle);
-                            }}>
-                            Resume
-                          </Button>
+                          {isPaused ? (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await resume(sdkHandle);
+                                setIsPaused(false);
+                              }}>
+                              Resume
+                            </Button>
+                          ) : (
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await pause(sdkHandle);
+                                setIsPaused(true);
+                              }}>
+                              Pause
+                            </Button>
+                          )}
                         </div>
                       </div>
+                    </Grid>
 
+                    <Grid item xs={12}>
                       <div style={{ display: 'flex' }}>
                         <label style={{
                           width: 120, fontWeight: "bold",
@@ -1527,57 +1490,58 @@ const VideoCameraDetails = () => {
                             Slow forward
                           </Button>
 
-                          <Button
+                          {/* <Button
                             sx={{ m: 1 }}
                             variant="contained"
                             onClick={async () => {
                               await fast_forward(sdkHandle);
                             }}>
                             Fast forward
-                          </Button>
+                          </Button> */}
                         </div>
+                        {/* <div style={{ display: 'flex' }}>
+                          <label style={{
+                            width: 120, fontWeight: "bold",
+                            alignSelf: 'center'
+                          }}>
+                            Media 3:
+                          </label>
+                          <div style={{ display: 'flex' }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await take_picture(sdkHandle);
+                              }}>
+                              Capture
+                            </Button>
+
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await start_recording(sdkHandle);
+                              }}>
+                              Start Clip
+                            </Button>
+
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={async () => {
+                                await stop_recording(sdkHandle);
+                              }}>
+                              Stop Clip
+                            </Button>
+                          </div>
+                        </div> */}
 
                       </div>
+                    </Grid>
 
-                      <div style={{ display: 'flex' }}>
-                        <label style={{
-                          width: 120, fontWeight: "bold",
-                          alignSelf: 'center'
-                        }}>
-                          Media 3:
-                        </label>
-                        <div style={{ display: 'flex' }}>
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await take_picture(sdkHandle);
-                            }}>
-                            Capture
-                          </Button>
+                  </Grid>
+                </div>
 
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await start_recording(sdkHandle);
-                            }}>
-                            Start Clip
-                          </Button>
-
-                          <Button
-                            sx={{ m: 1 }}
-                            variant="contained"
-                            onClick={async () => {
-                              await stop_recording(sdkHandle);
-                            }}>
-                            Stop Clip
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
               </Grid>
             </Grid>
           </Box>
