@@ -11,7 +11,7 @@ import videoRecorderApi from "../../../api/videorecorder";
 import toast from "react-hot-toast";
 import router from "next/router";
 import formUtils from "../../../utils/form-utils";
-import { entranceListLink } from "../../../utils/entrance";
+import { videoRecorderListLink } from "../../../utils/video-recorder";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
 
@@ -50,8 +50,6 @@ const CreateRecorders = () => {
         // Port number should be unique between recorders
         recorderIWSPortExist: false,
         recorderIWSPortDuplicated: false,
-
-
 
         // private IP address must be unique between recorders
         recorderPrivateIpExists: false,
@@ -143,7 +141,6 @@ const CreateRecorders = () => {
             validationArr[i].recorderPrivateIpDuplicated = groupArr[i].recorderPrivateIp in duplicatedPrivateIp;
         }
     }
-
 
     // helper for remove card and changePortNumberCheck
     // directly modifies validationArr
@@ -242,6 +239,7 @@ const CreateRecorders = () => {
 
         setRecorderValidationsArr(newValidations);
     }
+
     const onNameChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changeNameCheck(e, id);
@@ -301,6 +299,7 @@ const CreateRecorders = () => {
 
         setRecorderValidationsArr(newValidations);
     }
+
     const onPrivateIpChangeFactory = (id) => (e) => {
         changeTextField(e, id);
         changePrivateIpCheck(e, id);
@@ -432,7 +431,7 @@ const CreateRecorders = () => {
                 <Container maxWidth="xl">
                     <Box sx={{ mb: 4 }}>
                         <NextLink
-                            href={entranceListLink}
+                            href={videoRecorderListLink}
                             passHref
                         >
                             <Link
