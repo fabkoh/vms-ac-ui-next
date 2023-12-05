@@ -97,6 +97,7 @@ const Logs = () => {
     query: "",
   });
   const queryRef = useRef(null);
+
   const handleQueryChange = (e) => {
     e.preventDefault();
     setFilters((prevState) => ({
@@ -160,26 +161,6 @@ const Logs = () => {
   const onPollingTimeChange = (e) => {
     setPollingTime(e.target.value);
   };
-
-  const getEvents = useCallback(async () => {
-    try {
-      //const data = await personApi.getFakePersons()
-      const res = await eventslogsApi.getEvents(
-        Math.floor(Events.length / 500)
-      );
-
-      if (res.status === 200) {
-        const data = await res.json();
-        if (isMounted()) {
-          setEvents(data);
-        }
-      } else {
-        setEvents([]);
-      }
-    } catch (err) {
-      toast.error("Some error has occurred");
-    }
-  }, [isMounted]);
 
   const getEventsWithErrorPopUps = useCallback(async () => {
     try {
@@ -259,33 +240,6 @@ const Logs = () => {
       }
     }
   }, [isMounted]);
-
-  const search = async () => {
-    const start = filterStart
-      ? new Date(
-          filterStart.getTime() - filterStart.getTimezoneOffset() * 60000
-        ).toISOString()
-      : null;
-    const end = filterEnd
-      ? new Date(
-          filterEnd.getTime() - filterEnd.getTimezoneOffset() * 60000
-        ).toISOString()
-      : null;
-    const eventsRes = await eventslogsApi.searchEvent(
-      Math.floor(searchedEvents.length / 500),
-      filters.query,
-      start,
-      end
-    );
-    if (eventsRes.status !== 200) {
-      toast.error("Failed To Search");
-      return;
-    }
-    const eventsJson = await eventsRes.json();
-    toast.success("Search Successfully");
-    setIsPolling(false);
-    setSearchedEvents(eventsJson);
-  };
 
   return (
     <>
@@ -451,9 +405,6 @@ const Logs = () => {
                 onClick={onClear}
               >
                 Clear Dates
-              </Button>
-              <Button variant="contained" sx={{ m: 1, mr: 5 }} onClick={search}>
-                Search
               </Button>
             </Box>
             <EventLogTable
