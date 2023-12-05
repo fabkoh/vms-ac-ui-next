@@ -1,4 +1,4 @@
-import parsePhoneNumber from 'libphonenumber-js'
+import { parsePhoneNumberWithError, ParseError } from 'libphonenumber-js'
 
 const isObject = (e) => typeof e === 'object' && e !== null
 
@@ -74,12 +74,20 @@ const validateEmail = (email) => {
 };
 
 const validatePhoneNumber = (phoneNumber) => {
-    const possiblePhoneNumber = parsePhoneNumber(phoneNumber);
-    if (possiblePhoneNumber) {
-        return possiblePhoneNumber.isValid();
+    try {
+        const possiblePhoneNumber = parsePhoneNumberWithError(phoneNumber);
+        return { isValid: possiblePhoneNumber.isValid(), errorMessage: null };
+    } catch (error) {
+        if (error instanceof ParseError) {
+            // Return false and the error message
+            console.log(error.message);
+            return { isValid: false, errorMessage: error.message };
+        } else {
+            // Re-throw other unexpected errors
+            throw error;
+        }
     }
-    return false;
-}
+};
 
 export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDate, toDisplayDateString,toDisplayEventsDateString, validateEmail, validatePhoneNumber }
 

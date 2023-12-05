@@ -29,7 +29,14 @@ import { EmailEdit } from "../email-edit";
 import { validatePhoneNumber, validateEmail } from "../../../../utils/utils";
 import { SMSEdit } from "../sms-edit";
 
-const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBeginForEventManagement, checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules,changeTextField,removeCard,eventsManagementInfo,eventsManagementValidations,allInputEvents, allOutputEvents,eventActionOutputEqual,eventActionOutputFilter,getEventActionOutputName, changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer,changeInputEventsWithTimer, changeOutputActionsWithTimer,outputActionsValueWithoutTimer,inputEventsValueWithoutTimer, notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
+const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBeginForEventManagement, 
+    checkAnyTimeStartForEventManagement, checkAnyTimeEndForEventManagement, changeTriggerSchedules, 
+    changeTextField, removeCard, eventsManagementInfo, eventsManagementValidations, allInputEvents, 
+    allOutputEvents, eventActionOutputEqual, eventActionOutputFilter, getEventActionOutputName, 
+    changeInputEventsWithoutTimer, changeOutputActionsWithoutTimer, changeInputEventsWithTimer, 
+    changeOutputActionsWithTimer, outputActionsValueWithoutTimer, inputEventsValueWithoutTimer, 
+    notificationEmails, notificationSMSs, changeNotificationEmails, changeNotificationSMSs}) => {
+    
     const inputEventsWithTimer = allInputEvents.filter(e => e.timerEnabled);
     const inputEventsWithoutTimer = allInputEvents.filter(e => !e.timerEnabled);
     const outputEventsWithTimer = allOutputEvents.filter(e => e.timerEnabled);
@@ -346,10 +353,13 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         eventsManagementOutputActionsConflict,
         eventsManagementTriggerSchedulesEmpty,
         eventsManagementInvalidEmailRecipients,
+        eventsManagementInvalidEmailRecipientsError,
         eventsManagementInvalidSMSRecipients,
+        eventsManagementInvalidSMSRecipientsError,
         eventsManagementEmailRecipientsEmpty,
         eventsManagementSMSRecipientsEmpty,
     } = eventsManagementValidations;
+
     const inputEventsValueForWithoutTimer = inputEventsValueWithoutTimer[eventsManagementId];
     const outputActionsValueForWithoutTimer = outputActionsValueWithoutTimer[eventsManagementId];
     const [inputEventsValueWithoutTimerState, setInputEventsValueWithoutTimerState] = useState(inputEventsValueForWithoutTimer);
@@ -871,7 +881,8 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         value={notificationSMSsInputValue}
                                         helperText={ 
                                             (Boolean(eventsManagementSMSRecipientsEmpty) && "Error: empty SMS recipients is not allowed") ||
-                                            (Boolean(eventsManagementInvalidSMSRecipients) && "Error: invalid SMS recipient(s)")
+                                            (Boolean(eventsManagementInvalidSMSRecipients) && 
+                                            `Error: invalid SMS recipient(s). Details: ${eventsManagementInvalidSMSRecipientsError}`)
                                         }
                                         error={ Boolean(eventsManagementSMSRecipientsEmpty) || Boolean(eventsManagementInvalidSMSRecipients) }
                                         InputProps={{
@@ -884,7 +895,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                                     <Chip key={index}
                                                         sx={{ mr: 1, mb: 1 }}
                                                         size="small"
-                                                        color={(!validatePhoneNumber(item)) ? "error": "default"}
+                                                        color={(!validatePhoneNumber(item).isValid) ? "error": "default"}
                                                         onDelete={() => {
                                                             let arr = [...notificationSMSsRecipients]
                                                             arr.splice(index, 1)

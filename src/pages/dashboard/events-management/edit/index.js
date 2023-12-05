@@ -326,6 +326,7 @@ const EditEventManagement = () => {
         eventsManagementDefaultTitle: eventManagement.eventsManagementNotification,
         eventsManagementDefaultContent: eventManagement.eventsManagementNotification,
     });
+
     const getEmptyEventsManagementValidations = (eventsManagementId) => ({
         eventsManagementId,
         eventsManagementNameBlank: false,
@@ -337,7 +338,9 @@ const EditEventManagement = () => {
         eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
         eventsManagementInvalidEmailRecipients: false,
+        eventsManagementInvalidEmailRecipientsError: "",
         eventsManagementInvalidSMSRecipients: false,
+        eventsManagementInvalidSMSRecipientsError: "",
         eventsManagementEmailRecipientsEmpty: false,
         eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,
@@ -829,6 +832,7 @@ const EditEventManagement = () => {
         setEventsManagementValidationsArr(newValidations);
         updateEventManagementDefaultContent();
     }
+
     const changeOutputActionsWithoutTimer = (newValue, id) => {
         updateEventManagementDefaultContent();
         updateEventManagementDefaultTitle();
@@ -1141,11 +1145,22 @@ const EditEventManagement = () => {
         const validation = newValidations.find(v => v.eventsManagementId == id);
         validation.eventsManagementSMSRecipientsEmpty = newRecipients.length === 0 && eventManagementToBeUpdated['eventsManagementSMS'];
         validation.eventsManagementInvalidSMSRecipients = false;
+
+        let invalidRecipientsErrors = new Set();
+
         for (let j = 0; j < newRecipients.length; j++) {
-            if (!validatePhoneNumber(newRecipients[j])) {
+            const phoneNumberValidation = validatePhoneNumber(newRecipients[j]);
+            if (!phoneNumberValidation.isValid) {
                 validation.eventsManagementInvalidSMSRecipients = true;
+                invalidRecipientsErrors.add(phoneNumberValidation.errorMessage);
             }
         }
+
+        // Convert the set to a string and store it
+        if (invalidRecipientsErrors.size > 0) {
+            validation.eventsManagementInvalidSMSRecipientsError = Array.from(invalidRecipientsErrors).join(", ");
+        }
+
         setEventsManagementValidationsArr(newValidations);
     }
     // console.log(eventsManagementValidationsArr)
