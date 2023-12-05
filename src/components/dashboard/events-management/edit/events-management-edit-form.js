@@ -1233,7 +1233,7 @@ const EditEventManagementForm = ({
                         (Boolean(eventsManagementSMSRecipientsEmpty) &&
                           "Error: empty SMS recipients is not allowed") ||
                         (Boolean(eventsManagementInvalidSMSRecipients) && 
-                        `Error: invalid SMS recipient(s). Details: ${eventsManagementInvalidSMSRecipientsError}`)
+                        `Error: ${eventsManagementInvalidSMSRecipientsError}`)
                       }
                       error={
                         Boolean(eventsManagementSMSRecipientsEmpty) ||

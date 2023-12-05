@@ -882,7 +882,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         helperText={ 
                                             (Boolean(eventsManagementSMSRecipientsEmpty) && "Error: empty SMS recipients is not allowed") ||
                                             (Boolean(eventsManagementInvalidSMSRecipients) && 
-                                            `Error: invalid SMS recipient(s). Details: ${eventsManagementInvalidSMSRecipientsError}`)
+                                            `Error: ${eventsManagementInvalidSMSRecipientsError}`)
                                         }
                                         error={ Boolean(eventsManagementSMSRecipientsEmpty) || Boolean(eventsManagementInvalidSMSRecipients) }
                                         InputProps={{
@@ -941,10 +941,6 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                     </Button>
                                 </div>
                             </div>
-                            }
-                            {(Boolean(eventsManagementSMSRecipientsEmpty) || Boolean(eventsManagementInvalidSMSRecipients)) && <Grid sx={{ color: "#D14343", fontSize: "0.75rem", marginTop: "3px", marginLeft: "12px", marginRight: "12px" }}>
-                                {Boolean(eventsManagementSMSRecipientsEmpty) && "Error: empty SMS recipients is not allowed" || Boolean(eventsManagementInvalidSMSRecipients) && "Error: invalid SMS recipient(s)"}
-                            </Grid>
                             }
                             {outputWithTimerEventsManagementArr.map((info, i) => (
                                 <Grid container

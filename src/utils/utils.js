@@ -79,9 +79,25 @@ const validatePhoneNumber = (phoneNumber) => {
         return { isValid: possiblePhoneNumber.isValid(), errorMessage: null };
     } catch (error) {
         if (error instanceof ParseError) {
-            // Return false and the error message
             console.log(error.message);
-            return { isValid: false, errorMessage: error.message };
+            let detailedErrorMessage;
+            switch (error.message) {
+                case 'NOT_A_NUMBER':
+                    detailedErrorMessage = 'the input is not a valid phone number.';
+                    break;
+                case 'INVALID_COUNTRY':
+                    detailedErrorMessage = 'the country code is missing, invalid or not supported. e.g. +65 912345678';
+                    break;
+                case 'TOO_SHORT':
+                    detailedErrorMessage = 'the phone number is too short.';
+                    break;
+                case 'TOO_LONG':
+                    detailedErrorMessage = 'the phone number is too long.';
+                    break;
+                default:
+                    detailedErrorMessage = 'invalid phone number.';
+            }
+            return { isValid: false, errorMessage: detailedErrorMessage };
         } else {
             // Re-throw other unexpected errors
             throw error;
