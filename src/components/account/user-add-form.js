@@ -172,12 +172,13 @@ const UserAddForm = ({
                       validation.numberInvalid || validation.numberRepeated
                     }
                     helperText={
-                      //   (validation.numberInUse && "Note: number taken") ||
-                      (validation.numberRepeated &&
-                        "Error: duplicate number in form") ||
-                      (validation.numberInvalid &&
-                        "Error: Invalid Singapore phone number")
+                      validation.numberRepeated 
+                        ? "Error: duplicate number in form"
+                        : validation.numberInvalid
+                          ? `Error: ${validation.numberErrorMessage || "invalid phone number"}`
+                          : ""
                     }
+                    
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>

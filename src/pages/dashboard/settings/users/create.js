@@ -25,6 +25,7 @@ import { ServerDownError } from "../../../../components/dashboard/errors/server-
 import { serverDownCode } from "../../../../api/api-helpers";
 import { authSignUp } from "../../../../api/auth-api";
 import { authGetProfile, authGetAccounts } from "../../../../api/auth-api";
+import { validatePhoneNumber } from "../../../../utils/utils";
 
 const getNextId = createCounterObject(1);
 
@@ -44,6 +45,7 @@ const getNewPersonValidation = (id) => ({
   firstNameCharCheck: false,
   lastNameCharCheck: false,
   numberInvalid: false,
+  numberErrorMessage: null,
   passwordNameCharCheck: false,
   emailBlank: false,
   roleBlank: false,
@@ -93,7 +95,6 @@ const CreatePersonsTwo = () => {
         }
         setUsersList(newList);
         setIsUpdated(true);
-        // console.log(usersList);
       } else {
         if (res.status == serverDownCode) {
           setServerDownOpen(true);
@@ -155,23 +156,6 @@ const CreatePersonsTwo = () => {
   };
 
   // returns if validArr is changed
-  const checkInUseHelper = (
-    id,
-    value,
-    arrayOfUsedValues,
-    inUseKey,
-    validArr
-  ) => {
-    const inUse = value != "" && arrayOfUsedValues.includes(value);
-    const personValidation = validArr.find((p) => p.personId == id);
-    if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
-      personValidation[inUseKey] = inUse;
-      return true;
-    }
-    return false;
-  };
-
-  // returns if validArr is changed
   const checkDuplicateHelper = (id, number, key, validArr, usernames) => {
     let newNum = number;
     if (number.charAt(0) === "+") {
@@ -187,32 +171,25 @@ const CreatePersonsTwo = () => {
     return isDuplicate;
   };
 
-  // const checkDuplicateHelper = (id, number, key, validArr, usernames) => {
-  //   let newNum = number;
-  //   if (number.charAt(0) === "+") {
-  //     newNum = number.slice(1);
-  //   }
-  //   console.log(usernames);
-  //   console.log(newNum);
-  //   if (usernames.includes(newNum)) {
-  //     console.log(newNum + " is in list");
-  //     return (validArr[id][key] = true);
-  //   }
-  //   return (validArr[id][key] = false);
-  // };
-
-  // check if phone number is a valid Singapore phone numnber
+  // check if phone number is a valid phone numnber
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
-    const invalid = number.startsWith("+65 ") && number.length !== 13;
-    // console.log("invalid phone number is " + invalid);
 
-    if (isObject(personValidation) && personValidation[key] != invalid) {
-      personValidation[key] = invalid;
-      return true;
-    }
+    // Use the validatePhoneNumber function to validate the phone number
+    const { isValid, errorMessage } = validatePhoneNumber(number);
 
-    return false;
+    console.log("is valid", isValid);
+    console.log("error message", errorMessage);
+
+    // Check if the validation state has changed
+    personValidation[key] = !isValid; // Update the validation state
+
+    // Optionally, store the error message in the personValidation object
+    personValidation.numberErrorMessage = !isValid ? errorMessage : null;
+
+    console.log(personValidation.numberErrorMessage);
+
+    return isValid; // No change in validation state
   };
 
   //   first and last name char size 3-20
@@ -301,9 +278,6 @@ const CreatePersonsTwo = () => {
       personsValidation
     );
 
-    console.log(personsValidation[0].numberRepeated);
-    console.log(usersList);
-
     if (b1 || b2) {
       setPersonsValidation([...personsValidation]);
     }
@@ -354,189 +328,181 @@ const CreatePersonsTwo = () => {
     }
   };
 
-  // const onPersonRoleChangeFactory = (id) => (ref) => {
-  //     changeTextField("personRole", id, ref);
-
-  //     const b1 = blankCheckHelper(id, "roleBlank", ref.current?.value, personsValidation);
-
-  //     if (b1) { setPersonsValidation([ ...personsValidation ]); }
-  // };
-
-  const onPersonRoleChangeFactory = (id) => (e) => {
-    const newInfo = [...personsInfo];
-    const value = e.target.value;
-    newInfo.find((p) => p.personId === id).personRole = [value];
-    setPersonsInfo(newInfo);
-  };
-
-  const submitDisabled =
-    personsInfo.length == 0 || personsValidation.some(cardError);
-
-  const [disableSubmit, setDisableSubmit] = useState(false);
-
-  // return true if the person creation was successful
-  const createPerson = async (person) => {
-    console.log(person, 34);
-    const userSettings = {
-      firstName: person.personFirstName,
-      lastName: person.personLastName,
-      email: person.personEmail,
-      password: person.personPassword,
-      role: person.personRole,
-      mobile: person.personMobileNumber.slice(1),
+    const onPersonRoleChangeFactory = (id) => (e) => {
+      const newInfo = [...personsInfo];
+      const value = e.target.value;
+      newInfo.find((p) => p.personId === id).personRole = [value];
+      setPersonsInfo(newInfo);
     };
-    console.log(userSettings, 12);
-    try {
-      const res = await authSignUp(userSettings);
-      console.log(res);
-      if (res.type != "success") {
-        throw new Error("Unable to register User");
+
+    const submitDisabled =
+      personsInfo.length == 0 || personsValidation.some(cardError);
+
+    const [disableSubmit, setDisableSubmit] = useState(false);
+
+    // return true if the person creation was successful
+    const createPerson = async (person) => {
+      console.log(person, 34);
+      const userSettings = {
+        firstName: person.personFirstName,
+        lastName: person.personLastName,
+        email: person.personEmail,
+        password: person.personPassword,
+        role: person.personRole,
+        mobile: person.personMobileNumber.slice(1),
+      };
+      console.log(userSettings, 12);
+      try {
+        const res = await authSignUp(userSettings);
+        console.log(res);
+        if (res.type != "success") {
+          throw new Error("Unable to register User");
+        }
+        return true;
+      } catch (e) {
+        console.error(e);
+        return false;
       }
-      return true;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  };
+    };
 
-  const submitForm = async (e) => {
-    e.preventDefault();
-    setDisableSubmit(true);
+    const submitForm = async (e) => {
+      e.preventDefault();
+      setDisableSubmit(true);
 
-    // send res
-    try {
-      const boolArr = await Promise.all(
-        personsInfo.map((p) => createPerson(p))
-      );
+      // send res
+      try {
+        const boolArr = await Promise.all(
+          personsInfo.map((p) => createPerson(p))
+        );
 
-      // success toast
-      const numSuccess = boolArr.filter((b) => b).length;
-      if (numSuccess) {
-        toast.success(`Successfully created ${numSuccess} persons`);
+        // success toast
+        const numSuccess = boolArr.filter((b) => b).length;
+        if (numSuccess) {
+          toast.success(`Successfully created ${numSuccess} persons`);
+        }
+
+        // if some failed
+        if (boolArr.some((b) => !b)) {
+          toast.error("Unable to create persons below");
+          // filter failed personsInfo and personsValidation
+          setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
+          setPersonsValidation(personsValidation.filter((v, i) => !boolArr[i]));
+        } else {
+          // all success
+          router.replace(usersManagementLink);
+        }
+      } catch (e) {
+        console.log("error", e);
+        toast.error("Unable to submit form");
       }
+      setDisableSubmit(false);
+    };
 
-      // if some failed
-      if (boolArr.some((b) => !b)) {
-        toast.error("Unable to create persons below");
-        // filter failed personsInfo and personsValidation
-        setPersonsInfo(personsInfo.filter((p, i) => !boolArr[i]));
-        setPersonsValidation(personsValidation.filter((v, i) => !boolArr[i]));
-      } else {
-        // all success
-        router.replace(usersManagementLink);
-      }
-    } catch (e) {
-      console.log("error", e);
-      toast.error("Unable to submit form");
-    }
-    setDisableSubmit(false);
-  };
-
-  return (
-    <>
-      <Head>
-        <title>Etlas: Create User</title>
-      </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}
-      >
-        <Container maxWidth="xl">
-          <Box sx={{ mb: 4 }}>
-            <ServerDownError
-              open={serverDownOpen}
-              handleDialogClose={() => setServerDownOpen(false)}
-            />
-            <NextLink href={usersManagementLink} passHref>
-              <Link
-                color="textPrimary"
-                component="a"
-                sx={{
-                  alignItems: "center",
-                  display: "flex",
-                }}
-              >
-                <ArrowBack fontSize="small" sx={{ mr: 1 }} />
-                <Typography variant="subtitle2">Users Management</Typography>
-              </Link>
-            </NextLink>
-          </Box>
-          <Stack spacing={3}>
-            <div>
-              <Typography variant="h3">Add User</Typography>
-            </div>
-            <form onSubmit={submitForm}>
-              <Stack spacing={3}>
-                {Array.isArray(personsInfo) &&
-                  personsInfo.map((p, i) => {
-                    const id = p.personId;
-                    return (
-                      <UserAddForm
-                        key={id}
-                        onClear={removePersonFactory(id)}
-                        person={p}
-                        onPersonFirstNameChange={onPersonFirstNameChangeFactory(
-                          id
-                        )}
-                        onPersonLastNameChange={onPersonLastNameChangeFactory(
-                          id
-                        )}
-                        onPersonMobileNumberChange={onPersonMobileNumberChangeFactory(
-                          id
-                        )}
-                        onPersonEmailChange={onPersonEmailChangeFactory(id)}
-                        onPersonPasswordChange={onPersonPasswordChangeFactory(
-                          id
-                        )}
-                        handlePersonRoleChange={onPersonRoleChangeFactory(id)}
-                        validation={personsValidation[i]}
-                        cardError={cardError}
-                      />
-                    );
-                  })}
-                <div>
-                  <Button
-                    size="large"
-                    sx={{ mr: 3 }}
-                    variant="outlined"
-                    startIcon={<Add />}
-                    onClick={addPerson}
-                  >
-                    Add user
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    size="large"
-                    type="submit"
-                    sx={{ mr: 3 }}
-                    variant="contained"
-                    disabled={submitDisabled || disableSubmit}
-                  >
-                    Create Users
-                  </Button>
-                  <NextLink href={usersManagementLink} passHref>
+    return (
+      <>
+        <Head>
+          <title>Etlas: Create User</title>
+        </Head>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            py: 8,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Box sx={{ mb: 4 }}>
+              <ServerDownError
+                open={serverDownOpen}
+                handleDialogClose={() => setServerDownOpen(false)}
+              />
+              <NextLink href={usersManagementLink} passHref>
+                <Link
+                  color="textPrimary"
+                  component="a"
+                  sx={{
+                    alignItems: "center",
+                    display: "flex",
+                  }}
+                >
+                  <ArrowBack fontSize="small" sx={{ mr: 1 }} />
+                  <Typography variant="subtitle2">Users Management</Typography>
+                </Link>
+              </NextLink>
+            </Box>
+            <Stack spacing={3}>
+              <div>
+                <Typography variant="h3">Add User</Typography>
+              </div>
+              <form onSubmit={submitForm}>
+                <Stack spacing={3}>
+                  {Array.isArray(personsInfo) &&
+                    personsInfo.map((p, i) => {
+                      const id = p.personId;
+                      return (
+                        <UserAddForm
+                          key={id}
+                          onClear={removePersonFactory(id)}
+                          person={p}
+                          onPersonFirstNameChange={onPersonFirstNameChangeFactory(
+                            id
+                          )}
+                          onPersonLastNameChange={onPersonLastNameChangeFactory(
+                            id
+                          )}
+                          onPersonMobileNumberChange={onPersonMobileNumberChangeFactory(
+                            id
+                          )}
+                          onPersonEmailChange={onPersonEmailChangeFactory(id)}
+                          onPersonPasswordChange={onPersonPasswordChangeFactory(
+                            id
+                          )}
+                          handlePersonRoleChange={onPersonRoleChangeFactory(id)}
+                          validation={personsValidation[i]}
+                          cardError={cardError}
+                        />
+                      );
+                    })}
+                  <div>
                     <Button
                       size="large"
                       sx={{ mr: 3 }}
                       variant="outlined"
-                      color="error"
+                      startIcon={<Add />}
+                      onClick={addPerson}
                     >
-                      Cancel
+                      Add user
                     </Button>
-                  </NextLink>
-                </div>
-              </Stack>
-            </form>
-          </Stack>
-        </Container>
-      </Box>
-    </>
-  );
-};
+                  </div>
+                  <div>
+                    <Button
+                      size="large"
+                      type="submit"
+                      sx={{ mr: 3 }}
+                      variant="contained"
+                      disabled={submitDisabled || disableSubmit}
+                    >
+                      Create Users
+                    </Button>
+                    <NextLink href={usersManagementLink} passHref>
+                      <Button
+                        size="large"
+                        sx={{ mr: 3 }}
+                        variant="outlined"
+                        color="error"
+                      >
+                        Cancel
+                      </Button>
+                    </NextLink>
+                  </div>
+                </Stack>
+              </form>
+            </Stack>
+          </Container>
+        </Box>
+      </>
+    );
+  };
 
 CreatePersonsTwo.getLayout = (page) => (
   <AuthGuard>

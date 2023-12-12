@@ -76,6 +76,8 @@ const validateEmail = (email) => {
 const validatePhoneNumber = (phoneNumber) => {
     try {
         const possiblePhoneNumber = parsePhoneNumberWithError(phoneNumber);
+        console.log(phoneNumber);
+        console.log("possible Phone number", possiblePhoneNumber.isValid());
         return { isValid: possiblePhoneNumber.isValid(), errorMessage: null };
     } catch (error) {
         if (error instanceof ParseError) {
