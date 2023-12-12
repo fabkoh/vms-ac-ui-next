@@ -161,7 +161,7 @@ const PersonAddFormTwo = ({
                       (validation.numberRepeated &&
                         "Error: duplicate number in form") ||
                       (validation.numberInvalid &&
-                        "Error: Invalid Singapore phone number")
+                        `Error: ${validation.numberErrorMessage || "invalid phone number"}`)
                     }
                   />
                 </Grid>

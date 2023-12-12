@@ -163,7 +163,7 @@ const PersonEditFormTwo = ({
                     helperText={
                       (validation.numberInUse && "Error: number taken") ||
                       (validation.numberInvalid &&
-                        "Error: Invalid Singapore phone number") ||
+                        `Error: ${validation.numberErrorMessage || "invalid phone number"}`) ||
                       (validation.numberRepeated &&
                         "Error: duplicate number in form")
                     }

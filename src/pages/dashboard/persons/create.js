@@ -24,6 +24,7 @@ import { controllerApi } from "../../../api/controllers";
 import { CredTypePinID } from "../../../utils/constants";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
+import { validatePhoneNumber } from "../../../utils/utils";
 
 const getNextId = createCounterObject(1);
 
@@ -49,6 +50,7 @@ const getNewPersonValidation = (id) => ({
   credentialUidRepeatedIds: [],
   credentialCheckFailed: {},
   numberInvalid: false,
+  numberErrorMessage: null,
   // note
   numberInUse: false,
   numberRepeated: false,
@@ -375,18 +377,23 @@ const CreatePersonsTwo = () => {
     return toChange;
   };
 
-  // check if phone number is a valid Singapore phone numnber
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
-    const invalid = number.startsWith("+65 ") && number.length !== 13;
-    console.log("invalid phone number is " + invalid);
 
-    if (isObject(personValidation) && personValidation[key] != invalid) {
-      personValidation[key] = invalid;
-      return true;
-    }
+    // Use the validatePhoneNumber function to validate the phone number
+    const { isValid, errorMessage } = validatePhoneNumber(number);
 
-    return false;
+    console.log("is valid", isValid);
+    console.log("error message", errorMessage);
+
+    personValidation[key] = !isValid; // Update the validation state
+
+    // Optionally, store the error message in the personValidation object
+    personValidation.numberErrorMessage = !isValid ? errorMessage : null;
+
+    console.log(personValidation.numberErrorMessage);
+
+    return isValid; // No change in validation state
   };
 
   const onPersonFirstNameChangeFactory = (id) => (ref) => {
