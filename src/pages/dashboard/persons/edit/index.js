@@ -28,6 +28,7 @@ import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { validatePhoneNumber } from "../../../../utils/utils";
 
 // const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
@@ -337,19 +338,50 @@ const EditPersonsTwo = () => {
 
     return toChange;
   };
-  // check if phone number is a valid Singapore phone numnber
+
+  /**
+   * Checks if the number is valid and updates the validation state accordingly
+   * 
+   * @param {number} personId
+   * @param {string} number
+   * @param {string} key
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
-    const invalid = number.startsWith("+65 ") && number.length !== 13;
-    console.log("invalid phone number is " + invalid);
-
-    if (isObject(personValidation) && personValidation[key] != invalid) {
-      personValidation[key] = invalid;
-      return true;
+    if (!isObject(personValidation)) {
+        return false;
     }
 
-    return false;
+    // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
+    // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
+    if (number === '+' || number === '+65') {
+      if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
+          personValidation[key] = false; // Mark as valid
+          personValidation.numberErrorMessage = null; // Clear any existing error message
+          return true; // Indicates a change in the validation state
+      }
+      return false; // No change needed
+    }
+
+    const { isValid, errorMessage } = validatePhoneNumber(number);
+    const isInvalid = !isValid;
+
+    // Determine if there's a change in either the validation state or the error message
+    const isStateChanged = personValidation[key] !== isInvalid;
+    const isErrorMessageChanged = personValidation.numberErrorMessage !== errorMessage;
+
+    // Update if there's a change in the state or the error message
+    if (isStateChanged || isErrorMessageChanged) {
+        personValidation[key] = isInvalid;
+        personValidation.numberErrorMessage = isInvalid ? errorMessage : null;
+        return true; // Indicates a change
+    }
+
+    return false; // No change
   };
+
   // returns if validArr is changed
   const checkCredRepeatedHelper = (infoArr, validArr) => {
     let toChange = false;
@@ -483,7 +515,8 @@ const EditPersonsTwo = () => {
       id,
       ref.current?.value,
       "numberInvalid",
-      personsValidation
+      personsValidation,
+      personsInfo
     );
 
     if (b1 || b2) {

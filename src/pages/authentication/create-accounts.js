@@ -332,24 +332,49 @@ const CreatePersonsTwo = () => {
         return toChange;
     }
 
+    /**
+     * Checks if the number is valid and updates the validation state accordingly
+     * 
+     * @param {number} personId
+     * @param {string} number
+     * @param {string} key
+     * @param {object[]} validArr
+     * @returns {boolean} true if the validation state is changed, false otherwise
+     */
     const checkInvalidNumberHelper = (personId, number, key, validArr) => {
         const personValidation = validArr.find((p) => p.personId === personId);
+        if (!isObject(personValidation)) {
+            return false;
+        }
     
-        // Use the validatePhoneNumber function to validate the phone number
+        // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
+        // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
+        if (number === '+' || number === '+65') {
+          if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
+              personValidation[key] = false; // Mark as valid
+              personValidation.numberErrorMessage = null; // Clear any existing error message
+              return true; // Indicates a change in the validation state
+          }
+          return false; // No change needed
+        }
+    
         const { isValid, errorMessage } = validatePhoneNumber(number);
+        const isInvalid = !isValid;
     
-        console.log("is valid", isValid);
-        console.log("error message", errorMessage);
+        // Determine if there's a change in either the validation state or the error message
+        const isStateChanged = personValidation[key] !== isInvalid;
+        const isErrorMessageChanged = personValidation.numberErrorMessage !== errorMessage;
     
-        personValidation[key] = !isValid; // Update the validation state
+        // Update if there's a change in the state or the error message
+        if (isStateChanged || isErrorMessageChanged) {
+            personValidation[key] = isInvalid;
+            personValidation.numberErrorMessage = isInvalid ? errorMessage : null;
+            return true; // Indicates a change
+        }
     
-        // Optionally, store the error message in the personValidation object
-        personValidation.numberErrorMessage = !isValid ? errorMessage : null;
-    
-        console.log(personValidation.numberErrorMessage);
-    
-        return isValid; // No change in validation state
+        return false; // No change
       };
+    
 
     const onPersonFirstNameChangeFactory = (id) => (ref) => {
         changeTextField("personFirstName", id, ref);
@@ -379,7 +404,7 @@ const CreatePersonsTwo = () => {
 
         const b1 = checkDuplicateHelper("personMobileNumber", "numberRepeated", personsValidation, personsInfo);
         const b2 = checkInUseHelper(id, ref.current?.value, personMobileNumbers, "numberInUse", personsValidation);
-        const b3 = checkInvalidNumberHelper(id, ref.current?.value, "numberInvalid", personsValidation);
+        const b3 = checkInvalidNumberHelper(id, ref.current?.value, "numberInvalid", personsValidation, personsInfo);
 
         if (b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     }

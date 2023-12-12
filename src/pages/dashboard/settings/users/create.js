@@ -186,6 +186,17 @@ const CreatePersonsTwo = () => {
         return false;
     }
 
+    // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
+    // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
+    if (number === '+' || number === '+65') {
+      if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
+          personValidation[key] = false; // Mark as valid
+          personValidation.numberErrorMessage = null; // Clear any existing error message
+          return true; // Indicates a change in the validation state
+      }
+      return false; // No change needed
+    }
+
     const { isValid, errorMessage } = validatePhoneNumber(number);
     const isInvalid = !isValid;
 
@@ -287,7 +298,8 @@ const CreatePersonsTwo = () => {
       id,
       ref.current?.value,
       "numberInvalid",
-      personsValidation
+      personsValidation,
+      personsInfo
     );
 
     if (b1 || b2) {

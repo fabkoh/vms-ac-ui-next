@@ -150,7 +150,6 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Mobile Number"
                     name="personMobileNumber"
-                    defaultCountry="sg"
                     onChange={handlePersonMobileNumberChange}
                     inputProps={{ ref: personMobileNumberRef }}
                     value={person.personMobileNumber}
