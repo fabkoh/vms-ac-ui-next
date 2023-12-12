@@ -379,22 +379,17 @@ const CreatePersonsTwo = () => {
 
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
-
-    // Use the validatePhoneNumber function to validate the phone number
     const { isValid, errorMessage } = validatePhoneNumber(number);
 
-    console.log("is valid", isValid);
-    console.log("error message", errorMessage);
+    // Check if there's a change in the validation state
+    if (isObject(personValidation) && personValidation[key] != !isValid) {
+        personValidation[key] = !isValid;
+        personValidation.numberErrorMessage = !isValid ? errorMessage : null;
+        return true; // Indicates a change
+    }
+    return false; // No change
+};
 
-    personValidation[key] = !isValid; // Update the validation state
-
-    // Optionally, store the error message in the personValidation object
-    personValidation.numberErrorMessage = !isValid ? errorMessage : null;
-
-    console.log(personValidation.numberErrorMessage);
-
-    return isValid; // No change in validation state
-  };
 
   const onPersonFirstNameChangeFactory = (id) => (ref) => {
     changeTextField("personFirstName", id, ref);
