@@ -1,4 +1,4 @@
-import parsePhoneNumber from 'libphonenumber-js'
+import { parsePhoneNumberWithError, ParseError } from 'libphonenumber-js'
 
 const isObject = (e) => typeof e === 'object' && e !== null
 
@@ -74,12 +74,38 @@ const validateEmail = (email) => {
 };
 
 const validatePhoneNumber = (phoneNumber) => {
-    const possiblePhoneNumber = parsePhoneNumber(phoneNumber);
-    if (possiblePhoneNumber) {
-        return possiblePhoneNumber.isValid();
+    try {
+        const possiblePhoneNumber = parsePhoneNumberWithError(phoneNumber);
+        console.log(phoneNumber);
+        console.log("possible Phone number", possiblePhoneNumber.isValid());
+        return { isValid: possiblePhoneNumber.isValid(), errorMessage: null };
+    } catch (error) {
+        if (error instanceof ParseError) {
+            console.log(error.message);
+            let detailedErrorMessage;
+            switch (error.message) {
+                case 'NOT_A_NUMBER':
+                    detailedErrorMessage = 'the input has to be a number.';
+                    break;
+                case 'INVALID_COUNTRY':
+                    detailedErrorMessage = 'the country code is missing, invalid or not supported. e.g. +65 912345678';
+                    break;
+                case 'TOO_SHORT':
+                    detailedErrorMessage = 'the phone number is too short.';
+                    break;
+                case 'TOO_LONG':
+                    detailedErrorMessage = 'the phone number is too long.';
+                    break;
+                default:
+                    detailedErrorMessage = 'invalid phone number.';
+            }
+            return { isValid: false, errorMessage: detailedErrorMessage };
+        } else {
+            // Re-throw other unexpected errors
+            throw error;
+        }
     }
-    return false;
-}
+};
 
 export { isObject, filterByState, stringIn, arraySameContents, DEFAULT_URL, toDisplayDate, toDisplayDateString,toDisplayEventsDateString, validateEmail, validatePhoneNumber }
 

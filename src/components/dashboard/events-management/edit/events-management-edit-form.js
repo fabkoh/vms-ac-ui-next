@@ -483,7 +483,9 @@ const EditEventManagementForm = ({
     eventsManagementOutputActionsConflict,
     eventsManagementTriggerSchedulesEmpty,
     eventsManagementInvalidEmailRecipients,
+    eventsManagementInvalidEmailRecipientsError,
     eventsManagementInvalidSMSRecipients,
+    eventsManagementInvalidSMSRecipientsError,
     eventsManagementEmailRecipientsEmpty,
     eventsManagementSMSRecipientsEmpty,
   } = eventsManagementValidations;
@@ -1230,8 +1232,8 @@ const EditEventManagementForm = ({
                       helperText={
                         (Boolean(eventsManagementSMSRecipientsEmpty) &&
                           "Error: empty SMS recipients is not allowed") ||
-                        (Boolean(eventsManagementInvalidSMSRecipients) &&
-                          "Error: invalid SMS recipient(s)")
+                        (Boolean(eventsManagementInvalidSMSRecipients) && 
+                        `Error: ${eventsManagementInvalidSMSRecipientsError}`)
                       }
                       error={
                         Boolean(eventsManagementSMSRecipientsEmpty) ||
@@ -1258,7 +1260,7 @@ const EditEventManagementForm = ({
                                   sx={{ mr: 1, mb: 1 }}
                                   size="small"
                                   color={
-                                    !validatePhoneNumber(item)
+                                    !validatePhoneNumber(item).isValid
                                       ? "error"
                                       : "default"
                                   }

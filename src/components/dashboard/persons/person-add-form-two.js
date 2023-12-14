@@ -149,7 +149,7 @@ const PersonAddFormTwo = ({
                     defaultCountry="sg"
                     onChange={handlePersonMobileNumberChange}
                     inputProps={{ ref: personMobileNumberRef }}
-                    value={person.personMobileNumber}
+                    value={person.personMobileNumber || "+65"}
                     variant="outlined"
                     error={
                       validation.numberInvalid ||
@@ -161,7 +161,7 @@ const PersonAddFormTwo = ({
                       (validation.numberRepeated &&
                         "Error: duplicate number in form") ||
                       (validation.numberInvalid &&
-                        "Error: Invalid Singapore phone number")
+                        `Error: ${validation.numberErrorMessage || "invalid phone number"}`)
                     }
                   />
                 </Grid>

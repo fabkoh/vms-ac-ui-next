@@ -279,6 +279,7 @@ const ModifyEventManagement = () => {
     eventsManagementTriggerSchedulesEmpty: false,
     eventsManagementInvalidEmailRecipients: false,
     eventsManagementInvalidSMSRecipients: false,
+    eventsManagementInvalidSMSRecipientsError: "",
     eventsManagementEmailRecipientsEmpty: false,
     eventsManagementSMSRecipientsEmpty: false,
     timeEndInvalid: false,
@@ -1387,11 +1388,22 @@ const ModifyEventManagement = () => {
       newRecipients.length === 0 &&
       eventManagementToBeUpdated["eventsManagementSMS"];
     validation.eventsManagementInvalidSMSRecipients = false;
+
+    let invalidRecipientsErrors = new Set();
+
     for (let j = 0; j < newRecipients.length; j++) {
-      if (!validatePhoneNumber(newRecipients[j])) {
+      const phoneNumberValidation = validatePhoneNumber(newRecipients[j]);
+      if (!phoneNumberValidation.isValid) {
         validation.eventsManagementInvalidSMSRecipients = true;
+        invalidRecipientsErrors.add(phoneNumberValidation.errorMessage);
       }
     }
+
+    // Convert the set to a string and store it
+    if (invalidRecipientsErrors.size > 0) {
+      validation.eventsManagementInvalidSMSRecipientsError = Array.from(invalidRecipientsErrors).join(", ");
+    }
+
     setEventsManagementValidationsArr(newValidations);
   };
   // console.log(eventsManagementValidationsArr)
@@ -1584,7 +1596,9 @@ const ModifyEventManagement = () => {
                         validation.eventsManagementOutputActionsConflict ||
                         validation.eventsManagementTriggerSchedulesEmpty ||
                         validation.eventsManagementInvalidEmailRecipients ||
+                        validation.eventsManagementInvalidEmailRecipientsError ||
                         validation.eventsManagementInvalidSMSRecipients ||
+                        validation.eventsManagementInvalidSMSRecipientsError ||
                         validation.eventsManagementEmailRecipientsEmpty ||
                         validation.eventsManagementSMSRecipientsEmpty
                     )
@@ -1619,7 +1633,9 @@ const ModifyEventManagement = () => {
                         validation.eventsManagementOutputActionsConflict ||
                         validation.eventsManagementTriggerSchedulesEmpty ||
                         validation.eventsManagementInvalidEmailRecipients ||
+                        validation.eventsManagementInvalidEmailRecipientsError ||
                         validation.eventsManagementInvalidSMSRecipients ||
+                        validation.eventsManagementInvalidSMSRecipientsError ||
                         validation.eventsManagementEmailRecipientsEmpty ||
                         validation.eventsManagementSMSRecipientsEmpty
                     )
