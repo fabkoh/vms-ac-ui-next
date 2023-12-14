@@ -169,14 +169,16 @@ const UserAddForm = ({
                     variant="outlined"
                     required
                     error={
-                      validation.numberInvalid || validation.numberRepeated
+                      validation.numberInvalid || validation.numberRepeated || validation.numberInUse
                     }
                     helperText={
                       validation.numberRepeated 
                         ? "Error: duplicate number in form"
-                        : validation.numberInvalid
-                          ? `Error: ${validation.numberErrorMessage || "invalid phone number"}`
-                          : ""
+                        : validation.numberInUse
+                          ? "Error: number taken"
+                          : validation.numberInvalid
+                            ? `Error: ${validation.numberErrorMessage || "invalid phone number"}`
+                            : ""
                     }
                     
                   />

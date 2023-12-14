@@ -140,7 +140,7 @@ export const UsersListTable = (props) => {
 									</TableCell>
 									<TableCell>
 									<Typography width={190} noWrap>
-										+{person.mobile || (
+										{person.mobile || (
 												<SeverityPill color="warning">
 													<WarningIcon fontSize="small"
 													sx={{ mr: 1 }} />

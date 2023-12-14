@@ -76,34 +76,48 @@ const CreatePersonsTwo = () => {
   const [personsValidation, setPersonsValidation] = useState([
     getNewPersonValidation(0),
   ]);
+  const [mobileNumbersList, setMobileNumbersList] = useState([]);
   const [usersList, setUsersList] = useState([]);
+
+  console.log(mobileNumbersList);
 
   // get info
   const isMounted = useMounted();
   const getUserList = async () => {
     try {
-      const res = await authGetAccounts();
-      if (res.type == "success") {
-        const body = res.response;
-        console.log(body);
-        const newList = [];
-        for (const role of Object.keys(body)) {
-          for (const user of body[role]) {
-            user["role"] = role;
-            newList.push(user);
-          }
+        const res = await authGetAccounts();
+        if (res.type == "success") {
+            const body = res.response;
+            console.log(body);
+
+            const newList = [];
+            const mobileNumbers = []; // Array to store mobile numbers
+
+            for (const role of Object.keys(body)) {
+                for (const user of body[role]) {
+                    user["role"] = role;
+                    newList.push(user);
+
+                    // Add the mobile number to the mobileNumbers array
+                    if (user.mobile) {
+                        mobileNumbers.push(user.mobile);
+                    }
+                }
+            }
+            
+            setUsersList(newList);
+            setMobileNumbersList(mobileNumbers); // Assuming you have a state or method to handle this
+            setIsUpdated(true);
+        } else {
+            if (res.status == serverDownCode) {
+                setServerDownOpen(true);
+            }
         }
-        setUsersList(newList);
-        setIsUpdated(true);
-      } else {
-        if (res.status == serverDownCode) {
-          setServerDownOpen(true);
-        }
-      }
     } catch (err) {
-      console.log(err);
+        console.log(err);
     }
   };
+
 
   const getInfo = useCallback(() => {
     getUserList();
@@ -155,20 +169,57 @@ const CreatePersonsTwo = () => {
     return false;
   };
 
-  // returns if validArr is changed
-  const checkDuplicateHelper = (id, number, key, validArr, usernames) => {
-    let newNum = number;
-    if (number.charAt(0) === "+") {
-      newNum = number.slice(1);
+  /**
+   * Checks if the specified key has duplicate values in the infoArray and updates the validationArray accordingly
+   * 
+   * @param {string} key The key to check for duplicates
+   * @param {string} duplicateKey The key in the validationArray to update if there are duplicates
+   * @param {object[]} validationArray The validationArray to update
+   * @param {object[]} infoArray The infoArray to check for duplicates
+   * @returns {boolean} true if the validationArray is changed, false otherwise
+   */
+  const checkDuplicateHelper = (key, duplicateKey, validationArray, infoArray) => {
+    let hasChanged = false;
+
+    // Get a list of all duplicate values for the specified key in the infoArray
+    const duplicateValues = getDuplicates(infoArray.map((data) => data[key]));
+    console.log("Duplicate values for key:", key, duplicateValues);
+
+    // Iterate through each item in the infoArray
+    infoArray.forEach((dataItem, index) => {
+      const currentValue = dataItem[key];
+      const isDuplicate = currentValue !== "" && currentValue in duplicateValues;
+
+      // Update the duplicate status in the validationArray if it has changed
+      if (validationArray[index][duplicateKey] !== isDuplicate) {
+        validationArray[index][duplicateKey] = isDuplicate;
+        hasChanged = true;
+      }
+    });
+
+    // Return true if any changes were made to the validationArray
+    return hasChanged;
+  };
+
+  const checkInUseHelper = (
+    id,
+    value,
+    arrayOfUsedValues,
+    inUseKey,
+    validArr
+  ) => {
+    const inUse = value != "" && arrayOfUsedValues.includes(value);
+    console.log("arrayOfUsedValues", arrayOfUsedValues);
+    console.log("value", value);
+    console.log("inUse", inUse);
+    const personValidation = validArr.find((p) => p.personId == id);
+    if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
+      personValidation[inUseKey] = inUse;
+      return true;
     }
-    console.log(usernames);
-    console.log(newNum);
-    const isDuplicate = usernames.includes(newNum);
-    if (!validArr[id]) {
-      validArr[id] = {};
-    }
-    validArr[id][key] = isDuplicate;
-    return isDuplicate;
+
+    console.log("inusekey", personValidation[inUseKey]);
+    return false;
   };
 
   /**
@@ -288,11 +339,10 @@ const CreatePersonsTwo = () => {
     const usernames = usersList.map((user) => user.mobile);
 
     const b1 = checkDuplicateHelper(
-      id,
-      ref.current?.value,
+      "personMobileNumber",
       "numberRepeated",
       personsValidation,
-      usernames
+      personsInfo
     );
     const b2 = checkInvalidNumberHelper(
       id,
@@ -301,8 +351,15 @@ const CreatePersonsTwo = () => {
       personsValidation,
       personsInfo
     );
+    const b3 = checkInUseHelper(
+      id,
+      ref.current?.value,
+      mobileNumbersList,
+      "numberInUse",
+      personsValidation
+    );
 
-    if (b1 || b2) {
+    if (b1 || b2 || b3) {
       setPersonsValidation([...personsValidation]);
     }
   };
