@@ -65,6 +65,8 @@ const getNewCredential = (id) => ({
 
 const cardError = (v) => {
     return isObject(v) && (v.firstNameBlank || v.lastNameBlank || v.uidInUse || v.uidRepeated || v.credentialRepeatedIds.length > 0 || v.credentialUidRepeatedIds.length > 0 || Object.keys(v.credentialCheckFailed).length > 0
+    || v.numberInUse
+    || v.numberRepeated
     || v.numberInvalid)
 };
 

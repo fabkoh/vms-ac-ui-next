@@ -64,6 +64,7 @@ const cardError = (v) => {
       v.emailBlank ||
       v.passwordNameCharCheck ||
       v.roleBlank ||
+      v.numberInUse ||
       v.numberInvalid ||
       v.numberRepeated ||
       v.emailRepeated)
