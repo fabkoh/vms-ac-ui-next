@@ -340,7 +340,6 @@ const EditEventManagement = () => {
         eventsManagementInvalidEmailRecipients: false,
         eventsManagementInvalidEmailRecipientsError: "",
         eventsManagementInvalidSMSRecipients: false,
-        eventsManagementInvalidSMSRecipientsError: "",
         eventsManagementEmailRecipientsEmpty: false,
         eventsManagementSMSRecipientsEmpty: false,
         timeEndInvalid:false,

@@ -278,7 +278,6 @@ const ModifyEventManagement = () => {
     eventsManagementOutputActionsConflict: false,
     eventsManagementTriggerSchedulesEmpty: false,
     eventsManagementInvalidEmailRecipients: false,
-    eventsManagementInvalidEmailRecipientsError: "",
     eventsManagementInvalidSMSRecipients: false,
     eventsManagementInvalidSMSRecipientsError: "",
     eventsManagementEmailRecipientsEmpty: false,

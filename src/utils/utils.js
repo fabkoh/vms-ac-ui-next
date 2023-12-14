@@ -85,7 +85,7 @@ const validatePhoneNumber = (phoneNumber) => {
             let detailedErrorMessage;
             switch (error.message) {
                 case 'NOT_A_NUMBER':
-                    detailedErrorMessage = 'the input is not a valid phone number.';
+                    detailedErrorMessage = 'the input has to be a number.';
                     break;
                 case 'INVALID_COUNTRY':
                     detailedErrorMessage = 'the country code is missing, invalid or not supported. e.g. +65 912345678';
