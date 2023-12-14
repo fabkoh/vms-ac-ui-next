@@ -11,7 +11,7 @@ import ErrorCard from "../shared/error-card";
 import ExpandMore from "../shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
 import { isObject } from "../../../utils/utils";
@@ -67,6 +67,10 @@ const PersonEditFormTwo = ({
     e.preventDefault();
     onPersonEmailChange(personEmailRef);
   };
+
+  useEffect(() => {
+    console.log("mobile number", person.personMobileNumber);
+  }, []);
 
   // expanding card logic
   const [expanded, setExpanded] = useState(true);
@@ -152,7 +156,8 @@ const PersonEditFormTwo = ({
                     name="personMobileNumber"
                     onChange={handlePersonMobileNumberChange}
                     inputProps={{ ref: personMobileNumberRef }}
-                    value={person.personMobileNumber}
+                    // Value is unable to handle null and empty strings because Mui is bad, might have to create a new component in the future
+                    value={person.personMobileNumber || "+65"}
                     variant="outlined"
                     error={
                       validation.numberInvalid ||

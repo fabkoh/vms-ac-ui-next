@@ -230,7 +230,7 @@ export const PersonEditForm = (props) => {
                     defaultCountry={"sg"}
                     name="mobileNumber"
                     onChange={(e) => onNumberChange(e, person.id)}
-                    value={person.mobileNumber}
+                    value={person.personMobileNumber || "+65"}
                     variant ='outlined'
                   />
                 </Grid>

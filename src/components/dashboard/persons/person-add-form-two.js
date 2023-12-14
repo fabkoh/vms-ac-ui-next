@@ -149,7 +149,7 @@ const PersonAddFormTwo = ({
                     defaultCountry="sg"
                     onChange={handlePersonMobileNumberChange}
                     inputProps={{ ref: personMobileNumberRef }}
-                    value={person.personMobileNumber}
+                    value={person.personMobileNumber || "+65"}
                     variant="outlined"
                     error={
                       validation.numberInvalid ||

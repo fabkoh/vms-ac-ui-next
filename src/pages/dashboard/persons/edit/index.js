@@ -135,7 +135,7 @@ const EditPersonsTwo = () => {
         credentials: credArr[i],
         originalCreds: credArr2[i],
       });
-
+      
       validations.push({
         personId: bodyArr[i].personId,
         firstNameBlank: false,
@@ -147,6 +147,7 @@ const EditPersonsTwo = () => {
         credentialUidRepeatedIds: [],
         credentialSubmitFailed: {},
         numberInvalid: false,
+        numberErrorMessage: null,
         // note
         numberInUse: false,
         numberRepeated: false,
@@ -157,12 +158,10 @@ const EditPersonsTwo = () => {
         submitFailed: false,
       });
     });
+
     setPersonsValidation(validations);
     setPersonsInfo(personsInfoArr);
   };
-  useEffect(() => {
-    console.log("personsvalidations", personsValidation);
-  }, [personsValidation]);
 
   const cardError = (v) => {
     return (
