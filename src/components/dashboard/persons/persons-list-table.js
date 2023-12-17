@@ -49,9 +49,14 @@ export const PersonsListTable = (props) => {
     page,
     rowsPerPage,
     accessGroupNames,
-    onSelect,
+    handleAccessGroupFilter,
     ...other
   } = props;
+
+  const [accessGroupFilter, setAccessGroupFilter] = useState([]);
+  useEffect(() => {
+    setAccessGroupFilter(accessGroupNames.map((ag) => ag.name));
+  }, [accessGroupNames]);
   // const [selectedPersons, setSelectedPersons] = useState([]);
 
   // // Reset selected Persons when Persons change
@@ -133,8 +138,8 @@ export const PersonsListTable = (props) => {
               <TableCell>email</TableCell>
               <TableCell>
                 <ListFilter
-                  array={accessGroupNames}
-                  onSelect={onSelect}
+                  array={accessGroupFilter}
+                  onSelect={handleAccessGroupFilter}
                   defaultLabel="ACCESS GROUP"
                 />
               </TableCell>
