@@ -64,6 +64,7 @@ const cardError = (v) => {
       v.emailBlank ||
       v.passwordNameCharCheck ||
       v.roleBlank ||
+      v.numberInUse ||
       v.numberInvalid ||
       v.numberRepeated ||
       v.emailRepeated)
@@ -209,16 +210,12 @@ const CreatePersonsTwo = () => {
     validArr
   ) => {
     const inUse = value != "" && arrayOfUsedValues.includes(value);
-    console.log("arrayOfUsedValues", arrayOfUsedValues);
-    console.log("value", value);
-    console.log("inUse", inUse);
     const personValidation = validArr.find((p) => p.personId == id);
     if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
       personValidation[inUseKey] = inUse;
       return true;
     }
 
-    console.log("inusekey", personValidation[inUseKey]);
     return false;
   };
 
@@ -374,15 +371,14 @@ const CreatePersonsTwo = () => {
     );
     const usernames = usersList.map((user) => user.email);
     const b2 = checkDuplicateHelper(
-      id,
-      ref.current?.value,
+      "personEmail",
       "emailRepeated",
       personsValidation,
-      usernames
+      personsInfo
     );
-    console.log(personsValidation[0].emailRepeated);
+    const b3 = checkInUseHelper(id, ref.current?.value, usernames, "emailInUse", personsValidation);
 
-    if (b1 || b2) {
+    if (b1 || b2 || b3) {
       setPersonsValidation([...personsValidation]);
     }
   };
@@ -430,12 +426,10 @@ const CreatePersonsTwo = () => {
         email: person.personEmail,
         password: person.personPassword,
         role: person.personRole,
-        mobile: person.personMobileNumber.slice(1),
+        mobile: person.personMobileNumber,
       };
-      console.log(userSettings, 12);
       try {
         const res = await authSignUp(userSettings);
-        console.log(res);
         if (res.type != "success") {
           throw new Error("Unable to register User");
         }

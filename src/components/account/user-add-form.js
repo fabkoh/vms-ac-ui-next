@@ -145,14 +145,14 @@ const UserAddForm = ({
                     defaultValue={person.personEmail}
                     required
                     error={
-                      //   validation.emailInUse ||
-                      //   validation.emailRepeated ||
+                      validation.emailInUse ||
+                      validation.emailRepeated ||
                       validation.emailBlank
                     }
                     helperText={
-                      //   (validation.emailInUse && "Note: email taken") ||
-                      //   (validation.emailRepeated &&
-                      //     "Error: duplicate email in form") ||
+                      (validation.emailInUse && "Note: email taken") ||
+                      (validation.emailRepeated &&
+                        "Error: duplicate email in form") ||
                       validation.emailBlank && "Error: email cannot be blank"
                     }
                   />
