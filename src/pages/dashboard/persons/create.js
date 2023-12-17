@@ -77,6 +77,8 @@ const cardError = (v) => {
       v.credentialRepeatedIds.length > 0 ||
       v.credentialUidRepeatedIds.length > 0 ||
       Object.keys(v.credentialCheckFailed).length > 0 ||
+      v.numberInUse ||
+      v.numberRepeated ||
       v.numberInvalid)
   );
 };
@@ -386,15 +388,11 @@ const CreatePersonsTwo = () => {
    * @param {object[]} validArr
    * @returns {boolean} true if the validation state is changed, false otherwise
    */
-  const checkInvalidNumberHelper = (personId, number, key, validArr, infoArr) => {
+  const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
     if (!isObject(personValidation)) {
         return false;
     }
-
-    const personInfo = infoArr.find((p) => p.personId === personId);
-
-    console.log("number", number)
 
     // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
     // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
@@ -402,11 +400,8 @@ const CreatePersonsTwo = () => {
       if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
           personValidation[key] = false; // Mark as valid
           personValidation.numberErrorMessage = null; // Clear any existing error message
-          console.log(personInfo);
-          // personInfo.personMobileNumber = '+'; // Clear the mobile number
           return true; // Indicates a change in the validation state
       }
-      console.log("here");
       return false; // No change needed
     }
 
@@ -426,8 +421,6 @@ const CreatePersonsTwo = () => {
 
     return false; // No change
   };
-
-
 
   const onPersonFirstNameChangeFactory = (id) => (ref) => {
     changeTextField("personFirstName", id, ref);
@@ -609,6 +602,7 @@ const CreatePersonsTwo = () => {
 
   const submitDisabled =
     personsInfo.length == 0 || personsValidation.some(cardError);
+  console.log("submit disable", submitDisabled);
 
   const [disableSubmit, setDisableSubmit] = useState(false);
 

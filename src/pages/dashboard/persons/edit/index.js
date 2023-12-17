@@ -174,6 +174,8 @@ const EditPersonsTwo = () => {
         v.credentialRepeatedIds.length > 0 ||
         v.credentialUidRepeatedIds.length > 0 ||
         Object.keys(v.credentialSubmitFailed).length > 0 ||
+        v.numberInUse ||
+        v.numberRepeated ||
         v.numberInvalid)
     );
   };
@@ -302,7 +304,19 @@ const EditPersonsTwo = () => {
     return false;
   };
 
-  // returns if personsValidation is changed
+  /**
+   * Checks if the value is in use or is a duplicate and updates the validation state accordingly
+   * Currently allows swapping of phone numbers within the same edit form
+   * 
+   * @param {number} id
+   * @param {string} key
+   * @param {string} value
+   * @param {string[]} arrayOfUsedValues
+   * @param {string} inUseKey
+   * @param {string} duplicateKey
+   * @param {string} originalKey
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkDuplicatesAndInUseHelper = (
     id,
     key,
@@ -315,11 +329,14 @@ const EditPersonsTwo = () => {
     let toChange = false;
 
     if (value != "") {
-      // const temp = arrayOfUsedValues.filter(v=>v!=value) //this allows user to set own value again
-      // const inUse = temp.includes(value);                //values can thus be swapped which shouldnt be allowed.
       const inUse = arrayOfUsedValues.includes(value);
       const personValidation = personsValidation.find((p) => p.personId == id);
-      if (inUse != personValidation[inUseKey]) {
+      const personInfo = personsInfo.find((p) => p.personId == id);
+
+      console.log(value);
+      
+      // second condition prevents user from not being able to change back to original value
+      if (inUse != personValidation[inUseKey] && personInfo.personMobileNumber != value) {
         personValidation[inUseKey] = inUse;
         toChange = true;
       }
@@ -500,8 +517,6 @@ const EditPersonsTwo = () => {
 
   const onPersonMobileNumberChangeFactory = (id) => (ref) => {
     changeTextField("personMobileNumber", id, ref);
-    console.log(ref.current?.value);
-    console.log(typeof ref.current?.value);
     const b1 = checkDuplicatesAndInUseHelper(
       id,
       "personMobileNumber",
