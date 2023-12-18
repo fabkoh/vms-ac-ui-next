@@ -51,6 +51,7 @@ const CredentialEdit = ({
     // console.log("UidREF", test())
     // console.log("UidREF", credUidRef)
 	const handleCredUidChange = (e) => {
+		console.log("cred change")
 		e.preventDefault();
 		// onCredUidChange(credUidRef.current.value);
 		// onCredUidChange(e.target.value);
@@ -140,12 +141,19 @@ const CredentialEdit = ({
                     // value={credUidRef.current.value}
                     // value={credUidRef.current.value}  undef
                     // value={credUidRef.current?.value} undef
-                    error={credentialRepeated || credentialSubmitFailed || credentialUidRepeatedForNotPinTypeCred}
-						helperText={
-						(credentialSubmitFailed && "Error: " + validation.credentialSubmitFailed[credId]) ||
-						(credentialRepeated && "Error: repeated type & value in form") ||
-						(credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||' '
-                    }
+                    error={
+						credentialRepeated ||
+						credentialSubmitFailed ||
+						credentialUidRepeatedForNotPinTypeCred ||
+						validation.credentialPinInvalidLength
+					}
+					helperText={
+						(credentialSubmitFailed && "Error: " + validation.credentialCheckFailed[credId]) ||
+						(credentialRepeated && "Error: repeated credential type & value in form") ||
+						(credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||
+						(validation.credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
+						' '
+					}
                     defaultValue={credUid}
                 />
 			</Grid>

@@ -49,6 +49,7 @@ const getNewPersonValidation = (id) => ({
   credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
   credentialUidRepeatedIds: [],
   credentialCheckFailed: {},
+  credentialPinInvalidLength: false,
   numberInvalid: false,
   numberErrorMessage: null,
   // note
@@ -77,6 +78,7 @@ const cardError = (v) => {
       v.credentialRepeatedIds.length > 0 ||
       v.credentialUidRepeatedIds.length > 0 ||
       Object.keys(v.credentialCheckFailed).length > 0 ||
+      v.credentialPinInvalidLength ||
       v.numberInUse ||
       v.numberRepeated ||
       v.numberInvalid)
@@ -299,7 +301,13 @@ const CreatePersonsTwo = () => {
     return toChange;
   };
 
-  // returns if validArr is changed
+  /** 
+   * Checks for duplicates in credentials based on a combination of credTypeId and credUid for each person.
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkCredRepeatedHelper = (infoArr, validArr) => {
     let toChange = false;
 
@@ -345,7 +353,13 @@ const CreatePersonsTwo = () => {
     return toChange;
   };
 
-  // to check if same credUid for not pin is being repeated
+  /**
+   * Checks for duplicates of credential UIDs (credUid) across all persons
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkCredUidRepeatedForNotPinTypeCred = (infoArr, validArr) => {
     let toChange = false;
 
@@ -377,6 +391,50 @@ const CreatePersonsTwo = () => {
     });
 
     return toChange;
+  };
+
+    /**
+   * Checks if there is only one valid (4-6 digits) and updates the validation state accordingly
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
+    const checkPinCredValidity = (infoArr, validArr) => {
+      const pinTypeId = 4; // 4 is the ID for PIN type credentials
+      let toChange = false;
+    
+      infoArr.forEach((person, i) => {
+        const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
+        console.log("pinCreds", pinCreds);
+        const hasMultiplePins = pinCreds.length > 1;
+        const hasSinglePin = pinCreds.length === 1;
+        const isValidLength = hasSinglePin ? (pinCreds[0].credUid.length >= 4 && pinCreds[0].credUid.length <= 6) : true;
+  
+        // Check for multiple PINs
+        if (hasMultiplePins) {
+          validArr[i].credentialMultiplePins = true;
+          toChange = true;
+        } else {
+          if (validArr[i].credentialMultiplePins) {
+            validArr[i].credentialMultiplePins = false;
+            toChange = true;
+          }
+        }
+  
+        // Check for PIN length validity
+        if (hasSinglePin && !isValidLength) {
+          validArr[i].credentialPinInvalidLength = true;
+          toChange = true;
+        } else {
+          if (validArr[i].credentialPinInvalidLength) {
+            validArr[i].credentialPinInvalidLength = false;
+            toChange = true;
+          }
+        }
+      });
+    
+      return toChange;
   };
 
   /**
@@ -552,11 +610,9 @@ const CreatePersonsTwo = () => {
     setPersonsValidation(newValidations);
 
     const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
-    const b2 = checkCredUidRepeatedForNotPinTypeCred(
-      newInfo,
-      personsValidation
-    );
-    if (b1 || b2) {
+    const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
+    const b3 = checkPinCredValidity(newInfo, personsValidation);
+    if (b1 || b2 || b3) {
       setPersonsValidation([...personsValidation]);
     }
   };
