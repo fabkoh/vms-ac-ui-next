@@ -16,20 +16,30 @@ const getPersonName = (person) =>
 const getPersonDetailsLink = (person) =>
   isObject(person) && "/dashboard/persons/details/" + person.personId;
 
+/**
+ * Filters a person by a string query with the different fields of the person.
+ * 
+ * @param {Object} person
+ * @param {string} query
+ * @returns {boolean} true if the person matches the query, false otherwise
+ */
 const stringFilterHelper = (person, query) => {
-  if (
-    query === "" ||
-    stringIn(query, getPersonName(person)) ||
-    stringIn(query, person.personUid) ||
-    stringIn(query, person.personMobileNumber) ||
-    (person.accessGroup &&
-      stringIn(query, person.accessGroup.accessGroupName)) ||
-    stringIn(query, person.personEmail)
-  ) {
+  // remove hyphens from query to allow for searching by mobile number without hyphens, will need a
+  // better implementation as this means other fields cannot have hyphens as well
+  const queryWithoutHyphens = query.replace(/-/g, '');
+
+  const matchesName = stringIn(query, getPersonName(person));
+  const matchesUid = stringIn(query, person.personUid);
+  const matchesMobileNumber = stringIn(queryWithoutHyphens, person.personMobileNumber.replace(/-/g, ''));
+  const matchesAccessGroup = person.accessGroup && stringIn(query, person.accessGroup.accessGroupName);
+  const matchesEmail = stringIn(query, person.personEmail);
+
+  if (query === "" || matchesName || matchesUid || matchesMobileNumber || matchesAccessGroup || matchesEmail) {
     return true;
   }
   return false;
 };
+  
 
 const credentialFilterHelper = (person, query) => {
   if (stringFilterHelper(person, query)) return true;
@@ -44,6 +54,7 @@ const credentialFilterHelper = (person, query) => {
 
 const filterPersonByString = (person, queryString) =>
   stringFilterHelper(person, queryString.toLowerCase());
+
 const filterPersonByCredential = (person, queryString) =>
   credentialFilterHelper(person, queryString.toLowerCase());
 

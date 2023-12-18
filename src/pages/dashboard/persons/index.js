@@ -491,6 +491,12 @@ const PersonList = () => {
   // 	setCurrentTab(value);
   // };
 
+  /** 
+   * Handles the query filter
+   * 
+   * @param {Event} event - the event object
+   * @returns {void}
+   */
   const handleQueryChange = (event) => {
     event.preventDefault();
     // onSelect();
@@ -526,8 +532,7 @@ const PersonList = () => {
       const selectedGroupName = accessGroupNames[selectedIndex].name;
       newFilters.accessGroup = selectedGroupName;
     }
-  
-    console.log(newFilters);
+
     setFilters(newFilters);
   }; 
 
@@ -604,7 +609,6 @@ const PersonList = () => {
   };
 
   useEffect(() => {
-    // console.log(selectedPersons);
   }, [selectedPersons]);
 
   const deletePersons = async (e) => {
