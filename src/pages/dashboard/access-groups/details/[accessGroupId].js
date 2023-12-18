@@ -107,7 +107,8 @@ const AccessGroupDetails = () => {
       if (res.status == serverDownCode) {
         setServerDownOpen(true);
       }
-      toast.error("Error loading access group current in schedule info");
+      // Might need a better way to check if the component is still mounted then throw this error
+      // toast.error("Error loading access group current in schedule info");
       return {};
     }
     const data = await res.json();
@@ -126,9 +127,11 @@ const AccessGroupDetails = () => {
       if (res.status != 200) {
         if (res.status == serverDownCode) {
           toast.error("Error loading access group info due to server is down");
-        } else {
-          toast.error("Access group not found");
-        }
+        } 
+        // Might need a better way to just check if the component is still mounted
+        // else {
+        //   toast.error("Access group not found");
+        // }
         router.replace(accessGroupListLink);
         return;
       }
