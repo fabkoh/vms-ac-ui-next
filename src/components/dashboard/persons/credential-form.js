@@ -8,11 +8,13 @@ import { Add } from "@mui/icons-material";
 import { getCredTypeId, getCredTypeName } from "../../../utils/credential-type";
 import Credential from "./credential";
 
-const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
+const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, originalCredTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
 
     // expanded logic
     const [expanded, setExpanded] = useState(true);
     const onExpandedClick = () => setExpanded(!expanded);
+
+    console.log("original2", originalCredTypes)
 
     return (
         <>
@@ -42,7 +44,8 @@ const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, c
                                     <Credential
                                         key={id}
                                         onCredTypeChange={onCredTypeChangeFactory(id)}
-                                        credTypes={credTypes}
+                                        // Only the cred that is of type Pin will have Pin in its list of credTypes
+                                        credTypes={cred.credTypeId === 4 ? originalCredTypes : credTypes}
                                         credential={cred}
                                         removeCredential={removeCredentialFactory(id)}
                                         onCredUidChange={onCredUidChangeFactory(id)}

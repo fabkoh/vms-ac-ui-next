@@ -100,8 +100,14 @@ const CreatePersonsTwo = () => {
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
   const [personEmails, setPersonEmails] = useState([]);
 
-  // credTypes
+  /**
+   * credTypes dynamically stores the allowed credTypes for each person
+   * 
+   * If a person has a PIN credential, then the PIN credential type will be excluded from the credTypes
+   * If a person does not have a PIN credential, then the originalCredTypes will be used to render the dropdown selection
+   */
   const [credTypes, setCredTypes] = useState([]);
+  const [originalCredTypes, setOriginalCredTypes] = useState([]);
 
   // get info
   const isMounted = useMounted();
@@ -120,6 +126,7 @@ const CreatePersonsTwo = () => {
       }
       const body = await res.json();
       setCredTypes(body);
+      setOriginalCredTypes(body);
     } catch (e) {
       console.error(e);
       toast.error("Error loading credential types");
@@ -393,49 +400,36 @@ const CreatePersonsTwo = () => {
     return toChange;
   };
 
-    /**
+  /**
    * Checks if there is only one valid (4-6 digits) and updates the validation state accordingly
    * 
    * @param {object[]} infoArr
    * @param {object[]} validArr
    * @returns {boolean} true if the validation state is changed, false otherwise
    */
-    const checkPinCredValidity = (infoArr, validArr) => {
-      const pinTypeId = 4; // 4 is the ID for PIN type credentials
-      let toChange = false;
-    
-      infoArr.forEach((person, i) => {
-        const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
-        console.log("pinCreds", pinCreds);
-        const hasMultiplePins = pinCreds.length > 1;
-        const hasSinglePin = pinCreds.length === 1;
-        const isValidLength = hasSinglePin ? (pinCreds[0].credUid.length >= 4 && pinCreds[0].credUid.length <= 6) : true;
+  const checkPinCredValidity = (infoArr, validArr) => {
+    const pinTypeId = 4; // 4 is the ID for PIN type credentials
+    let toChange = false;
   
-        // Check for multiple PINs
-        if (hasMultiplePins) {
-          validArr[i].credentialMultiplePins = true;
+    infoArr.forEach((person, i) => {
+      const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
+      const hasSinglePin = pinCreds.length === 1;
+      const isValidLength = hasSinglePin ? (pinCreds[0].credUid.length >= 4 && pinCreds[0].credUid.length <= 6) : true;
+
+      // Check for PIN length validity
+      if (hasSinglePin && !isValidLength) {
+        validArr[i].credentialPinInvalidLength = true;
+        toChange = true;
+      } else {
+        if (validArr[i].credentialPinInvalidLength) {
+          validArr[i].credentialPinInvalidLength = false;
           toChange = true;
-        } else {
-          if (validArr[i].credentialMultiplePins) {
-            validArr[i].credentialMultiplePins = false;
-            toChange = true;
-          }
         }
+      }
+    });
   
-        // Check for PIN length validity
-        if (hasSinglePin && !isValidLength) {
-          validArr[i].credentialPinInvalidLength = true;
-          toChange = true;
-        } else {
-          if (validArr[i].credentialPinInvalidLength) {
-            validArr[i].credentialPinInvalidLength = false;
-            toChange = true;
-          }
-        }
-      });
-    
-      return toChange;
-  };
+    return toChange;
+};
 
   /**
    * Checks if the number is valid and updates the validation state accordingly
@@ -594,26 +588,50 @@ const CreatePersonsTwo = () => {
     setPersonsInfo(newInfo);
   };
 
+  const PIN_CRED_TYPE = { id: 4, name: 'Pin' };
+
+  const hasPinCred = (personCredentials) => {
+    return personCredentials.some(cred => cred.credTypeId === PIN_CRED_TYPE.id);
+  };
+
+  /**
+   * Updates the credential validity state and credTypes when credType changes
+   * 
+   * @param {number} personId
+   * @param {number} credId
+   * @returns {function} event handler
+   */
   const onCredTypeChangeFactory = (personId) => (credId) => (e) => {
     const newInfo = [...personsInfo];
-    newInfo
-      .find((p) => p.personId == personId)
-      .credentials.find((cred) => cred.credId == credId).credTypeId =
-      e.target.value;
+    const person = newInfo.find(p => p.personId === personId);
+    const cred = person.credentials.find(cred => cred.credId === credId);
+
+    cred.credTypeId = e.target.value;
+
+    // Update credTypes based on the existence of a pin cred
+    const hasPin = hasPinCred(person.credentials);
+    if (hasPin) {
+        // Exclude pin type if a pin cred already exists
+        setCredTypes(credTypes.filter(credType => credType.credTypeId !== PIN_CRED_TYPE.id));
+    } else {
+        // Include pin type if no pin cred exists
+        setCredTypes(originalCredTypes);
+    }
+
     setPersonsInfo(newInfo);
 
+    // Reset and update validations
     const newValidations = [...personsValidation];
-
     newInfo.forEach((person, i) => {
-      newValidations[i].credentialCheckFailed = {};
+        newValidations[i].credentialSubmitFailed = {};
     });
-    setPersonsValidation(newValidations);
 
     const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
     const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
     const b3 = checkPinCredValidity(newInfo, personsValidation);
+
     if (b1 || b2 || b3) {
-      setPersonsValidation([...personsValidation]);
+        setPersonsValidation([...personsValidation]);
     }
   };
 
@@ -658,14 +676,11 @@ const CreatePersonsTwo = () => {
 
   const submitDisabled =
     personsInfo.length == 0 || personsValidation.some(cardError);
-  console.log("submit disable", submitDisabled);
 
   const [disableSubmit, setDisableSubmit] = useState(false);
 
   // return true if the person creation was successful
   const createPerson = async (person) => {
-    console.log(person);
-    console.log("DWHEHEHHEHEHEHE");
     const newValidations = [...personsValidation];
     const personValidation = newValidations.find(
       (p) => p.personId == person.personId
@@ -814,6 +829,7 @@ const CreatePersonsTwo = () => {
                         addCredential={addCredentialFactory(id)}
                         removeCredentialFactory={removeCredentialFactory(id)}
                         credTypes={credTypes}
+                        originalCredTypes={originalCredTypes}
                         onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
                         onCredUidChangeFactory={onCredUidChangeFactory(id)}
                         onCredTTLChangeFactory={onCredTTLChangeFactory(id)}

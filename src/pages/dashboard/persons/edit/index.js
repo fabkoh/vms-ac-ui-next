@@ -57,8 +57,14 @@ const EditPersonsTwo = () => {
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
   const [personEmails, setPersonEmails] = useState([]);
 
-  // credTypes
+  /**
+   * credTypes dynamically stores the allowed credTypes for each person
+   * 
+   * If a person has a PIN credential, then the PIN credential type will be excluded from the credTypes
+   * If a person does not have a PIN credential, then the originalCredTypes will be used to render the dropdown selection
+   */
   const [credTypes, setCredTypes] = useState([]);
+  const [originalCredTypes, setOriginalCredTypes] = useState([]);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
@@ -80,6 +86,7 @@ const EditPersonsTwo = () => {
         return;
       }
       const body = await res.json();
+      setOriginalCredTypes(body);
       setCredTypes(body);
     } catch (e) {
       console.error(e);
@@ -591,6 +598,13 @@ const EditPersonsTwo = () => {
     return personCredentials.some(cred => cred.credTypeId === PIN_CRED_TYPE.id);
   };
 
+  /**
+   * Updates the credential validity state and credTypes when credType changes
+   * 
+   * @param {number} personId
+   * @param {number} credId
+   * @returns {function} event handler
+   */
   const onCredTypeChangeFactory = (personId) => (credId) => (e) => {
     const newInfo = [...personsInfo];
     const person = newInfo.find(p => p.personId === personId);
@@ -602,12 +616,10 @@ const EditPersonsTwo = () => {
     const hasPin = hasPinCred(person.credentials);
     if (hasPin) {
         // Exclude pin type if a pin cred already exists
-        credTypes = credTypes.filter(credType => credType.id !== PIN_CRED_TYPE.id);
+        setCredTypes(credTypes.filter(credType => credType.credTypeId !== PIN_CRED_TYPE.id));
     } else {
         // Include pin type if no pin cred exists
-        if (!credTypes.some(credType => credType.id === PIN_CRED_TYPE.id)) {
-            credTypes = [...credTypes, PIN_CRED_TYPE];
-        }
+        setCredTypes(originalCredTypes);
     }
 
     setPersonsInfo(newInfo);
@@ -641,8 +653,6 @@ const EditPersonsTwo = () => {
       newValidations[i].credentialSubmitFailed = {};
     });
     setPersonsValidation(newValidations);
-
-    console.log("uid change")
 
     const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
     const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
@@ -873,7 +883,9 @@ const EditPersonsTwo = () => {
                         cardError={cardError}
                         addCredential={addCredentialFactory(id)}
                         removeCredentialFactory={removeCredentialFactory(id)}
+                        // To differentiate the credential entry that has Pin from the others
                         credTypes={credTypes}
+                        originalCredTypes={originalCredTypes}
                         onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
                         onCredUidChangeFactory={onCredUidChangeFactory(id)}
                         onCredTTLChangeFactory={onCredTTLChangeFactory(id)}
