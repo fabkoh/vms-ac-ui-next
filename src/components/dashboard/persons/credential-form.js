@@ -15,6 +15,13 @@ const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, c
     const onExpandedClick = () => setExpanded(!expanded);
 
     console.log("original2", originalCredTypes)
+    console.log("credentials", credentials)
+
+    const PIN_CRED_TYPE = { id: 4, name: 'Pin' };
+
+    const hasPinCred = (personCredentials) => {
+        return personCredentials.some(cred => cred.credTypeId === PIN_CRED_TYPE.id);
+    };
 
     return (
         <>
@@ -45,7 +52,7 @@ const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, c
                                         key={id}
                                         onCredTypeChange={onCredTypeChangeFactory(id)}
                                         // Only the cred that is of type Pin will have Pin in its list of credTypes
-                                        credTypes={cred.credTypeId === 4 ? originalCredTypes : credTypes}
+                                        credTypes={cred.credTypeId === 4 || !hasPinCred(credentials) ? originalCredTypes : credTypes}
                                         credential={cred}
                                         removeCredential={removeCredentialFactory(id)}
                                         onCredUidChange={onCredUidChangeFactory(id)}
