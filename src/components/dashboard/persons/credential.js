@@ -60,6 +60,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
     const credentialCheckFailed = validation.credentialCheckFailed[credId] !== undefined;
     const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
+    const credentialPinInvalidLength = validation.credentialPinInvalidLengthIds.includes(credId);
 
     return (
         <Grid
@@ -103,12 +104,12 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                         handleChange={handleCredUidChange}
                         inputRef={credUidRef}
                         error={credentialRepeated || credentialCheckFailed || credentialUidRepeatedForNotPinTypeCred
-                        || validation.credentialPinInvalidLength}
+                        || credentialPinInvalidLength}
                         helperText={
                             (credentialCheckFailed && "Error: " + validation.credentialCheckFailed[credId]) ||
                             (credentialRepeated && "Error: repeated credential type & value in form") ||
                             (credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||
-                            (validation.credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
+                            (credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
                             ' '
                         }
                     />

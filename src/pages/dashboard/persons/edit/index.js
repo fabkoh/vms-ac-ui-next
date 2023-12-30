@@ -153,7 +153,7 @@ const EditPersonsTwo = () => {
         credentialRepeatedIds: [],
         credentialUidRepeatedIds: [],
         credentialSubmitFailed: {},
-        credentialPinInvalidLength: false,
+        credentialPinInvalidLengthIds: [],
         credentialMultiplePins: false,
         numberInvalid: false,
         numberErrorMessage: null,
@@ -183,7 +183,7 @@ const EditPersonsTwo = () => {
         v.credentialRepeatedIds.length > 0 ||
         v.credentialUidRepeatedIds.length > 0 ||
         Object.keys(v.credentialSubmitFailed).length > 0 ||
-        v.credentialPinInvalidLength ||
+        v.credentialPinInvalidLengthIds.length > 0 ||
         v.numberInUse ||
         v.numberRepeated ||
         v.numberInvalid)
@@ -502,7 +502,7 @@ const EditPersonsTwo = () => {
   };
 
   /**
-   * Checks if there is only one valid (4-6 digits) and updates the validation state accordingly
+   * Checks if there is only one valid (4-6 digits) PIN per person and updates the validation state accordingly
    * 
    * @param {object[]} infoArr
    * @param {object[]} validArr
@@ -511,27 +511,30 @@ const EditPersonsTwo = () => {
   const checkPinCredValidity = (infoArr, validArr) => {
     const pinTypeId = 4; // 4 is the ID for PIN type credentials
     let toChange = false;
-  
+
     infoArr.forEach((person, i) => {
       const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
-      console.log("pinCreds", pinCreds);
-      const hasSinglePin = pinCreds.length === 1;
-      const isValidLength = hasSinglePin ? (pinCreds[0].credUid.length >= 4 && pinCreds[0].credUid.length <= 6) : true;
 
-      // Check for PIN length validity
-      if (hasSinglePin && !isValidLength) {
-        validArr[i].credentialPinInvalidLength = true;
+      // Collect IDs of PIN credentials with invalid length
+      const invalidPinCredIds = pinCreds
+        .filter(cred => cred.credUid.length < 4 || cred.credUid.length > 6)
+        .map(cred => cred.credId);
+
+      // Check if there are any invalid PIN credentials
+      if (invalidPinCredIds.length > 0) {
+        validArr[i].credentialPinInvalidLengthIds = invalidPinCredIds;
         toChange = true;
       } else {
-        if (validArr[i].credentialPinInvalidLength) {
-          validArr[i].credentialPinInvalidLength = false;
+        // Reset the state if previously marked as invalid
+        if (validArr[i].credentialPinInvalidLengthIds && validArr[i].credentialPinInvalidLengthIds.length > 0) {
+          validArr[i].credentialPinInvalidLengthIds = [];
           toChange = true;
         }
       }
     });
-  
+
     return toChange;
-};
+  };
 
   const onPersonFirstNameChangeFactory = (id) => (ref) => {
     changeTextField("personFirstName", id, ref);

@@ -90,6 +90,7 @@ const CredentialEdit = ({
 	const credentialSubmitFailed = validation.credentialSubmitFailed[credId] !== undefined;
 	const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
+	const credentialPinInvalidLength = validation.credentialPinInvalidLengthIds.includes(credId);
 
 	// const [show, setShow] = useState(true);
 	// const handleShowPasswordClick = () => setShow(!show);
@@ -145,13 +146,13 @@ const CredentialEdit = ({
 						credentialRepeated ||
 						credentialSubmitFailed ||
 						credentialUidRepeatedForNotPinTypeCred ||
-						validation.credentialPinInvalidLength
+						credentialPinInvalidLength
 					}
 					helperText={
 						(credentialSubmitFailed && "Error: " + validation.credentialCheckFailed[credId]) ||
 						(credentialRepeated && "Error: repeated credential type & value in form") ||
 						(credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||
-						(validation.credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
+						(credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
 						' '
 					}
                     defaultValue={credUid}

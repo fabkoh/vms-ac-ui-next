@@ -49,7 +49,7 @@ const getNewPersonValidation = (id) => ({
   credentialRepeatedIds: [], // stores the ids of repeated credentials (repeated = credType and credUid same)
   credentialUidRepeatedIds: [],
   credentialCheckFailed: {},
-  credentialPinInvalidLength: false,
+  credentialPinInvalidLengthIds: [],
   numberInvalid: false,
   numberErrorMessage: null,
   // note
@@ -78,7 +78,7 @@ const cardError = (v) => {
       v.credentialRepeatedIds.length > 0 ||
       v.credentialUidRepeatedIds.length > 0 ||
       Object.keys(v.credentialCheckFailed).length > 0 ||
-      v.credentialPinInvalidLength ||
+      v.credentialPinInvalidLengthIds.length > 0 ||
       v.numberInUse ||
       v.numberRepeated ||
       v.numberInvalid)
@@ -401,7 +401,7 @@ const CreatePersonsTwo = () => {
   };
 
   /**
-   * Checks if there is only one valid (4-6 digits) and updates the validation state accordingly
+   * Checks if there is only one valid (4-6 digits) PIN per person and updates the validation state accordingly
    * 
    * @param {object[]} infoArr
    * @param {object[]} validArr
@@ -410,26 +410,30 @@ const CreatePersonsTwo = () => {
   const checkPinCredValidity = (infoArr, validArr) => {
     const pinTypeId = 4; // 4 is the ID for PIN type credentials
     let toChange = false;
-  
+
     infoArr.forEach((person, i) => {
       const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
-      const hasSinglePin = pinCreds.length === 1;
-      const isValidLength = hasSinglePin ? (pinCreds[0].credUid.length >= 4 && pinCreds[0].credUid.length <= 6) : true;
 
-      // Check for PIN length validity
-      if (hasSinglePin && !isValidLength) {
-        validArr[i].credentialPinInvalidLength = true;
+      // Collect IDs of PIN credentials with invalid length
+      const invalidPinCredIds = pinCreds
+        .filter(cred => cred.credUid.length < 4 || cred.credUid.length > 6)
+        .map(cred => cred.credId);
+
+      // Check if there are any invalid PIN credentials
+      if (invalidPinCredIds.length > 0) {
+        validArr[i].credentialPinInvalidLengthIds = invalidPinCredIds;
         toChange = true;
       } else {
-        if (validArr[i].credentialPinInvalidLength) {
-          validArr[i].credentialPinInvalidLength = false;
+        // Reset the state if previously marked as invalid
+        if (validArr[i].credentialPinInvalidLengthIds && validArr[i].credentialPinInvalidLengthIds.length > 0) {
+          validArr[i].credentialPinInvalidLengthIds = [];
           toChange = true;
         }
       }
     });
-  
+
     return toChange;
-};
+  };
 
   /**
    * Checks if the number is valid and updates the validation state accordingly
@@ -646,12 +650,15 @@ const CreatePersonsTwo = () => {
       newValidations[i].credentialCheckFailed = {};
     });
     setPersonsValidation(newValidations);
+
     const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
     const b2 = checkCredUidRepeatedForNotPinTypeCred(
       personsInfo,
       personsValidation
     );
-    if (b1 || b2) {
+    const b3 = checkPinCredValidity(personsInfo, personsValidation);
+
+    if (b1 || b2 || b3) {
       setPersonsValidation([...personsValidation]);
     }
   };
