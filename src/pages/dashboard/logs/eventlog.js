@@ -99,6 +99,7 @@ const Logs = () => {
   const queryRef = useRef(null);
   const handleQueryChange = (e) => {
     e.preventDefault();
+    setPage(0);
     setFilters((prevState) => ({
       ...prevState,
       query: queryRef.current?.value,
