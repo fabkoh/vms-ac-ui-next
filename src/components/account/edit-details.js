@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../hooks/use-auth";
 import { useMounted } from "../../hooks/use-mounted";
+import MuiPhoneNumber from "material-ui-phone-number";
 import { authEditProfile } from "../../api/auth-api";
 import toast from "react-hot-toast";
 
@@ -25,6 +26,9 @@ export const EditAccountDetails = (accountDetails) => {
   const isMounted = useMounted();
   const router = useRouter();
   const { register } = useAuth();
+
+  const handlePersonMobileNumberChange = () =>
+    onPersonMobileNumberChange(personMobileNumberRef);
 
   const formik = useFormik({
     initialValues: {
@@ -47,8 +51,11 @@ export const EditAccountDetails = (accountDetails) => {
         .min(3, "Must be at least 3 characters")
         .max(20, "Must be at most 20 characters")
         .required("Last Name is required"),
-      mobileNumber: Yup.string().required("Mobile Number is required").phone(),
+        mobileNumber: Yup.string()
+        .required("Mobile Number is required")
     }),
+
+
 
     onSubmit: async (values, helpers) => {
       try {
@@ -122,24 +129,19 @@ export const EditAccountDetails = (accountDetails) => {
         value={formik.values.email}
         required
       />
-
-      <TextField
-        error={Boolean(
-          formik.touched.mobileNumber && formik.errors.mobileNumber
-        )}
+      <MuiPhoneNumber
         fullWidth
-        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
         label="Mobile Number"
-        margin="normal"
         name="mobileNumber"
-        onBlur={formik.handleBlur}
+        defaultCountry="sg"
         onChange={formik.handleChange}
-        value={formik.values.mobileNumber}
-        InputProps={{
-          startAdornment: <InputAdornment position="start">+</InputAdornment>,
-        }}
+        value={formik.values.mobileNumber || "+65"}
+        variant="outlined"
         required
+        error={Boolean(formik.touched.mobileNumber && formik.errors.mobileNumber)}
+        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
       />
+
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>{formik.errors.submit}</FormHelperText>
