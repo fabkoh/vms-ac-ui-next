@@ -11,7 +11,7 @@ import StyledMenu from "../../../components/dashboard/styled-menu";
 import { useMounted } from "../../../hooks/use-mounted";
 import { ChevronDown } from "../../../icons/chevron-down";
 import { gtm } from "../../../lib/gtm";
-import { Upload } from "../../../icons/upload"; 
+import { Upload } from "../../../icons/upload";
 import { Download } from "../../../icons/download";
 import { Search } from "../../../icons/search";
 import VideoListTable from "../../../components/dashboard/video-recorders/video-list-table";
@@ -32,7 +32,7 @@ const RecorderList = () => {
     useEffect(() => {
         gtm.push({ event: "page_view" });
     })
-    
+
     // get entrances and access groups
     const [recorders, setRecorders] = useState([]);
 
@@ -46,7 +46,7 @@ const RecorderList = () => {
 
 
     // sdk 
-    const get_sdk_handle = async function() {
+    const get_sdk_handle = async function () {
         while (true) {
             if (window.WebVideoCtrl && window.jQuery) {
                 return window.WebVideoCtrl
@@ -55,17 +55,17 @@ const RecorderList = () => {
         }
     }
 
-    const attach_sdk     = async function(handle) {
+    const attach_sdk = async function (handle) {
         return await new Promise((resolve, reject) => {
             handle.I_InitPlugin(500, 300, {
-                bWndFull:       true,
-                iPackageType:   2,
-                iWndowType:     1,
-                bNoPlugin:      true,
-                cbSelWnd:           function (xmlDoc) { },
-                cbDoubleClickWnd:   function (iWndIndex, bFullScreen) { },
-                cbEvent:            function (iEventType, iParam1, iParam2) { },
-                cbRemoteConfig:     function () { },
+                bWndFull: true,
+                iPackageType: 2,
+                iWndowType: 1,
+                bNoPlugin: true,
+                cbSelWnd: function (xmlDoc) { },
+                cbDoubleClickWnd: function (iWndIndex, bFullScreen) { },
+                cbEvent: function (iEventType, iParam1, iParam2) { },
+                cbRemoteConfig: function () { },
                 cbInitPluginComplete: function () {
                     try {
                         resolve();
@@ -78,9 +78,9 @@ const RecorderList = () => {
         });
     }
 
-    const login_sdk = async function(handle, {ip, port, username, password}) {
+    const login_sdk = async function (name, { ip, port, username, password }) {
         return await new Promise((resolve, reject) => {
-            handle.I_Login(ip, 1, port, username, password, {
+            name.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
                 }, error: function (status, xmlDoc) {
@@ -91,32 +91,32 @@ const RecorderList = () => {
         });
     }
 
-    const get_device_info = async function(handle, {ip}) {
+    const get_device_info = async function (handle, { ip }) {
         return await new Promise((resolve, reject) => {
-            try{
-            handle.I_GetDeviceInfo(ip, {
-                success: function (xmlDoc) {
-                    const xml_handle = $(xmlDoc);
+            try {
+                handle.I_GetDeviceInfo(ip, {
+                    success: function (xmlDoc) {
+                        const xml_handle = $(xmlDoc);
 
-                    resolve({
-                        device_name:        xml_handle.find("deviceName").eq(0).text(),
-                        device_id:          xml_handle.find("deviceID").eq(0).text(),
-                        model:              xml_handle.find("model").eq(0).text(),
-                        serial_number:      xml_handle.find("serialNumber").eq(0).text(),
-                        mac_addreess:       xml_handle.find("macAddress").eq(0).text(),
-                        firmware_version:   `${xml_handle.find("firmwareVersion").eq(0).text()}  ${xml_handle.find("firmwareReleasedDate").eq(0).text()}`,
-                        encoder_version:    `${xml_handle.find("encoderVersion").eq(0).text()}  ${xml_handle.find("encoderReleasedDate").eq(0).text()}`,
-                    });
-                },
-                error: function (status, xmlDoc) {
-                    reject();
-                }
-            })
-        } catch(ex) {}
+                        resolve({
+                            device_name: xml_handle.find("deviceName").eq(0).text(),
+                            device_id: xml_handle.find("deviceID").eq(0).text(),
+                            model: xml_handle.find("model").eq(0).text(),
+                            serial_number: xml_handle.find("serialNumber").eq(0).text(),
+                            mac_addreess: xml_handle.find("macAddress").eq(0).text(),
+                            firmware_version: `${xml_handle.find("firmwareVersion").eq(0).text()}  ${xml_handle.find("firmwareReleasedDate").eq(0).text()}`,
+                            encoder_version: `${xml_handle.find("encoderVersion").eq(0).text()}  ${xml_handle.find("encoderReleasedDate").eq(0).text()}`,
+                        });
+                    },
+                    error: function (status, xmlDoc) {
+                        reject();
+                    }
+                })
+            } catch (ex) { }
         })
     }
 
-    const get_analogue_channels = async function(handle, {ip}) {
+    const get_analogue_channels = async function (handle, { ip }) {
         return await new Promise((resolve, reject) => {
             handle.I_GetAnalogChannelInfo(ip, {
                 async: false,
@@ -125,8 +125,8 @@ const RecorderList = () => {
 
                     $.each($(xmlDoc).find("VideoInputChannel"), function (i) {
                         channels.push({
-                            id:     $(this).find("id").eq(0).text(),
-                            name:   $(this).find("name").eq(0).text()
+                            id: $(this).find("id").eq(0).text(),
+                            name: $(this).find("name").eq(0).text()
                         });
                     });
 
@@ -139,7 +139,7 @@ const RecorderList = () => {
         });
     }
 
-    const get_digital_channels = async function(handle, {ip}) {
+    const get_digital_channels = async function (handle, { ip }) {
         return await new Promise((resolve, reject) => {
             handle.I_GetDigitalChannelInfo(ip, {
                 async: false,
@@ -147,12 +147,11 @@ const RecorderList = () => {
                     const channels = [];
 
                     $.each($(xmlDoc).find("InputProxyChannelStatus"), function (i) {
-                        //setCount(prev => prev + 1)
                         channels.push({
-                            id:     $(this).find("id").eq(0).text(),
-                            name:   $(this).find("name").eq(0).text(),
+                            id: $(this).find("id").eq(0).text(),
+                            name: $(this).find("name").eq(0).text(),
                             online: ($(this).find("online").eq(0).text().toLowerCase() === 'true'),
-                            ip:     $(this).find("ipAddress").eq(0).text()
+                            ip: $(this).find("ipAddress").eq(0).text()
                         });
                     });
 
@@ -178,65 +177,62 @@ const RecorderList = () => {
         const data = await res.json();
         setRecorders(data);
         if (isMounted()) {
-            // try{
-                if (!loadedSDK){
-                    await Promise.resolve(data.forEach(async(recorder) => { 
-                        const sdk_handle        = await get_sdk_handle();
-                        setSDKHandle(sdk_handle);
+            if (!loadedSDK) {
+                await Promise.resolve(data.forEach(async (recorder) => {
+                    const sdk_handle = await get_sdk_handle();
+                    setSDKHandle(sdk_handle);
 
-                        await attach_sdk(sdk_handle);
+                    await attach_sdk(sdk_handle);
 
-                        const login             = await login_sdk(sdk_handle, {
-                            ip:         recorder.recorderPublicIp,
-                            port:       recorder.recorderPortNumber,
-                            username:   recorder.recorderUsername,
-                            password:   recorder.recorderPassword
-                        });
+                    // Timeout to handle case where it is already logged in
+                    const timeout = (ms) => new Promise((resolve, reject) => setTimeout(() => reject(new Error("Timeout")), ms));
 
-                        const device_info       = await get_device_info(sdk_handle, {
-                            ip: recorder.recorderPublicIp
-                        })
-
-                        for (const key of Object.keys(device_info)) {
-                            recorder[key] = device_info[key]
+                    const login = await Promise.race([
+                        login_sdk(sdk_handle, {
+                            ip: recorder.recorderPrivateIp,
+                            port: recorder.recorderPortNumber,
+                            username: recorder.recorderUsername,
+                            password: recorder.recorderPassword
+                        }),
+                        timeout(3000)
+                    ]).catch((error) => {
+                        if (error.message === "Timeout") {
+                            console.log("Login function call timed out after 3 seconds");
+                        } else {
+                            console.error(error);
                         }
+                    });
 
-                        const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: recorder.recorderPublicIp
-                        })
+                    const device_info = await get_device_info(sdk_handle, {
+                        ip: recorder.recorderPrivateIp
+                    })
 
-                        const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: recorder.recorderPublicIp
-                        })
+                    for (const key of Object.keys(device_info)) {
+                        recorder[key] = device_info[key]
+                    }
 
-                        // recorder = {...recorder,
-                        //             "cameras":digital_channels,
-                        //             "isActive":true}
-                        recorder.cameras  = digital_channels;
-                        recorder.recorderSerialNumber = device_info["serial_number"];
-                        videoRecorderApi.updateRecorder(recorder);
+                    const analogue_channels = await get_analogue_channels(sdk_handle, {
+                        ip: recorder.recorderPrivateIp
+                    })
 
-                        recorder.isActive = true;
-                        setRecorders([...data]);
-                        
-                    //return { ...recorder } 
+                    const digital_channels = await get_digital_channels(sdk_handle, {
+                        ip: recorder.recorderPrivateIp
+                    })
+
+                    recorder.cameras = digital_channels;
+                    recorder.recorderSerialNumber = device_info["serial_number"];
+                    videoRecorderApi.updateRecorder(recorder);
+
+                    setRecorders([...data]);
                 }))
 
-                    
-                // console.log(222,data);
-                // const newData = [...data]; 
-                // newData.forEach(recorder => console.log(444,recorder.device_id
-                //     ));
-                // setRecorders([...newData]);
                 setLoadedSDK(true);
-                }
             }
-        
-        // } catch(err){ }
+        }
         return data;
     }
 
-    const refresh = (async() => {
+    const refresh = (async () => {
         window.location.reload(true);
     })
 
@@ -249,17 +245,17 @@ const RecorderList = () => {
         if (selectedRecorders.includes(recorderId)) {
             setSelectedRecorders(selectedRecorders.filter(id => id !== recorderId));
         } else {
-            setSelectedRecorders([ ...selectedRecorders, recorderId ]);
+            setSelectedRecorders([...selectedRecorders, recorderId]);
         }
     }
 
-     // for actions button
+    // for actions button
     const [actionAnchor, setActionAnchor] = useState(null);
     const open = Boolean(actionAnchor);
     const handleActionClick = (e) => setActionAnchor(e.currentTarget);
     const handleActionClose = () => setActionAnchor(null);
     const actionDisabled = selectedRecorders.length == 0;
-    
+
     // for filtering
     const [filters, setFilters] = useState({
         query: "",
@@ -293,56 +289,45 @@ const RecorderList = () => {
     const paginatedRecorders = applyPagination(filteredRecorders, page, rowsPerPage);
 
     //for delete action button
-	const [deleteOpen, setDeleteOpen] = useState(false);  
-	
-	//Set to true if a video recorder is selected. controls form input visibility.
+    const [deleteOpen, setDeleteOpen] = useState(false);
+
+    //Set to true if a video recorder is selected. controls form input visibility.
     //TODO: Check whether this can be removed
-	const [selectedState, setselectedState] = useState(false);
-	useEffect(() => {
-	if(selectedRecorders.length>=1) {
-		 setselectedState(true)
-	  }
-	}, [selectedRecorders]);
-	
+    const [selectedState, setselectedState] = useState(false);
+    useEffect(() => {
+        if (selectedRecorders.length >= 1) {
+            setselectedState(true)
+        }
+    }, [selectedRecorders]);
 
-	const handleDeleteOpen = () => {        
-		setDeleteOpen(true);           
-	};
-	const handleDeleteClose = () => {
-		setDeleteOpen(false);
+
+    const handleDeleteOpen = () => {
+        setDeleteOpen(true);
+    };
+    const handleDeleteClose = () => {
+        setDeleteOpen(false);
     }
-    
-	const deleteRecorders = async() => {
-		Promise.all(selectedRecorders.map(id=>{
-			return videoRecorderApi.deleteRecorder(id)
-		})).then( resArr => {
-			resArr.filter(res=>{
-				if(res.status == 204 || res.status == 200){
-					toast.success('Delete success',{duration:2000},);
-				}
-				else{
-					toast.error('Delete unsuccessful' )
-				}
-			})
-			getRecordersLocal();
-		})
-		setDeleteOpen(false);
-	};
 
-    // Reset selectedRecorders when recorders change
-	// useEffect(
-	// 	() => {
-	// 		if (selectedRecorders.length) {
-	// 			setSelectedRecorders([]);
-	// 		}
-	// 	},
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// 	[recorders]
-    // );
-    
+    const deleteRecorders = async () => {
+        Promise.all(selectedRecorders.map(id => {
+            return videoRecorderApi.deleteRecorder(id)
+        })).then(resArr => {
+            resArr.filter(res => {
+                if (res.status == 204 || res.status == 200) {
+                    toast.success('Delete success', { duration: 2000 },);
+                }
+                else {
+                    toast.error('Delete unsuccessful')
+                }
+            })
+            getRecordersLocal();
+        })
+        setDeleteOpen(false);
+    };
+
     useEffect(() => getRecordersLocal(), [isMounted]);
 
-    return(
+    return (
         <>
             <Head>
                 <title>Etlas: Video Recorder List</title>
@@ -351,7 +336,7 @@ const RecorderList = () => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    py:8
+                    py: 8
                 }}
             >
                 <ServerDownError
@@ -365,8 +350,8 @@ const RecorderList = () => {
                             spacing={3}>
                             <Grid item
                                 sx={{ m: 2.5 }}>
-                                <Typography variant="h4">Video Recorders</Typography>    
-                            </Grid>    
+                                <Typography variant="h4">Video Recorders</Typography>
+                            </Grid>
                             <Grid item>
                                 <Button
                                     endIcon={<ChevronDown fontSize="small" />}
@@ -389,15 +374,15 @@ const RecorderList = () => {
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink href={getVideoRecordersEditLink(selectedRecorders)}
-                                        passHref>    
+                                        passHref>
                                         <MenuItem disableRipple
                                             disabled={actionDisabled}>
                                             <Edit />
                                             &#8288;Edit
                                         </MenuItem>
                                     </NextLink>
-                                    <MenuItem 
-                                        disableRipple 
+                                    <MenuItem
+                                        disableRipple
                                         disabled={actionDisabled}
                                         onClick={handleDeleteOpen}
 
@@ -407,13 +392,13 @@ const RecorderList = () => {
                                     </MenuItem>
                                     <Confirmdelete
                                         setActionAnchor={setActionAnchor}
-                                        open={deleteOpen} 
+                                        open={deleteOpen}
                                         handleDialogClose={handleDeleteClose}
                                         selectedEntrances={selectedRecorders}
                                         deleteRecorders={deleteRecorders}
                                     />
                                 </StyledMenu>
-                            </Grid> 
+                            </Grid>
                         </Grid>
                         <Box
                             sx={{
@@ -422,9 +407,9 @@ const RecorderList = () => {
                             }}
                         >
                             <Button startIcon={<Upload fontSize="small" />}
-                             sx={{ m: 1 }}>Import</Button>    
+                                sx={{ m: 1 }}>Import</Button>
                             <Button startIcon={<Download fontSize="small" />}
-                             sx={{ m: 1 }}>Export</Button>
+                                sx={{ m: 1 }}>Export</Button>
                             <Tooltip
                                 title="Excel template can be found in our documentation"
                                 enterTouchDelay={0}
@@ -453,26 +438,26 @@ const RecorderList = () => {
                                 sx={{
                                     flexGrow: 1,
                                     m: 1.5
-                                }}    
+                                }}
                             >
                                 <TextField
                                     defaultValue=""
                                     fullWidth
-                                    inputProps={{ 
+                                    inputProps={{
                                         ref: queryRef
                                     }}
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <Search fontSize="small" />    
+                                                <Search fontSize="small" />
                                             </InputAdornment>
                                         )
                                     }}
                                     placeholder={filterVideoByStringPlaceholder}
-                                />                                   
+                                />
                             </Box>
                         </Box>
-                        <VideoListTable 
+                        <VideoListTable
                             key={recorders.toString()}
                             videoRecorders={paginatedRecorders}
                             selectedAllVideoRecorders={selectedAllRecorders}
@@ -489,7 +474,7 @@ const RecorderList = () => {
                             getRecordersLocal={getRecordersLocal}
                         />
                     </Card>
-                </Container>    
+                </Container>
             </Box>
         </>
     )
@@ -498,11 +483,11 @@ const RecorderList = () => {
 RecorderList.getLayout = (page) => (
     <AuthGuard>
         <Head>
-             <script src="/static/sdk/codebase/jquery-1.12.1.min.js"></script>
-             <script src="/static/sdk/codebase/encryption/AES.js"></script>
-             <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
-             <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-             <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
+            <script src="/static/sdk/codebase/jquery-1.12.1.min.js"></script>
+            <script src="/static/sdk/codebase/encryption/AES.js"></script>
+            <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
+            <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
+            <script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js"></script>
         </Head>
         <DashboardLayout>{page}</DashboardLayout>
     </AuthGuard>

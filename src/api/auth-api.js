@@ -1,43 +1,7 @@
-// var api = "http://localhost:8082";
-// const createAuthRequest = async (path, data) => {
-//     try {
-//         const token = localStorage.getItem("accessToken");
-//         const auth = token ? { "Authorization": `Bearer ${token}` } : {};
-//         console.log({body: JSON.stringify(data)});
-//         const response = await fetch(`${api}/${path}`, {
-//                 method: "POST",  
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                     ...auth
-//                 },
-//                 body: JSON.stringify(data)
-//             });
-//     return { response: await response.json(), type: response.ok ? "success" : "error"};
-//     } catch (error) {
-//         return { response: error, type: "error" };
-//     }
-//   };
-
-//   const createGetRequest = async (path) => {
-//     try {
-//         const token = localStorage.getItem("accessToken");
-//         const response = await fetch(`${api}/${path}`, {
-//                 method: "GET",  
-//                 headers: {
-//                     Authorization: `Bearer ${token}`                    
-//                 }
-//             })
-        
-//         return { response: await response.json(), type: response.ok ? "success" : "error"};
-//     } catch (error) {
-//         return { response: error, type: "error" };
-//     }
-//   };
-
 import { sendApi } from "./api-helpers";
 
-const sendApiHelper = async(path,init={}) =>{
-    const response = await sendApi(path,init);
+const sendApiHelper = async(path,init={},refresh=true) =>{
+    const response = await sendApi(path,init,refresh);
     try{
         return { response: await response.json(), type: response.ok ? "success" : "error"};
     }
@@ -48,7 +12,7 @@ const sendApiHelper = async(path,init={}) =>{
 }
 
 export const authLogin = async( {email, password}) => {
-    // const res = await createAuthRequest("api/auth/signin", { email, password });
+    console.log("authlogin")
     const res = await sendApiHelper("/api/auth/signin", {
                                    method: 'POST',
                                    body: JSON.stringify({email, password})
@@ -92,7 +56,7 @@ export const authEditProfile = async (data) => {
 }
 
 export const authGetProfile = async () => {
-    const res = sendApiHelper("/api/auth/profile");
+    const res = sendApiHelper("/api/auth/profile", {}, false);
     return res;
 }
 

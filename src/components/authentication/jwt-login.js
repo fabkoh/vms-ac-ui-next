@@ -62,20 +62,16 @@ export const JWTLogin = (props) => {
 
   const formik = useFormik({
     initialValues: {
-      email: 'ISSAdmin@isssecurity.sg',
-      password: 'ISSAdmin',
-      submit: null
+      // email: 'ISSAdmin@isssecurity.sg',
+      // password: 'ISSAdmin',
+      submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
+      email: Yup.string()
+        .email("Must be a valid email")
         .max(255)
-        .required('Email is required'),
-      password: Yup
-        .string()
-        .max(255)
-        .required('Password is required')
+        .required("Email is required"),
+      password: Yup.string().max(255).required("Password is required"),
     }),
     onSubmit: async (values, helpers) => {
       const res = await login(values.email, values.password);
@@ -86,21 +82,16 @@ export const JWTLogin = (props) => {
           const returnUrl = router.query.returnUrl || '/dashboard';
           router.push(returnUrl);
         }
-      }
-      else {
+      } else {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: res.response.message });
         helpers.setSubmitting(false);
       }
-
     }
   });
 
   return (
-    <form
-      noValidate
-      onSubmit={formik.handleSubmit}
-      {...props}>
+    <form noValidate onSubmit={formik.handleSubmit} {...props}>
       <TextField
         autoFocus
         error={Boolean(formik.touched.email && formik.errors.email)}
@@ -128,9 +119,7 @@ export const JWTLogin = (props) => {
       />
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
-          <FormHelperText error>
-            {formik.errors.submit}
-          </FormHelperText>
+          <FormHelperText error>{formik.errors.submit}</FormHelperText>
         </Box>
       )}
       <Box sx={{ mt: 2 }}>
@@ -147,13 +136,7 @@ export const JWTLogin = (props) => {
       <Box sx={{ mt: 2 }}>
         <Alert severity="info">
           <div>
-            Use
-            {' '}
-            <b>ISSAdmin@isssecurity.sg</b>
-            {' '}
-            and password
-            {' '}
-            <b>ISSAdmin</b>
+            Use <b>ISSAdmin@isssecurity.sg</b> and password <b>ISSAdmin</b>
           </div>
         </Alert>
       </Box>

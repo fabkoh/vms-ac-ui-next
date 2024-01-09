@@ -53,7 +53,7 @@ export const OverviewBanner = (props) => {
           sx={{ mt: 1 }}
           variant="subtitle2"
         >
-          Your dashboard has been improved! Explore new features like Notifications, Search, Jobs Platform and more.
+          Your dashboard has been improved!
         </Typography>
         <Box sx={{ mt: 2 }}>
           <Button

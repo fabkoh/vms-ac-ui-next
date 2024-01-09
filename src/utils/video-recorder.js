@@ -38,8 +38,7 @@ const getVideoRecorderEditLink = (recorderId) => {
 const getVideoRecorderIdsEditLink = (ids) =>  '/dashboard/video-recorders/edit?ids=' + encodeURIComponent(JSON.stringify(ids));
 
 const getVideoRecordersEditLink = (recorders) =>  
-{   console.log(recorders)
-    return `/dashboard/video-recorders/edit?ids=${encodeURIComponent(JSON.stringify(recorders))}`;}
+{   return `/dashboard/video-recorders/edit?ids=${encodeURIComponent(JSON.stringify(recorders))}`;}
 
 
 const videoRecorderListLink = '/dashboard/video-recorders';

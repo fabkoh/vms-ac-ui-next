@@ -42,6 +42,8 @@ export const AccessGroupListTable = (props) => {
     page,
     rowsPerPage,
     person,
+    openStatusUpdateDialog,
+    openUnlockDialog,
     ...other
   } = props;
   // const [selectedPersons, setSelectedPersons] = useState([]);
@@ -82,6 +84,7 @@ export const AccessGroupListTable = (props) => {
   // 	const handleSelectId = (event,personId) => {
   //   setSelectId(personId)
   //   }, [selectId]);
+  const reversedAccessGroup = accessGroup.slice().reverse();
 
   return (
     <div {...other}>
@@ -129,10 +132,15 @@ export const AccessGroupListTable = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {accessGroup.map((accGroup) => {
+            {reversedAccessGroup.map((accGroup) => {
               const isAccessGroupselected = props.selectedAccessGroup.includes(
                 accGroup.accessGroupId
               );
+              const id = accGroup.accessGroupId;
+              const isActive = accGroup.isActive;
+              const handleOpenStatusUpdateDialog = () =>
+                openStatusUpdateDialog([id], !isActive);
+              console.log("accGroup", accGroup);
 
               return (
                 <TableRow
@@ -197,7 +205,7 @@ export const AccessGroupListTable = (props) => {
                   <TableCell width="10%">
                     <Chip
                       label={accGroup.isActive ? "ACTIVE" : "NOT ACTIVE"}
-                      onClick={() => {}}
+                      onClick={handleOpenStatusUpdateDialog}
                       color={accGroup.isActive ? "success" : "error"}
                       sx={{
                         fontSize: "12px",

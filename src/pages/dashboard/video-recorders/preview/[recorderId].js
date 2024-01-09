@@ -47,7 +47,6 @@ import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../
 import {VideoRecorderCameras} from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
 import { serverDownCode } from "../../../../api/api-helpers";
 import {ServerDownError} from "../../../../components/dashboard/errors/server-down-error";
-import { authRenewToken } from "../../../../api/api-helpers";
 
 function formatDate(date) {
   var d = new Date(date),
@@ -68,27 +67,6 @@ const VideoRecorderPreview = () => {
     const { theaterMode, setTheaterMode} = useContext(TheaterModeContext);
     const [entrance, setEntrance] = useState(null);
     const { cameraId, recorderId }  = router.query;
-
-    // Begin indefinite polling for refresh token
-    useEffect(
-      () => {  
-        const timer = setInterval(() => {
-            refreshToken();
-          }, 5 * 1000);
-        return () => clearInterval(timer);
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
-  
-    const refreshToken = async () => {
-      try {  
-        authRenewToken();
-        } catch (error) {
-        console.error("Error here")
-        console.error("Error:", error);
-      }
-    }
 
     useEffect(() => {
         gtm.push({ event: 'page_view' });
@@ -111,6 +89,28 @@ const VideoRecorderPreview = () => {
     const [selectedWindow, setSelectedWindow] = useState(1);
     const [selectedChannel, setSelectedChannel] = useState('1');
     const [availableChannels, setAvailableChannels] = useState([]);
+
+    // Begin indefinite polling for refresh token
+    useEffect(
+      () => {  
+        const timer = setInterval(() => {
+            refreshToken();
+          }, 5 * 60 * 1000);
+        return () => clearInterval(timer);
+        
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+  
+    const refreshToken = async () => {
+      try {  
+        authRenewToken();
+        } catch (error) {
+        console.error("Error here")
+        console.error("Error:", error);
+      }
+    }
 
     const get_sdk_handle = async function() {
         while (true) {
@@ -154,9 +154,10 @@ const VideoRecorderPreview = () => {
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
       return await new Promise((resolve, reject) => {
-          handle.I_Login(ip, 1, port, username, password, {
+          handle.I_Login(ip, 2, port, username, password, {
               success: function (xmlDoc) {
                   resolve();
+                  console.log("login success");
               }, error: function (status, xmlDoc) {
                   reject();
                   alert("login failed");
@@ -164,179 +165,6 @@ const VideoRecorderPreview = () => {
           });
       });
   }
-
-    // time format
-// function dateFormat(oDate, fmt) {
-//   var o = {
-//       "M+": oDate.getMonth() + 1, //month
-//       "d+": oDate.getDate(), //day
-//       "h+": oDate.getHours(), //hour
-//       "m+": oDate.getMinutes(), //minute
-//       "s+": oDate.getSeconds(), //second
-//       "q+": Math.floor((oDate.getMonth() + 3) / 3), //quarter
-//       "S": oDate.getMilliseconds()//millisecond
-//   };
-//   if (/(y+)/.test(fmt)) {
-//       fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
-//   }
-//   for (var k in o) {
-//       if (new RegExp("(" + k + ")").test(fmt)) {
-//           fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-//       }
-//   }
-//   return fmt;
-// }
-
-//     function showOPInfo(szInfo, status, xmlDoc) {
-//     var szTip = "<div>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo;
-//     if (typeof status != "undefined" && status != 200) {
-//         var szStatusString = $(xmlDoc).find("statusString").eq(0).text();
-//         var szSubStatusCode = $(xmlDoc).find("subStatusCode").eq(0).text();
-//         if ("" === szSubStatusCode) {
-//             if("" === szSubStatusCode && "" === szStatusString){
-//                 szTip += "(" + status + ")";
-//             }
-//             else{
-//                 szTip += "(" + status + ", " + szStatusString + ")";
-//             }
-//         } else {
-//             szTip += "(" + status + ", " + szSubStatusCode + ")";
-//         }
-//     }
-//     szTip += "</div>";
-
-//     $("#opinfo").html(szTip + $("#opinfo").html());
-// }
-
-//     const login_sdk = async function(handle, {ip, port, username, password}) {
-//       var szDeviceIdentify = ip + "_" + port;
-//       var iRet = handle.I_Login(ip, 1, port, username, password, {
-//           success: function (xmlDoc) {            
-//               showOPInfo(szDeviceIdentify + " 登录成功！");
-//               $(ip).prepend("<option value='" + szDeviceIdentify + "'>" + szDeviceIdentify + "</option>");
-//               setTimeout(function () {
-//                 $(ip).val(szDeviceIdentify);
-//                   getChannelInfo(handle,ip);
-//                   getDevicePort(handle,ip);
-//               }, 10);
-//           },
-//           error: function (status, xmlDoc) {
-//               console.log(xmlDoc);
-//               showOPInfo(szDeviceIdentify + " 登录失败！", status, xmlDoc);
-//           }
-//       });
-  
-//       if (-1 == iRet) {
-//           showOPInfo(szDeviceIdentify + " 已登录过！");
-//       }
-//   }
-//   // {
-//   //       return await new Promise((resolve, reject) => {
-//   //           handle.I_Login(ip, 1, port, username, password, {
-//   //               success: function (xmlDoc) {
-//   //                   resolve();
-//   //               }, error: function (status, xmlDoc) {
-//   //                   reject();
-//   //                   alert("login failed");
-//   //               }
-//   //           });
-//   //       });
-//   //   }
-
-//   function getChannelInfo(handle,ip) {
-//     var szDeviceIdentify =ip,
-//         oSel = $("#channels").empty();
-
-//     if (null == szDeviceIdentify) {
-//         return;
-//     }
-
-//     // analog channel
-//     handle.I_GetAnalogChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("VideoInputChannel");
-
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text();
-//                 if ("" == name) {
-//                     name = "Camera " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
-//             });
-//             showOPInfo(szDeviceIdentify + " get analog channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get analog channel failed！", status, xmlDoc);
-//         }
-//     });
-//     // IP channel
-//     handle.I_GetDigitalChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("InputProxyChannelStatus");
-
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text(),
-//                     online = $(this).find("online").eq(0).text();
-//                 if ("false" == online) {// filter the forbidden IP channel
-//                     return true;
-//                 }
-//                 if ("" == name) {
-//                     name = "IPCamera " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 oSel.append("<option value='" + id + "' bZero='false'>" + name + "</option>");
-//             });
-//             showOPInfo(szDeviceIdentify + " get IP channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get IP channel failed！", status, xmlDoc);
-//         }
-//     });
-//     // zero-channel info
-//     handle.I_GetZeroChannelInfo(szDeviceIdentify, {
-//         async: false,
-//         success: function (xmlDoc) {
-//             var oChannels = $(xmlDoc).find("ZeroVideoChannel");
-            
-//             $.each(oChannels, function (i) {
-//                 var id = $(this).find("id").eq(0).text(),
-//                     name = $(this).find("name").eq(0).text();
-//                 if ("" == name) {
-//                     name = "Zero Channel " + (i < 9 ? "0" + (i + 1) : (i + 1));
-//                 }
-//                 if ("true" == $(this).find("enabled").eq(0).text()) {//  filter the forbidden zero-channel
-//                     oSel.append("<option value='" + id + "' bZero='true'>" + name + "</option>");
-//                 }
-//             });
-//             showOPInfo(szDeviceIdentify + " get zero-channel success！");
-//         },
-//         error: function (status, xmlDoc) {
-//             showOPInfo(szDeviceIdentify + " get zero-channel failed！", status, xmlDoc);
-//         }
-//     });
-// }
-
-// // get port
-// function getDevicePort(handle,ip) {
-//     var szDeviceIdentify = ip;
-
-//     if (null == szDeviceIdentify) {
-//         return;
-//     }
-
-//     var oPort = WebVideoCtrl.I_GetDevicePort(szDeviceIdentify);
-//     if (oPort != null) {
-//         $("#deviceport").val(oPort.iDevicePort);
-//         $("#rtspport").val(oPort.iRtspPort);
-
-//         showOPInfo(szDeviceIdentify + " get port success！");
-//     } else {
-//         showOPInfo(szDeviceIdentify + " get port failed！");
-//     }
-// }
 
     const get_device_info = async function(handle, {ip}) {
         return await new Promise((resolve, reject) => {
@@ -415,28 +243,33 @@ const VideoRecorderPreview = () => {
         });
     }
 
-    const preview_recorder     = async function(handle, {ip, rtsp_port, stream_type, channel_id, zero_channel, port}) {
-        return await new Promise((resolve, reject) => {
-            handle.I_StartRealPlay(ip, {
-            iRtspPort:      rtsp_port,
-            iStreamType:    stream_type,
-            iChannelID:     channel_id,
-            bZeroChannel:   zero_channel,
+    const preview_recorder     = async function(handle, {privateIP, publicIP, rtsp_port, stream_type, channel_id, zero_channel, port}) {
+      try {
+        console.log("handle", handle);
+        console.log("privateIP", privateIP);
+        console.log("publicIP", publicIP);
+        await new Promise((resolve, reject) => {
+          handle.I_StartRealPlay(privateIP, publicIP, {
+            iRtspPort: rtsp_port,
+            iStreamType: stream_type,
+            iChannelID: channel_id,
+            bZeroChannel: zero_channel,
             iWSPort: port,
             success: function () {
-              console.log("started the preview", selectedWindow)
-            },
-            error: function (status, xmlDoc) {
-              if (status === 403) {
-                  console.log("Device do not support Websocket extracting the flow！");
-              } else {
-                  console.log("start real play failed！");
-              }
+              resolve();
+              console.log("preview_recorder success");
+            }, 
+            error: function () {
+              reject();
+              console.log("preview_recorder error");
             }
           });
-
-          resolve();
+          console.log("startrealplay didn't resolve or reject");
         });
+      } catch (error) {
+        console.log(error);  // Will log: "Error: An error occurred in preview_recorder"
+      }
+      
     }
 
     const stop_preview_recorder = async function(handle) {
@@ -471,20 +304,22 @@ const VideoRecorderPreview = () => {
                     const data              = await res.json()
 
                     if (!loadedSDK) {
+                      // code for the sdk needs to load first
                         const sdk_handle        = await get_sdk_handle();
                         setSDKHandle(sdk_handle);
 
                         await attach_sdk(sdk_handle);
 
+                        // Note IP is public IP and port is port to access recorder 
                         const login             = await login_sdk(sdk_handle, {
-                            ip:         data.recorderPublicIp,
+                            ip:         data.recorderPrivateIp,
                             port:       data.recorderPortNumber,
                             username:   data.recorderUsername,
                             password:   data.recorderPassword
                         });
 
                         const device_info       = await get_device_info(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         for (const key of Object.keys(device_info)) {
@@ -492,23 +327,24 @@ const VideoRecorderPreview = () => {
                         }
 
                         const analogue_channels = await get_analogue_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         const digital_channels  = await get_digital_channels(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         const device_ports      = await get_device_ports(sdk_handle, {
-                            ip: data.recorderPublicIp
+                            ip: data.recorderPrivateIp
                         })
 
                         setAvailableChannels([...digital_channels]);
                         data.rtsp_port = device_ports.iRtspPort;
                         // channel_id to switch cam
                         await preview_recorder(sdk_handle, {
-                            ip: data.recorderPublicIp, rtsp_port: device_ports.iRtspPort,
-                            stream_type: 1, channel_id: 1, zero_channel: false, port: 7681
+                          privateIP: data.recorderPrivateIp,
+                            publicIP: data.recorderPublicIp, rtsp_port: 8443,
+                            stream_type: 1, channel_id: cameraId, zero_channel: false, port: data.recorderIWSPort
                         });
                         data.recorderSerialNumber = device_info["serial_number"];
                         videoRecorderApi.updateRecorder(data);
@@ -608,7 +444,7 @@ const VideoRecorderPreview = () => {
                   }}>
                   <div>
                     <Typography variant="h4">
-                      { videoRecorderInfo? `Live View/Playback: ${videoRecorderInfo.recorderName}`: " Camera Not Found" }    
+                      { videoRecorderInfo? `Live View: ${videoRecorderInfo.recorderName}`: " Camera Not Found" }    
                     </Typography>    
                   </div>    
                 </Grid>
@@ -711,8 +547,9 @@ const VideoRecorderPreview = () => {
                                 // if something is already running then close it to play the current choice
                                 await stop_preview_recorder(sdkHandle) 
                                 await preview_recorder(sdkHandle, {
-                                  ip: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
-                                  stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: 7681
+                                  privateIP: videoRecorderInfo.recorderPrivateIp,
+                                  publicIP: videoRecorderInfo.recorderPublicIp, rtsp_port: videoRecorderInfo.rtsp_port,
+                                  stream_type: 1, channel_id: selectedChannel, zero_channel: false, port: videoRecorderInfo.recorderIWSPort
                                 });
                               }}>Start Preview</Button>
                               <Button onClick={async () => {
@@ -721,6 +558,20 @@ const VideoRecorderPreview = () => {
                               }}>Stop Preview</Button>
                             </div> 
                           }
+                          <div style={{ display: 'flex', alignItems: "center" }}>
+                            <Button
+                              sx={{ m: 1 }}
+                              variant="contained"
+                              onClick={() => {
+                                window.open(`http://${videoRecorderInfo.recorderPrivateIp}:${videoRecorderInfo.recorderPortNumber}`);
+                              }}>
+                              Detailed Interface
+                            </Button>
+
+                            <Typography color="neutral.500" variant="body2">
+                              To access this feature, please ensure that you are connected to the local network
+                            </Typography>
+                          </div>
                         </div>
                       </div>
                     </div>

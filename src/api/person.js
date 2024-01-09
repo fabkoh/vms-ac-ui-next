@@ -235,20 +235,20 @@ class PersonApi {
   }
 
   postCSV(formData) {
-    return sendApi(
-      "/api/person/importcsv",
-      {
-        method: "POST",
-        body: formData,
-      },
-      "multipart/form-data"
-    );
-
-    // return axios.post(apiUri + "/api/person/importcsv", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
+    // return sendApi(
+    //   "/api/person/importcsv",
+    //   {
+    //     method: "POST",
+    //     body: formData,
     //   },
-    // });
+    //   "multipart/form-data"
+    // );
+
+    return axios.post(apiUri + "/api/person/importcsv", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   }
 
   getCSVJson() {
