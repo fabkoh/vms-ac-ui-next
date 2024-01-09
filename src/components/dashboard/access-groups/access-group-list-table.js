@@ -184,17 +184,7 @@ export const AccessGroupListTable = (props) => {
                   </TableCell>
                   <TableCell width="20%">
                     {accGroup.accessGroupDesc ? (
-                      <NextLink
-                        href={
-                          "/dashboard/access-groups/details/" +
-                          accGroup.accessGroupId
-                        }
-                        passHref
-                      >
-                        <Link color="inherit">
-                          <Typography>{accGroup.accessGroupDesc}</Typography>
-                        </Link>
-                      </NextLink>
+                        <Typography>{accGroup.accessGroupDesc}</Typography>
                     ) : (
                       <SeverityPill color="warning">
                         <WarningIcon fontSize="small" sx={{ mr: 1 }} />

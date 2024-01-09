@@ -28,6 +28,7 @@ import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import { validatePhoneNumber } from "../../../../utils/utils";
 
 // const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
@@ -134,7 +135,7 @@ const EditPersonsTwo = () => {
         credentials: credArr[i],
         originalCreds: credArr2[i],
       });
-
+      
       validations.push({
         personId: bodyArr[i].personId,
         firstNameBlank: false,
@@ -146,6 +147,7 @@ const EditPersonsTwo = () => {
         credentialUidRepeatedIds: [],
         credentialSubmitFailed: {},
         numberInvalid: false,
+        numberErrorMessage: null,
         // note
         numberInUse: false,
         numberRepeated: false,
@@ -156,12 +158,10 @@ const EditPersonsTwo = () => {
         submitFailed: false,
       });
     });
+
     setPersonsValidation(validations);
     setPersonsInfo(personsInfoArr);
   };
-  useEffect(() => {
-    console.log("personsvalidations", personsValidation);
-  }, [personsValidation]);
 
   const cardError = (v) => {
     return (
@@ -174,6 +174,8 @@ const EditPersonsTwo = () => {
         v.credentialRepeatedIds.length > 0 ||
         v.credentialUidRepeatedIds.length > 0 ||
         Object.keys(v.credentialSubmitFailed).length > 0 ||
+        v.numberInUse ||
+        v.numberRepeated ||
         v.numberInvalid)
     );
   };
@@ -302,7 +304,19 @@ const EditPersonsTwo = () => {
     return false;
   };
 
-  // returns if personsValidation is changed
+  /**
+   * Checks if the value is in use or is a duplicate and updates the validation state accordingly
+   * Currently allows swapping of phone numbers within the same edit form
+   * 
+   * @param {number} id
+   * @param {string} key
+   * @param {string} value
+   * @param {string[]} arrayOfUsedValues
+   * @param {string} inUseKey
+   * @param {string} duplicateKey
+   * @param {string} originalKey
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkDuplicatesAndInUseHelper = (
     id,
     key,
@@ -315,11 +329,14 @@ const EditPersonsTwo = () => {
     let toChange = false;
 
     if (value != "") {
-      // const temp = arrayOfUsedValues.filter(v=>v!=value) //this allows user to set own value again
-      // const inUse = temp.includes(value);                //values can thus be swapped which shouldnt be allowed.
       const inUse = arrayOfUsedValues.includes(value);
       const personValidation = personsValidation.find((p) => p.personId == id);
-      if (inUse != personValidation[inUseKey]) {
+      const personInfo = personsInfo.find((p) => p.personId == id);
+
+      console.log(value);
+      
+      // second condition prevents user from not being able to change back to original value
+      if (inUse != personValidation[inUseKey] && personInfo.personMobileNumber != value) {
         personValidation[inUseKey] = inUse;
         toChange = true;
       }
@@ -337,19 +354,50 @@ const EditPersonsTwo = () => {
 
     return toChange;
   };
-  // check if phone number is a valid Singapore phone numnber
+
+  /**
+   * Checks if the number is valid and updates the validation state accordingly
+   * 
+   * @param {number} personId
+   * @param {string} number
+   * @param {string} key
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkInvalidNumberHelper = (personId, number, key, validArr) => {
     const personValidation = validArr.find((p) => p.personId === personId);
-    const invalid = number.startsWith("+65 ") && number.length !== 13;
-    console.log("invalid phone number is " + invalid);
-
-    if (isObject(personValidation) && personValidation[key] != invalid) {
-      personValidation[key] = invalid;
-      return true;
+    if (!isObject(personValidation)) {
+        return false;
     }
 
-    return false;
+    // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
+    // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
+    if (number === '+' || number === '+65') {
+      if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
+          personValidation[key] = false; // Mark as valid
+          personValidation.numberErrorMessage = null; // Clear any existing error message
+          return true; // Indicates a change in the validation state
+      }
+      return false; // No change needed
+    }
+
+    const { isValid, errorMessage } = validatePhoneNumber(number);
+    const isInvalid = !isValid;
+
+    // Determine if there's a change in either the validation state or the error message
+    const isStateChanged = personValidation[key] !== isInvalid;
+    const isErrorMessageChanged = personValidation.numberErrorMessage !== errorMessage;
+
+    // Update if there's a change in the state or the error message
+    if (isStateChanged || isErrorMessageChanged) {
+        personValidation[key] = isInvalid;
+        personValidation.numberErrorMessage = isInvalid ? errorMessage : null;
+        return true; // Indicates a change
+    }
+
+    return false; // No change
   };
+
   // returns if validArr is changed
   const checkCredRepeatedHelper = (infoArr, validArr) => {
     let toChange = false;
@@ -469,8 +517,6 @@ const EditPersonsTwo = () => {
 
   const onPersonMobileNumberChangeFactory = (id) => (ref) => {
     changeTextField("personMobileNumber", id, ref);
-    console.log(ref.current?.value);
-    console.log(typeof ref.current?.value);
     const b1 = checkDuplicatesAndInUseHelper(
       id,
       "personMobileNumber",
@@ -483,7 +529,8 @@ const EditPersonsTwo = () => {
       id,
       ref.current?.value,
       "numberInvalid",
-      personsValidation
+      personsValidation,
+      personsInfo
     );
 
     if (b1 || b2) {

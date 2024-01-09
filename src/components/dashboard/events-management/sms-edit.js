@@ -113,7 +113,7 @@ export const SMSEdit = (props) => {
                       <Chip
                         key={index}
                         sx={{ mr: 1, mb: 1 }}
-                        color={!validatePhoneNumber(item) ? "error" : "default"}
+                        color={!validatePhoneNumber(item).isValid ? "error" : "default"}
                         size="small"
                         onDelete={() => {
                           let arr = [...notificationSMSsRecipients];
@@ -124,7 +124,7 @@ export const SMSEdit = (props) => {
                           }
                           let isInvalid = false;
                           for (let j = 0; j < arr.length; j++) {
-                            if (!validatePhoneNumber(arr[j])) {
+                            if (!validatePhoneNumber(arr[j]).isValid) {
                               isInvalid = true;
                             }
                           }
@@ -145,7 +145,7 @@ export const SMSEdit = (props) => {
                 ];
                 let isInvalid = false;
                 for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
-                  if (!validatePhoneNumber(newNotificationSMSRecipients[j])) {
+                  if (!validatePhoneNumber(newNotificationSMSRecipients[j]).isValid) {
                     isInvalid = true;
                   }
                 }
