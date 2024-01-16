@@ -154,7 +154,7 @@ const VideoRecorderPreview = () => {
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
       return await new Promise((resolve, reject) => {
-          handle.I_Login(ip, 1, port, username, password, {
+          handle.I_Login(ip, 2, port, username, password, {
               success: function (xmlDoc) {
                   resolve();
                   console.log("login success");
