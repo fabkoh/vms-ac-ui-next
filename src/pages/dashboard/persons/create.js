@@ -285,6 +285,9 @@ const CreatePersonsTwo = () => {
   ) => {
     const inUse = value != "" && arrayOfUsedValues.includes(value);
     const personValidation = validArr.find((p) => p.personId == id);
+    console.log("arrayOfUsedValues", arrayOfUsedValues);
+    console.log("value", value);
+    console.log("inUse", inUse);
     if (isObject(personValidation) && personValidation[inUseKey] != inUse) {
       personValidation[inUseKey] = inUse;
       return true;
@@ -293,19 +296,37 @@ const CreatePersonsTwo = () => {
   };
 
   // returns if validArr is changed
-  const checkDuplicateHelper = (key, duplicateKey, validArr, infoArr) => {
-    let toChange = false;
 
-    const duplicateKeys = getDuplicates(infoArr.map((p) => p[key]));
-    infoArr.forEach((p, i) => {
-      const v = p[key];
-      const b = v != "" && v != undefined && v != null && v in duplicateKeys; // ignores empty strings
-      if (validArr[i][duplicateKey] != b) {
-        validArr[i][duplicateKey] = b;
-        toChange = true;
+  /**
+   * Checks if the specified key has duplicate values in the infoArray and updates the validationArray accordingly
+   * 
+   * @param {string} key The key to check for duplicates
+   * @param {string} duplicateKey The key in the validationArray to update if there are duplicates
+   * @param {object[]} validationArray The validationArray to update
+   * @param {object[]} infoArray The infoArray to check for duplicates
+   * @returns {boolean} true if the validationArray is changed, false otherwise
+   */
+  const checkDuplicateHelper = (key, duplicateKey, validationArray, infoArray) => {
+    let hasChanged = false;
+
+    // Get a list of all duplicate values for the specified key in the infoArray
+    const duplicateValues = getDuplicates(infoArray.map((data) => data[key]));
+    console.log("Duplicate values for key:", key, duplicateValues);
+
+    // Iterate through each item in the infoArray
+    infoArray.forEach((dataItem, index) => {
+      const currentValue = dataItem[key];
+      const isDuplicate = currentValue !== "" && currentValue in duplicateValues;
+
+      // Update the duplicate status in the validationArray if it has changed
+      if (validationArray[index][duplicateKey] !== isDuplicate) {
+        validationArray[index][duplicateKey] = isDuplicate;
+        hasChanged = true;
       }
     });
-    return toChange;
+
+    // Return true if any changes were made to the validationArray
+    return hasChanged;
   };
 
   /** 

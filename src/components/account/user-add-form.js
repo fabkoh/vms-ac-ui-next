@@ -145,14 +145,14 @@ const UserAddForm = ({
                     defaultValue={person.personEmail}
                     required
                     error={
-                      //   validation.emailInUse ||
-                      //   validation.emailRepeated ||
+                      validation.emailInUse ||
+                      validation.emailRepeated ||
                       validation.emailBlank
                     }
                     helperText={
-                      //   (validation.emailInUse && "Note: email taken") ||
-                      //   (validation.emailRepeated &&
-                      //     "Error: duplicate email in form") ||
+                      (validation.emailInUse && "Note: email taken") ||
+                      (validation.emailRepeated &&
+                        "Error: duplicate email in form") ||
                       validation.emailBlank && "Error: email cannot be blank"
                     }
                   />
@@ -169,14 +169,16 @@ const UserAddForm = ({
                     variant="outlined"
                     required
                     error={
-                      validation.numberInvalid || validation.numberRepeated
+                      validation.numberInvalid || validation.numberRepeated || validation.numberInUse
                     }
                     helperText={
                       validation.numberRepeated 
                         ? "Error: duplicate number in form"
-                        : validation.numberInvalid
-                          ? `Error: ${validation.numberErrorMessage || "invalid phone number"}`
-                          : ""
+                        : validation.numberInUse
+                          ? "Error: number taken"
+                          : validation.numberInvalid
+                            ? `Error: ${validation.numberErrorMessage || "invalid phone number"}`
+                            : ""
                     }
                     
                   />
