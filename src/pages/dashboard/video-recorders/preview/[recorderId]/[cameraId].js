@@ -170,7 +170,7 @@ const VideoCameraDetails = () => {
 
   const login_sdk = async function (handle, { ip, port, username, password }) {
     return await new Promise((resolve, reject) => {
-      handle.I_Login(ip, 2, port, username, password, {
+      handle.I_Login(ip, 1, port, username, password, {
         success: function (xmlDoc) {
           resolve();
         }, error: function (status, xmlDoc) {
@@ -355,6 +355,7 @@ const VideoCameraDetails = () => {
           bZeroChannel: zero_channel,
           iWSPort: port,
           success: function () {
+            console.log("Preview Started")
             resolve();
           },
           error: function () {
@@ -858,11 +859,11 @@ const VideoCameraDetails = () => {
                   overflow: 'hidden'
                 }}>
                 <div>
-                  <Typography variant="h4">
-                    {videoRecorderInfo ? `${previewMode === 'live' ? 'Live View' : 'Playback'}: 
-    ${videoRecorderInfo.recorderCameras
-                      [parseInt(cameraId) - 1].name}` : " Camera Not Found"}
-                  </Typography>
+                <Typography variant="h4">
+                  {videoRecorderInfo 
+                    ? `${previewMode === 'live' ? 'Live View' : 'Playback'}: ${videoRecorderInfo.recorderCameras[parseInt(cameraId) - 1].name}`
+                    : "Camera Not Found"}
+                </Typography>
                 </div>
               </Grid>
             </Grid>
