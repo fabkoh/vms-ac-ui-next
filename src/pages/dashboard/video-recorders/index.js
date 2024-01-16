@@ -80,7 +80,7 @@ const RecorderList = () => {
 
     const login_sdk = async function (name, { ip, port, username, password }) {
         return await new Promise((resolve, reject) => {
-            name.I_Login(ip, 1, port, username, password, {
+            name.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
                 }, error: function (status, xmlDoc) {
