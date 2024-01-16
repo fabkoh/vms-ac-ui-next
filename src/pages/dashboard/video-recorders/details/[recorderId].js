@@ -88,7 +88,7 @@ const VideoRecorderDetails = () => {
     console.log(ip);
     console.log(port);
     return await new Promise((resolve, reject) => {
-      handle.I_Login(ip, 2, port, username, password, {
+      handle.I_Login(ip, 1, port, username, password, {
         success: function (xmlDoc) {
           resolve();
           console.log("success");

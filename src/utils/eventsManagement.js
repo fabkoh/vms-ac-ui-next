@@ -15,7 +15,7 @@ import { MeetingRoom, SelectAll, WarningAmber } from "@mui/icons-material";
 import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { rrulestr } from "rrule";
 import RenderTableCell from "../components/dashboard/shared/renderTableCell";
-import { rruleDescriptionWithBr } from "./rrule-desc";
+import rruleDescription, { rruleDescriptionWithBr } from "./rrule-desc";
 import { filterByState, isObject, stringIn } from "./utils";
 import {Grid, Tooltip, IconButton} from "@mui/material";
 import { bool } from "prop-types";
