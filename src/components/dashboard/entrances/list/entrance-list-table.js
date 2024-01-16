@@ -62,6 +62,7 @@ export default function EntranceListTable({
                 />
               </TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
               <TableCell>No. of Access Groups</TableCell>
               <TableCell>No. of Schedules</TableCell>
               <TableCell>Controller</TableCell>
@@ -87,6 +88,7 @@ export default function EntranceListTable({
               const {
                 entranceId,
                 entranceName,
+                entranceDesc,
                 accessGroups,
                 isActive,
                 isLocked,
@@ -116,6 +118,11 @@ export default function EntranceListTable({
                         <Typography noWrap>{entranceName}</Typography>
                       </Link>
                     </NextLink>
+                  </TableCell>
+                  <TableCell style={{ maxWidth: '200px' }}> {/* You can adjust the maxWidth value as needed */}
+                    <Typography>
+                          {entranceDesc ? entranceDesc : <WarningChip text="No description" />}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     {Array.isArray(accessGroups) && accessGroups.length > 0 ? (
