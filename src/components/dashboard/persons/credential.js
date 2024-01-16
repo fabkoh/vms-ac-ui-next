@@ -60,6 +60,7 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
     const credentialCheckFailed = validation.credentialCheckFailed[credId] !== undefined;
     const credentialRepeated = validation.credentialRepeatedIds.includes(credId);
 	const credentialUidRepeatedForNotPinTypeCred = validation.credentialUidRepeatedIds.includes(credId);
+    const credentialPinInvalidLength = validation.credentialPinInvalidLengthIds.includes(credId);
 
     return (
         <Grid
@@ -96,21 +97,20 @@ const Credential = ({ onCredTypeChange, credTypes, credential, removeCredential,
                         helperText=' '
                     />
                 </Grid>
-                <Grid
-                    item
-                    md={5}
-                >
+                <Grid item md={5}>
                     <PasswordField
                         fullWidth
-                        required
                         label="Value"
                         handleChange={handleCredUidChange}
                         inputRef={credUidRef}
-                        error={ credentialRepeated || credentialCheckFailed || credentialUidRepeatedForNotPinTypeCred}
+                        error={credentialRepeated || credentialCheckFailed || credentialUidRepeatedForNotPinTypeCred
+                        || credentialPinInvalidLength}
                         helperText={
                             (credentialCheckFailed && "Error: " + validation.credentialCheckFailed[credId]) ||
                             (credentialRepeated && "Error: repeated credential type & value in form") ||
-                            (credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") || ' '
+                            (credentialUidRepeatedForNotPinTypeCred && "Error: credential value for non-pin credentials must be unique") ||
+                            (credentialPinInvalidLength && "Error: pin value has to be between 4 to 6 characters inclusive") ||
+                            ' '
                         }
                     />
                 </Grid>

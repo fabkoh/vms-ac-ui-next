@@ -491,6 +491,12 @@ const PersonList = () => {
   // 	setCurrentTab(value);
   // };
 
+  /** 
+   * Handles the query filter
+   * 
+   * @param {Event} event - the event object
+   * @returns {void}
+   */
   const handleQueryChange = (event) => {
     event.preventDefault();
     // onSelect();
@@ -511,6 +517,24 @@ const PersonList = () => {
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
+
+  /** 
+   * Handles the access group filter
+   * 
+   * @param {number} selectedIndex - index of the selected access group in the accessGroupNames array
+  */
+  const handleAccessGroupFilter = (selectedIndex) => {
+    const newFilters = { ...filters };
+  
+    if (selectedIndex === -1) {
+      newFilters.accessGroup = null;
+    } else {
+      const selectedGroupName = accessGroupNames[selectedIndex].name;
+      newFilters.accessGroup = selectedGroupName;
+    }
+
+    setFilters(newFilters);
+  }; 
 
   // Usually query is done on backend with indexing solutions
   const filteredPersons = applyFilter(Persons, filters);
@@ -585,7 +609,6 @@ const PersonList = () => {
   };
 
   useEffect(() => {
-    // console.log(selectedPersons);
   }, [selectedPersons]);
 
   const deletePersons = async (e) => {
@@ -620,21 +643,6 @@ const PersonList = () => {
     }
   }, [selectedPersons]);
 
-  // access group filtering
-  const onSelect = (i) => {
-    const newFilters = { ...filters };
-    const query = newFilters.query;
-    if (i == -1) {
-      newFilters.accessGroup = null;
-    } else {
-      // if (accessGroupNames[i].includes(query)) {
-      //   newFilters.accessGroup = accessGroupNames[i];
-      // }
-    }
-    console.log(newFilters);
-    setFilters(newFilters);
-  };
-
   const getInfo = useCallback(async () => {
     try {
       const res = await Promise.all([
@@ -668,6 +676,15 @@ const PersonList = () => {
             .map((cred) => cred.credUid);
         });
       setPersons(personData);
+
+      // Extract unique access groups
+      const uniqueAccessGroups = Array.from(new Set(personData.map(person => {
+        return person.accessGroup ? 
+              { id: person.accessGroup.accessGroupId, name: person.accessGroup.accessGroupName } : 
+              null;
+      }).filter(ag => ag !== null)));
+
+      setAccessGroupNames(uniqueAccessGroups);
     } catch (e) {
       console.error(e);
       toast.error(e);
@@ -1017,7 +1034,7 @@ const PersonList = () => {
               rowsPerPage={rowsPerPage}
               page={page}
               accessGroupNames={accessGroupNames}
-              onSelect={onSelect}
+              handleAccessGroupFilter={handleAccessGroupFilter}
             />
           </Card>
         </Container>

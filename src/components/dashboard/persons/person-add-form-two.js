@@ -32,6 +32,7 @@ const PersonAddFormTwo = ({
   addCredential,
   removeCredentialFactory,
   credTypes,
+  originalCredTypes,
   onCredTypeChangeFactory,
   onCredUidChangeFactory,
   onCredTTLChangeFactory,
@@ -71,6 +72,8 @@ const PersonAddFormTwo = ({
   // expanding card logic
   const [expanded, setExpanded] = useState(true);
   const onExpandedClick = () => setExpanded(!expanded);
+
+  console.log("originc", originalCredTypes)
 
   return (
     <ErrorCard error={cardError(validation)}>
@@ -208,6 +211,7 @@ const PersonAddFormTwo = ({
           addCredential={addCredential}
           removeCredentialFactory={removeCredentialFactory}
           credTypes={credTypes}
+          originalCredTypes={originalCredTypes}
           onCredTypeChangeFactory={onCredTypeChangeFactory}
           onCredUidChangeFactory={onCredUidChangeFactory}
           onCredTTLChangeFactory={onCredTTLChangeFactory}

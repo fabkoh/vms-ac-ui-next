@@ -8,11 +8,20 @@ import { Add } from "@mui/icons-material";
 import { getCredTypeId, getCredTypeName } from "../../../utils/credential-type";
 import Credential from "./credential";
 
-const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
+const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, originalCredTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
 
     // expanded logic
     const [expanded, setExpanded] = useState(true);
     const onExpandedClick = () => setExpanded(!expanded);
+
+    console.log("original2", originalCredTypes)
+    console.log("credentials", credentials)
+
+    const PIN_CRED_TYPE = { id: 4, name: 'Pin' };
+
+    const hasPinCred = (personCredentials) => {
+        return personCredentials.some(cred => cred.credTypeId === PIN_CRED_TYPE.id);
+    };
 
     return (
         <>
@@ -42,7 +51,8 @@ const CredentialForm = ({ credentials, addCredential, removeCredentialFactory, c
                                     <Credential
                                         key={id}
                                         onCredTypeChange={onCredTypeChangeFactory(id)}
-                                        credTypes={credTypes}
+                                        // Only the cred that is of type Pin will have Pin in its list of credTypes
+                                        credTypes={cred.credTypeId === 4 || !hasPinCred(credentials) ? originalCredTypes : credTypes}
                                         credential={cred}
                                         removeCredential={removeCredentialFactory(id)}
                                         onCredUidChange={onCredUidChangeFactory(id)}

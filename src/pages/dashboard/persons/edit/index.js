@@ -1,4 +1,4 @@
-import { Add, ArrowBack } from "@mui/icons-material";
+import { Add, ArrowBack, Battery3BarSharp } from "@mui/icons-material";
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -57,8 +57,14 @@ const EditPersonsTwo = () => {
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
   const [personEmails, setPersonEmails] = useState([]);
 
-  // credTypes
+  /**
+   * credTypes dynamically stores the allowed credTypes for each person
+   * 
+   * If a person has a PIN credential, then the PIN credential type will be excluded from the credTypes
+   * If a person does not have a PIN credential, then the originalCredTypes will be used to render the dropdown selection
+   */
   const [credTypes, setCredTypes] = useState([]);
+  const [originalCredTypes, setOriginalCredTypes] = useState([]);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
@@ -80,6 +86,7 @@ const EditPersonsTwo = () => {
         return;
       }
       const body = await res.json();
+      setOriginalCredTypes(body);
       setCredTypes(body);
     } catch (e) {
       console.error(e);
@@ -146,6 +153,8 @@ const EditPersonsTwo = () => {
         credentialRepeatedIds: [],
         credentialUidRepeatedIds: [],
         credentialSubmitFailed: {},
+        credentialPinInvalidLengthIds: [],
+        credentialMultiplePins: false,
         numberInvalid: false,
         numberErrorMessage: null,
         // note
@@ -174,6 +183,9 @@ const EditPersonsTwo = () => {
         v.credentialRepeatedIds.length > 0 ||
         v.credentialUidRepeatedIds.length > 0 ||
         Object.keys(v.credentialSubmitFailed).length > 0 ||
+        v.credentialPinInvalidLengthIds.length > 0 ||
+        v.numberInUse ||
+        v.numberRepeated ||
         v.numberInvalid)
     );
   };
@@ -302,7 +314,19 @@ const EditPersonsTwo = () => {
     return false;
   };
 
-  // returns if personsValidation is changed
+  /**
+   * Checks if the value is in use or is a duplicate and updates the validation state accordingly
+   * Currently allows swapping of phone numbers within the same edit form
+   * 
+   * @param {number} id
+   * @param {string} key
+   * @param {string} value
+   * @param {string[]} arrayOfUsedValues
+   * @param {string} inUseKey
+   * @param {string} duplicateKey
+   * @param {string} originalKey
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkDuplicatesAndInUseHelper = (
     id,
     key,
@@ -315,11 +339,14 @@ const EditPersonsTwo = () => {
     let toChange = false;
 
     if (value != "") {
-      // const temp = arrayOfUsedValues.filter(v=>v!=value) //this allows user to set own value again
-      // const inUse = temp.includes(value);                //values can thus be swapped which shouldnt be allowed.
       const inUse = arrayOfUsedValues.includes(value);
       const personValidation = personsValidation.find((p) => p.personId == id);
-      if (inUse != personValidation[inUseKey]) {
+      const personInfo = personsInfo.find((p) => p.personId == id);
+
+      console.log(value);
+      
+      // second condition prevents user from not being able to change back to original value
+      if (inUse != personValidation[inUseKey] && personInfo.personMobileNumber != value) {
         personValidation[inUseKey] = inUse;
         toChange = true;
       }
@@ -381,7 +408,13 @@ const EditPersonsTwo = () => {
     return false; // No change
   };
 
-  // returns if validArr is changed
+  /** 
+   * Checks for duplicates in credentials based on a combination of credTypeId and credUid for each person.
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkCredRepeatedHelper = (infoArr, validArr) => {
     let toChange = false;
 
@@ -428,7 +461,13 @@ const EditPersonsTwo = () => {
     return toChange;
   };
 
-  // to check if same credUid for not pin is being repeated
+  /**
+   * Checks for duplicates of credential UIDs (credUid) across all persons
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
   const checkCredUidRepeatedForNotPinTypeCred = (infoArr, validArr) => {
     let toChange = false;
 
@@ -456,6 +495,41 @@ const EditPersonsTwo = () => {
       ) {
         toChange = true;
         validArr[i].credentialUidRepeatedIds = repeatedCredUidCredIds;
+      }
+    });
+
+    return toChange;
+  };
+
+  /**
+   * Checks if there is only one valid (4-6 digits) PIN per person and updates the validation state accordingly
+   * 
+   * @param {object[]} infoArr
+   * @param {object[]} validArr
+   * @returns {boolean} true if the validation state is changed, false otherwise
+   */
+  const checkPinCredValidity = (infoArr, validArr) => {
+    const pinTypeId = 4; // 4 is the ID for PIN type credentials
+    let toChange = false;
+
+    infoArr.forEach((person, i) => {
+      const pinCreds = person.credentials.filter(cred => cred.credTypeId === pinTypeId);
+
+      // Collect IDs of PIN credentials with invalid length
+      const invalidPinCredIds = pinCreds
+        .filter(cred => cred.credUid.length < 4 || cred.credUid.length > 6)
+        .map(cred => cred.credId);
+
+      // Check if there are any invalid PIN credentials
+      if (invalidPinCredIds.length > 0) {
+        validArr[i].credentialPinInvalidLengthIds = invalidPinCredIds;
+        toChange = true;
+      } else {
+        // Reset the state if previously marked as invalid
+        if (validArr[i].credentialPinInvalidLengthIds && validArr[i].credentialPinInvalidLengthIds.length > 0) {
+          validArr[i].credentialPinInvalidLengthIds = [];
+          toChange = true;
+        }
       }
     });
 
@@ -500,8 +574,6 @@ const EditPersonsTwo = () => {
 
   const onPersonMobileNumberChangeFactory = (id) => (ref) => {
     changeTextField("personMobileNumber", id, ref);
-    console.log(ref.current?.value);
-    console.log(typeof ref.current?.value);
     const b1 = checkDuplicatesAndInUseHelper(
       id,
       "personMobileNumber",
@@ -523,27 +595,50 @@ const EditPersonsTwo = () => {
     }
   };
 
+  const PIN_CRED_TYPE = { id: 4, name: 'Pin' };
+
+  const hasPinCred = (personCredentials) => {
+    return personCredentials.some(cred => cred.credTypeId === PIN_CRED_TYPE.id);
+  };
+
+  /**
+   * Updates the credential validity state and credTypes when credType changes
+   * 
+   * @param {number} personId
+   * @param {number} credId
+   * @returns {function} event handler
+   */
   const onCredTypeChangeFactory = (personId) => (credId) => (e) => {
     const newInfo = [...personsInfo];
-    newInfo
-      .find((p) => p.personId == personId)
-      .credentials.find((cred) => cred.credId == credId).credTypeId =
-      e.target.value;
-    // console.log("credtypechange",newInfo.find(p => p.personId == personId).credentials.find(cred => cred.credId == credId))
-    setPersonsInfo(newInfo);
-    const newValidations = [...personsValidation];
+    const person = newInfo.find(p => p.personId === personId);
+    const cred = person.credentials.find(cred => cred.credId === credId);
 
+    cred.credTypeId = e.target.value;
+
+    // Update credTypes based on the existence of a pin cred
+    const hasPin = hasPinCred(person.credentials);
+    if (hasPin) {
+        // Exclude pin type if a pin cred already exists
+        setCredTypes(credTypes.filter(credType => credType.credTypeId !== PIN_CRED_TYPE.id));
+    } else {
+        // Include pin type if no pin cred exists
+        setCredTypes(originalCredTypes);
+    }
+
+    setPersonsInfo(newInfo);
+
+    // Reset and update validations
+    const newValidations = [...personsValidation];
     newInfo.forEach((person, i) => {
-      newValidations[i].credentialSubmitFailed = {};
+        newValidations[i].credentialSubmitFailed = {};
     });
-    setPersonsValidation(newValidations);
+
     const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
-    const b2 = checkCredUidRepeatedForNotPinTypeCred(
-      newInfo,
-      personsValidation
-    );
-    if (b1 || b2) {
-      setPersonsValidation([...personsValidation]);
+    const b2 = checkCredUidRepeatedForNotPinTypeCred(newInfo, personsValidation);
+    const b3 = checkPinCredValidity(newInfo, personsValidation);
+
+    if (b1 || b2 || b3) {
+        setPersonsValidation([...personsValidation]);
     }
   };
 
@@ -563,11 +658,9 @@ const EditPersonsTwo = () => {
     setPersonsValidation(newValidations);
 
     const b1 = checkCredRepeatedHelper(personsInfo, personsValidation);
-    const b2 = checkCredUidRepeatedForNotPinTypeCred(
-      personsInfo,
-      personsValidation
-    );
-    if (b1 || b2) {
+    const b2 = checkCredUidRepeatedForNotPinTypeCred(personsInfo, personsValidation);
+    const b3 = checkPinCredValidity(personsInfo, personsValidation);
+    if (b1 || b2 || b3) {
       setPersonsValidation([...personsValidation]);
     }
   };
@@ -793,7 +886,9 @@ const EditPersonsTwo = () => {
                         cardError={cardError}
                         addCredential={addCredentialFactory(id)}
                         removeCredentialFactory={removeCredentialFactory(id)}
+                        // To differentiate the credential entry that has Pin from the others
                         credTypes={credTypes}
+                        originalCredTypes={originalCredTypes}
                         onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
                         onCredUidChangeFactory={onCredUidChangeFactory(id)}
                         onCredTTLChangeFactory={onCredTTLChangeFactory(id)}
