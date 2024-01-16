@@ -8,11 +8,13 @@ import { Add } from "@mui/icons-material";
 import { getCredTypeId, getCredTypeName } from "../../../utils/credential-type";
 import CredentialEdit from "./credential-edit";
 
-const CredentialEditForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
+const CredentialEditForm = ({ credentials, addCredential, removeCredentialFactory, credTypes, originalCredTypes, onCredTypeChangeFactory, onCredUidChangeFactory, onCredTTLChangeFactory, onCredValidChangeFactory, onCredPermChangeFactory, validation }) => {
 
     // expanded logic
     const [expanded, setExpanded] = useState(true);
     const onExpandedClick = () => setExpanded(!expanded);
+
+    console.log("original 3", originalCredTypes)
 
     return (
         <>
@@ -37,14 +39,14 @@ const CredentialEditForm = ({ credentials, addCredential, removeCredentialFactor
                     >
                         {
                             credentials.map(cred => {
-                                // console.log("credentials",credentials)
                                 const id = cred.credId;
-                                // const credUidRef= useRef(cred.credUid)
+                                console.log("cred deep", cred.credTypeId);
+                                console.log("original", originalCredTypes);
                                 return (
                                     <CredentialEdit
                                         key={id}
                                         onCredTypeChange={onCredTypeChangeFactory(id)}
-                                        credTypes={credTypes}
+                                        credTypes={cred.credTypeId === 4 ? originalCredTypes : credTypes}
                                         // credUidRef={credUidRef}
                                         credential={cred}
                                         removeCredential={removeCredentialFactory(id)}
