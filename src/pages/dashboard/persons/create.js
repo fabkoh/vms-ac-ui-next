@@ -98,7 +98,14 @@ const CreatePersonsTwo = () => {
   // info for checking
   const [personUids, setPersonUids] = useState([]);
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
-  const [personEmails, setPersonEmails] = useState([]);
+  const [personEmails, setPersonEmails] = useState([]); 
+
+  useEffect(() => {
+    console.log("personsMobileNumbers", personMobileNumbers);
+    console.log("personEmails", personEmails);
+    console.log("accessGroups", accessGroups);
+    console.log("personsInfo", personsInfo);
+  }, [personMobileNumbers, personEmails, accessGroups, personsInfo]);
 
   /**
    * credTypes dynamically stores the allowed credTypes for each person

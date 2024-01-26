@@ -30,7 +30,7 @@ const stringFilterHelper = (person, query) => {
 
   const matchesName = stringIn(query, getPersonName(person));
   const matchesUid = stringIn(query, person.personUid);
-  const matchesMobileNumber = stringIn(queryWithoutHyphens, person.personMobileNumber.replace(/-/g, ''));
+  const matchesMobileNumber = person.personMobileNumber && stringIn(queryWithoutHyphens, person.personMobileNumber.replace(/-/g, ''));
   const matchesAccessGroup = person.accessGroup && stringIn(query, person.accessGroup.accessGroupName);
   const matchesEmail = stringIn(query, person.personEmail);
 
