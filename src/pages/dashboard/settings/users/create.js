@@ -47,6 +47,7 @@ const getNewPersonValidation = (id) => ({
   numberInvalid: false,
   numberErrorMessage: null,
   passwordNameCharCheck: false,
+  numberBlank: false,
   emailBlank: false,
   roleBlank: false,
   // note
@@ -62,6 +63,7 @@ const cardError = (v) => {
     (v.firstNameCharCheck ||
       v.lastNameCharCheck ||
       v.emailBlank ||
+      v.numberBlank ||
       v.passwordNameCharCheck ||
       v.roleBlank ||
       v.numberInUse ||
@@ -160,6 +162,11 @@ const CreatePersonsTwo = () => {
   const blankCheckHelper = (id, key, value, validArr) => {
     let isBlank = typeof value === "string" && /^\s*$/.test(value);
 
+    if (key === "numberBlank") {
+      isBlank = isBlank || value === "+" || value === "+65";
+    }
+    console.log(isBlank, key)
+
     // only update if different
     const personValidation = validArr.find((p) => p.personId === id);
     if (isObject(personValidation) && personValidation[key] != isBlank) {
@@ -232,17 +239,6 @@ const CreatePersonsTwo = () => {
     const personValidation = validArr.find((p) => p.personId === personId);
     if (!isObject(personValidation)) {
         return false;
-    }
-
-    // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
-    // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
-    if (number === '+' || number === '+65') {
-      if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
-          personValidation[key] = false; // Mark as valid
-          personValidation.numberErrorMessage = null; // Clear any existing error message
-          return true; // Indicates a change in the validation state
-      }
-      return false; // No change needed
     }
 
     const { isValid, errorMessage } = validatePhoneNumber(number);
@@ -355,8 +351,14 @@ const CreatePersonsTwo = () => {
       "numberInUse",
       personsValidation
     );
+    const b4 = blankCheckHelper(
+      id,
+      "numberBlank",
+      ref.current?.value,
+      personsValidation
+    );
 
-    if (b1 || b2 || b3) {
+    if (b1 || b2 || b3 || b4) {
       setPersonsValidation([...personsValidation]);
     }
   };
@@ -440,12 +442,23 @@ const CreatePersonsTwo = () => {
       }
     };
 
+    const checkBlankNumber = () => {
+      // check if all fields are filled
+      const blankCheck = personsValidation.every((v) => !v.numberBlank);
+      console.log(blankCheck, "blankCheck")
+      if (blankCheck) {
+        throw new Error("Please fill in your mobile number");
+      }
+    }
+
     const submitForm = async (e) => {
       e.preventDefault();
       setDisableSubmit(true);
 
       // send res
       try {
+        checkBlankNumber();
+
         const boolArr = await Promise.all(
           personsInfo.map((p) => createPerson(p))
         );
@@ -466,9 +479,13 @@ const CreatePersonsTwo = () => {
           // all success
           router.replace(usersManagementLink);
         }
-      } catch (e) {
-        console.log("error", e);
-        toast.error("Unable to submit form");
+      } catch (error) {
+        if (error.message === "Please fill in your mobile number") {
+          toast.error(error.message);
+        } else {
+          console.log("error", error);
+          toast.error("Unable to submit form");
+        }
       }
       setDisableSubmit(false);
     };
