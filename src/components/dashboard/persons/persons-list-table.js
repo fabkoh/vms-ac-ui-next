@@ -176,6 +176,7 @@ export const PersonsListTable = (props) => {
                         display: "flex",
                       }}
                     >
+                      {/* Require an upload image function
                       <Avatar
                         src={person.avatar}
                         sx={{
@@ -185,7 +186,7 @@ export const PersonsListTable = (props) => {
                       >
                         {getInitials(person.personFirstName) +
                           getInitials(person.personLastName)}
-                      </Avatar>
+                      </Avatar> */}
                       <Box sx={{ ml: 1, width: 100 }}>
                         <NextLink href={getPersonDetailsLink(person)} passHref>
                           <Link color="inherit" variant="subtitle2">

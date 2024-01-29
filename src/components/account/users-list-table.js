@@ -113,7 +113,7 @@ export const UsersListTable = (props) => {
 												display: "flex",
 											}}
 										>
-											<Avatar
+											{/* <Avatar
 												src={person.avatar}
 												sx={{
 													height: 42,
@@ -121,7 +121,7 @@ export const UsersListTable = (props) => {
 												}}
 											>
 												{getInitials(person.firstName) + getInitials(person.lastName)}
-											</Avatar>
+											</Avatar> */}
 											<Box sx={{ ml: 2}}>
 												<Typography noWrap>
 													{person.firstName} {person.lastName}
