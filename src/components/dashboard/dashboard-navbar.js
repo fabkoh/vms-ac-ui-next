@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Menu as MenuIcon } from '../../icons/menu';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { AccountPopover } from './account-popover';
 import { ContactsPopover } from './contacts-popover';
 import { ContentSearchDialog } from './content-search-dialog';
@@ -22,6 +23,7 @@ import { Bell as BellIcon } from '../../icons/bell';
 import { UserCircle as UserCircleIcon } from '../../icons/user-circle';
 import { Search as SearchIcon } from '../../icons/search';
 import { Users as UsersIcon } from '../../icons/users';
+import { AccountCircle } from '@mui/icons-material';
 
 const languages = {
   en: '/static/icons/uk_flag.svg',
@@ -225,7 +227,10 @@ const AccountButton = () => {
           ml: 2
         }}
       >
-        <Avatar
+        <AccountCircleIcon
+          color="primary"
+        />
+        {/* <Avatar
           sx={{
             height: 40,
             width: 40
@@ -233,7 +238,7 @@ const AccountButton = () => {
           src={user.avatar}
         >
           <UserCircleIcon fontSize="small" />
-        </Avatar>
+        </Avatar> */}
       </Box>
       <AccountPopover
         anchorEl={anchorRef.current}
