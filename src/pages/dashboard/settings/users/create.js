@@ -163,12 +163,12 @@ const CreatePersonsTwo = () => {
     let isBlank = typeof value === "string" && /^\s*$/.test(value);
 
     if (key === "numberBlank") {
-      isBlank = isBlank || value === "+" || value === "+65";
+      isBlank = (isBlank || value === "+" || value === "+65");
     }
-    console.log(isBlank, key)
 
     // only update if different
     const personValidation = validArr.find((p) => p.personId === id);
+
     if (isObject(personValidation) && personValidation[key] != isBlank) {
       personValidation[key] = isBlank; // modifies validArr, remember to setState after calling this function
       return true;
@@ -444,9 +444,9 @@ const CreatePersonsTwo = () => {
 
     const checkBlankNumber = () => {
       // check if all fields are filled
-      const blankCheck = personsValidation.every((v) => !v.numberBlank);
-      console.log(blankCheck, "blankCheck")
-      if (blankCheck) {
+      const noBlanks = personsValidation.every((v) => !v.numberBlank);
+
+      if (!noBlanks) {
         throw new Error("Please fill in your mobile number");
       }
     }
