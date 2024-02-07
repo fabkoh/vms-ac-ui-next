@@ -90,6 +90,10 @@ const EventsManagementList = () => {
 
       if (eventManagements.status == 200) {
         const body = await eventManagements.json();
+
+        // Sort by descending order of id to get the latest events management entry first
+        body.sort((a, b) => b.eventsManagementId - a.eventsManagementId);
+
         if (isMounted()) {
           setEventsManagement(body);
           console.log(body);
