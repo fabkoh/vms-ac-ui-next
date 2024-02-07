@@ -69,7 +69,6 @@ export const UsersList = () => {
   const fileReader = new FileReader();
 
   const createPerson = async (person) => {
-    // console.log(person);
     const userSettings = {
       firstName: person.personFirstName,
       lastName: person.personLastName,
@@ -80,7 +79,6 @@ export const UsersList = () => {
     };
     try {
       const res = await authSignUp(userSettings);
-      // console.log(res)
       if (res.type != "success") {
         throw new Error("Unable to register User");
       }
@@ -254,6 +252,10 @@ export const UsersList = () => {
             newList.push(user);
           }
         }
+
+        // Sort by descending order of id to get the latest users first
+        newList.sort((a, b) => b.id - a.id);
+
         setPersons(newList);
       } else {
         if (res.status == serverDownCode) {
