@@ -275,6 +275,7 @@ const AccessGroupList = () => {
   //query filter
   const handleQueryChange = (event) => {
     event.preventDefault();
+    setPage(0);
     setFilters((prevState) => ({
       ...prevState,
       query: queryRef.current?.value,

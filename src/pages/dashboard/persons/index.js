@@ -499,7 +499,7 @@ const PersonList = () => {
    */
   const handleQueryChange = (event) => {
     event.preventDefault();
-    // onSelect();
+    setPage(0);
     setFilters((prevState) => ({
       ...prevState,
       query: queryRef.current?.value,
