@@ -218,11 +218,11 @@ const NotificationSettings = () => {
     getSMSEnablementStatus();
     getEmailSettings();
     getSMSSettings();
+    getSMSCredits();
   }, [isMounted]);
 
   useEffect(() => {
     getInfo();
-    getSMSCredits();
   }, []);
 
   const onUsernameChange = (e) => {
@@ -362,9 +362,15 @@ const NotificationSettings = () => {
       }
     } catch {
       toast.error("Unable to test SMS settings");
-    } finally {
-      getSMSCredits();
-    }
+    }  finally {
+      // Attempt to get SMS credits, with error handling
+      try {
+        await getSMSCredits();
+      } catch (error) {
+        console.error("Error getting SMS credits:", error);
+        // Optionally, inform the user that fetching SMS credits failed
+        toast.error("Failed to retrieve SMS credits.");
+      }}
     setDisableSubmit(false);
   };
 
