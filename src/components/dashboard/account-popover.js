@@ -61,13 +61,7 @@ export const AccountPopover = (props) => {
           display: "flex",
         }}
       >
-        <Avatar
-          src={user.avatar}
-          sx={{
-            height: 40,
-            width: 40,
-          }}
-        >
+        <Avatar>
           <UserCircleIcon fontSize="small" />
         </Avatar>
         <Box
