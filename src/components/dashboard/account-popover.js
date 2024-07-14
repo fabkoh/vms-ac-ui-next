@@ -16,18 +16,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../hooks/use-auth";
 import { Cog as CogIcon } from "../../icons/cog";
 import { UserCircle as UserCircleIcon } from "../../icons/user-circle";
-import { SwitchHorizontalOutlined as SwitchHorizontalOutlinedIcon } from "../../icons/switch-horizontal-outlined";
+import { useEffect } from "react";
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open, ...other } = props;
   const router = useRouter();
-  const { logout } = useAuth();
-  // To get the user from the authContext, you can use
-  // `const { user } = useAuth();`
-  const user = {
-    avatar: "/static/mock-images/avatars/avatar-anika_visser.png",
-    name: "ISS ADMIN",
-  };
+  const { logout, user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -39,6 +33,11 @@ export const AccountPopover = (props) => {
       toast.error("Unable to logout.");
     }
   };
+
+  useEffect(() => {
+    console.log("user", user);
+  }
+  , [user]);
 
   return (
     <Popover
