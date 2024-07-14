@@ -68,9 +68,9 @@ export const AccountPopover = (props) => {
             ml: 1,
           }}
         >
-          <Typography variant="body1">{user.name}</Typography>
+          <Typography variant="body1">{user.firstName} {user.lastName}</Typography>
           <Typography color="textSecondary" variant="body2">
-            {user.name}
+            {user.username}
           </Typography>
         </Box>
       </Box>
