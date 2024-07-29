@@ -6,10 +6,6 @@ import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import BasicDetailsCard from "../../shared/basic-details-card";
 import { useEffect, useState } from "react";
-import NextLink from "next/link";
-import numeral from "numeral";
-import PropTypes from "prop-types";
-import router from 'next/router';
 import {
 	Avatar,
 	Box,
@@ -29,18 +25,15 @@ import {
 	Typography,
 } from "@mui/material";
 import { ArrowRight as ArrowRightIcon } from "../../../../icons/arrow-right";
-import { PencilAlt as PencilAltIcon } from "../../../../icons/pencil-alt";
-import { getInitials } from "../../../../utils/get-initials";
 import { Scrollbar } from "../../../scrollbar";
-import { Buttons1 } from "../../../widgets/buttons/buttons-1";
-import { Buttons2 } from "../../../widgets/buttons/buttons-2";
-import { Buttons3 } from "../../../widgets/buttons/buttons-3";
-import { Buttonfilter } from "../../../widgets/buttons/buttonfilter";
-import WarningIcon from "@mui/icons-material/Warning";
-import { useRouter } from "next/router";
-import { width } from "@mui/system";
+
 
 export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
+	useEffect(() => {
+		console.log("cameras", cameras);
+		console.log(cameras.map((camera) => console.log(camera)));
+	  }, [cameras]);
+
     return(
         <BasicDetailsCard
         	title =  {(recorder && "cameras" in recorder) 
