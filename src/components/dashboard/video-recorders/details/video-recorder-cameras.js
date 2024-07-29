@@ -112,8 +112,8 @@ export const VideoRecorderCameras = ({recorderId,recorder, cameras = []}) => {
 											{camera.ip}
 										</Typography>
 									</TableCell>
-									<TableCell width="20%">-</TableCell>
-									<TableCell width="20%">-</TableCell>
+									<TableCell width="20%">{camera.model}</TableCell>
+									<TableCell width="20%">{camera.serial_number}</TableCell>
 									<TableCell width="20%">
 										{ camera.online ? (
 											<SeverityPill color="success" style={{color: 'transparent'}}>_.</SeverityPill> 

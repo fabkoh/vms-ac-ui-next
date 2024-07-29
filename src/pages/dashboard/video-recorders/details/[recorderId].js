@@ -193,66 +193,73 @@ const VideoRecorderDetails = () => {
 
   const getVideoRecorder = async (recorderId) => {
     try {
-      Promise.resolve(videoRecorderApi.getRecorder(recorderId)).then(
-        async (res) => {
-          if (res.status == 200) {
-            const data = await res.json();
-
-            setVideoRecorderInfo(data);
-            if (!loadedSDK) {
-              const sdk_handle = await get_sdk_handle();
-              setSDKHandle(sdk_handle);
-
-              await attach_sdk(sdk_handle);
-
-              const login = await login_sdk(sdk_handle, {
-                ip: data.recorderPrivateIp,
-                port: data.recorderPortNumber,
-                username: data.recorderUsername,
-                password: data.recorderPassword,
-              });
-
-              const device_info = await get_device_info(sdk_handle, {
-                ip: data.recorderPrivateIp,
-              });
-
-              console.log(device_info)
-
-              for (const key of Object.keys(device_info)) {
-                data[key] = device_info[key];
-              }
-
-              const analogue_channels = await get_analogue_channels(
-                sdk_handle,
-                {
-                  ip: data.recorderPrivateIp,
-                }
-              );
-
-              const digital_channels = await get_digital_channels(sdk_handle, {
-                ip: data.recorderPrivateIp,
-              });
-
-              data.cameras = digital_channels;
-              data.recorderSerialNumber = device_info["serial_number"];
-              videoRecorderApi.updateRecorder(data);
-
-              setVideoRecorderInfo({ ...data });
-
-              setLoadedSDK(true);
-            }
-
-            //setControllerInfo(data)
-          } else {
-            if (res.status == serverDownCode) {
-              setServerDownOpen(true);
-            }
-            toast.error("Video Recorder info not found");
-            //router.replace(getControllerListLink())
+      Promise.resolve(videoRecorderApi.getRecorder(recorderId)).then(async (res) => {
+        if (res.status === 200) {
+          const data = await res.json();
+          setVideoRecorderInfo(data);
+    
+          if (!loadedSDK) {
+            const sdk_handle = await get_sdk_handle();
+            setSDKHandle(sdk_handle);
+    
+            await attach_sdk(sdk_handle);
+    
+            await login_sdk(sdk_handle, {
+              ip: data.recorderPrivateIp,
+              port: data.recorderPortNumber,
+              username: data.recorderUsername,
+              password: data.recorderPassword,
+            });
+    
+            // To get NVR information
+            const device_info = await get_device_info(sdk_handle, {
+              ip: data.recorderPrivateIp,
+            });
+    
+            console.log(device_info);
+    
+            // Update recorder info
+            const updatedData = { ...data, ...device_info };
+    
+            const analogue_channels = await get_analogue_channels(sdk_handle, {
+              ip: data.recorderPrivateIp,
+            });
+    
+            const digital_channels = await get_digital_channels(sdk_handle, {
+              ip: data.recorderPrivateIp,
+            });
+    
+            updatedData.cameras = digital_channels;
+    
+            // To get individual camera information
+            const camerasWithInfo = await Promise.all(
+              updatedData.cameras.map(async (camera) => {
+                const camera_info = await get_device_info(sdk_handle, {
+                  ip: camera.ip,
+                });
+                return { ...camera, ...camera_info };
+              })
+            );
+    
+            updatedData.cameras = camerasWithInfo;
+            updatedData.recorderSerialNumber = device_info["serial_number"];
+    
+            await videoRecorderApi.updateRecorder(updatedData);
+    
+            setVideoRecorderInfo(updatedData);
+            setLoadedSDK(true);
           }
+        } else {
+          if (res.status === serverDownCode) {
+            setServerDownOpen(true);
+          }
+          toast.error("Video Recorder info not found");
+          // router.replace(getControllerListLink())
         }
-      );
-    } catch (err) {}
+      });
+    } catch (err) {
+      console.error(err);
+    }    
   };
 
   const getInfo = useCallback(async () => {
@@ -433,6 +440,7 @@ const VideoRecorderDetails = () => {
                   recorderId={recorderId}
                   recorder={videoRecorderInfo}
                   cameras={videoRecorderInfo?.cameras}
+                  cameraDetails=
                 />
               </Grid>
             </Grid>
