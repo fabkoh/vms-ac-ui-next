@@ -440,7 +440,6 @@ const VideoRecorderDetails = () => {
                   recorderId={recorderId}
                   recorder={videoRecorderInfo}
                   cameras={videoRecorderInfo?.cameras}
-                  cameraDetails=
                 />
               </Grid>
             </Grid>
