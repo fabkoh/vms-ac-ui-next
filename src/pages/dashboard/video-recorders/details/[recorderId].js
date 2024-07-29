@@ -197,7 +197,7 @@ const VideoRecorderDetails = () => {
         async (res) => {
           if (res.status == 200) {
             const data = await res.json();
-            // console.log(data);
+
             setVideoRecorderInfo(data);
             if (!loadedSDK) {
               const sdk_handle = await get_sdk_handle();
@@ -215,6 +215,8 @@ const VideoRecorderDetails = () => {
               const device_info = await get_device_info(sdk_handle, {
                 ip: data.recorderPrivateIp,
               });
+
+              console.log(device_info)
 
               for (const key of Object.keys(device_info)) {
                 data[key] = device_info[key];
