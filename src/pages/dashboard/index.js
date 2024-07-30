@@ -16,9 +16,8 @@ import {
 import { AuthGuard } from '../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../components/dashboard/dashboard-layout';
 import { OverviewBanner } from '../../components/dashboard/overview/overview-banner';
-import { NotificationImportantOutlined, VideogameAsset } from '@mui/icons-material';
+import { NotificationImportantOutlined } from '@mui/icons-material';
 import { gtm } from '../../lib/gtm';
-import useExternalScripts from '../../__fake-api__/config';
 import ComponentList from './dashboard-components/list-of-components';
 import ControllerDeviceCondition from './dashboard-components/controller-device-condition';
 import VideoRecorderDeviceCondition from './dashboard-components/video-recorder-device-condition';
