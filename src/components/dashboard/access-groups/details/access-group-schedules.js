@@ -69,6 +69,8 @@ export default function AccessGroupSchedules({
       activeStates[schedule.accessGroupScheduleId] = schedule.isActive;
     });
     setScheduleActiveStates(activeStates);
+
+	// This will also run when deleteSchedules is called as accessGroupToEntranceScheduleMap changes
 	setAccessGroupToEntranceSchedules(accessGroupToEntranceScheduleMap);
   }, [accessGroupToEntranceScheduleMap]);
 
