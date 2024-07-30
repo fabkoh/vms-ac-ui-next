@@ -69,6 +69,7 @@ export default function AccessGroupSchedules({
       activeStates[schedule.accessGroupScheduleId] = schedule.isActive;
     });
     setScheduleActiveStates(activeStates);
+	setAccessGroupToEntranceSchedules(accessGroupToEntranceScheduleMap);
   }, [accessGroupToEntranceScheduleMap]);
 
   // schedule actions
