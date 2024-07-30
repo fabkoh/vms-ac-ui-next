@@ -220,6 +220,8 @@ const VideoRecorderDetails = () => {
     
             // Update recorder info
             const updatedData = { ...data, ...device_info };
+
+            console.log('updatedData before', updatedData);
     
             const analogue_channels = await get_analogue_channels(sdk_handle, {
               ip: data.recorderPrivateIp,
@@ -234,14 +236,19 @@ const VideoRecorderDetails = () => {
             // To get individual camera information
             const camerasWithInfo = await Promise.all(
               updatedData.cameras.map(async (camera) => {
+                console.log('camera', camera);
                 const camera_info = await get_device_info(sdk_handle, {
                   ip: camera.ip,
                 });
                 return { ...camera, ...camera_info };
               })
             );
+
+            console.log('camerasWithInfo', camerasWithInfo)
     
             updatedData.cameras = camerasWithInfo;
+
+            console.log('updatedData', updatedData);
             updatedData.recorderSerialNumber = device_info["serial_number"];
     
             await videoRecorderApi.updateRecorder(updatedData);
