@@ -1,5 +1,5 @@
 import { ArrowBack, } from "@mui/icons-material";
-import { Box, Button, containerClasses, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
@@ -21,11 +21,12 @@ import {
   saveCredentialApi,
   getCredentialWherePersonIdApi,
 } from "../../../../api/credentials";
-import { getCredTypesApi } from "../../../../api/credential-types";
+
 import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { validatePhoneNumber } from "../../../../utils/utils";
+import useCredentialTypes from "../../../../hooks/use-credential-types";
 
 // const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
@@ -39,8 +40,13 @@ const getNewCredential = (id) => ({
 });
 
 const EditPersonsTwo = () => {
+  const [serverDownOpen, setServerDownOpen] = useState(false);
+
   const router = useRouter();
-  const ids = JSON.parse(decodeURIComponent(router.query.ids));
+  const personIds = JSON.parse(decodeURIComponent(router.query.ids));
+
+  // Dynamically adjust credType options to user
+  const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
 
   // stores list of person objects
   const [personsInfo, setPersonsInfo] = useState([]);
@@ -54,42 +60,8 @@ const EditPersonsTwo = () => {
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
   const [personEmails, setPersonEmails] = useState([]);
 
-  /**
-   * credTypes dynamically stores the allowed credTypes for each person
-   * 
-   * If a person has a PIN credential, then the PIN credential type will be excluded from the credTypes
-   * If a person does not have a PIN credential, then the originalCredTypes will be used to render the dropdown selection
-   */
-  const [credTypes, setCredTypes] = useState([]);
-  const [originalCredTypes, setOriginalCredTypes] = useState([]);
-
-  const [serverDownOpen, setServerDownOpen] = useState(false);
-
   // get info
   const isMounted = useMounted();
-  useEffect(() => {
-    console.log("personsinfo", personsInfo);
-  }, [personsInfo]);
-
-  const getCredTypes = async () => {
-    try {
-      const res = await getCredTypesApi();
-      if (res.status != 200) {
-        toast.error("Error loading credential types");
-        setCredTypes([]);
-        if (res.status == serverDownCode) {
-          setServerDownOpen(true);
-        }
-        return;
-      }
-      const body = await res.json();
-      setOriginalCredTypes(body);
-      setCredTypes(body);
-    } catch (e) {
-      console.error(e);
-      toast.error("Error loading credential types");
-    }
-  };
 
   const getPersonsLocal = async (ids) => {
     const personsInfoArr = [];
@@ -230,10 +202,9 @@ const EditPersonsTwo = () => {
 
   const getInfo = useCallback(() => {
     // put methods here
-    getPersonsLocal(ids);
+    getPersonsLocal(personIds);
     getAccessGroups();
     getPersons();
-    getCredTypes();
   }, [isMounted]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
