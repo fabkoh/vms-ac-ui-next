@@ -14,8 +14,6 @@ const CredentialEditForm = ({ credentials, addCredential, removeCredentialFactor
     const [expanded, setExpanded] = useState(true);
     const onExpandedClick = () => setExpanded(!expanded);
 
-    console.log("original 3", originalCredTypes)
-
     return (
         <>
             <CardHeader
@@ -40,14 +38,11 @@ const CredentialEditForm = ({ credentials, addCredential, removeCredentialFactor
                         {
                             credentials.map(cred => {
                                 const id = cred.credId;
-                                console.log("cred deep", cred.credTypeId);
-                                console.log("original", originalCredTypes);
                                 return (
                                     <CredentialEdit
                                         key={id}
                                         onCredTypeChange={onCredTypeChangeFactory(id)}
                                         credTypes={cred.credTypeId === 4 ? originalCredTypes : credTypes}
-                                        // credUidRef={credUidRef}
                                         credential={cred}
                                         removeCredential={removeCredentialFactory(id)}
                                         onCredUidChange={onCredUidChangeFactory(id)}

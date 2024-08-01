@@ -27,8 +27,8 @@ import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { validatePhoneNumber } from "../../../../utils/utils";
 import useCredentialTypes from "../../../../hooks/use-credential-types";
+import usePersons from "../../../../hooks/use-persons";
 
-// const getNextId = createCounterObject(0);
 const getNextCredId = createNegativeCounterObject(-1);
 const getNewCredential = (id) => ({
   credId: id,
@@ -45,6 +45,9 @@ const EditPersonsTwo = () => {
   const router = useRouter();
   const personIds = JSON.parse(decodeURIComponent(router.query.ids));
 
+  // Check if mounted
+  const isMounted = useMounted();
+
   // Dynamically adjust credType options to user
   const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
 
@@ -59,87 +62,6 @@ const EditPersonsTwo = () => {
   const [personUids, setPersonUids] = useState([]);
   const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
   const [personEmails, setPersonEmails] = useState([]);
-
-  // get info
-  const isMounted = useMounted();
-
-  const getPersonsLocal = async (ids) => {
-    const personsInfoArr = [];
-    const validations = [];
-
-    // map each id to a fetch req for that access group
-    const resArr = await Promise.all(ids.map((id) => personApi.getPerson(id)));
-    const successfulRes = resArr.filter((res) => res.status == 200);
-
-    // no persons to edit
-    if (successfulRes.length == 0) {
-      toast.error("Error editing persons. Please try again");
-      router.replace("/dashboard/persons");
-    }
-
-    // some persons not found
-    if (successfulRes.length != resArr.length) {
-      toast.error("Some persons were not found");
-    }
-
-    const resArr2 = await Promise.all(
-      ids.map((id) => getCredentialWherePersonIdApi(id))
-    );
-    const credArr = await Promise.all(resArr2.map((res) => res.json()));
-    credArr.forEach((creds) => {
-      creds.forEach((cred) => {
-        cred.credTypeId = cred.credType.credTypeId;
-      });
-    });
-    // credArr.forEach(cred =>{ cred.credTypeId=cred.credType.credTypeId})
-    let credArr2 = JSON.parse(JSON.stringify(credArr));
-    const bodyArr = await Promise.all(successfulRes.map((req) => req.json()));
-    bodyArr.forEach((body, i) => {
-      const credIdArr = [];
-      credArr[i].forEach((cred) => credIdArr.push(cred.credId));
-      personsInfoArr.push({
-        personId: bodyArr[i].personId,
-        personFirstName: bodyArr[i].personFirstName,
-        personLastName: bodyArr[i].personLastName,
-        personUid: bodyArr[i].personUid,
-        personMobileNumber: bodyArr[i].personMobileNumber,
-        personEmail: bodyArr[i].personEmail,
-        personOriginalEmail: bodyArr[i].personEmail,
-        personOriginalUid: bodyArr[i].personUid,
-        personOriginalMobileNumber: bodyArr[i].personMobileNumber,
-        accessGroup: bodyArr[i].accessGroup,
-        credentials: credArr[i],
-        originalCreds: credArr2[i],
-      });
-      
-      validations.push({
-        personId: bodyArr[i].personId,
-        firstNameBlank: false,
-        lastNameBlank: false,
-        uidInUse: false,
-        uidRepeated: false,
-        uidBlank: false,
-        credentialRepeatedIds: [],
-        credentialUidRepeatedIds: [],
-        credentialSubmitFailed: {},
-        credentialPinInvalidLengthIds: [],
-        credentialMultiplePins: false,
-        numberInvalid: false,
-        numberErrorMessage: null,
-        // note
-        numberInUse: false,
-        numberRepeated: false,
-        emailInUse: false,
-        emailRepeated: false,
-
-        // submit failed
-        submitFailed: false,
-      });
-    });
-
-    setPersonsValidation(validations);
-    setPersonsInfo(personsInfoArr);
-  };
 
   const cardError = (v) => {
     return (

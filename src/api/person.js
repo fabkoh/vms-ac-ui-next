@@ -1,10 +1,14 @@
-import { useApi, fakePersons, fakeAccessGroups } from "./api-config";
-import axios from "axios";
-import { sendApi } from "./api-helpers";
-import { apiUri } from "./api-config";
-import toast from "react-hot-toast";
+import axios from 'axios';
+import { sendApi } from './api-helpers'; // Assuming sendApi is a utility to send API requests
+import { apiUri } from './api-config'; // Base URI for your API
 
 class PersonApi {
+  /**
+   * Create a new person.
+   * 
+   * @param {Object} person - Person details.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   createPerson({
     personFirstName,
     personLastName,
@@ -13,105 +17,49 @@ class PersonApi {
     personEmail,
     accessGroup,
   }) {
-    personFirstName = personFirstName === "" ? null : personFirstName;
-    personLastName = personLastName === "" ? null : personLastName;
-    personUid = personUid === "" ? null : personUid;
-    personMobileNumber = personMobileNumber === "" ? null : personMobileNumber;
-    personEmail = personEmail === "" ? null : personEmail;
-    accessGroup = accessGroup === "" ? null : accessGroup;
-
-    if (useApi) {
-      return sendApi("/api/person", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          personFirstName,
-          personLastName,
-          personUid,
-          personMobileNumber,
-          personEmail,
-          accessGroup,
-        }),
-      });
-    }
-
-    const newPerson = {
-      personId:
-        fakePersons.map((p) => p.personId).reduce((a, b) => Math.max(a, b), 0) +
-        1,
-      personFirstName,
-      personLastName,
-      // if no uid, generate random uid
-      personUid: personUid || String(Math.floor(Math.random() * 10 ** 8)),
-      personMobileNumber,
-      personEmail,
-      accessGroup: accessGroup && accessGroup.accessGroupId,
+    const payload = {
+      personFirstName: personFirstName || null,
+      personLastName: personLastName || null,
+      personUid: personUid || null,
+      personMobileNumber: personMobileNumber || null,
+      personEmail: personEmail || null,
+      accessGroup: accessGroup || null,
     };
 
-    fakePersons.push(newPerson);
-
-    // did not populate access group as not required
-    return Promise.resolve(
-      new Response(JSON.stringify(newPerson), { status: 201 })
-    );
+    return sendApi('/api/person', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
   }
 
+  /**
+   * Get all persons.
+   * 
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   getPersons() {
-    if (useApi) {
-      return sendApi("/api/persons");
-    }
-
-    const persons = fakePersons.map((p) => {
-      return { ...p };
-    });
-
-    persons.forEach((person) => {
-      if (person.accessGroup) {
-        // populate access group
-        person.accessGroup = {
-          ...fakeAccessGroups.find(
-            (group) => group.accessGroupId == person.accessGroup
-          ),
-        };
-      }
-      return person;
-    });
-    return Promise.resolve(
-      new Response(JSON.stringify(persons), { status: 200 })
-    );
+    return sendApi('/api/persons');
   }
 
+  /**
+   * Get a specific person by ID.
+   * 
+   * @param {number} id - The ID of the person.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   getPerson(id) {
-    if (useApi) {
-      return sendApi(`/api/person/${id}`);
-    }
-
-    const person = { ...fakePersons.find((p) => p.personId == id) };
-
-    if (person) {
-      if (person.accessGroup) {
-        // populate access group
-        person.accessGroup = {
-          ...fakeAccessGroups.find(
-            (group) => group.accessGroupId == person.accessGroup
-          ),
-        };
-      }
-      return Promise.resolve(
-        new Response(JSON.stringify(person), { status: 200 })
-      );
-    }
-
-    return Promise.resolve(
-      new Response(
-        JSON.stringify({ personId: `Person with Id ${id} does not exist` }),
-        { status: 404 }
-      )
-    );
+    return sendApi(`/api/person/${id}`);
   }
 
+  /**
+   * Update an existing person.
+   * 
+   * @param {Object} person - Updated person details.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   updatePerson({
     personId,
     personFirstName,
@@ -121,232 +69,112 @@ class PersonApi {
     personEmail,
     accessGroup,
   }) {
-    personId = personId || null;
-    personFirstName = personFirstName || null;
-    personLastName = personLastName || null;
-    personUid = personUid || null;
-    personMobileNumber = personMobileNumber || null;
-    personEmail = personEmail || null;
-    accessGroup = accessGroup || null;
+    const payload = {
+      personId: personId || null,
+      personFirstName: personFirstName || null,
+      personLastName: personLastName || null,
+      personUid: personUid || null,
+      personMobileNumber: personMobileNumber || null,
+      personEmail: personEmail || null,
+      accessGroup: accessGroup || null,
+    };
 
-    if (useApi) {
-      return sendApi("/api/person", {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          personId,
-          personFirstName,
-          personLastName,
-          personUid,
-          personMobileNumber,
-          personEmail,
-          accessGroup,
-        }),
-      });
-    }
-  }
-
-  deletePerson(id) {
-    if (useApi) {
-      return sendApi(`/api/person/${id}`, { method: "DELETE" });
-    }
-
-    const index = fakePersons.findIndex((person) => person.personId == id);
-    if (index == -1) {
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({ personId: `Person with Id ${id} does not exist` }),
-          { status: 404 }
-        )
-      );
-    }
-
-    fakePersons.splice(index, 1);
-
-    return Promise.resolve(new Response(null, { status: 204 }));
-  }
-
-  uidExists(uid) {
-    //if it exists db
-    if (useApi) {
-      return sendApi(`/api/person/uid/${uid}`);
-    }
-
-    return Promise.resolve(
-      new Response(
-        JSON.stringify(fakePersons.some((person) => person.personUid == uid)),
-        { status: 200 }
-      )
-    );
-  }
-
-  uidInUse(uid, id) {
-    //if it is in use by others
-    if (useApi) {
-      return sendApi(`/api/person/uid/${id}/${uid}`);
-    }
-
-    return Promise.resolve(
-      new Response(
-        JSON.stringify(
-          fakePersons.some(
-            (person) => person.personUid == uid && person.personId != id
-          )
-        ),
-        { status: 200 }
-      )
-    );
-  }
-
-  mobileNumberExists(mobileNumber) {
-    //for create person
-    if (useApi) {
-      return sendApi(`/api/person/mobileNumber/${mobileNumber}`);
-    }
-
-    return Promise.resolve(
-      new Response(
-        JSON.stringify(
-          fakePersons.some(
-            (person) => person.personMobileNumber == mobileNumber
-          )
-        ),
-        { status: 200 }
-      )
-    );
-  }
-
-  emailExists(email) {
-    //for create person
-    if (useApi) {
-      return sendApi(`/api/person/email/${email}`);
-    }
-
-    return Promise.resolve(
-      new Response(
-        JSON.stringify(
-          fakePersons.some((person) => person.personEmail == email)
-        ),
-        { status: 200 }
-      )
-    );
-  }
-
-  postCSV(formData) {
-    // return sendApi(
-    //   "/api/person/importcsv",
-    //   {
-    //     method: "POST",
-    //     body: formData,
-    //   },
-    //   "multipart/form-data"
-    // );
-
-    return axios.post(apiUri + "/api/person/importcsv", formData, {
+    return sendApi('/api/person', {
+      method: 'PUT',
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /**
+   * Delete a person by ID.
+   * 
+   * @param {number} id - The ID of the person to delete.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
+  deletePerson(id) {
+    return sendApi(`/api/person/${id}`, { method: 'DELETE' });
+  }
+
+  /**
+   * Check if a UID exists.
+   * 
+   * @param {string} uid - The UID to check.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
+  uidExists(uid) {
+    return sendApi(`/api/person/uid/${uid}`);
+  }
+
+  /**
+   * Check if a UID is in use by someone other than the specified ID.
+   * 
+   * @param {string} uid - The UID to check.
+   * @param {number} id - The ID to exclude.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
+  uidInUse(uid, id) {
+    return sendApi(`/api/person/uid/${id}/${uid}`);
+  }
+
+  /**
+   * Check if a mobile number exists.
+   * 
+   * @param {string} mobileNumber - The mobile number to check.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
+  mobileNumberExists(mobileNumber) {
+    return sendApi(`/api/person/mobileNumber/${mobileNumber}`);
+  }
+
+  /**
+   * Check if an email exists.
+   * 
+   * @param {string} email - The email to check.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
+  emailExists(email) {
+    return sendApi(`/api/person/email/${email}`);
+  }
+
+  /**
+   * Upload a CSV file for importing persons.
+   * 
+   * @param {FormData} formData - The form data containing the CSV file.
+   * @returns {Promise<AxiosResponse>} - A Promise resolving to the API response.
+   */
+  postCSV(formData) {
+    return axios.post(apiUri + '/api/person/importcsv', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
     });
   }
 
+  /**
+   * Get JSON data from a CSV import.
+   * 
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   getCSVJson() {
-    // if (useApi) {
-    // return sendApi("/api/person/importcsv/json", {
-    //   method: "GET",
-    // });
-    // }
-    if (useApi) {
-      return sendApi("/api/person/importcsv/json", {
-        method: "GET",
-      });
-
-      const persons = fakePersons.map((p) => {
-        return { ...p };
-      });
-
-      persons.forEach((person) => {
-        if (person.accessGroup) {
-          // populate access group
-          person.accessGroup = {
-            ...fakeAccessGroups.find(
-              (group) => group.accessGroupId == person.accessGroup
-            ),
-          };
-        }
-        return person;
-      });
-      return Promise.resolve(
-        new Response(JSON.stringify(persons), { status: 200 })
-      );
-    }
+    return sendApi('/api/person/importcsv/json');
   }
 
+  /**
+   * Upload green data file.
+   * 
+   * @param {File} file - The file to upload.
+   * @returns {Promise<Response>} - A Promise resolving to the API response.
+   */
   postGreenData(file) {
-    if (useApi) {
-      // const dataArray = file.map((obj) => {
-      //   // remove any invalid characters (such as the BOM marker)
-      //   const cleanObj = Object.keys(obj).reduce((acc, key) => {
-      //     const cleanKey = key.replace(/\W/g, "");
-      //     const cleanVal = obj[key];
-      //     return { ...acc, [cleanKey]: cleanVal };
-      //   }, {});
-      //   return cleanObj;
-      // });
-      console.log(file);
-      return sendApi("/api/person/importcsv/greenData", {
-        method: "POST",
-        body: file,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    return sendApi('/api/person/importcsv/greenData', {
+      method: 'POST',
+      body: file,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
-
-  // postGreenData(file) {
-  //   if (useApi) {
-  //     const stringData = file.map((obj) => JSON.stringify(obj)).join(", ");
-  //     // const dataArray = JSON.parse(`[${stringData}]`);
-  //     console.log(stringData);
-  //     return sendApi("/api/person/importcsv/greenData", {
-  //       method: "POST",
-  //       body: stringData,
-  //     });
-  //   }
-  // }
-
-  //   importCSV = async (CSVData) => {
-  //     const formData = new FormData();
-  //     formData.append("file", CSVData, "file.csv");
-  //     try {
-  //       // sendApi doesnt send multipart request
-
-  //       // const boundary =
-  //       //   "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
-  //       // sendApi("/api/person/importcsv", {
-  //       //   method: "POST",
-  //       //   body: formData,
-  //       //   headers: {
-  //       //     "Content-Type": `multipart/form-data; boundary=${boundary}`,
-  //       //   },
-  //       // });
-
-  //       // use axios for now, apiUri is BE address
-
-  //       await axios.post(apiUri + "/api/person/importcsv", formData, {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       });
-
-  //       alert("File uploaded successfully");
-  //     } catch (error) {
-  //       console.error(error);
-  //       alert(
-  //         "Failed to upload file, excel first row headers need to match import template"
-  //       );
-  //     }
-  //   };
-  // }
 }
+
 export const personApi = new PersonApi();
