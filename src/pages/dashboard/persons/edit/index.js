@@ -1,11 +1,9 @@
-import { Add, ArrowBack, Battery3BarSharp } from "@mui/icons-material";
-import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
+import { ArrowBack, } from "@mui/icons-material";
+import { Box, Button, containerClasses, Stack, Typography } from "@mui/material";
 import Head from "next/head";
-import NextLink from "next/link";
 import { AuthGuard } from "../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import formUtils, {
-  createCounterObject,
+import {
   createNegativeCounterObject,
   getDuplicates,
 } from "../../../../utils/form-utils";
@@ -16,7 +14,7 @@ import { accessGroupApi } from "../../../../api/access-groups";
 import { personApi } from "../../../../api/person";
 import { arraySameContents, isObject } from "../../../../utils/utils";
 import toast from "react-hot-toast";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import PersonEditFormTwo from "../../../../components/dashboard/persons/person-edit-form-two";
 import {
   deleteCredentialApi,
@@ -24,7 +22,6 @@ import {
   getCredentialWherePersonIdApi,
 } from "../../../../api/credentials";
 import { getCredTypesApi } from "../../../../api/credential-types";
-import { controllerApi } from "../../../../api/controllers";
 import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
@@ -241,19 +238,6 @@ const EditPersonsTwo = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getInfo, []);
-
-  // add / remove person logic
-  // const addPerson = () => {
-  //     const id = getNextId();
-  //     setPersonsInfo([ ...personsInfo, getNewPersonInfo(id) ]);
-  //     setPersonsValidation([ ...personsValidation, getNewPersonValidation(id)]);
-  // };
-
-  // done like this as putting getNextId in useState causes getNextId to be called
-  // an additional time every re-render
-  // if (personsInfo.length == 0) {
-  //     addPerson();
-  // }
 
   const removePersonFactory = (id) => () => {
     setPersonsInfo(personsInfo.filter((p) => p.personId != id));

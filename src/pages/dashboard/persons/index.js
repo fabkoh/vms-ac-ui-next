@@ -2,7 +2,6 @@ import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import router, { useRouter } from "next/router";
 import { getCredentialsApi } from "../../../api/credentials";
 import PersonImportCheck from ".//../../../components/dashboard/persons/person-import-check";
 
@@ -10,14 +9,11 @@ import {
   Box,
   Button,
   Card,
-  circularProgressClasses,
   Container,
   Divider,
   Grid,
   InputAdornment,
   MenuItem,
-  Tab,
-  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
@@ -27,7 +23,6 @@ import { DashboardLayout } from "../../../components/dashboard/dashboard-layout"
 import { PersonsListTable } from "../../../components/dashboard/persons/persons-list-table";
 import { useMounted } from "../../../hooks/use-mounted";
 import { Download as DownloadIcon } from "../../../icons/download";
-import { Plus as PlusIcon } from "../../../icons/plus";
 import { Search as SearchIcon } from "../../../icons/search";
 import { Upload as UploadIcon } from "../../../icons/upload";
 import { gtm } from "../../../lib/gtm";
@@ -51,7 +46,6 @@ import {
   personLostAndFoundLink,
   getPersonName,
 } from "../../../utils/persons";
-import { controllerApi } from "../../../api/controllers";
 import { ServerDownError } from "../../../components/dashboard/errors/server-down-error";
 import { serverDownCode } from "../../../api/api-helpers";
 import { CSVLink } from "react-csv";
@@ -59,29 +53,6 @@ import {
   saveCredentialApi,
   checkCredentialApi,
 } from "../../../api/credentials";
-import { FormControlUnstyled } from "@mui/base";
-
-const getEmptyauthMethodScheduleInfo = (authMethodScheduleId) => ({
-  authMethodScheduleId,
-  authMethodScheduleName: "",
-  rrule: "",
-  authMethod: "",
-  timeStart: "",
-  timeEnd: "",
-});
-
-const getEmptyauthMethodScheduleValidations = (authMethodScheduleId) => ({
-  authMethodScheduleId,
-  authMethodScheduleNameBlank: false,
-
-  timeEndInvalid: false,
-  timeStartInvalid: false,
-  //Entrance valid(might not need as field is select. cannot custom add)
-  untilInvalid: false,
-  // submit failed
-  submitFailed: false,
-  overlapped: false,
-});
 
 const e = [
   { label: "First Name", key: "firstName" },
@@ -110,25 +81,6 @@ const eImportTemplate = [
   {
     label: "Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)",
     key: "credentialValue",
-  },
-];
-
-const tabs = [
-  {
-    label: "All",
-    value: "all",
-  },
-  {
-    label: "Accepts Marketing",
-    value: "hasAcceptedMarketing",
-  },
-  {
-    label: "Prospect",
-    value: "isProspect",
-  },
-  {
-    label: "Returning",
-    value: "isReturning",
   },
 ];
 
@@ -265,115 +217,6 @@ const PersonList = () => {
     }
   };
 
-  const submitForm = async (personsInfo) => {
-    // send res
-    // TODO: Add validation to credentials here and some error handling
-    console.log(personsInfo);
-    try {
-      const boolArr = await Promise.all(
-        personsInfo.map((p) => createPerson(p))
-      );
-
-      // success toast
-      const numSuccess = boolArr.filter((b) => b).length;
-      if (numSuccess) {
-        toast.success(`Successfully created ${numSuccess} persons`);
-      }
-
-      // if some failed
-      if (boolArr.some((b) => !b)) {
-        toast.error("Unable to create persons below");
-        // filter failed personsInfo and personsValidation
-      } else {
-        // all success
-      }
-    } catch (e) {
-      console.log("error", e);
-      toast.error("Unable to submit persons");
-    } finally {
-      // getPersonsLocal();
-      getInfo();
-    }
-  };
-
-  const csvFileToArray = (string) => {
-    const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
-    const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
-
-    const array = csvRows.map((i) => {
-      const values = i.split(",");
-      const obj = csvHeader.reduce((object, header, index) => {
-        object[header] = values[index];
-        return object;
-      }, {});
-      return obj;
-    });
-    // console.log(person);
-
-    // person["Credential type"] == "Card" ? 0 : 1;
-    submitForm(
-      array.map((person, index) => {
-        let newCredTypeId = 0;
-        switch (person["Credential type"]) {
-          case "Card":
-            newCredTypeId = 1;
-            break;
-          case "Face":
-            newCredTypeId = 2;
-            break;
-          case "Fingerprint":
-            newCredTypeId = 3;
-            break;
-          case "Pin":
-            newCredTypeId = 4;
-            break;
-
-          default:
-            break;
-        }
-        return {
-          personId: index,
-          personFirstName: person["First Name"],
-          personLastName: person["Last Name"],
-          personUid: person["UID"] ?? "",
-          personMobileNumber: person["Mobile Number"] ?? "",
-          personEmail: person["Email"] ?? "",
-          // need to fix the importing of access group
-          //  person["Access Group"] ?? null doesnt work
-          accessGroup: null,
-          credentials: [
-            {
-              credId: 1,
-              credUid: person["Credential pin"] ?? "",
-              credTTL: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
-                ? new Date(
-                    Date.parse(
-                      person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
-                    )
-                  )
-                : new Date(),
-              isValid: true,
-              isPerm: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
-                ? false
-                : true,
-              credTypeId: newCredTypeId,
-            },
-            // {
-            //   credId: 2,
-            //   credUid: person["Credential pin"] ?? "",
-            //   credTTL: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]
-            //     ? new Date(Date.parse(person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"]))
-            //     : new Date(),
-            //   isValid: true,
-            //   isPerm: person["Credential Expiry (YYYY-MM-DD HOUR-MIN-SEC)"] ? false : true,
-            //   credTypeId: person["Credential type"] == "" ? 0 : 4, // 0 is invalid, TODO: Change this so it's not hardcoded
-            // },
-          ],
-        };
-      })
-    );
-  };
-
   // json data from csv file
   const [csvData, setCsvData] = useState([]);
 
@@ -425,13 +268,7 @@ const PersonList = () => {
   const handleOnChange = (e) => {
     let file = e.target.files[0];
     if (file) {
-      // fileReader.onload = function (event) {
-      //   const text = event.target.result;
-      //   csvFileToArray(text);
-      // };
-      // fileReader.readAsText(file);
       importCSVIndex(file);
-      // personApi.importCSV(file);
     }
     // to reset the input value otherwise uploading the same file won't trigger the onchange function
     e.target.value = null;
@@ -439,57 +276,6 @@ const PersonList = () => {
   useEffect(() => {
     gtm.push({ event: "page_view" });
   }, []);
-
-  // const getPersonsLocal = useCallback(async () => {
-  //   try {
-  //     //const data = await personApi.getFakePersons()
-  //     const res = await personApi.getPersons();
-  //     if (res.status == 200) {
-  //       const data = await res.json();
-  //       if (isMounted()) {
-  //         setPersons(data);
-  //         const newAccessGroupNames = {};
-  //         data.forEach((p) => {
-  //           if (p.accessGroup) {
-  //             newAccessGroupNames[p.accessGroup.accessGroupName] = 1;
-  //           }
-  //         });
-  //         setAccessGroupNames(Object.keys(newAccessGroupNames));
-  //       }
-  //     } else {
-  //       if (res.status == serverDownCode) {
-  //         setServerDownOpen(true);
-  //       }
-  //       setPersons([]);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, [isMounted]);
-
-  // useEffect(
-  //   () => {
-  //     getPersonsLocal();
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   []
-  // );
-
-  // const handleTabsChange = (event, value) => {
-  // 	const updatedFilters = {
-  // 		...filters,
-  // 		hasAcceptedMarketing: null,
-  // 		isProspect: null,
-  // 		isReturning: null,
-  // 	};
-
-  // 	if (value !== "all") {
-  // 		updatedFilters[value] = true;
-  // 	}
-
-  // 	setFilters(updatedFilters);
-  // 	setCurrentTab(value);
-  // };
 
   /** 
    * Handles the query filter
@@ -959,19 +745,6 @@ const PersonList = () => {
             </Grid>
           </Box>
           <Card>
-            {/* <Tabs
-							indicatorColor="primary"
-							onChange={handleTabsChange}
-							scrollButtons="auto"
-							sx={{ px: 3 }}
-							textColor="primary"
-							value={currentTab}
-							variant="scrollable"
-						>
-							{tabs.map((tab) => (
-								<Tab key={tab.value} label={tab.label} value={tab.value} />
-							))}
-						</Tabs> */}
             <Divider />
             <Box
               sx={{
@@ -1004,21 +777,6 @@ const PersonList = () => {
                   placeholder={filterPersonByStringPlaceholder}
                 />
               </Box>
-              {/* <TextField
-								label="Sort By"
-								name="sort"
-								onChange={handleSortChange}
-								select
-								SelectProps={{ native: true }}
-								sx={{ m: 1.5 }}
-								value={sort}
-							>
-								{sortOptions.map((option) => (
-									<option key={option.value} value={option.value}>
-										{option.label}
-									</option>
-								))}
-							</TextField> */}
             </Box>
             <PersonsListTable
               enableBulkActions={enableBulkActions}
