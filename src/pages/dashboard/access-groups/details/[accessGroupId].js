@@ -37,7 +37,6 @@ import {
   accessGroupCreateLink,
   getAccessGroupEditLink,
 } from "../../../../utils/access-group";
-import { controllerApi } from "../../../../api/controllers";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { CloudDone, CloudOff } from "@mui/icons-material";
@@ -56,41 +55,45 @@ const AccessGroupDetails = () => {
 
   const link = getAccessGroupScheduleEditLink(accessGroupId);
 
-  const [accessGroupEntrance, setAccessGroupEntrance] = useState([]);
-  const [accessGroupSchedules, setAccessGroupSchedules] = useState([]);
+  const [accessGroupToEntranceMap, setAccessGroupToEntranceMap] = useState([]);
+  const [accessGroupToEntranceScheduleMap, setAccessGroupToEntranceScheduleMap] = useState([]);
 
   const getAccessGroupEntranceAndSchedule = async () => {
     try {
-      const res = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(
+      const accessGroupToEntranceMapResponse = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(
         accessGroupId
       );
-      if (res.status == 200) {
-        const body = await res.json();
+
+      if (accessGroupToEntranceMapResponse.status == 200) {
+        const accessGroupToEntranceMapJson = await accessGroupToEntranceMapResponse.json();
+
         if (isMounted()) {
-          setAccessGroupEntrance(body);
+          setAccessGroupToEntranceMap(accessGroupToEntranceMapJson);
         }
 
-        const scheduleRes =
-          await accessGroupScheduleApi.getAccessGroupSchedulesWhereGroupToEntranceIdsIn(
-            body.map((groupEntrance) => groupEntrance.groupToEntranceId)
-          );
-        if (scheduleRes.status == 200) {
-          const body = await scheduleRes.json();
+        const accessGroupToEntranceScheduleMapResponse = await accessGroupScheduleApi.getAccessGroupSchedulesWhereGroupToEntranceIdsIn(
+          accessGroupToEntranceMapJson.map((accessGroupToEntranceEntry) => accessGroupToEntranceEntry.groupToEntranceId)
+        );
+
+        if (accessGroupToEntranceScheduleMapResponse.status == 200) {
+          const accessGroupToEntranceScheduleMapJson = await accessGroupToEntranceScheduleMapResponse.json();
+
           if (isMounted()) {
-            setAccessGroupSchedules(body);
+            setAccessGroupToEntranceScheduleMap(accessGroupToEntranceScheduleMapJson);
           }
+
         } else {
-          if (res.status == serverDownCode) {
+          if (accessGroupToEntranceMapJson.status == serverDownCode) {
             setServerDownOpen(true);
           }
-          setAccessGroupSchedules([]);
+          setAccessGroupToEntranceScheduleMap([]);
           toast.error("Error loading schedule info");
         }
       } else {
-        if (res.status == serverDownCode) {
+        if (accessGroupToEntranceMap.status == serverDownCode) {
           setServerDownOpen(true);
         }
-        setAccessGroupEntrance([]);
+        setAccessGroupToEntranceMap([]);
         toast.error("Error loading entrance info");
       }
     } catch (err) {
@@ -154,15 +157,8 @@ const AccessGroupDetails = () => {
     () => {
       getInfo();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [accessGroupIsActive]
   );
-
-  // actions menu open/close
-  /*  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null) // which component to anchor action menu to
-    const actionMenuOpen = Boolean(actionMenuAnchorEl);
-    const handleActionMenuOpen = (e) => { setActionMenuAnchorEl(e.currentTarget); }
-    const handleActionMenuClose = () => { setActionMenuAnchorEl(null); } */
 
   const [anchorEl, setAnchorEl] = useState(null);
   const actionMenuOpen = Boolean(anchorEl);
@@ -389,19 +385,18 @@ const AccessGroupDetails = () => {
           <Box sx={{ mt: 3 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                {console.log(accessGroup, "accessGroup")}
                 <AccessGroupBasicDetails accessGroup={accessGroup} />
               </Grid>
               <Grid item xs={12}>
                 <AccessGroupPersons accessGroup={accessGroup} />
               </Grid>
               <Grid item xs={12}>
-                <EntranceDetails accessGroupEntrance={accessGroupEntrance} />
+                <EntranceDetails accessGroupEntrance={accessGroupToEntranceMap} />
               </Grid>
               <Grid item xs={12}>
                 <AccessGroupSchedules
-                  accessGroupEntrance={accessGroupEntrance}
-                  accessGroupSchedules={accessGroupSchedules}
+                  accessGroupToEntranceMap={accessGroupToEntranceMap}
+                  accessGroupToEntranceScheduleMap={accessGroupToEntranceScheduleMap}
                   deleteSchedules={deleteSchedules}
                   link={link}
                 />
