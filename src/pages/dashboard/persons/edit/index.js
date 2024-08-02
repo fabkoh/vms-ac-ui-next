@@ -26,8 +26,7 @@ import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
 import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
 import { validatePhoneNumber } from "../../../../utils/utils";
-import useCredentialTypes from "../../../../hooks/use-credential-types";
-import usePersons from "../../../../hooks/use-persons";
+import usePersons from "../../../../hooks/use-persons-list";
 
 const getNextCredId = createNegativeCounterObject(-1);
 const getNewCredential = (id) => ({
@@ -48,12 +47,8 @@ const EditPersonsTwo = () => {
   // Check if mounted
   const isMounted = useMounted();
 
-  // Dynamically adjust credType options to user
-  const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
-
-  // stores list of person objects
-  const [personsInfo, setPersonsInfo] = useState([]);
-  const [personsValidation, setPersonsValidation] = useState([]);
+  // Gets list of persons that are selected to be edited
+  const [personsInfo, personsValidation] = usePersons(personIds, serverDownCode, setServerDownOpen);
 
   // access groups for access group select
   const [accessGroups, setAccessGroups] = useState([]);
@@ -763,9 +758,6 @@ const EditPersonsTwo = () => {
                         cardError={cardError}
                         addCredential={addCredentialFactory(id)}
                         removeCredentialFactory={removeCredentialFactory(id)}
-                        // To differentiate the credential entry that has Pin from the others
-                        credTypes={credTypes}
-                        originalCredTypes={originalCredTypes}
                         onCredTypeChangeFactory={onCredTypeChangeFactory(id)}
                         onCredUidChangeFactory={onCredUidChangeFactory(id)}
                         onCredTTLChangeFactory={onCredTTLChangeFactory(id)}

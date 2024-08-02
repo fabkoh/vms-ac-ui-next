@@ -16,19 +16,33 @@ import { useRouter } from 'next/router';
  */
 const usePersons = (ids, setPersonsInfo, setPersonsValidation, serverDownCode, setServerDownOpen) => {
   const [loading, setLoading] = useState(false);
-
+  
   useEffect(() => {
     if (!ids || ids.length === 0) return; // Exit if no IDs provided
 
-    const getPersons = async () => {
+    const fetchData = async () => {
       setLoading(true);
       const personsInfoArr = [];
       const validations = [];
 
       try {
         const resArr = await Promise.all(ids.map((id) => getPerson(id)));
-        const resArr2 = await Promise.all(ids.map((id) => getCredentialWherePersonIdApi(id)));
+        const successfulRes = resArr.filter((res) => res.status === 200);
 
+        if (successfulRes.length === 0) {
+          toast.error("Error editing persons. Please try again");
+          router.replace("/dashboard/persons");
+          return;
+        }
+
+        if (successfulRes.length !== resArr.length) {
+          toast.error("Some persons were not found");
+        }
+
+        const resArr2 = await Promise.all(
+          ids.map((id) => getCredentialWherePersonIdApi(id))
+        );
+        
         const credArr = await Promise.all(resArr2.map((res) => res.json()));
         credArr.forEach((creds) => {
           creds.forEach((cred) => {
@@ -39,8 +53,6 @@ const usePersons = (ids, setPersonsInfo, setPersonsValidation, serverDownCode, s
         const credArr2 = JSON.parse(JSON.stringify(credArr));
         const bodyArr = await Promise.all(successfulRes.map((req) => req.json()));
         bodyArr.forEach((body, i) => {
-          const credIdArr = [];
-          credArr[i].forEach((cred) => credIdArr.push(cred.credId));
           personsInfoArr.push({
             personId: body.personId,
             personFirstName: body.personFirstName,
@@ -88,8 +100,8 @@ const usePersons = (ids, setPersonsInfo, setPersonsValidation, serverDownCode, s
       }
     };
 
-    getPersons();
-  }, []);
+    fetchData();
+  }, [ids, setPersonsInfo, setPersonsValidation, serverDownCode, setServerDownOpen]);
 
   return { loading };
 };
