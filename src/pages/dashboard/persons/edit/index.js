@@ -54,12 +54,8 @@ const EditPersonsTwo = () => {
   const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   // Function to update the personsInfo state, passed down to PersonEditFormTwo
-  const updatePersonInfo = (personId, newInfo) => {
-    setPersonsInfoArr(prevPersonsInfo =>
-      prevPersonsInfo.map(person =>
-        person.personId === personId ? { ...person, ...newInfo } : person
-      )
-    );
+  const updatePersonInfo = (newInfo) => {
+    setPersonsInfoArr(newInfo);
   };
 
   // access groups for access group select

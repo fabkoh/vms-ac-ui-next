@@ -11,13 +11,14 @@ import ErrorCard from "../shared/error-card";
 import ExpandMore from "../shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
 import { isObject } from "../../../utils/utils";
 import { validatePhoneNumber } from "../../../utils/utils";
 import CredentialEditForm from "./credential-form-edit";
 import useCredentialTypes from "../../../hooks/use-credential-types";
+import debounce from 'lodash.debounce';
 
 const PersonEditFormTwo = ({
   personId,
@@ -34,11 +35,11 @@ const PersonEditFormTwo = ({
 
   // For validating each Person's individual fields
   const FieldNames = Object.freeze({
-    FIRST_NAME: "firstName",
-    LAST_NAME: "lastName",
-    UID: "uid",
-    MOBILE_NUMBER: "mobileNumber",
-    EMAIL: "email",
+    FIRST_NAME: "personFirstName",
+    LAST_NAME: "personLastName",
+    UID: "personUid",
+    MOBILE_NUMBER: "personMobileNumber",
+    EMAIL: "personEmail",
     ACCESS_GROUP: "accessGroup",
     CREDENTIALS: "credentials",
   });
@@ -62,7 +63,10 @@ const PersonEditFormTwo = ({
   }; 
 
   const checkValidation = () => {
+    console.log("Checking validation")
     const person = personsInfoArr.find((p) => p.personId === personId);
+
+    console.log("Curr Person", person)
 
     // Checks if required fields are empty
     const checkBlank = () => {
@@ -71,9 +75,9 @@ const PersonEditFormTwo = ({
         return false;
       }
 
-      if (isBlank(person.firstName)) {
+      if (isBlank(person.personFirstName)) {
         updateValidationState(FieldNames.FIRST_NAME, false, "First name cannot be blank");
-      } else if (isBlank(person.lastName)) {
+      } else if (isBlank(person.personLastName)) {
         updateValidationState(FieldNames.LAST_NAME, false, "Last name cannot be blank");
       } else {
         updateValidationState(FieldNames.FIRST_NAME, true);
@@ -85,7 +89,7 @@ const PersonEditFormTwo = ({
     const checkDuplicate = () => {
       personsInfoArr.forEach((p) => {
         if (p.personId !== personId) { // Skip the current person to avoid self-check
-          if (p.mobileNumber === person.mobileNumber) {
+          if (p.personMobileNumber === person.personMobileNumber) {
             updateValidationState(FieldNames.MOBILE_NUMBER, false, "Duplicate mobile number found");
           } else {
             updateValidationState(FieldNames.MOBILE_NUMBER, true);
@@ -131,6 +135,7 @@ const PersonEditFormTwo = ({
 
   // Forms are checked whenever the personInfo state changes
   useEffect(() => {
+    console.log(personsInfoArr);
     checkValidation();
   }, [personsInfoArr]);
 
@@ -388,6 +393,13 @@ const PersonEditFormTwo = ({
       .credentials.find((cred) => cred.credId == credId).credTTL = dateObj;
   };
 
+  const debouncedHandleFormChange = useCallback(
+    debounce((fieldName, value) => {
+      handleFormChange(fieldName, value);
+    }, 50), // Adjust the debounce delay as needed
+    []
+  );
+
   // expanding card logic
   const [expanded, setExpanded] = useState(true);
   const onExpandedClick = () => setExpanded(!expanded);
@@ -416,7 +428,7 @@ const PersonEditFormTwo = ({
               fullWidth
               label="First Name"
               name="personFirstName"
-              onChange={(event) => handleFormChange(FieldNames.FIRST_NAME, event.target.value)}
+              onChange={(event) => debouncedHandleFormChange(FieldNames.FIRST_NAME, event.target.value)}
               defaultValue={person.personFirstName}
               required
               error={!isValid[FieldNames.FIRST_NAME].isValid}
@@ -428,7 +440,7 @@ const PersonEditFormTwo = ({
               fullWidth
               label="Last Name"
               name="personLastName"
-              onChange={(event) => handleFormChange(FieldNames.LAST_NAME, event.target.value)}
+              onChange={(event) => debouncedHandleFormChange(FieldNames.LAST_NAME, event.target.value)}
               defaultValue={person.personLastName}
               required
               error={!isValid[FieldNames.LAST_NAME].isValid}
@@ -443,7 +455,7 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="UID"
                     name="personUid"
-                    onChange={(event) => handleFormChange(FieldNames.UID, event.target.value)}
+                    onChange={(event) => debouncedHandleFormChange(FieldNames.UID, event.target.value)}
                     defaultValue={person.personUid}
                     error={!isValid[FieldNames.UID].isValid}
                     helperText={isValid[FieldNames.UID].errorMessage}
@@ -454,7 +466,7 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Mobile Number"
                     name="personMobileNumber"
-                    onChange={(event) => handleFormChange(FieldNames.MOBILE_NUMBER, event.target.value)}
+                    onChange={(event) => debouncedHandleFormChange(FieldNames.MOBILE_NUMBER, event.target.value)}
                     // Value is unable to handle null and empty strings because Mui is bad, might have to create a new component in the future
                     value={person.personMobileNumber || "+65"}
                     variant="outlined"
@@ -468,7 +480,7 @@ const PersonEditFormTwo = ({
                     type="email"
                     label="Email"
                     name="email"
-                    onChange={(event) => handleFormChange(FieldNames.EMAIL, event.target.value)}
+                    onChange={(event) => debouncedHandleFormChange(FieldNames.EMAIL, event.target.value)}
                     defaultValue={person.personEmail}
                     error={!isValid[FieldNames.EMAIL].isValid}
                     helperText={isValid[FieldNames.EMAIL].errorMessage}
@@ -479,7 +491,7 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Access Group"
                     getLabel={getAccessGroupLabel}
-                    onChange={(event) => handleFormChange(FieldNames.ACCESS_GROUP, event.target.value)}
+                    onChange={(event) => debouncedHandleFormChange(FieldNames.ACCESS_GROUP, event.target.value)}
                     value={
                       isObject(person.accessGroup)
                         ? person.accessGroup.accessGroupId
