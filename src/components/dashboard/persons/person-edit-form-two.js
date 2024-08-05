@@ -11,38 +11,26 @@ import ErrorCard from "../shared/error-card";
 import ExpandMore from "../shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
 import { isObject } from "../../../utils/utils";
+import { validatePhoneNumber } from "../../../utils/utils";
 import CredentialEditForm from "./credential-form-edit";
 import useCredentialTypes from "../../../hooks/use-credential-types";
 
-// need person/personID
-// need usePerson (?)
 const PersonEditFormTwo = ({
-// adding these
-  personsInfoArr,
   personId,
-
-  onClear,
-  updatePersonInfo={updatePersonInfo},
+  personsInfoArr,
   accessGroups,
-  validation,
-  cardError,
-  addCredential,
-  removeCredentialFactory,
-  onCredTypeChangeFactory,
-  onCredUidChangeFactory,
-  onCredTTLChangeFactory,
-  onCredValidChangeFactory,
-  onCredPermChangeFactory,
+  updatePersonInfo,
+  onClear,
+  onValidationChange,
 }) => {
-
   const person = personsInfoArr.find((p) => p.personId === personId);
 
   // Dynamically adjust credType options to user
-  const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
+  // const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
 
   // For validating each Person's individual fields
   const FieldNames = Object.freeze({
@@ -113,12 +101,13 @@ const PersonEditFormTwo = ({
     };
 
     const checkValidNumber = () => {
-      const number = person.mobileNumber
+      const number = person.personMobileNumber
 
       // If the mobile number input is + or +65 (default value), then it is valid (no error message)
       // and the mobile number is treated as empty.
-      if (!(number === '+' || number === '+65')) {
+      if (!(number === '+' || number === '+65' || number === null || number === '')) {
         const { isValid, errorMessage } = validatePhoneNumber(number);
+
         if (isValid) {
           updateValidationState(FieldNames.MOBILE_NUMBER, true);
         } else {
@@ -134,15 +123,21 @@ const PersonEditFormTwo = ({
     checkValidNumber();
   };
 
+  // Update validation status to parent component everytime it changes
+  useEffect(() => {
+    const anyInvalid = Object.values(isValid).some(field => !field.isValid);
+    onValidationChange(!anyInvalid);
+  }, [isValid]);
+
   // Forms are checked whenever the personInfo state changes
   useEffect(() => {
     checkValidation();
   }, [personsInfoArr]);
 
   const handleFormChange = (fieldName, value) => {
-    const newPersons = { ...personsInfoArr };
-    const updatedPerson = newPersons.find((p) => p.personId == personId)
-    updatedPerson[fieldName] = value;
+    const newPersons = personsInfoArr.map((p) =>
+      p.personId === personId ? { ...p, [fieldName]: value } : p
+    );
     updatePersonInfo(newPersons);
   };
 
@@ -209,7 +204,6 @@ const PersonEditFormTwo = ({
 
     infoArr.forEach((person, i) => {
       const repeatedCredIds = [];
-      // console.log("repeatedCredIds",repeatedCredIds)
       person.credentials.forEach((cred) => {
         if (
           repeatedCred.some(
@@ -394,16 +388,12 @@ const PersonEditFormTwo = ({
       .credentials.find((cred) => cred.credId == credId).credTTL = dateObj;
   };
 
-  useEffect(() => {
-    console.log("mobile number", person.personMobileNumber);
-  }, []);
-
   // expanding card logic
   const [expanded, setExpanded] = useState(true);
   const onExpandedClick = () => setExpanded(!expanded);
 
   return (
-    <ErrorCard error={cardError(validation)}>
+    <ErrorCard error={Object.values(isValid).some(field => !field.isValid)}>
       <CardHeader
         avatar={
           <ExpandMore expand={expanded} onClick={onExpandedClick}>
@@ -429,7 +419,7 @@ const PersonEditFormTwo = ({
               onChange={(event) => handleFormChange(FieldNames.FIRST_NAME, event.target.value)}
               defaultValue={person.personFirstName}
               required
-              error={isValid[FieldNames.FIRST_NAME].isValid}
+              error={!isValid[FieldNames.FIRST_NAME].isValid}
               helperText={isValid[FieldNames.FIRST_NAME].errorMessage}
             />
           </Grid>
@@ -438,10 +428,10 @@ const PersonEditFormTwo = ({
               fullWidth
               label="Last Name"
               name="personLastName"
-              onChange={handleFormChange(FieldNames.LAST_NAME, event.target.value)}
+              onChange={(event) => handleFormChange(FieldNames.LAST_NAME, event.target.value)}
               defaultValue={person.personLastName}
               required
-              error={isValid[FieldNames.LAST_NAME].isValid}
+              error={!isValid[FieldNames.LAST_NAME].isValid}
               helperText={isValid[FieldNames.LAST_NAME].errorMessage}
             />
           </Grid>
@@ -453,9 +443,9 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="UID"
                     name="personUid"
-                    onChange={handleFormChange(FieldNames.UID, event.target.value)}
+                    onChange={(event) => handleFormChange(FieldNames.UID, event.target.value)}
                     defaultValue={person.personUid}
-                    error={isValid[FieldNames.UID].isValid}
+                    error={!isValid[FieldNames.UID].isValid}
                     helperText={isValid[FieldNames.UID].errorMessage}
                   />
                 </Grid>
@@ -464,11 +454,11 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Mobile Number"
                     name="personMobileNumber"
-                    onChange={handleFormChange(FieldNames.MOBILE_NUMBER, event.target.value)}
+                    onChange={(event) => handleFormChange(FieldNames.MOBILE_NUMBER, event.target.value)}
                     // Value is unable to handle null and empty strings because Mui is bad, might have to create a new component in the future
                     value={person.personMobileNumber || "+65"}
                     variant="outlined"
-                    error={isValid[FieldNames.MOBILE_NUMBER].isValid}
+                    error={!isValid[FieldNames.MOBILE_NUMBER].isValid}
                     helperText={isValid[FieldNames.MOBILE_NUMBER].errorMessage}
                   />
                 </Grid>
@@ -478,9 +468,9 @@ const PersonEditFormTwo = ({
                     type="email"
                     label="Email"
                     name="email"
-                    onChange={handleFormChange(FieldNames.EMAIL, event.target.value)}
+                    onChange={(event) => handleFormChange(FieldNames.EMAIL, event.target.value)}
                     defaultValue={person.personEmail}
-                    error={isValid[FieldNames.EMAIL].isValid}
+                    error={!isValid[FieldNames.EMAIL].isValid}
                     helperText={isValid[FieldNames.EMAIL].errorMessage}
                   />
                 </Grid>
@@ -489,7 +479,7 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Access Group"
                     getLabel={getAccessGroupLabel}
-                    onChange={handleFormChange(FieldNames.ACCESS_GROUP, event.target.value)}
+                    onChange={(event) => handleFormChange(FieldNames.ACCESS_GROUP, event.target.value)}
                     value={
                       isObject(person.accessGroup)
                         ? person.accessGroup.accessGroupId
