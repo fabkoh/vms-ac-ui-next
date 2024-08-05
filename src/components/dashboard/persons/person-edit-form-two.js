@@ -21,16 +21,13 @@ import useCredentialTypes from "../../../hooks/use-credential-types";
 // need person/personID
 // need usePerson (?)
 const PersonEditFormTwo = ({
+// adding these
+  personsInfoArr,
+  personId,
+
   onClear,
-  person,
   updatePersonInfo={updatePersonInfo},
-  onPersonFirstNameChange,
-  onPersonLastNameChange,
-  onPersonMobileNumberChange,
-  onPersonUidChange,
-  onPersonEmailChange,
   accessGroups,
-  handleAccessGroupChange,
   validation,
   cardError,
   addCredential,
@@ -41,12 +38,8 @@ const PersonEditFormTwo = ({
   onCredValidChangeFactory,
   onCredPermChangeFactory,
 }) => {
-  // update logic
-  const personFirstNameRef = useRef(person.personFirstName);
-  const personLastNameRef = useRef(person.personLastName);
-  const personUidRef = useRef(person.personUid);
-  const personMobileNumberRef = useRef(person.personMobileNumber);
-  const personEmailRef = useRef(person.personEmail);
+
+  const person = personsInfoArr.find((p) => p.personId === personId);
 
   // Dynamically adjust credType options to user
   const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
@@ -79,80 +72,79 @@ const PersonEditFormTwo = ({
       [fieldName]: { isValid, errorMessage },
     }));
   }; 
-  
-  // Forms are check whenever the personInfo state changes
-  useEffect(() => {
-    checkValidation();
-  }, [personInfo]);
 
   const checkValidation = () => {
-    const newValidation = { ...isValid };
-  }
+    const person = personsInfoArr.find((p) => p.personId === personId);
 
-  const handleFormChange = (fieldName, value) => {
-    // Update the specific field in personsInfo
-    updatePersonInfo(personId, fieldName, value);
-  };
-
-  const handleFormChange = (personId, key, value) => {
-    // Update the specific field in personsInfo
-    updatePersonsInfo(key, id, ref);
-
-    // Check for blanks
-    if (["personFirstName", "personLastName", "personUid"].includes(key)) {
-      blankCheckHelper(id, `${key}Blank`, ref.current?.value);
-    }
-
-    // Check for duplicates and in use
-    if (["personUid", "personMobileNumber", "personEmail"].includes(key)) {
-      let arrayOfUsedValues = [];
-      let inUseKey = "";
-      let duplicateKey = "";
-
-      switch (key) {
-        case "personUid":
-          arrayOfUsedValues = personUids;
-          inUseKey = "uidInUse";
-          duplicateKey = "uidRepeated";
-          break;
-        case "personMobileNumber":
-          arrayOfUsedValues = personMobileNumbers;
-          inUseKey = "numberInUse";
-          duplicateKey = "numberRepeated";
-          break;
-        case "personEmail":
-          arrayOfUsedValues = personEmails;
-          inUseKey = "emailInUse";
-          duplicateKey = "emailRepeated";
-          break;
-        default:
-          break;
+    // Checks if required fields are empty
+    const checkBlank = () => {
+      const isBlank = (value) => typeof value === "string" && /^\s*$/.test(value);
+      if (!person) {
+        return false;
       }
 
-      checkDuplicatesAndInUseHelper(
-        id,
-        key,
-        ref.current?.value,
-        arrayOfUsedValues,
-        inUseKey,
-        duplicateKey,
-        `${key}Original`
-      );
-    }
+      if (isBlank(person.firstName)) {
+        updateValidationState(FieldNames.FIRST_NAME, false, "First name cannot be blank");
+      } else if (isBlank(person.lastName)) {
+        updateValidationState(FieldNames.LAST_NAME, false, "Last name cannot be blank");
+      } else {
+        updateValidationState(FieldNames.FIRST_NAME, true);
+        updateValidationState(FieldNames.LAST_NAME, true);
+      }
+    };
 
-  // Check for invalid mobile number
-  if (key === "personMobileNumber") {
-    checkInvalidNumberHelper(
-      id,
-      ref.current?.value,
-      "numberInvalid",
-      personsValidation
-    );
-  }
+    // Checks if there are duplicate fields that are supposed to be unique
+    const checkDuplicate = () => {
+      personsInfoArr.forEach((p) => {
+        if (p.personId !== personId) { // Skip the current person to avoid self-check
+          if (p.mobileNumber === person.mobileNumber) {
+            updateValidationState(FieldNames.MOBILE_NUMBER, false, "Duplicate mobile number found");
+          } else {
+            updateValidationState(FieldNames.MOBILE_NUMBER, true);
+          }
 
-  // Update state (if any validation has changed within the helper functions)
-  setPersonsValidation([...personsValidation]);
-};
+          if (p.personUid === person.personUid) {
+            updateValidationState(FieldNames.UID, false, "Duplicate UID found");
+          } else {
+            updateValidationState(FieldNames.UID, true);
+          }
+        }
+      });
+    };
+
+    const checkValidNumber = () => {
+      const number = person.mobileNumber
+
+      // If the mobile number input is + or +65 (default value), then it is valid (no error message)
+      // and the mobile number is treated as empty.
+      if (!(number === '+' || number === '+65')) {
+        const { isValid, errorMessage } = validatePhoneNumber(number);
+        if (isValid) {
+          updateValidationState(FieldNames.MOBILE_NUMBER, true);
+        } else {
+          updateValidationState(FieldNames.MOBILE_NUMBER, false, errorMessage);
+        }
+      } else {
+        updateValidationState(FieldNames.MOBILE_NUMBER, true);
+      }
+    };
+
+    checkBlank();
+    checkDuplicate();
+    checkValidNumber();
+  };
+
+  // Forms are checked whenever the personInfo state changes
+  useEffect(() => {
+    checkValidation();
+  }, [personsInfoArr]);
+
+  const handleFormChange = (fieldName, value) => {
+    const newPersons = { ...personsInfoArr };
+    const updatedPerson = newPersons.find((p) => p.personId == personId)
+    updatedPerson[fieldName] = value;
+    updatePersonInfo(newPersons);
+  };
 
   //add / remove credential logic
   const addCredentialFactory = (personId) => () => {
@@ -183,100 +175,6 @@ const PersonEditFormTwo = ({
     if (b1 || b2) {
       setPersonsValidation([...personsValidation]);
     }
-  };
-
-  /**
-   * Checks if the value is in use or is a duplicate and updates the validation state accordingly
-   * Currently allows swapping of phone numbers within the same edit form
-   * 
-   * @param {number} id
-   * @param {string} key
-   * @param {string} value
-   * @param {string[]} arrayOfUsedValues
-   * @param {string} inUseKey
-   * @param {string} duplicateKey
-   * @param {string} originalKey
-   * @returns {boolean} true if the validation state is changed, false otherwise
-   */
-  const checkDuplicatesAndInUseHelper = (
-    id,
-    key,
-    value,
-    arrayOfUsedValues,
-    inUseKey,
-    duplicateKey,
-    originalKey
-  ) => {
-    let toChange = false;
-
-    if (value != "") {
-      const inUse = arrayOfUsedValues.includes(value);
-      const personValidation = personsValidation.find((p) => p.personId == id);
-      const personInfo = personsInfo.find((p) => p.personId == id);
-
-      console.log(value);
-      
-      // second condition prevents user from not being able to change back to original value
-      if (inUse != personValidation[inUseKey] && personInfo.personMobileNumber != value) {
-        personValidation[inUseKey] = inUse;
-        toChange = true;
-      }
-    }
-    const duplicateKeys = getDuplicates(personsInfo.map((p) => p[key]));
-
-    personsInfo.forEach((p, i) => {
-      const v = p[key];
-      const b = v != "" && v in duplicateKeys; // ignores empty strings
-      if (personsValidation[i][duplicateKey] != b) {
-        personsValidation[i][duplicateKey] = b;
-        toChange = true;
-      }
-    });
-
-    return toChange;
-  };
-
-  /**
-   * Checks if the number is valid and updates the validation state accordingly
-   * 
-   * @param {number} personId
-   * @param {string} number
-   * @param {string} key
-   * @param {object[]} validArr
-   * @returns {boolean} true if the validation state is changed, false otherwise
-   */
-  const checkInvalidNumberHelper = (personId, number, key, validArr) => {
-    const personValidation = validArr.find((p) => p.personId === personId);
-    if (!isObject(personValidation)) {
-        return false;
-    }
-
-    // If the mobile number input is + or +65 (default value), then it is valid (no error message) and the mobile number is treated as empty.
-    // Currently when you try to delete the digits individually to reach +, it will by default cycle to +65
-    if (number === '+' || number === '+65') {
-      if (personValidation[key] !== false || personValidation.numberErrorMessage !== null) {
-          personValidation[key] = false; // Mark as valid
-          personValidation.numberErrorMessage = null; // Clear any existing error message
-          return true; // Indicates a change in the validation state
-      }
-      return false; // No change needed
-    }
-
-    const { isValid, errorMessage } = validatePhoneNumber(number);
-    const isInvalid = !isValid;
-
-    // Determine if there's a change in either the validation state or the error message
-    const isStateChanged = personValidation[key] !== isInvalid;
-    const isErrorMessageChanged = personValidation.numberErrorMessage !== errorMessage;
-
-    // Update if there's a change in the state or the error message
-    if (isStateChanged || isErrorMessageChanged) {
-        personValidation[key] = isInvalid;
-        personValidation.numberErrorMessage = isInvalid ? errorMessage : null;
-        return true; // Indicates a change
-    }
-
-    return false; // No change
   };
 
   /** 
@@ -407,65 +305,6 @@ const PersonEditFormTwo = ({
     return toChange;
   };
 
-  const onPersonFirstNameChangeFactory = (id) => (ref) => {
-    updatePersonsInfo("personFirstName", id, ref);
-    const b1 = blankCheckHelper(id, "firstNameBlank", ref.current?.value);
-
-    if (b1) {
-      setPersonsValidation([...personsValidation]);
-    }
-  };
-
-  const onPersonLastNameChangeFactory = (id) => (ref) => {
-    updatePersonsInfo("personLastName", id, ref);
-    const b1 = blankCheckHelper(id, "lastNameBlank", ref.current?.value);
-
-    if (b1) {
-      setPersonsValidation([...personsValidation]);
-    }
-  };
-
-  const onPersonUidChangeFactory = (id) => (ref) => {
-    updatePersonsInfo("personUid", id, ref);
-
-    const b1 =
-      checkDuplicatesAndInUseHelper(
-        id,
-        "personUid",
-        ref.current?.value,
-        personUids,
-        "uidInUse",
-        "uidRepeated"
-      ) || blankCheckHelper(id, "uidBlank", ref.current?.value);
-
-    if (b1) {
-      setPersonsValidation([...personsValidation]);
-    }
-  };
-
-  const onPersonMobileNumberChangeFactory = (id) => (ref) => {
-    updatePersonsInfo("personMobileNumber", id, ref);
-    const b1 = checkDuplicatesAndInUseHelper(
-      id,
-      "personMobileNumber",
-      ref.current?.value,
-      personMobileNumbers,
-      "numberInUse",
-      "numberRepeated"
-    );
-    const b2 = checkInvalidNumberHelper(
-      id,
-      ref.current?.value,
-      "numberInvalid",
-      personsValidation,
-      personsInfo
-    );
-
-    if (b1 || b2) {
-      setPersonsValidation([...personsValidation]);
-    }
-  };
-
   const PIN_CRED_TYPE = { id: 4, name: 'Pin' };
 
   const hasPinCred = (personCredentials) => {
@@ -555,36 +394,6 @@ const PersonEditFormTwo = ({
       .credentials.find((cred) => cred.credId == credId).credTTL = dateObj;
   };
 
-  const onPersonEmailChangeFactory = (id) => (ref) => {
-    updatePersonsInfo("personEmail", id, ref);
-
-    const b1 = checkDuplicatesAndInUseHelper(
-      id,
-      "personEmail",
-      ref.current?.value,
-      personEmails,
-      "emailInUse",
-      "emailRepeated"
-    );
-
-    if (b1) {
-      setPersonsValidation([...personsValidation]);
-    }
-  };
-
-  const onAccessGroupChangeFactory = (id) => (e) => {
-    const newInfo = [...personsInfo];
-    const value = e.target.value;
-    if (value == null) {
-      newInfo.find((p) => p.personId === id).accessGroup = value;
-    } else {
-      newInfo.find((p) => p.personId === id).accessGroup = accessGroups.find(
-        (group) => group.accessGroupId === value
-      );
-    }
-    setPersonsInfo(newInfo);
-  };
-
   useEffect(() => {
     console.log("mobile number", person.personMobileNumber);
   }, []);
@@ -617,14 +426,11 @@ const PersonEditFormTwo = ({
               fullWidth
               label="First Name"
               name="personFirstName"
-              inputProps={{ ref: personFirstNameRef }}
               onChange={(event) => handleFormChange(FieldNames.FIRST_NAME, event.target.value)}
               defaultValue={person.personFirstName}
               required
-              error={validation.firstNameBlank}
-              helperText={
-                validation.firstNameBlank && "Error: first name cannot be blank"
-              }
+              error={isValid[FieldNames.FIRST_NAME].isValid}
+              helperText={isValid[FieldNames.FIRST_NAME].errorMessage}
             />
           </Grid>
           <Grid item md={6} xs={12}>
@@ -632,14 +438,11 @@ const PersonEditFormTwo = ({
               fullWidth
               label="Last Name"
               name="personLastName"
-              inputProps={{ ref: personLastNameRef }}
-              onChange={handlePersonLastNameChange}
+              onChange={handleFormChange(FieldNames.LAST_NAME, event.target.value)}
               defaultValue={person.personLastName}
               required
-              error={validation.lastNameBlank}
-              helperText={
-                validation.lastNameBlank && "Error: last name cannot be blank"
-              }
+              error={isValid[FieldNames.LAST_NAME].isValid}
+              helperText={isValid[FieldNames.LAST_NAME].errorMessage}
             />
           </Grid>
           <Grid item md={12} xs={12}>
@@ -650,20 +453,10 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="UID"
                     name="personUid"
-                    inputProps={{ ref: personUidRef }}
-                    onChange={handlePersonUidChange}
+                    onChange={handleFormChange(FieldNames.UID, event.target.value)}
                     defaultValue={person.personUid}
-                    error={
-                      validation.uidInUse ||
-                      validation.uidRepeated ||
-                      validation.uidBlank
-                    }
-                    helperText={
-                      (validation.uidInUse && "Error: uid taken") ||
-                      (validation.uidRepeated &&
-                        "Error: duplicate uid in form") ||
-                      (validation.uidBlank && "Error: uid must not be blank")
-                    }
+                    error={isValid[FieldNames.UID].isValid}
+                    helperText={isValid[FieldNames.UID].errorMessage}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -671,23 +464,12 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Mobile Number"
                     name="personMobileNumber"
-                    onChange={handlePersonMobileNumberChange}
-                    inputProps={{ ref: personMobileNumberRef }}
+                    onChange={handleFormChange(FieldNames.MOBILE_NUMBER, event.target.value)}
                     // Value is unable to handle null and empty strings because Mui is bad, might have to create a new component in the future
                     value={person.personMobileNumber || "+65"}
                     variant="outlined"
-                    error={
-                      validation.numberInvalid ||
-                      validation.numberInUse ||
-                      validation.numberRepeated
-                    }
-                    helperText={
-                      (validation.numberInUse && "Error: number taken") ||
-                      (validation.numberInvalid &&
-                        `Error: ${validation.numberErrorMessage || "invalid phone number"}`) ||
-                      (validation.numberRepeated &&
-                        "Error: duplicate number in form")
-                    }
+                    error={isValid[FieldNames.MOBILE_NUMBER].isValid}
+                    helperText={isValid[FieldNames.MOBILE_NUMBER].errorMessage}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -696,14 +478,10 @@ const PersonEditFormTwo = ({
                     type="email"
                     label="Email"
                     name="email"
-                    inputProps={{ ref: personEmailRef }}
-                    onChange={handlePersonEmailChange}
+                    onChange={handleFormChange(FieldNames.EMAIL, event.target.value)}
                     defaultValue={person.personEmail}
-                    helperText={
-                      (validation.emailInUse && "Note: email taken") ||
-                      (validation.emailRepeated &&
-                        "Note: duplicate email in form")
-                    }
+                    error={isValid[FieldNames.EMAIL].isValid}
+                    helperText={isValid[FieldNames.EMAIL].errorMessage}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -711,7 +489,7 @@ const PersonEditFormTwo = ({
                     fullWidth
                     label="Access Group"
                     getLabel={getAccessGroupLabel}
-                    onChange={handleAccessGroupChange}
+                    onChange={handleFormChange(FieldNames.ACCESS_GROUP, event.target.value)}
                     value={
                       isObject(person.accessGroup)
                         ? person.accessGroup.accessGroupId
@@ -726,7 +504,7 @@ const PersonEditFormTwo = ({
           </Grid>
         </Grid>
       </CardContent>
-      <Collapse in={expanded}>
+      {/* <Collapse in={expanded}>
         <Divider />
         <CredentialEditForm
           credentials={person.credentials}
@@ -741,7 +519,7 @@ const PersonEditFormTwo = ({
           onCredPermChangeFactory={onCredPermChangeFactory}
           validation={validation}
         />
-      </Collapse>
+      </Collapse> */}
     </ErrorCard>
   );
 };
