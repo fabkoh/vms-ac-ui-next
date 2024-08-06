@@ -47,15 +47,23 @@ const EditPersonsTwo = () => {
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
-  // Modify this such that the mapping is such that I can access the person info based on ID
-  const [personsInfoArr, setPersonsInfoArr] = useState([]);
+  // Contains all personsInfo to check for duplicates and etc.
+  const [personsInfo, setPersonsInfo] = useState([]);
   const [personsValidation, setPersonsValidation] = useState([]);
+
+  // Original details of the selected persons to allow for revert when cleared from the form
+  const [originalSelectedPersonsInfo, setOriginalSelectedPersonsInfo] = useState([]);
+
+  useEffect(() => {
+    console.log("originalSelectedPersonsInfo", originalSelectedPersonsInfo);
+    console.log("personsInfo", personsInfo);
+  }, [originalSelectedPersonsInfo]);
 
   const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   // Function to update the personsInfo state, passed down to PersonEditFormTwo
   const updatePersonInfo = (newInfo) => {
-    setPersonsInfoArr(newInfo);
+    setPersonsInfo(newInfo);
   };
 
   // access groups for access group select
@@ -66,7 +74,7 @@ const EditPersonsTwo = () => {
       const res = await personApi.getPersons();
       if (res.status != 200) {
         toast.error("Error loading person info");
-        setPersonsInfoArr([]);
+        setPersonsInfo([]);
         if (res.status == serverDownCode) {
           setServerDownOpen(true);
         }
@@ -74,13 +82,15 @@ const EditPersonsTwo = () => {
       }
       const body = await res.json();
 
-      setPersonsInfoArr(body);
-      // Initialize personsValidation
+      setPersonsInfo(body);
+
+      const filteredPersons = body.filter((p) => personIds.includes(p.personId));
+      setOriginalSelectedPersonsInfo(filteredPersons);
+
       const initialValidation = body.map(person => ({
         personId: person.personId,
         isValid: true,
       }));
-
       setPersonsValidation(initialValidation);
     } catch (e) {
       console.error(e);
@@ -114,10 +124,16 @@ const EditPersonsTwo = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getInfo, []);
 
-  const removePersonFactory = (id) => () => {
-    setPersonsInfo(personsInfo.filter((p) => p.personId != id));
-    setPersonsValidation(personsValidation.filter((p) => p.personId != id));
-    if (personsInfo.length == 1) {
+  const clearPerson = (id) => () => {
+    // Restore the original person info to personsInfo
+    setPersonsInfo((prevPersons) =>
+      prevPersons.map((p) => (p.personId === id ? originalSelectedPersonsInfo.find((orig) => orig.personId === id) : p))
+    );
+    
+    // Remove the person from originalSelectedPersonsInfo
+    setOriginalSelectedPersonsInfo((prevPersons) => prevPersons.filter((p) => p.personId !== id));
+
+    if (originalSelectedPersonsInfo.length == 0) {
       router.push("/dashboard/persons");
     }
   };
@@ -281,22 +297,21 @@ const EditPersonsTwo = () => {
             </div>
             <form onSubmit={submitForm}>
               <Stack spacing={3}>
-                {Array.isArray(personsInfoArr) &&
-                  personsInfoArr
-                  .filter((p) => personIds.includes(p.personId))
+                {Array.isArray(personsInfo) &&
+                  personsInfo
+                  .filter((p) => originalSelectedPersonsInfo.some(orig => orig.personId === p.personId))
                   .map((p, i) => {
                     return (
                       <PersonEditFormTwo
                         personId={p.personId}
-                        personsInfoArr={personsInfoArr}
+                        personsInfoArr={personsInfo}
                         accessGroups={accessGroups}
                         updatePersonInfo={updatePersonInfo}
-                        onClear={removePersonFactory(p.personId)}
+                        onClear={clearPerson(p.personId)}
                         onValidationChange={(isValid) => handleValidationChange(p.personId, isValid)}
                       />
                     );
                   })}
-
                 <div>
                   <Button
                     size="large"

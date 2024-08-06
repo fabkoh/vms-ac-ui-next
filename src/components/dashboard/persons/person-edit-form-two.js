@@ -22,13 +22,13 @@ import debounce from 'lodash.debounce';
 
 const PersonEditFormTwo = ({
   personId,
-  personsInfoArr,
+  personsInfoArr: personsInfo,
   accessGroups,
   updatePersonInfo,
   onClear,
   onValidationChange,
 }) => {
-  const person = personsInfoArr.find((p) => p.personId === personId);
+  const person = personsInfo.find((p) => p.personId === personId);
 
   // Dynamically adjust credType options to user
   // const [setCredTypes, credTypes, originalCredTypes] = useCredentialTypes(serverDownCode, setServerDownOpen);
@@ -63,10 +63,7 @@ const PersonEditFormTwo = ({
   }; 
 
   const checkValidation = () => {
-    console.log("Checking validation")
-    const person = personsInfoArr.find((p) => p.personId === personId);
-
-    console.log("Curr Person", person)
+    const person = personsInfo.find((p) => p.personId === personId);
 
     // Checks if required fields are empty
     const checkBlank = () => {
@@ -87,7 +84,7 @@ const PersonEditFormTwo = ({
 
     // Checks if there are duplicate fields that are supposed to be unique
     const checkDuplicate = () => {
-      personsInfoArr.forEach((p) => {
+      personsInfo.forEach((p) => {
         if (p.personId !== personId) { // Skip the current person to avoid self-check
           if (p.personMobileNumber === person.personMobileNumber) {
             updateValidationState(FieldNames.MOBILE_NUMBER, false, "Duplicate mobile number found");
@@ -135,12 +132,11 @@ const PersonEditFormTwo = ({
 
   // Forms are checked whenever the personInfo state changes
   useEffect(() => {
-    console.log(personsInfoArr);
     checkValidation();
-  }, [personsInfoArr]);
+  }, [personsInfo]);
 
   const handleFormChange = (fieldName, value) => {
-    const newPersons = personsInfoArr.map((p) =>
+    const newPersons = personsInfo.map((p) =>
       p.personId === personId ? { ...p, [fieldName]: value } : p
     );
     updatePersonInfo(newPersons);
@@ -396,7 +392,7 @@ const PersonEditFormTwo = ({
   const debouncedHandleFormChange = useCallback(
     debounce((fieldName, value) => {
       handleFormChange(fieldName, value);
-    }, 50), // Adjust the debounce delay as needed
+    }, 200), // Adjust the debounce delay as needed
     []
   );
 
