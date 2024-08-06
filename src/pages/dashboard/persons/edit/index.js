@@ -20,6 +20,7 @@ import {
   deleteCredentialApi,
   saveCredentialApi,
   getCredentialWherePersonIdApi,
+  getCredentialsApi,
 } from "../../../../api/credentials";
 
 import { CredTypePinID } from "../../../../utils/constants";
@@ -44,6 +45,7 @@ const EditPersonsTwo = () => {
 
   // Gets list of persons that are selected to be edited
   const personIds = JSON.parse(decodeURIComponent(router.query.ids));
+  const [personIdsState, setPersonIdsState] = useState(personIds);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
@@ -69,8 +71,9 @@ const EditPersonsTwo = () => {
   // access groups for access group select
   const [accessGroups, setAccessGroups] = useState([]);
 
-  const getPersons = async () => {
+  const getPersonsWithCred = async () => {
     try {
+      // Get Persons
       const res = await personApi.getPersons();
       if (res.status != 200) {
         toast.error("Error loading person info");
@@ -80,14 +83,34 @@ const EditPersonsTwo = () => {
         }
         return;
       }
-      const body = await res.json();
+      const persons = await res.json();
 
-      setPersonsInfo(body);
+      // Get Credentials
+      const res2 = await getCredentialsApi();
+      if (res2.status != 200) {
+        toast.error("Error loading credentials");
+        if (res2.status == serverDownCode) {
+          setServerDownOpen(true);
+        }
+        return;
+      }
+      const creds = await res2.json();
 
-      const filteredPersons = body.filter((p) => personIds.includes(p.personId));
+      // Merge credentials with persons
+      const personsWithCreds = persons.map(person => {
+        const personCreds = creds.filter(cred => cred.person.personId === person.personId);
+        return { ...person, credentials: personCreds };
+      });
+
+      console.log("second persons", personsWithCreds);
+
+      setPersonsInfo(personsWithCreds);
+
+      // Store only the selected persons
+      const filteredPersons = persons.filter((p) => personIds.includes(p.personId));
       setOriginalSelectedPersonsInfo(filteredPersons);
 
-      const initialValidation = body.map(person => ({
+      const initialValidation = persons.map(person => ({
         personId: person.personId,
         isValid: true,
       }));
@@ -118,7 +141,7 @@ const EditPersonsTwo = () => {
 
   const getInfo = useCallback(() => {
     getAccessGroups();
-    getPersons();
+    getPersonsWithCred();
   }, [isMounted]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,10 +153,11 @@ const EditPersonsTwo = () => {
       prevPersons.map((p) => (p.personId === id ? originalSelectedPersonsInfo.find((orig) => orig.personId === id) : p))
     );
     
-    // Remove the person from originalSelectedPersonsInfo
+    // Remove the person from originalSelectedPersonsInfo and personIdsState
     setOriginalSelectedPersonsInfo((prevPersons) => prevPersons.filter((p) => p.personId !== id));
+    setPersonIdsState((prevIds) => prevIds.filter((p) => p !== id));
 
-    if (originalSelectedPersonsInfo.length == 0) {
+    if (originalSelectedPersonsInfo.length == 1) {
       router.push("/dashboard/persons");
     }
   };
@@ -299,12 +323,12 @@ const EditPersonsTwo = () => {
               <Stack spacing={3}>
                 {Array.isArray(personsInfo) &&
                   personsInfo
-                  .filter((p) => originalSelectedPersonsInfo.some(orig => orig.personId === p.personId))
+                  .filter((p) => personIdsState.includes(p.personId))
                   .map((p, i) => {
                     return (
                       <PersonEditFormTwo
                         personId={p.personId}
-                        personsInfoArr={personsInfo}
+                        personsInfo={personsInfo}
                         accessGroups={accessGroups}
                         updatePersonInfo={updatePersonInfo}
                         onClear={clearPerson(p.personId)}

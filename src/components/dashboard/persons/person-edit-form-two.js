@@ -22,7 +22,7 @@ import debounce from 'lodash.debounce';
 
 const PersonEditFormTwo = ({
   personId,
-  personsInfoArr: personsInfo,
+  personsInfo,
   accessGroups,
   updatePersonInfo,
   onClear,
@@ -502,7 +502,7 @@ const PersonEditFormTwo = ({
           </Grid>
         </Grid>
       </CardContent>
-      {/* <Collapse in={expanded}>
+      <Collapse in={expanded}>
         <Divider />
         <CredentialEditForm
           credentials={person.credentials}
@@ -517,7 +517,7 @@ const PersonEditFormTwo = ({
           onCredPermChangeFactory={onCredPermChangeFactory}
           validation={validation}
         />
-      </Collapse> */}
+      </Collapse>
     </ErrorCard>
   );
 };
