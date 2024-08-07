@@ -159,11 +159,15 @@ class NotificationsApi {
   }
 
   getSMSCredits() {
-    if (useApi) {
-      return sendApi("/api/notification/sms/credits", {
-        method: "GET",
-      });
-    }
+    try {
+      if (useApi) {
+        return sendApi("/api/notification/sms/credits", {
+          method: "GET",
+        });
+      }
+    } catch (err) {
+      throw new Error(err);
+    }  
   }
 }
 
