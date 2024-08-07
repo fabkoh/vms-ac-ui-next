@@ -22,6 +22,9 @@ import {
   getCredentialWherePersonIdApi,
   getCredentialsApi,
 } from "../../../../api/credentials";
+import {
+  getCredTypesApi,
+} from "../../../../api/credential-types";
 
 import { CredTypePinID } from "../../../../utils/constants";
 import { serverDownCode } from "../../../../api/api-helpers";
@@ -53,6 +56,8 @@ const EditPersonsTwo = () => {
   const [personsInfo, setPersonsInfo] = useState([]);
   const [personsValidation, setPersonsValidation] = useState([]);
 
+  const [credTypes, setCredTypes] = useState([]);
+
   // Original details of the selected persons to allow for revert when cleared from the form
   const [originalSelectedPersonsInfo, setOriginalSelectedPersonsInfo] = useState([]);
 
@@ -71,7 +76,7 @@ const EditPersonsTwo = () => {
   // access groups for access group select
   const [accessGroups, setAccessGroups] = useState([]);
 
-  const getPersonsWithCred = async () => {
+  const getPersons = async () => {
     try {
       // Get Persons
       const res = await personApi.getPersons();
@@ -102,8 +107,6 @@ const EditPersonsTwo = () => {
         return { ...person, credentials: personCreds };
       });
 
-      console.log("second persons", personsWithCreds);
-
       setPersonsInfo(personsWithCreds);
 
       // Store only the selected persons
@@ -115,6 +118,21 @@ const EditPersonsTwo = () => {
         isValid: true,
       }));
       setPersonsValidation(initialValidation);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getCredTypes = async () => {
+    try {
+      const res = await getCredTypesApi();
+      if (res.status != 200) {
+        toast.error("Error loading credential types");
+        setCredTypes([]);
+        return;
+      }
+      const body = await res.json();
+      setCredTypes(body);
     } catch (e) {
       console.error(e);
     }
@@ -141,7 +159,7 @@ const EditPersonsTwo = () => {
 
   const getInfo = useCallback(() => {
     getAccessGroups();
-    getPersonsWithCred();
+    getPersons();
   }, [isMounted]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -329,6 +347,7 @@ const EditPersonsTwo = () => {
                       <PersonEditFormTwo
                         personId={p.personId}
                         personsInfo={personsInfo}
+                        credTypes={credTypes}
                         accessGroups={accessGroups}
                         updatePersonInfo={updatePersonInfo}
                         onClear={clearPerson(p.personId)}
