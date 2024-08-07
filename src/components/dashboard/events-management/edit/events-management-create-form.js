@@ -10,6 +10,7 @@ import {
     Stack,
     Typography,
     Select,
+    Switch,
     Input,
     MenuItem,
     Chip,
@@ -43,6 +44,12 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     const outputEventsWithoutTimer = allOutputEvents.filter(e => !e.timerEnabled);
     const MAX_INPUT_TIMER_DURATION = 300;
     const MAX_OUTPUT_TIMER_DURATION = 300;
+
+    const [isWithTimer, setIsWithTimer] = useState(false);
+
+    const handleTriggerSwitchChange = (event) => {
+        setIsWithTimer(event.target.checked);
+    };
 
     const getEmptyInputWithTimer = (inputId) => ({
         inputId, // this id will not be used for anything
@@ -637,6 +644,22 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                     </Grid>
                     <Collapse in={expanded}>
                         <Stack spacing={3}>
+
+                            <Grid container>
+                                <Grid item mr={2} mb={2}>
+                                <Typography fontWeight="bold">Choose Trigger Type:</Typography>
+                                </Grid>
+
+                                <Grid item>
+                                <Switch
+                                    checked={isWithTimer}
+                                    onChange={handleTriggerSwitchChange}
+                                    inputProps={{ 'aria-label': 'Trigger (with Timer)' }}
+                                />
+                                <Typography>{isWithTimer ? 'Trigger (with timer)' : 'Trigger (without timer)'}</Typography>
+                                </Grid>
+                            </Grid>
+
                             <Grid
                                 container
                             >
