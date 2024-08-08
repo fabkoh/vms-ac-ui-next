@@ -159,16 +159,12 @@ class NotificationsApi {
   }
 
   getSMSCredits() {
-    try {
       if (useApi) {
         return sendApi("/api/notification/sms/credits", {
           method: "GET",
         });
       }
-    } catch (err) {
-      throw new Error(err);
-    }  
-  }
+    }
 }
 
 export const notificationsApi = new NotificationsApi();
