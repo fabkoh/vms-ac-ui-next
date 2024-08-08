@@ -105,9 +105,11 @@ const NotificationSettings = () => {
   const getSMSCredits = async () => {
     try {
       const res = await notificationsApi.getSMSCredits();
-      const body = await res.json();
-      console.log(body);
-      setSMSCredits(body);
+      if (res.status == 200) {
+        const body = await res.json();
+        console.log(body);
+        setSMSCredits(body);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -365,6 +367,7 @@ const NotificationSettings = () => {
     }  finally {
       // Attempt to get SMS credits, with error handling
       try {
+        console.log("Getting SMS credits...");
         await getSMSCredits();
       } catch (error) {
         console.error("Error getting SMS credits:", error);
