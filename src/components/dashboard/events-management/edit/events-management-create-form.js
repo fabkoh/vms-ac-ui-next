@@ -232,6 +232,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     }
 
     const removeTriggerScheduleCard = (id) => {
+        console.log("removeTriggerScheduleCard called with id", id)
         const newTriggerScheduleArr = triggerScheduleArr.filter(info => info.triggerScheduleId != id);
         const newValidations = triggerScheduleValidations.filter(validation => validation.triggerScheduleId != id);
 
@@ -430,8 +431,9 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     }
 
     useEffect(() => {
+        console.log("useEffect of changeTriggerSchedules done")
         changeTriggerSchedules(triggerScheduleArr, eventsManagementId);
-    }, [triggerScheduleArr])
+    }, [triggerScheduleArr, triggerScheduleValidations])
     
     useEffect(() => {
         changeInputEventsWithTimer(inputWithTimerEventsManagementArr, eventsManagementId);
@@ -463,7 +465,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         checkAnyUntilForEventManagement(untilHolderForEventManagement[eventsManagementId]);
         checkAnyTimeStartForEventManagement(startHolderForEventManagement[eventsManagementId]);
         checkAnyTimeEndForEventManagement(endHolderForEventManagement[eventsManagementId]);
-    }, [beginHolderForEventManagement, untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
+    }, [beginHolderForEventManagement, untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement, triggerScheduleArr])
 
     useEffect(() => {
         const inputEventsId = allInputEvents.map(event => event.eventActionInputId);

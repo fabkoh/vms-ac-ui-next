@@ -349,6 +349,7 @@ const ModifyEventManagement = () => {
 
   // change triggerSchedules
   const changeTriggerSchedules = (value, id) => {
+    console.log("changeTriggerSchedules in dashboard page with value: ", value, " and id: ", id);
     const updatedInfo = [...eventsManagementInfoArr];
     const eventManagementToBeUpdated = updatedInfo.find(
       (info) => info.eventsManagementId == id
@@ -360,6 +361,7 @@ const ModifyEventManagement = () => {
     const newValidations = [...eventsManagementValidationsArr];
     const validation = newValidations.find((v) => v.eventsManagementId == id);
     validation.eventsManagementTriggerSchedulesEmpty = value.length === 0;
+    console.log(newValidations, "newValidations in changeTriggerSchedules dashboard page");
     setEventsManagementValidationsArr(newValidations);
   };
 
