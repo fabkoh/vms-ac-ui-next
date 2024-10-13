@@ -433,7 +433,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     useEffect(() => {
         console.log("useEffect of changeTriggerSchedules done")
         changeTriggerSchedules(triggerScheduleArr, eventsManagementId);
-    }, [triggerScheduleArr, triggerScheduleValidations])
+    }, [triggerScheduleArr])
     
     useEffect(() => {
         changeInputEventsWithTimer(inputWithTimerEventsManagementArr, eventsManagementId);
@@ -465,7 +465,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
         checkAnyUntilForEventManagement(untilHolderForEventManagement[eventsManagementId]);
         checkAnyTimeStartForEventManagement(startHolderForEventManagement[eventsManagementId]);
         checkAnyTimeEndForEventManagement(endHolderForEventManagement[eventsManagementId]);
-    }, [beginHolderForEventManagement, untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement, triggerScheduleArr])
+    }, [beginHolderForEventManagement, untilHolderForEventManagement, startHolderForEventManagement, endHolderForEventManagement])
 
     useEffect(() => {
         const inputEventsId = allInputEvents.map(event => event.eventActionInputId);
