@@ -133,13 +133,13 @@ export const JWTLogin = (props) => {
           Log In
         </Button>
       </Box>
-      <Box sx={{ mt: 2 }}>
+      {/* <Box sx={{ mt: 2 }}>
         <Alert severity="info">
           <div>
             Use <b>ISSAdmin@isssecurity.sg</b> and password <b>ISSAdmin</b>
           </div>
         </Alert>
-      </Box>
+      </Box> */}
     </form>
   );
 };
