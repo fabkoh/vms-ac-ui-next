@@ -137,7 +137,7 @@ const Login = () => {
               {platform === 'Firebase' && <FirebaseLogin />}
               {platform === 'JWT' && <JWTLogin />}
             </Box>
-            <Divider sx={{ my: 3 }} />
+            {/* <Divider sx={{ my: 3 }} />
             <NextLink
               href={disableGuard
                 ? `/authentication/register?disableGuard=${disableGuard}`
@@ -150,7 +150,7 @@ const Login = () => {
               >
                 Create new account
               </Link>
-            </NextLink>
+            </NextLink> */}
             {platform === 'Amplify' && (
               <NextLink
                 href={disableGuard
