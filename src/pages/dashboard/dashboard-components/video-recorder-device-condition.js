@@ -77,11 +77,11 @@ const VideoRecorderDeviceCondition = () => {
         success: function (xmlDoc) {
           resolve();
           setLogin(true);
-          console.log("login success")
+          console.log("Video Recorder login success")
         }, error: function (status, xmlDoc) {
           reject();
-          console.log("login failed")
-          alert("login failed");
+          console.log("Video Recorder login failed")
+          // alert("login failed");
         }
       });
     });

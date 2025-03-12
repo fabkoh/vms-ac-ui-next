@@ -95,7 +95,7 @@ const VideoRecorderDetails = () => {
         },
         error: function (status, xmlDoc) {
           reject();
-          alert("login failed");
+          alert("Video Recorder login failed");
           console.log("failure");
           console.log("Status Code:", status);
           console.log("XML response:", xmlDoc);

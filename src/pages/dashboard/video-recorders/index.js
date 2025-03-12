@@ -85,7 +85,7 @@ const RecorderList = () => {
                     resolve();
                 }, error: function (status, xmlDoc) {
                     reject();
-                    alert("login failed");
+                    alert("Video Recorder login failed");
                 }
             });
         });
