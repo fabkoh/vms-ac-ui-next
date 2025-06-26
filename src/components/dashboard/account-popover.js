@@ -27,7 +27,8 @@ export const AccountPopover = (props) => {
     try {
       onClose?.();
       await logout();
-      router.push("/");
+      //Ensure that the login page is routed upon logout
+      router.push("/authentication/login"); 
     } catch (err) {
       console.error(err);
       toast.error("Unable to logout.");
@@ -68,9 +69,12 @@ export const AccountPopover = (props) => {
             ml: 1,
           }}
         >
-          <Typography variant="body1">{user.firstName} {user.lastName}</Typography>
+          {/* Prevents crash if user is null */}
+          <Typography variant="body1">
+            {user ? `${user.firstName} ${user.lastName}` : ""}
+          </Typography>
           <Typography color="textSecondary" variant="body2">
-            {user.username}
+            {user ? user.username : ""}
           </Typography>
         </Box>
       </Box>
