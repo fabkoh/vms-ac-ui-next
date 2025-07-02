@@ -9,7 +9,7 @@ const neutral = {
   600: '#4B5563',
   700: '#374151',
   800: '#1F2937',
-  900: '#111827'
+  900: '#0A0E1A'
 };
 
 const background = {
@@ -17,13 +17,20 @@ const background = {
   paper: neutral[900]
 };
 
-const divider = '#2D3748';
+const divider = '#1F2933';
+
+// const primary = {
+//   main: '#5C6BC0',
+//   light: '#8C9EFF',
+//   dark: '#3F51B5',
+//   contrastText: neutral[900]
+// };
 
 const primary = {
-  main: '#7582EB',
-  light: '#909BEF',
-  dark: '#515BA4',
-  contrastText: neutral[900]
+  main: neutral[600],
+  light: neutral[400],
+  dark: neutral[700],
+  contrastText: neutral[100]
 };
 
 const secondary = {
@@ -34,9 +41,9 @@ const secondary = {
 };
 
 const success = {
-  main: '#14B8A6',
-  light: '#43C6B7',
-  dark: '#0E8074',
+  main: '#22C55E',
+  light: '#4ADE80',
+  dark: '#15803D',
   contrastText: neutral[900]
 };
 
@@ -48,9 +55,9 @@ const info = {
 };
 
 const warning = {
-  main: '#FFB020',
-  light: '#FFBF4C',
-  dark: '#B27B16',
+  main: '#F59E0B',
+  light: '#FBBF24',
+  dark: '#B45309',
   contrastText: neutral[900]
 };
 
@@ -62,9 +69,9 @@ const error = {
 };
 
 const text = {
-  primary: '#EDF2F7',
-  secondary: '#A0AEC0',
-  disabled: 'rgba(255, 255, 255, 0.48)'
+  primary: '#F5F7FA',  
+  secondary: '#CBD5E1',
+  disabled: 'rgb(255, 255, 255, 0.38)'
 };
 
 export const darkThemeOptions = {
@@ -108,7 +115,7 @@ export const darkThemeOptions = {
     MuiOutlinedInput: {
       styleOverrides: {
         notchedOutline: {
-          borderColor: divider
+          borderColor: neutral[200]
         }
       }
     },
@@ -153,11 +160,29 @@ export const darkThemeOptions = {
         root: {
           backgroundColor: neutral[800],
           '.MuiTableCell-root': {
-            color: neutral[300]
+            color: neutral[800]
           }
         }
       }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: neutral[800],
+          borderRadius: '12px'
+        },
+        elevation1: {
+          boxShadow: '0px 4px 12px rgba(0,0,0,0.25)'
+        }
+      }
+    },
+    MuiButton: {
+    styleOverrides: {
+      root: {
+        color: '#FFFFFF' 
+      }
     }
+  }
   },
   palette: {
     action: {
