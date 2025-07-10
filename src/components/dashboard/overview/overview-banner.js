@@ -1,8 +1,17 @@
 import PropTypes from 'prop-types';
 import { Box, Button, Card, Chip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 export const OverviewBanner = (props) => {
   const { onDismiss, ...other } = props;
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode == 'dark';
+
+  const bannerForDark = {
+    main: '#29313D',
+    hover: '#1B2028',
+    contrastText: '#FFFFFF'
+  };
 
   return (
     <Card
@@ -36,10 +45,20 @@ export const OverviewBanner = (props) => {
       </Box>
       <div>
         <div>
+          {isDarkMode ? (
+            <Chip
+              label="New"
+              sx={{
+                backgroundColor: bannerForDark.main,
+                color: bannerForDark.contrastText
+              }}
+            />
+          ) : (
           <Chip
             color="secondary"
             label="New"
           />
+          )}
         </div>
         <Typography
           color="inherit"
@@ -56,13 +75,29 @@ export const OverviewBanner = (props) => {
           Your dashboard has been improved!
         </Typography>
         <Box sx={{ mt: 2 }}>
-          <Button
+          {isDarkMode ? (
+            <Button
+              onClick={onDismiss}
+              variant="contained"
+              sx={{
+                backgroundColor: bannerForDark.main,
+                color: bannerForDark.contrastText,
+                '&:hover': {
+                  backgroundColor: bannerForDark.hover
+                }
+              }}
+            >
+              Dismiss Banner
+            </Button>
+          ) : (
+            <Button
             color="secondary"
             onClick={onDismiss}
             variant="contained"
           >
             Dismiss Banner
           </Button>
+          )}
         </Box>
       </div>
     </Card>
