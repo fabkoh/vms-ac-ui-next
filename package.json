@@ -3,6 +3,11 @@
   "version": "5.0.2",
   "author": "Devias",
   "private": true,
+  "overrides": {
+    "material-ui-phone-number": {
+      "react": "$react"
+    }
+  },
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
