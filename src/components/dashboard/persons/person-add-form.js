@@ -20,7 +20,7 @@ import { makeStyles } from '@mui/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 
-import MuiPhoneNumber from "material-ui-phone-number";
+// import MuiPhoneNumber from "material-ui-phone-number";
 
 export const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -172,7 +172,7 @@ export const PersonAddForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                  <ThemeProvider theme={theme}>
+                  {/* <ThemeProvider theme={theme}>
                     <MuiPhoneNumber
                       fullWidth
                       error={!(person.valid.mobileNumberNotRepeated && person.valid.mobileNumberNotInUse)}
@@ -184,7 +184,7 @@ export const PersonAddForm = (props) => {
                       value={person.personMobileNumber || "+65"}
                       variant="outlined"
                     />
-                  </ThemeProvider>
+                  </ThemeProvider> */}
                 </Grid>
                 <Grid
                   item

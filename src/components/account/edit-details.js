@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../hooks/use-auth";
 import { useMounted } from "../../hooks/use-mounted";
-import MuiPhoneNumber from "material-ui-phone-number";
+// import MuiPhoneNumber from "material-ui-phone-number";
 import { authEditProfile } from "../../api/auth-api";
 import toast from "react-hot-toast";
 
@@ -129,7 +129,7 @@ export const EditAccountDetails = (accountDetails) => {
         value={formik.values.email}
         required
       />
-      <MuiPhoneNumber
+      {/* <MuiPhoneNumber
         fullWidth
         label="Mobile Number"
         name="mobileNumber"
@@ -140,7 +140,7 @@ export const EditAccountDetails = (accountDetails) => {
         required
         error={Boolean(formik.touched.mobileNumber && formik.errors.mobileNumber)}
         helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
-      />
+      /> */}
 
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>

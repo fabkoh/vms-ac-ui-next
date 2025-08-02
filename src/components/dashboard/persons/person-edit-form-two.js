@@ -10,7 +10,7 @@ import {
 import ErrorCard from "../shared/error-card";
 import ExpandMore from "../shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MuiPhoneNumber from "material-ui-phone-number";
+// import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef, useEffect } from "react";
 import SingleSelect from "../shared/single-select-input";
 import { getAccessGroupLabel } from "../../../utils/access-group";
@@ -152,7 +152,7 @@ const PersonEditFormTwo = ({
                     }
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <MuiPhoneNumber
                     fullWidth
                     label="Mobile Number"
@@ -175,7 +175,7 @@ const PersonEditFormTwo = ({
                         "Error: duplicate number in form")
                     }
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item md={6} xs={12}>
                   <TextField
                     fullWidth

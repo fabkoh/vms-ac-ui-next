@@ -14,7 +14,7 @@ import ErrorCard from "../dashboard/shared/error-card";
 import SingleSelect from "../dashboard/shared/single-select-input";
 import ExpandMore from "../dashboard/shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MuiPhoneNumber from "material-ui-phone-number";
+// import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef } from "react";
 import { getRoleLabel } from "../../utils/users";
 import { useAuth } from "../../hooks/use-auth";
@@ -157,7 +157,7 @@ const UserAddForm = ({
                     }
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <MuiPhoneNumber
                     fullWidth
                     label="Mobile Number"
@@ -182,7 +182,7 @@ const UserAddForm = ({
                     }
                     
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item md={6} xs={12}>
                   <TextField
                     fullWidth

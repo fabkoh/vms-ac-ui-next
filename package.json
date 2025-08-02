@@ -67,7 +67,6 @@
     "intl-tel-input": "^17.0.15",
     "libphonenumber-js": "^1.10.13",
     "lodash.debounce": "^4.0.8",
-    "material-ui-phone-number": "^3.0.0",
     "moment": "^2.29.4",
     "next": "^13.5.6",
     "nprogress": "^0.2.0",

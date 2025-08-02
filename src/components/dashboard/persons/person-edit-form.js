@@ -21,7 +21,7 @@ import { Confirmdelete } from '../persons/confirm-delete';
 import { personApi } from '../../../api/person';
 import toast from 'react-hot-toast';
 import { Box } from '@mui/system';
-import MuiPhoneNumber from "material-ui-phone-number";
+// import MuiPhoneNumber from "material-ui-phone-number";
 import { accessGroupApi } from '../../../api/access-groups';
 
 const ExpandMore = styled((props) => {
@@ -222,7 +222,7 @@ export const PersonEditForm = (props) => {
                   md={6}
                   xs={12}
                 >
-                  <MuiPhoneNumber
+                  {/* <MuiPhoneNumber
                     fullWidth
                     error={!person.valid.mobileNumber}
                     helperText={person.valid.mobileNumber || 'Mobile number is in use'}
@@ -232,7 +232,7 @@ export const PersonEditForm = (props) => {
                     onChange={(e) => onNumberChange(e, person.id)}
                     value={person.personMobileNumber || "+65"}
                     variant ='outlined'
-                  />
+                  /> */}
                 </Grid>
                 <Grid
                   item
