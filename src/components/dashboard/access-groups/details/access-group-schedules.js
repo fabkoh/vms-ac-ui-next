@@ -162,7 +162,7 @@ export default function AccessGroupSchedules({
         open={actionOpen}
         onClose={handleActionMenuClose}
       >
-        <NextLink href={link} passHref>
+        <NextLink href={link} passHref legacyBehavior>
           <MenuItem disableRipple disabled={actionDisabled}>
             <Edit />
             &#8288;Modify

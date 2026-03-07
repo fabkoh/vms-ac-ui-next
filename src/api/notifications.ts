@@ -1,8 +1,9 @@
 import { useApi } from "./api-config";
 import { sendApi } from "./api-helpers";
+import type { EmailConfig } from "../types/models";
 
 class NotificationsApi {
-  backToDefault() {
+  backToDefault(): Promise<Response> | undefined {
     //for back to default
     if (useApi) {
       return sendApi(`/api/notification/email/backToDefault`, {
@@ -14,7 +15,7 @@ class NotificationsApi {
     }
   }
 
-  changeSMSEnablement(enabled) {
+  changeSMSEnablement(enabled: boolean): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/notification/sms/enablement", {
         method: "POST",
@@ -28,7 +29,7 @@ class NotificationsApi {
     }
   }
 
-  changeEmailEnablement(enabled) {
+  changeEmailEnablement(enabled: boolean): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/notification/email/enablement", {
         method: "POST",
@@ -42,13 +43,13 @@ class NotificationsApi {
     }
   }
 
-  getSMSSettings() {
+  getSMSSettings(): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/notification/sms");
     }
   }
 
-  getEmailSettings() {
+  getEmailSettings(): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/notification/email`);
     }
@@ -63,7 +64,7 @@ class NotificationsApi {
     portNumber,
     isTLS,
     enabled,
-  }) {
+  }: EmailConfig): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/notification/email", {
         method: "PUT",
@@ -84,8 +85,7 @@ class NotificationsApi {
     }
   }
 
-  updateSMS(SMSApiKey) {
-    // console.log(SMSApiKey);
+  updateSMS(SMSApiKey: string): Promise<Response> | undefined {
     const smsAPI = SMSApiKey;
     console.log(smsAPI);
     if (useApi) {
@@ -112,10 +112,10 @@ class NotificationsApi {
       enabled,
       isTLS,
       custom,
-    },
-    recipentUser,
-    recipentEmail
-  ) {
+    }: EmailConfig & { custom?: boolean },
+    recipentUser: string,
+    recipentEmail: string
+  ): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/notification/testSMTP", {
         method: "POST",
@@ -139,7 +139,7 @@ class NotificationsApi {
     }
   }
 
-  testSMS(recipentSMS) {
+  testSMS(recipentSMS: string): Promise<Response> | undefined {
     console.log("recipentSMS:", recipentSMS);
     console.log("JSON body:", JSON.stringify({ recipentSMS }));
 
@@ -150,21 +150,19 @@ class NotificationsApi {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
-          //   smsAPI: "test",
-          //   enabled: true,
           recipentSMS,
         }),
       });
     }
   }
 
-  getSMSCredits() {
-      if (useApi) {
-        return sendApi("/api/notification/sms/credits", {
-          method: "GET",
-        });
-      }
+  getSMSCredits(): Promise<Response> | undefined {
+    if (useApi) {
+      return sendApi("/api/notification/sms/credits", {
+        method: "GET",
+      });
     }
+  }
 }
 
 export const notificationsApi = new NotificationsApi();

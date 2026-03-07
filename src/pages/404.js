@@ -74,7 +74,7 @@ const NotFound = () => {
           >
             <NextLink
               href="/dashboard"
-              passHref
+              passHref legacyBehavior
             >
               <Button
                 component="a"

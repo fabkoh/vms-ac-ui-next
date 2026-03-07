@@ -130,14 +130,17 @@ const EditEntrances = () => {
     return entrances; // for extension (see useEffect() below)
   };
 
-  useEffect(async () => {
-    try {
-      getAccessGroupsEntrances(
-        await getEntrances(JSON.parse(decodeURIComponent(router.query.ids)))
-      );
-    } catch (e) {
-      router.replace("/dashboard/entrances");
-    }
+  useEffect(() => {
+    const run = async () => {
+      try {
+        getAccessGroupsEntrances(
+          await getEntrances(JSON.parse(decodeURIComponent(router.query.ids)))
+        );
+      } catch (e) {
+        router.replace("/dashboard/entrances");
+      }
+    };
+    run();
   }, []);
 
   // fetch all access groups info
@@ -461,7 +464,7 @@ const EditEntrances = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <NextLink href="/dashboard/entrances/" passHref>
+                  <NextLink href="/dashboard/entrances/" passHref legacyBehavior>
                     <Button
                       size="large"
                       variant="outlined"

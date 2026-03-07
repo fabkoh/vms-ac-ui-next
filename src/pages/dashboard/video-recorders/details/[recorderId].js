@@ -326,7 +326,7 @@ const VideoRecorderDetails = () => {
         <Container maxWidth="md">
           <div>
             <Box sx={{ mb: 4 }}>
-              <NextLink href={"/dashboard/video-recorders"} passHref>
+              <NextLink href={"/dashboard/video-recorders"} passHref legacyBehavior>
                 <Link
                   color="textPrimary"
                   component="a"
@@ -396,7 +396,7 @@ const VideoRecorderDetails = () => {
                     href={getVideoRecorderEditLink(
                       videoRecorderInfo ? videoRecorderInfo.recorderId : null
                     )}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <MenuItem disableRipple>
                       <EditIcon />

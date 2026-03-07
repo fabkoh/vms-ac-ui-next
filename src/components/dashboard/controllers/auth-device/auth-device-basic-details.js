@@ -70,7 +70,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                         deviceInfo.entrance ? (
                             <NextLink
                                 href={getEntranceDetailsLink(deviceInfo.entrance)}
-                                passHref
+                                passHref legacyBehavior
                             >
                                 <Link>
                                 <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>

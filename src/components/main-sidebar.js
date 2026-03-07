@@ -43,7 +43,7 @@ export const MainSidebar = (props) => {
       <Box sx={{ p: 2 }}>
         <NextLink
           href="/dashboard"
-          passHref
+          passHref legacyBehavior
         >
           <MainSidebarLink
             color="textSecondary"
@@ -55,7 +55,7 @@ export const MainSidebar = (props) => {
         </NextLink>
         <NextLink
           href="/browse"
-          passHref
+          passHref legacyBehavior
         >
           <MainSidebarLink
             color="textSecondary"
@@ -67,7 +67,7 @@ export const MainSidebar = (props) => {
         </NextLink>
         <NextLink
           href="/docs/welcome"
-          passHref
+          passHref legacyBehavior
         >
           <MainSidebarLink
             color="textSecondary"

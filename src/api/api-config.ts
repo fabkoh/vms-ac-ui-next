@@ -207,7 +207,7 @@ const fakeVideoRecorders = [
         "recorderUsername": "demo",
         "recorderPassword": "password",
         "created": "2022-06-24T10:31:35.126183"
-    }, 
+    },
     {
         "recorderId": 3,
         "recorderName": "Video Recorder 2",
@@ -217,7 +217,7 @@ const fakeVideoRecorders = [
         "recorderUsername": "demo",
         "recorderPassword": "password",
         "created": "2022-06-24T10:31:35.126183"
-    }, 
+    },
     {
         "recorderId": 2,
         // "isActive": true,
@@ -254,7 +254,7 @@ const fakeEmailConfig = {
   enabled: true,
 };
 
-const fakeEventsManagement = [];
+const fakeEventsManagement: unknown[] = [];
 const fakeInputEvents = [
   {
     eventActionInputId: 1,

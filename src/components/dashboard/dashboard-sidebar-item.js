@@ -94,7 +94,7 @@ export const DashboardSidebarItem = (props) => {
         px: 2,
       }}
     >
-      <NextLink href={path} passHref>
+      <NextLink href={path} passHref legacyBehavior>
         <Button
           component="a"
           startIcon={icon}

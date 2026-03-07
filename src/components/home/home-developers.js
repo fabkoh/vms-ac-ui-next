@@ -44,7 +44,7 @@ export const HomeDevelopers = (props) => {
               </Typography>
               <NextLink
                 href="/browse"
-                passHref
+                passHref legacyBehavior
               >
                 <Button
                   size="large"

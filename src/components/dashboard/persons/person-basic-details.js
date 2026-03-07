@@ -80,7 +80,7 @@ export const PersonBasicDetails = (props) => {
         <PropertyListItem align={align} divider label="Access group">
           {accessGroup ? (
             <Link component="a">
-              <NextLink href={getAccessGroupDetailsLink(accessGroup)} passHref>
+              <NextLink href={getAccessGroupDetailsLink(accessGroup)} passHref legacyBehavior>
                 <Chip
                   color={
                     accessGroup.isActive && accessGroupInSchedule

@@ -29,7 +29,7 @@ const RenderTableCell = ({exist,deleted, id, name,link,chip}) => {
                                         >
                                             <NextLink
                                                 href={ link }
-                                                passHref
+                                                passHref legacyBehavior
                                             >
                                                 <Link component="a">
                                                     <Chip icon={chip} label={name} clickable />

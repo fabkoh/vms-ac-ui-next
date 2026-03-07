@@ -427,7 +427,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                         <Box sx={{ mb: 4 }}>
                             <NextLink
                                 href={entranceListLink}
-                                passHref
+                                passHref legacyBehavior
                             >
                                 <Link
                                     color="textPrimary"
@@ -485,7 +485,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                 >
                                     <NextLink
                                         href={entranceCreateLink}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <MenuItem disableRipple>
                                             <AddIcon />
@@ -494,7 +494,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                     </NextLink>
                                     <NextLink
                                         href={getEntranceEditLink([entrance])}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />

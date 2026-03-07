@@ -147,14 +147,17 @@ const EditAccessGroups = () => {
     return accessGroups; // for extension (see useEffect() below)
   };
 
-  useEffect(async () => {
-    try {
-      getGroupEntrances(
-        await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
-      );
-    } catch (e) {
-      router.replace("/dashboard/access-groups");
-    }
+  useEffect(() => {
+    const run = async () => {
+      try {
+        getGroupEntrances(
+          await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
+        );
+      } catch (e) {
+        router.replace("/dashboard/access-groups");
+      }
+    };
+    run();
   }, []);
 
   // persons logic (displaying in dropdown box)
@@ -514,7 +517,7 @@ const EditAccessGroups = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <NextLink href="/dashboard/access-groups/" passHref>
+                  <NextLink href="/dashboard/access-groups/" passHref legacyBehavior>
                     <Button
                       size="large"
                       variant="outlined"

@@ -67,7 +67,7 @@ const NotificationLogTable = ({
                                     {log.eventsManagementNotification ?
                                         <NextLink
                                             href={getEventsManagementDetailsLink(log.eventsManagementNotification.eventsManagement.eventsManagementId)}
-                                            passHref
+                                            passHref legacyBehavior
                                         >
                                             <Link color="inherit"
                                                 variant="subtitle2">

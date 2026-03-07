@@ -111,7 +111,7 @@ export default function EntranceEventsManagement({
 					href={
                         eventsManagementCreatelink
 					}
-					passHref
+					passHref legacyBehavior
 				>
 					<MenuItem disableRipple 
 					// disabled={actionDisabled}

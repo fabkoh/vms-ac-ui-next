@@ -79,7 +79,7 @@ const PersonsListTable = ({ persons, selectedAllPersons, selectedSomePersons, ha
                                                 >
                                                     <NextLink
                                                         href={getPersonDetailsLink(person)}
-                                                        passHref
+                                                        passHref legacyBehavior
                                                     >
                                                         <Link
                                                             color="inherit"

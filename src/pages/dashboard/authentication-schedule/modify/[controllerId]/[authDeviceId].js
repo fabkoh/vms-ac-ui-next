@@ -611,7 +611,7 @@ const ModifyauthMethodSchedule = () => {
           <Box sx={{ mb: 4 }}>
             <NextLink
               href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`}
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textPrimary"
@@ -776,7 +776,7 @@ const ModifyauthMethodSchedule = () => {
                 <Grid item>
                   <NextLink
                     href={`/dashboard/controllers/auth-device/details/${controllerId}/${authDeviceId}`}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <Button size="large" variant="outlined" color="error">
                       Cancel

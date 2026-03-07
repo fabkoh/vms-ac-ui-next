@@ -93,7 +93,7 @@ export const EntranceBasicDetails = (props) => {
                     value={
                         controller ? ( // TODO make this into link
                             <NextLink href={getControllerDetailsLink(controller)}
-                                passHref>
+                                passHref legacyBehavior>
                                 <Link color="inherit">
                                     <Typography noWrap>{ controller.controllerName }</Typography>
                                 </Link>

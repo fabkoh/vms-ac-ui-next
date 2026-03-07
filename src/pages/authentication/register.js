@@ -102,7 +102,7 @@ const Register = () => {
             >
               <NextLink
                 href="/"
-                passHref
+                passHref legacyBehavior
               >
                 <a>
                   <Logo
@@ -133,7 +133,7 @@ const Register = () => {
               href={disableGuard
                 ? `/authentication/login?disableGuard=${disableGuard}`
                 : '/authentication/login'}
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textSecondary"

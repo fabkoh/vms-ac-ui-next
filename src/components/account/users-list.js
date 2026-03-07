@@ -494,7 +494,7 @@ export const UsersList = () => {
                 Actions
               </Button>
               <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                <NextLink href={userCreateLink} passHref>
+                <NextLink href={userCreateLink} passHref legacyBehavior>
                   <MenuItem disableRipple>
                     <AddIcon />
                     &#8288;Create

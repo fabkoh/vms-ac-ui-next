@@ -63,7 +63,7 @@ export const EventManagementDetails = (props) => {
             accessGroup ? (
               <Link component="a">
                 <NextLink href={getAccessGroupDetailsLink(accessGroup)}
-                  passHref>                
+                  passHref legacyBehavior>                
                   <Chip color={accessGroup.isActive &&  accessGroupInSchedule? "success" : "default"}
                         label={getAccessGroupLabel(accessGroup)}
                         icon={<LockClosed />}/>

@@ -82,7 +82,7 @@ export const AccountPopover = (props) => {
       <Box sx={{ my: 1 }}>
         {/* <NextLink
           href="/dashboard/social/profile"
-          passHref
+          passHref legacyBehavior
         >
           <MenuItem component="a">
             <ListItemIcon>
@@ -97,7 +97,7 @@ export const AccountPopover = (props) => {
             />
           </MenuItem>
         </NextLink> */}
-        <NextLink href="/dashboard/settings/account" passHref>
+        <NextLink href="/dashboard/settings/account" passHref legacyBehavior>
           <MenuItem component="a">
             <ListItemIcon>
               <CogIcon fontSize="small" />

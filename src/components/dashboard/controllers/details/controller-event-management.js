@@ -133,7 +133,7 @@ export default function ControllerEventsManagement({
 					href={
                         eventsManagementCreateLink
 					}
-					passHref
+					passHref legacyBehavior
 				>
 					<MenuItem disableRipple 
 					// disabled={actionDisabled}

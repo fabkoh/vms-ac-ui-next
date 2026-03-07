@@ -37,7 +37,7 @@ export const AuthBanner = () => (
           {' '}
           <NextLink
             href="/docs/welcome"
-            passHref
+            passHref legacyBehavior
           >
             <Link variant="subtitle2">
               docs

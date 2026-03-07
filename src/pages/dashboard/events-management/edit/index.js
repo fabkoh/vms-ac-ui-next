@@ -1212,7 +1212,7 @@ const EditEventManagement = () => {
                         />
                         <NextLink
                             href={`/dashboard/events-management`}
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -1364,7 +1364,7 @@ const EditEventManagement = () => {
                                 <Grid item>
                                     <NextLink
                                         href="/dashboard/events-management/"
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

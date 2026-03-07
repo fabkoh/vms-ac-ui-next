@@ -18,7 +18,7 @@ export const DocsNavbar = ({ onOpenSidebar }) => (
     <Toolbar sx={{ height: 64 }}>
       <NextLink
         href="/"
-        passHref
+        passHref legacyBehavior
       >
         <a>
           <Logo
@@ -32,7 +32,7 @@ export const DocsNavbar = ({ onOpenSidebar }) => (
       <Box sx={{ flexGrow: 1 }} />
       <NextLink
         href="/dashboard"
-        passHref
+        passHref legacyBehavior
       >
         <Link
           color="textSecondary"
@@ -44,7 +44,7 @@ export const DocsNavbar = ({ onOpenSidebar }) => (
       </NextLink>
       <NextLink
         href="/browse"
-        passHref
+        passHref legacyBehavior
       >
         <Link
           color="textSecondary"

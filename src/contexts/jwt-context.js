@@ -1,6 +1,6 @@
 import { createContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { authApi, authLogOut } from '../api/auth-api';
+import { authLogOut } from '../api/auth-api';
 import { authLogin, authGetProfile } from '../api/auth-api';
 
 const initialState = {

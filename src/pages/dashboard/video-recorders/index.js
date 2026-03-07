@@ -368,14 +368,14 @@ const RecorderList = () => {
                                     onClose={handleActionClose}
                                 >
                                     <NextLink href={videoRecorderCreateLink}
-                                        passHref>
+                                        passHref legacyBehavior>
                                         <MenuItem disableRipple>
                                             <Add />
                                             &#8288;Create
                                         </MenuItem>
                                     </NextLink>
                                     <NextLink href={getVideoRecordersEditLink(selectedRecorders)}
-                                        passHref>
+                                        passHref legacyBehavior>
                                         <MenuItem disableRipple
                                             disabled={actionDisabled}>
                                             <Edit />

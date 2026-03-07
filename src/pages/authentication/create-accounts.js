@@ -581,7 +581,7 @@ const CreatePersonsTwo = () => {
 					    />
                         <NextLink
                             href={personListLink}
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -657,7 +657,7 @@ const CreatePersonsTwo = () => {
                                     </Button>
                                     <NextLink
                                         href={personListLink}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

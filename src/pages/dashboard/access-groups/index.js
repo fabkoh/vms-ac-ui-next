@@ -380,7 +380,7 @@ const AccessGroupList = () => {
     );
 
     let successCount = 0;
-    const someFailed = false;
+    let someFailed = false;
     resArr.forEach((res) => {
       if (res.status == 200) {
         successCount++;
@@ -518,7 +518,7 @@ const AccessGroupList = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  <NextLink href={"/dashboard/access-groups/create"} passHref>
+                  <NextLink href={"/dashboard/access-groups/create"} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <AddIcon />
                       &#8288;Create
@@ -533,7 +533,7 @@ const AccessGroupList = () => {
                         ),
                       },
                     }}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <MenuItem disableRipple disabled={buttonBlock}>
                       <EditIcon />

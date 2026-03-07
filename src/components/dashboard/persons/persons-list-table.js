@@ -188,7 +188,7 @@ export const PersonsListTable = (props) => {
                           getInitials(person.personLastName)}
                       </Avatar> */}
                       <Box sx={{ ml: 1, width: 100 }}>
-                        <NextLink href={getPersonDetailsLink(person)} passHref>
+                        <NextLink href={getPersonDetailsLink(person)} passHref legacyBehavior>
                           <Link color="inherit" variant="subtitle2">
                             <Typography noWrap>
                               {getPersonName(person)}
@@ -229,7 +229,7 @@ export const PersonsListTable = (props) => {
                     {person.accessGroup ? (
                       <NextLink
                         href={`/dashboard/access-groups/details/${person.accessGroup.accessGroupId}`}
-                        passHref
+                        passHref legacyBehavior
                       >
                         <Chip
                           label={person.accessGroup.accessGroupName}
@@ -264,12 +264,12 @@ export const PersonsListTable = (props) => {
                     </Typography>
                   </TableCell> */}
                   <TableCell width="10%" align="left">
-                    <NextLink href={getPersonsEditLink([person])} passHref>
+                    <NextLink href={getPersonsEditLink([person])} passHref legacyBehavior>
                       <IconButton component="a">
                         <PencilAltIcon fontSize="small" />
                       </IconButton>
                     </NextLink>
-                    <NextLink href={getPersonDetailsLink(person)} passHref>
+                    <NextLink href={getPersonDetailsLink(person)} passHref legacyBehavior>
                       <IconButton component="a">
                         <ArrowRightIcon fontSize="small" />
                       </IconButton>

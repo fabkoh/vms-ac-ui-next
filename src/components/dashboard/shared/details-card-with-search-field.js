@@ -90,7 +90,7 @@ export default function DetailsCardWithSearchField({
           {entities.map((e, i) => (
             console.log(1, e, e.isActive),
             <Grid item paddingRight={3} paddingBottom={3} key={i}>
-              <NextLink href={getLink(e)} passHref>
+              <NextLink href={getLink(e)} passHref legacyBehavior>
                 <Link component="a">
                   <Chip
                     color={

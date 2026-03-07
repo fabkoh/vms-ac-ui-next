@@ -97,7 +97,7 @@ const PasswordRecovery = () => {
             >
               <NextLink
                 href="/"
-                passHref
+                passHref legacyBehavior
               >
                 <a>
                   <Logo

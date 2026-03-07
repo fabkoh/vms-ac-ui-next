@@ -74,7 +74,7 @@ const AuthorizationRequired = () => {
           >
             <NextLink
               href="/dashboard"
-              passHref
+              passHref legacyBehavior
             >
               <Button
                 component="a"

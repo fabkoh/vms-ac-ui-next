@@ -162,7 +162,7 @@ const AssignAuthDevice = ({authPair,status,statusLoaded,allEntrances,changeEntra
 											/>{" "}
 										</TableCell> */}
 										<TableCell>
-											{/* <NextLink href={"/dashboard"} passHref> */}
+											{/* <NextLink href={"/dashboard"} passHref legacyBehavior> */}
 												{/* <Link color="inherit"> */}
 													{device.authDeviceName}
 												{/* </Link> */}

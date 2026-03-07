@@ -1645,7 +1645,7 @@ const ModifyEventManagement = () => {
                 </Button>
               </Grid>
               <Grid item>
-                <NextLink href="/dashboard/events-management/" passHref>
+                <NextLink href="/dashboard/events-management/" passHref legacyBehavior>
                   <Button
                     size="large"
                     variant="outlined"

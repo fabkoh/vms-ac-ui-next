@@ -303,7 +303,7 @@ const ModifyEntranceSchedule = () => {
                     <Box sx={{ mb: 4 }}>
                         <NextLink
                             href={`/dashboard/entrances/details/${entranceId}`}
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -465,7 +465,7 @@ const ModifyEntranceSchedule = () => {
                                 <Grid item>
                                     <NextLink
                                         href={`/dashboard/entrances/details/${entranceId}`}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

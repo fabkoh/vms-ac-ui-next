@@ -91,7 +91,7 @@ const LostPerson = () => {
 							/>
 							<NextLink
 								href={personListLink}
-								passHref
+								passHref legacyBehavior
 							>
 								<Link
 								color="textPrimary"

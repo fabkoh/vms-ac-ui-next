@@ -41,7 +41,7 @@ export const BrowseLayout = (props) => {
               {!isBase && (
                 <NextLink
                   href="/browse"
-                  passHref
+                  passHref legacyBehavior
                 >
                   <Button
                     component="a"

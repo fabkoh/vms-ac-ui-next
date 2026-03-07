@@ -532,7 +532,7 @@ const EditVideoRecorder = () => {
               open={serverDownOpen}
               handleDialogClose={() => setServerDownOpen(false)}
             />
-            <NextLink href={videoRecorderListLink} passHref>
+            <NextLink href={videoRecorderListLink} passHref legacyBehavior>
               <Link
                 color="textPrimary"
                 component="a"
@@ -587,7 +587,7 @@ const EditVideoRecorder = () => {
                 >
                   Submit
                 </Button>
-                <NextLink href={videoRecorderListLink} passHref>
+                <NextLink href={videoRecorderListLink} passHref legacyBehavior>
                   <Button
                     size="large"
                     sx={{ mr: 3 }}

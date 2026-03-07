@@ -101,7 +101,7 @@ function EventsManagementTable({
                   {/* <TableCell width="1%">
                                                 <NextLink
                                                     href={eventsManagementEditLink(eventManagement.eventsManagementId)}
-                                                    passHref
+                                                    passHref legacyBehavior
                                                 >
                                                     <IconButton component="a">
                                                         <PencilAltIcon fontSize="small" />
@@ -113,7 +113,7 @@ function EventsManagementTable({
                       href={getEventsManagementDetailsLink(
                         eventManagement.eventsManagementId
                       )}
-                      passHref
+                      passHref legacyBehavior
                     >
                       <IconButton component="a">
                         <ArrowRightIcon fontSize="small" />

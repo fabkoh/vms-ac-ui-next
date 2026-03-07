@@ -19,7 +19,7 @@ const EntranceComponent = ({ entrance, ...props }) => {
             <Box { ...props }>
                 <NextLink
                     href={getEntranceDetailsLink(entrance)}
-                    passHref
+                    passHref legacyBehavior
                 >
                     <Link color="inherit">
                         <Typography noWrap>{ entrance.entranceName }</Typography>
@@ -59,21 +59,24 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
     const [statusLoaded, setStatusLoaded] = useState(false);
     const [connected,    setConnected]    = useState(false);
 
-    useEffect(async() => {
-        setStatusLoaded(false);
-        try {
-            const res = await controllerApi.getAuthStatus(controllerId);
-            if(res.status == 200) {
-                const body = await res.json();
-                setDeviceStatus(body);
-                setConnected(true);
-            } else {
-                throw new Error("controller not connected");
+    useEffect(() => {
+        const fetchStatus = async () => {
+            setStatusLoaded(false);
+            try {
+                const res = await controllerApi.getAuthStatus(controllerId);
+                if(res.status == 200) {
+                    const body = await res.json();
+                    setDeviceStatus(body);
+                    setConnected(true);
+                } else {
+                    throw new Error("controller not connected");
+                }
+            } catch(e) {
+                setConnected(false);
             }
-        } catch(e) {
-            setConnected(false);
-        }
-        setStatusLoaded(true);
+            setStatusLoaded(true);
+        };
+        fetchStatus();
     }, [controller]) // whenever controller changes (during refresh, run this)
 
     return (
@@ -92,7 +95,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
             <TableCell>
                 <NextLink
                     href={ detailsLink }
-                    passHref
+                    passHref legacyBehavior
                 >
                     <Link color="inherit">
                         <Typography noWrap>{ controllerName }</Typography>
@@ -144,7 +147,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
             <TableCell>
                 <NextLink
                     href={ getControllerEditLink(controller) }
-                    passHref
+                    passHref legacyBehavior
                 >
                     <IconButton component="a">
                         <PencilAlt fontSize="small" />
@@ -152,7 +155,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
                 </NextLink>
                 <NextLink
                     href={ detailsLink }
-                    passHref
+                    passHref legacyBehavior
                 >
                     <IconButton component="a">
                         <ArrowRight fontSize="small" />

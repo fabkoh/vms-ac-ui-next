@@ -74,7 +74,7 @@ const ServerError = () => {
           >
             <NextLink
               href="/dashboard"
-              passHref
+              passHref legacyBehavior
             >
               <Button
                 component="a"

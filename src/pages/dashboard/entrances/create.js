@@ -435,7 +435,7 @@ const CreateEntrances = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <NextLink href="/dashboard/entrances/" passHref>
+                  <NextLink href="/dashboard/entrances/" passHref legacyBehavior>
                     <Button
                       size="large"
                       variant="outlined"

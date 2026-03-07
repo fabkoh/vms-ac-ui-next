@@ -508,7 +508,7 @@ const CreatePersonsTwo = () => {
                 open={serverDownOpen}
                 handleDialogClose={() => setServerDownOpen(false)}
               />
-              <NextLink href={usersManagementLink} passHref>
+              <NextLink href={usersManagementLink} passHref legacyBehavior>
                 <Link
                   color="textPrimary"
                   component="a"
@@ -576,7 +576,7 @@ const CreatePersonsTwo = () => {
                     >
                       Create Users
                     </Button>
-                    <NextLink href={usersManagementLink} passHref>
+                    <NextLink href={usersManagementLink} passHref legacyBehavior>
                       <Button
                         size="large"
                         sx={{ mr: 3 }}

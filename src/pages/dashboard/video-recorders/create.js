@@ -432,7 +432,7 @@ const CreateRecorders = () => {
                     <Box sx={{ mb: 4 }}>
                         <NextLink
                             href={videoRecorderListLink}
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -523,7 +523,7 @@ const CreateRecorders = () => {
                                 <Grid item>
                                     <NextLink
                                         href="/dashboard/video-recorders/"
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

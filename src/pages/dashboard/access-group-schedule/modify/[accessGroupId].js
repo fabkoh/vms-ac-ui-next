@@ -303,7 +303,7 @@ const ModifyAccessGroupSchedule = () => {
                     <Box sx={{ mb: 4 }}>
                         <NextLink
                             href={`/dashboard/access-groups/details/${accessGroupId}`}
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -468,7 +468,7 @@ mb={2}>
                                 <Grid item>
                                     <NextLink
                                         href={accGrp? getAccessGroupDetailsLink(accGrp) : accessGroupListLink}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

@@ -691,8 +691,9 @@ const PersonList = () => {
     }
   }, [isMounted]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(getInfo, []);
+  useEffect(() => {
+  getInfo();
+}, [getInfo]);
 
   // pop-up for import-check
 
@@ -834,7 +835,7 @@ const PersonList = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  <NextLink href={personCreateLink} passHref>
+                  <NextLink href={personCreateLink} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <AddIcon />
                       &#8288;Create
@@ -842,7 +843,7 @@ const PersonList = () => {
                   </NextLink>
                   <NextLink
                     href={getPersonIdsEditLink(selectedPersons)}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <MenuItem disableRipple disabled={buttonBlock}>
                       <EditIcon />
@@ -950,7 +951,7 @@ const PersonList = () => {
                 </Tooltip>
               </Grid>
               <Grid item>
-                <NextLink href={personLostAndFoundLink} passHref>
+                <NextLink href={personLostAndFoundLink} passHref legacyBehavior>
                   <Button sx={{ m: 2 }} variant="contained" color="error">
                     Lost & Found
                   </Button>

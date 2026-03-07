@@ -169,7 +169,7 @@ const PersonDetails = () => {
 				/>
 			  <NextLink
 				href={personListLink}
-				passHref
+				passHref legacyBehavior
               >
 				<Link
 				  color="textPrimary"
@@ -229,7 +229,7 @@ const PersonDetails = () => {
           >
             <NextLink
               href="/dashboard/persons/create"
-              passHref
+              passHref legacyBehavior
             >
               <MenuItem disableRipple>
                 <AddIcon />
@@ -238,7 +238,7 @@ const PersonDetails = () => {
             </NextLink>
             <NextLink
               href={editLink}
-              passHref
+              passHref legacyBehavior
             >
               <MenuItem disableRipple>
                 <EditIcon />

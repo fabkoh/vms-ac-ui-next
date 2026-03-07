@@ -304,7 +304,7 @@ const AuthDeviceDetails = () => {
                         <Box sx={{ mb: 4 }}>
                             <NextLink
                                 href={getControllerDetailsLinkWithId(controllerId)} //change to controller details view
-                                passHref
+                                passHref legacyBehavior
                             >
                                 <Link
                                     color="textPrimary"
@@ -372,7 +372,7 @@ const AuthDeviceDetails = () => {
                                 >
                                     <NextLink
                                         href={getAuthdeviceEditLink(controllerId,authDeviceId)}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />

@@ -961,7 +961,7 @@ export const DashboardSidebar = (props) => {
           />
           <div>
             <Box sx={{ p: 3 }}>
-              <NextLink href="/dashboard" passHref>
+              <NextLink href="/dashboard" passHref legacyBehavior>
                 <a>
                   <Logo
                     sx={{
@@ -971,7 +971,7 @@ export const DashboardSidebar = (props) => {
                   />
                 </a>
               </NextLink>
-              <NextLink href="/dashboard" passHref>
+              <NextLink href="/dashboard" passHref legacyBehavior>
                 <a>
                   <Image src={etlasname} />
                 </a>
@@ -1099,7 +1099,7 @@ export const DashboardSidebar = (props) => {
             <Typography color="neutral.500" variant="body2">
               {t("Check our docs")}
             </Typography>
-            <NextLink href="/docs/welcome" passHref>
+            <NextLink href="/docs/welcome" passHref legacyBehavior>
               <Button
                 color="secondary"
                 component="a"

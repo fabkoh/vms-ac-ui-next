@@ -25,7 +25,6 @@ import {
 import { toDisplayDateString } from "../../../utils/utils";
 import CropPortraitIcon from "@mui/icons-material/CropPortrait";
 import SignalCellularAlt1BarSharpIcon from "@mui/icons-material/SignalCellularAlt1BarSharp";
-import { resolveTypeReferenceDirective } from "typescript";
 import { SeverityPill } from "../../severity-pill";
 import { useEffect, useState } from "react";
 
@@ -117,7 +116,7 @@ export default function VideoListTable({
                   <TableCell>
                     {/* <NextLink
                                                 href={detailsLink}    
-                                                passHref
+                                                passHref legacyBehavior
                                             > */}
                     <Link
                       color="inherit"
@@ -218,7 +217,7 @@ export default function VideoListTable({
                     )}
                   </TableCell> */}
                   <TableCell>
-                    <NextLink href={detailsLink} passHref>
+                    <NextLink href={detailsLink} passHref legacyBehavior>
                       <Link color="inherit">
                         <Typography noWrap>
                           {toDisplayDateString(created)}
@@ -227,12 +226,12 @@ export default function VideoListTable({
                     </NextLink>
                   </TableCell>
                   <TableCell>
-                    <NextLink href={editLink} passHref>
+                    <NextLink href={editLink} passHref legacyBehavior>
                       <IconButton component="a">
                         <PencilAlt fontSize="small" />
                       </IconButton>
                     </NextLink>
-                    <NextLink href={detailsLink} passHref>
+                    <NextLink href={detailsLink} passHref legacyBehavior>
                       <IconButton
                         component="a"
                         onClick={() => {

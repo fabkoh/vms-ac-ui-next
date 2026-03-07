@@ -319,7 +319,7 @@ const EditController = () => {
                     <Box sx={{ mb: 4 }}>
                         <NextLink
                             href={getControllerListLink()} 
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -401,7 +401,7 @@ marginRight={3}>
                                 <Grid item>
                                     <NextLink
                                         href={getControllerDetailsLink(controllerInfo)} 
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

@@ -190,7 +190,7 @@ const AddCredentials = () => {
                 >
                   <NextLink
                     href={getPersonIdsEditLink(selectedPersons)}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <MenuItem disableRipple disabled={buttonBlock}>
                       <EditIcon />

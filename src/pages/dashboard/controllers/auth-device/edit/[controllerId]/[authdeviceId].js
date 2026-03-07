@@ -144,7 +144,7 @@ const EditAuthDevice = () => {
                     <Box sx={{ mb: 4 }}>
                         <NextLink
                             href={getControllerDetailsLinkWithId(controllerId)} 
-                            passHref
+                            passHref legacyBehavior
                         >
                             <Link
                                 color="textPrimary"
@@ -205,7 +205,7 @@ const EditAuthDevice = () => {
                                 <Grid item>
                                     <NextLink
                                         href={getAuthdeviceDetailsLink(controllerId, authdeviceId)} 
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <Button
                                             size="large"

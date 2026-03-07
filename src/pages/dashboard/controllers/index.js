@@ -78,8 +78,9 @@ const ControllerList = () => {
     }
   }, [isMounted]);
 
-  //eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => getInfo(), []);
+  useEffect(() => {
+    getInfo();
+  }, []);
 
   // for selection of checkboxes
   const [selectedControllers, setSelectedControllers] = useState([]); // stores the ids of selected

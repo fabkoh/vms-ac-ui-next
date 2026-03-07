@@ -261,7 +261,7 @@ const EventsManagementList = () => {
                   open={open}
                   onClose={handleActionClose}
                 >
-                  <NextLink href={eventsManagementCreateLink} passHref>
+                  <NextLink href={eventsManagementCreateLink} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <Add />
                       &#8288;Create

@@ -198,8 +198,10 @@ const EntranceList = () => {
     getEntranceSchedules();
     getAccessGroupsLocal(await getEntrancesLocal());
   };
-  //eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(getInfo, []);
+
+  useEffect(() => {
+    getInfo();
+  }, []);
 
   // for selection of checkboxes
   const [selectedEntrances, setSelectedEntrances] = useState([]);
@@ -340,7 +342,7 @@ const EntranceList = () => {
     );
 
     let successCount = 0;
-    const someFailed = false;
+    let someFailed = false;
     resArr.forEach((res) => {
       if (res.status == 200) {
         successCount++;
@@ -474,7 +476,7 @@ const EntranceList = () => {
                   open={open}
                   onClose={handleActionClose}
                 >
-                  <NextLink href={entranceCreateLink} passHref>
+                  <NextLink href={entranceCreateLink} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <Add />
                       &#8288;Create
@@ -482,7 +484,7 @@ const EntranceList = () => {
                   </NextLink>
                   <NextLink
                     href={getEntranceIdsEditLink(selectedEntrances)}
-                    passHref
+                    passHref legacyBehavior
                   >
                     <MenuItem disableRipple disabled={actionDisabled}>
                       <Edit />

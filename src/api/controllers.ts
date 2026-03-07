@@ -10,14 +10,14 @@ import {
 import { encodeArrayForSpring, sendApi } from "./api-helpers";
 
 class ControllerApi {
-  getControllers() {
+  getControllers(): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/controllers`);
     }
     const controllers = fakeControllers.map((controller) => {
       return { ...controller };
     });
-    controllers.forEach((controller) => {
+    controllers.forEach((controller: any) => {
       // populate authDevice
       controller.authDevice = fakeAuthDevices.filter(
         (device) => device.controllerId == controller.controllerId
@@ -30,11 +30,11 @@ class ControllerApi {
     );
   }
 
-  getController(controllerId) {
+  getController(controllerId: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/controller/${controllerId}`);
     }
-    const controller = fakeControllers.find(
+    const controller: any = fakeControllers.find(
       (c) => c.controllerId == controllerId
     );
 
@@ -64,7 +64,14 @@ class ControllerApi {
     controllerIPStatic,
     controllerMAC,
     controllerSerialNo,
-  }) {
+  }: {
+    controllerId: number | string;
+    controllerIP: string;
+    controllerName: string;
+    controllerIPStatic: boolean;
+    controllerMAC: string;
+    controllerSerialNo: string;
+  }): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controller/${controllerId}`, {
         method: "PUT",
@@ -83,7 +90,7 @@ class ControllerApi {
     }
   }
 
-  deleteController(controllerId) {
+  deleteController(controllerId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controller/delete/${controllerId}`, {
         method: "DELETE",
@@ -91,13 +98,13 @@ class ControllerApi {
     }
   }
 
-  getAuthStatus(controllerId) {
+  getAuthStatus(controllerId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controllerConnection/${controllerId}`);
     }
   }
 
-  resetController(controllerId) {
+  resetController(controllerId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controller/reset/${controllerId}`, {
         method: "PUT",
@@ -105,19 +112,19 @@ class ControllerApi {
     }
   }
 
-  uniconUpdater() {
+  uniconUpdater(): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/uniconUpdater`, { method: "POST" });
     }
   }
 
-  getAllCurrentAuthMethod(controllerId) {
+  getAllCurrentAuthMethod(controllerId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controller/currentAuthMethod/${controllerId}`);
     }
   }
 
-  getPiProperty(controllerId) {
+  getPiProperty(controllerId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/controller/piProperty/${controllerId}`);
     }

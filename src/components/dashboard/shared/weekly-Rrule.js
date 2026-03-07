@@ -300,7 +300,7 @@ mt={1} >
 	const weekarray = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 	const handleWeekarray = () => {
 		const weekarrayno = nonChangingRule.dtstart.getDay();
-		const newweekarrayno = weekarrayno - 1
+		let newweekarrayno = weekarrayno - 1
 		newweekarrayno==-1? newweekarrayno=6:false;
 		return weekarray[newweekarrayno]
 	}

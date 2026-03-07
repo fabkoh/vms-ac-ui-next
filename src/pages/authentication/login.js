@@ -104,7 +104,7 @@ const Login = () => {
             >
               <NextLink
                 href="/"
-                passHref
+                passHref legacyBehavior
               >
                 <a>
                   <Logo
@@ -142,7 +142,7 @@ const Login = () => {
               href={disableGuard
                 ? `/authentication/register?disableGuard=${disableGuard}`
                 : '/authentication/register'}
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textSecondary"
@@ -156,7 +156,7 @@ const Login = () => {
                 href={disableGuard
                   ? `/authentication/password-recovery?disableGuard=${disableGuard}`
                   : '/authentication/password-recovery'}
-                passHref
+                passHref legacyBehavior
               >
                 <Link
                   color="textSecondary"

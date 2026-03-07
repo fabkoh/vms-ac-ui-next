@@ -76,7 +76,7 @@ sx={{ mr: 1 }} />
             accessGroup ? (
               <Link component="a">
                 <NextLink href={getAccessGroupDetailsLink(accessGroup)}
-                  passHref>                
+                  passHref legacyBehavior>                
                   <Chip color={accessGroup.isActive ? "default" : "error"}
                         label={getAccessGroupLabel(accessGroup)}
                         icon={<LockClosed />}/>

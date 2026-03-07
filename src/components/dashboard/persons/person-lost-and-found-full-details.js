@@ -181,7 +181,7 @@ export const PersonLostDetailsCard = (props) => {
 					>
 						<NextLink
 						href={editLink}
-						passHref
+						passHref legacyBehavior
 						>
 							<MenuItem disableRipple>
 								<EditIcon />

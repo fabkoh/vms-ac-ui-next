@@ -122,7 +122,7 @@ const IndividualEventManagement = () => {
                 open={serverDownOpen}
                 handleDialogClose={() => setServerDownOpen(false)}
               />
-              <NextLink href={eventsManagementListLink} passHref>
+              <NextLink href={eventsManagementListLink} passHref legacyBehavior>
                 <Link
                   color="textPrimary"
                   component="a"
@@ -167,7 +167,7 @@ const IndividualEventManagement = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  <NextLink href="/dashboard/events-management/create" passHref>
+                  <NextLink href="/dashboard/events-management/create" passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <AddIcon />
                       Create

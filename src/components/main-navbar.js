@@ -25,7 +25,7 @@ export const MainNavbar = (props) => {
         >
           <NextLink
             href="/"
-            passHref
+            passHref legacyBehavior
           >
             <a>
               <Logo
@@ -63,7 +63,7 @@ export const MainNavbar = (props) => {
           >
             <NextLink
               href="/dashboard"
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textSecondary"
@@ -75,7 +75,7 @@ export const MainNavbar = (props) => {
             </NextLink>
             <NextLink
               href="/browse"
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textSecondary"
@@ -88,7 +88,7 @@ export const MainNavbar = (props) => {
             </NextLink>
             <NextLink
               href="/docs/welcome"
-              passHref
+              passHref legacyBehavior
             >
               <Link
                 color="textSecondary"

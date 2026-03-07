@@ -172,7 +172,7 @@ export const AccessGroupListTable = (props) => {
                           "/dashboard/access-groups/details/" +
                           accGroup.accessGroupId
                         }
-                        passHref
+                        passHref legacyBehavior
                       >
                         <Link color="inherit" variant="headline5">
                           <Typography noWrap>
@@ -240,7 +240,7 @@ export const AccessGroupListTable = (props) => {
                           ),
                         },
                       }}
-                      passHref
+                      passHref legacyBehavior
                     >
                       <IconButton component="a">
                         <PencilAltIcon fontSize="small" />
@@ -251,7 +251,7 @@ export const AccessGroupListTable = (props) => {
                         "/dashboard/access-groups/details/" +
                         accGroup.accessGroupId
                       }
-                      passHref
+                      passHref legacyBehavior
                     >
                       <IconButton component="a">
                         <ArrowRightIcon fontSize="small" />

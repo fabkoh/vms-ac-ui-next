@@ -172,7 +172,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 				<Box>
 				<NextLink 
                                                 href={getControllerEditLinkWithId(controllerId)}
-                                                passHref
+                                                passHref legacyBehavior
                                             >
 					<Button
 						sx={{ ml:2, mb: 2 }}
@@ -203,7 +203,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					href={
                         link
 					}
-					passHref
+					passHref legacyBehavior
 				>
 				<MenuItem
 					disableRipple
@@ -261,7 +261,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											/>{" "}
 										</TableCell> */}
 										<TableCell>							
-											<NextLink href={getAuthdeviceDetailsLink(controllerId,authDeviceId)} passHref> 
+											<NextLink href={getAuthdeviceDetailsLink(controllerId,authDeviceId)} passHref legacyBehavior> 
 												<Link color="inherit">
 													{device.authDeviceName} 
 												</Link>
@@ -297,7 +297,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 										<TableCell>
 											<NextLink
                                                 href={ getAuthdeviceEditLink(controllerId,authDeviceId) }
-                                                passHref
+                                                passHref legacyBehavior
                                             >
 											<IconButton component="a">
 												<PencilAlt fontSize="small" />
@@ -305,7 +305,7 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 											</NextLink>
                                             <NextLink 
                                                 href={ getAuthdeviceDetailsLink(controllerId,authDeviceId) }
-                                                passHref
+                                                passHref legacyBehavior
                                             >
 											<IconButton component="a">
 												<ArrowRight fontSize="small" />

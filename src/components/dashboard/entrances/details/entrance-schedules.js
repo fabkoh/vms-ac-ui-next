@@ -132,7 +132,7 @@ export default function EntranceSchedules({
 					href={
                         link
 					}
-					passHref
+					passHref legacyBehavior
 				>
 					<MenuItem disableRipple 
 					// disabled={actionDisabled}

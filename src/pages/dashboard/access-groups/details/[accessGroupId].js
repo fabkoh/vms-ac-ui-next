@@ -297,7 +297,7 @@ const AccessGroupDetails = () => {
         <Container maxWidth="md">
           <div>
             <Box sx={{ mb: 4 }}>
-              <NextLink href={accessGroupListLink} passHref>
+              <NextLink href={accessGroupListLink} passHref legacyBehavior>
                 <Link
                   color="textPrimary"
                   component="a"
@@ -340,13 +340,13 @@ const AccessGroupDetails = () => {
                   open={actionMenuOpen}
                   onClose={handleActionMenuClose}
                 >
-                  <NextLink href={accessGroupCreateLink} passHref>
+                  <NextLink href={accessGroupCreateLink} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <AddIcon />
                       &#8288;Create
                     </MenuItem>
                   </NextLink>
-                  <NextLink href={getAccessGroupEditLink(accessGroup)} passHref>
+                  <NextLink href={getAccessGroupEditLink(accessGroup)} passHref legacyBehavior>
                     <MenuItem disableRipple>
                       <EditIcon />
                       &#8288;Edit

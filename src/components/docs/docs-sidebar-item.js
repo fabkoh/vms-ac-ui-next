@@ -96,7 +96,7 @@ export const DocsSidebarItem = (props) => {
     >
       <NextLink
         href={path}
-        passHref
+        passHref legacyBehavior
       >
         <Button
           component="a"

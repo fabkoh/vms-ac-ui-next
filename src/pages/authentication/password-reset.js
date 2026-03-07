@@ -100,7 +100,7 @@ const PasswordReset = () => {
             >
               <NextLink
                 href="/"
-                passHref
+                passHref legacyBehavior
               >
                 <a>
                   <Logo
@@ -136,7 +136,7 @@ const PasswordReset = () => {
                 href={disableGuard
                   ? `/authentication/password-recovery?disableGuard=${disableGuard}`
                   : '/authentication/password-recovery'}
-                passHref
+                passHref legacyBehavior
               >
                 <Link
                   color="textSecondary"

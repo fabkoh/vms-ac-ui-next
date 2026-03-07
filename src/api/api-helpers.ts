@@ -1,17 +1,22 @@
 import { apiUri } from "./api-config";
 
-export function encodeArrayForSpring(array) {
+export function encodeArrayForSpring(array: unknown[]): string {
   const arrString = JSON.stringify(array);
   return encodeURIComponent(arrString.substring(1, arrString.length - 1));
 }
 
 export const serverDownCode = 599;
 
-export function sendApi(path, init = {}, refresh = true, contentType = "application/json") {
+export function sendApi(
+  path: string,
+  init: RequestInit = {},
+  refresh: boolean = true,
+  contentType: string = "application/json"
+): Promise<Response> {
 
-  function helper(contentType) {
+  function helper(contentType: string): Promise<Response> {
     let token = localStorage.getItem("accessToken");
-    var auth = {};
+    var auth: HeadersInit = {};
 
     if (contentType == "multipart/form-data") {
       auth = token ? { Authorization: `Bearer ${token}` } : {};
@@ -25,7 +30,7 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
     const promise = fetch(apiUri + path, init).catch((error) => {
       console.error("Error:", error);
       console.log("server is down!!");
-      return Promise.resolve(new Response({}, { status: serverDownCode }));
+      return Promise.resolve(new Response({} as BodyInit, { status: serverDownCode }));
     });
     return promise;
   }
@@ -39,18 +44,22 @@ export function sendApi(path, init = {}, refresh = true, contentType = "applicat
   return helper(contentType);
 }
 
-export const authRenewToken = async (contentType = "application/json") => {
+export const authRenewToken = async (contentType: string = "application/json"): Promise<void> => {
   console.log("Token is renewed.");
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) return;
+
   const res = await fetch(apiUri + "/api/auth/refreshtoken", {
     method: "POST",
     headers: { "Content-Type": contentType },
-    body: JSON.stringify({
-      refreshToken: localStorage.getItem("refreshToken"),
-    }),
+    body: JSON.stringify({ refreshToken }),
   });
-  const token = await res.json();
-  const newToken = token["accessToken"];
-  if (res.status === 200) {
-    localStorage.setItem("accessToken", newToken);
+  try {
+    const token = await res.json();
+    if (res.status === 200) {
+      localStorage.setItem("accessToken", token["accessToken"]);
+    }
+  } catch (e) {
+    // non-JSON response (e.g. 4xx) — do nothing
   }
 };

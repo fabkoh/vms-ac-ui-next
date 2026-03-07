@@ -487,7 +487,7 @@ const CreateAccessGroups = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <NextLink href="/dashboard/access-groups/" passHref>
+                  <NextLink href="/dashboard/access-groups/" passHref legacyBehavior>
                     <Button
                       size="large"
                       variant="outlined"

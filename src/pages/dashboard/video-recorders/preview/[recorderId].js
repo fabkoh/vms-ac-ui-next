@@ -411,7 +411,7 @@ const VideoRecorderPreview = () => {
               <Box sx={{ mb: 4 }}>   
               {/* <NextLink
                   href={`/dashboard/video-recorders/details/${recorderId}`}
-                  passHref
+                  passHref legacyBehavior
               > */}
                 <Link
                   color="textPrimary"

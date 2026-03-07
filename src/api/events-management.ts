@@ -5,6 +5,7 @@ import {
   fakeEventsManagement,
 } from "./api-config";
 import { encodeArrayForSpring, sendApi } from "./api-helpers";
+import type { EventActionInput, EventActionOutput, TriggerSchedule, EventsManagement } from "../types/models";
 
 class EventsManagementApi {
   createEventsManagement({
@@ -14,7 +15,14 @@ class EventsManagementApi {
     controllerIds,
     entranceIds,
     triggerSchedules,
-  }) {
+  }: {
+    eventsManagementName: string;
+    inputEvents: EventActionInput[];
+    outputActions: EventActionOutput[];
+    controllerIds: number[];
+    entranceIds: number[];
+    triggerSchedules: TriggerSchedule[];
+  }): Promise<Response> {
     if (useApi) {
       return sendApi("/api/eventsmanagement", {
         method: "POST",
@@ -28,18 +36,16 @@ class EventsManagementApi {
           controllerIds,
           entranceIds,
           triggerSchedules,
-          eventsManagementEmail,
-          eventsManagementSMS,
         }),
       });
     }
 
-    newEventsManagementArr = [];
+    const newEventsManagementArr: unknown[] = [];
     if (controllerIds && controllerIds.length > 0) {
       for (let i = 0; i < controllerIds.length; i++) {
         const newEventManagement = {
           eventsManagementId:
-            fakeEventsManagement
+            (fakeEventsManagement as EventsManagement[])
               .map((group) => group.eventsManagementId)
               .reduce((a, b) => Math.max(a, b), 0) + 1,
           eventsManagementName,
@@ -48,8 +54,6 @@ class EventsManagementApi {
           controllerId: controllerIds[i],
           entranceId: null,
           triggerSchedules,
-          eventsManagementEmail,
-          eventsManagementSMS,
         };
         fakeEventsManagement.push(newEventManagement);
         newEventsManagementArr.push(newEventManagement);
@@ -59,7 +63,7 @@ class EventsManagementApi {
       for (let i = 0; i < entranceIds.length; i++) {
         const newEventManagement = {
           eventsManagementId:
-            fakeEventsManagement
+            (fakeEventsManagement as EventsManagement[])
               .map((group) => group.eventsManagementId)
               .reduce((a, b) => Math.max(a, b), 0) + 1,
           eventsManagementName,
@@ -79,7 +83,11 @@ class EventsManagementApi {
     );
   }
 
-  replaceEventsManagement(eventsManagementList, entranceIds, controllerIds) {
+  replaceEventsManagement(
+    eventsManagementList: EventsManagement[],
+    entranceIds: number[],
+    controllerIds: number[]
+  ): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(
         `/api/eventsmanagement/replace?entranceIds=${encodeArrayForSpring(
@@ -96,8 +104,11 @@ class EventsManagementApi {
     }
   }
 
-  addEventsManagement(eventsManagementList, entranceIds, controllerIds) {
-    //console.log("add ems called");
+  addEventsManagement(
+    eventsManagementList: EventsManagement[],
+    entranceIds: number[],
+    controllerIds: number[]
+  ): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(
         `/api/eventsmanagement/add?entranceIds=${encodeArrayForSpring(
@@ -114,7 +125,7 @@ class EventsManagementApi {
     }
   }
 
-  getEventsManagementNotifications(eventsManagementId) {
+  getEventsManagementNotifications(eventsManagementId: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(
         "api/eventsmanagement/notifications/" + eventsManagementId
@@ -122,46 +133,46 @@ class EventsManagementApi {
     }
   }
 
-  getAllEventsManagementNotifications() {
+  getAllEventsManagementNotifications(): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("api/eventsmanagement/notifications");
     }
   }
 
-  getAllEventsManagement() {
+  getAllEventsManagement(): Promise<Response> {
     if (useApi) {
       return sendApi("/api/eventsmanagement");
     }
     return Promise.resolve(
-      new Response(JSON.stringify(controllers), { status: 200 })
+      new Response(JSON.stringify([]), { status: 200 })
     );
   }
 
-  getEntranceEventsManagement(entranceId) {
+  getEntranceEventsManagement(entranceId: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/eventsmanagement/entrance/${entranceId}`);
     }
     return Promise.resolve(
-      new Response(JSON.stringify(controllers), { status: 200 })
+      new Response(JSON.stringify([]), { status: 200 })
     );
   }
 
-  getControllerEventsManagement(controllerId) {
+  getControllerEventsManagement(controllerId: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/eventsmanagement/controller/${controllerId}`);
     }
     return Promise.resolve(
-      new Response(JSON.stringify(controllers), { status: 200 })
+      new Response(JSON.stringify([]), { status: 200 })
     );
   }
 
-  deleteEventsManagement(id) {
+  deleteEventsManagement(id: number | string): Promise<Response> | undefined {
     if (useApi) {
       return sendApi(`/api/eventsmanagement/${id}`, { method: "DELETE" });
     }
   }
 
-  getInputEvents(forController) {
+  getInputEvents(forController: boolean): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/event/input/types?forController=${forController}`);
     }
@@ -170,7 +181,7 @@ class EventsManagementApi {
     );
   }
 
-  getOutputEvents(forController) {
+  getOutputEvents(forController: boolean): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/event/output/types?forController=${forController}`);
     }
@@ -179,29 +190,34 @@ class EventsManagementApi {
     );
   }
 
-  getIndividualEventsManagement(emId) {
+  getIndividualEventsManagement(emId: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/eventsmanagement/${emId}`);
     }
     console.log("apitest");
     return Promise.resolve(
-      new Response(JSON.stringify(eventManagement), { status: 200 })
+      new Response(JSON.stringify({}), { status: 200 })
     );
   }
 
-  getForController(controllerId) {
+  getForController(controllerId: number | string): Promise<Response> {
     return sendApi(`/api/controller/${controllerId}/eventsmanagement`, {
       method: "GET",
     });
   }
 
-  deleteById(emId) {
+  deleteById(emId: number | string): Promise<Response> {
     return sendApi(`/api/eventsmanagement/${emId}`, { method: "DELETE" });
   }
 
-  editEventsManagement(emId, eventsManagementList, entranceIds, controllerIds) {
+  editEventsManagement(
+    emId: number | string,
+    eventsManagementList: EventsManagement[],
+    entranceIds: number[],
+    controllerIds: number[]
+  ): void {
     Promise.resolve(this.deleteById(emId)).then(
-      this.addEventsManagement(eventsManagementList, entranceIds, controllerIds)
+      () => this.addEventsManagement(eventsManagementList, entranceIds, controllerIds)
     );
   }
 }

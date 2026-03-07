@@ -113,7 +113,7 @@ export default function EntranceListTable({
                     />
                   </TableCell>
                   <TableCell>
-                    <NextLink href={detailsLink} passHref>
+                    <NextLink href={detailsLink} passHref legacyBehavior>
                       <Link color="inherit">
                         <Typography noWrap>{entranceName}</Typography>
                       </Link>
@@ -142,7 +142,7 @@ export default function EntranceListTable({
                     {controller ? ( // TODO make this into link
                       <NextLink
                         href={getControllerDetailsLink(controller)}
-                        passHref
+                        passHref legacyBehavior
                       >
                         <Link color="inherit">
                           <Typography noWrap>
@@ -185,12 +185,12 @@ export default function EntranceListTable({
                     >
                       <LockOpen fontSize="small" />
                     </IconButton>
-                    <NextLink href={editLink} passHref>
+                    <NextLink href={editLink} passHref legacyBehavior>
                       <IconButton component="a">
                         <PencilAlt fontSize="small" />
                       </IconButton>
                     </NextLink>
-                    <NextLink href={detailsLink} passHref>
+                    <NextLink href={detailsLink} passHref legacyBehavior>
                       <IconButton component="a">
                         <ArrowRight fontSize="small" />
                       </IconButton>

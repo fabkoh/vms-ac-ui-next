@@ -894,7 +894,7 @@ const CreatePersonsTwo = () => {
                   >
                     Submit
                   </Button>
-                  <NextLink href={personListLink} passHref>
+                  <NextLink href={personListLink} passHref legacyBehavior>
                     <Button
                       size="large"
                       sx={{ mr: 3 }}

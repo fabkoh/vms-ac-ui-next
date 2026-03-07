@@ -426,7 +426,7 @@ const ControllerDetails = () => {
                             <NextLink
                                 // href={`/dashboard/controllers/auth-device/id?=${1}`} 
                                 href={getControllerListLink()} 
-                                passHref
+                                passHref legacyBehavior
                             >
                                 <Link
                                     color="textPrimary"
@@ -494,7 +494,7 @@ const ControllerDetails = () => {
                                 >
                                     <NextLink
                                         href={getControllerEditLink(controllerInfo)}
-                                        passHref
+                                        passHref legacyBehavior
                                     >
                                         <MenuItem disableRipple>
                                             <EditIcon />

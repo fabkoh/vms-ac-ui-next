@@ -129,7 +129,7 @@ export default function AuthenticationSchedules({
 					href={
                         link
 					}
-					passHref
+					passHref legacyBehavior
 				>
 					<MenuItem disableRipple 
 					// disabled={actionDisabled}

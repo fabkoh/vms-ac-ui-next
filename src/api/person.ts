@@ -3,6 +3,7 @@ import axios from "axios";
 import { sendApi } from "./api-helpers";
 import { apiUri } from "./api-config";
 import toast from "react-hot-toast";
+import type { Person, AccessGroup } from "../types/models";
 
 class PersonApi {
   createPerson({
@@ -12,7 +13,14 @@ class PersonApi {
     personMobileNumber,
     personEmail,
     accessGroup,
-  }) {
+  }: {
+    personFirstName: string;
+    personLastName: string;
+    personUid: string;
+    personMobileNumber: string;
+    personEmail: string;
+    accessGroup: AccessGroup | number | string | null;
+  }): Promise<Response> {
     personFirstName = personFirstName === "" ? null : personFirstName;
     personLastName = personLastName === "" ? null : personLastName;
     personUid = personUid === "" ? null : personUid;
@@ -47,7 +55,7 @@ class PersonApi {
       personUid: personUid || String(Math.floor(Math.random() * 10 ** 8)),
       personMobileNumber,
       personEmail,
-      accessGroup: accessGroup && accessGroup.accessGroupId,
+      accessGroup: accessGroup && (accessGroup as AccessGroup).accessGroupId,
     };
 
     fakePersons.push(newPerson);
@@ -58,7 +66,7 @@ class PersonApi {
     );
   }
 
-  getPersons() {
+  getPersons(): Promise<Response> {
     if (useApi) {
       return sendApi("/api/persons");
     }
@@ -67,7 +75,7 @@ class PersonApi {
       return { ...p };
     });
 
-    persons.forEach((person) => {
+    persons.forEach((person: any) => {
       if (person.accessGroup) {
         // populate access group
         person.accessGroup = {
@@ -83,12 +91,12 @@ class PersonApi {
     );
   }
 
-  getPerson(id) {
+  getPerson(id: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/person/${id}`);
     }
 
-    const person = { ...fakePersons.find((p) => p.personId == id) };
+    const person: any = { ...fakePersons.find((p) => p.personId == id) };
 
     if (person) {
       if (person.accessGroup) {
@@ -120,7 +128,15 @@ class PersonApi {
     personMobileNumber,
     personEmail,
     accessGroup,
-  }) {
+  }: {
+    personId: number;
+    personFirstName: string;
+    personLastName: string;
+    personUid: string;
+    personMobileNumber: string;
+    personEmail: string;
+    accessGroup: AccessGroup | number | null;
+  }): Promise<Response> | undefined {
     personId = personId || null;
     personFirstName = personFirstName || null;
     personLastName = personLastName || null;
@@ -148,7 +164,7 @@ class PersonApi {
     }
   }
 
-  deletePerson(id) {
+  deletePerson(id: number | string): Promise<Response> {
     if (useApi) {
       return sendApi(`/api/person/${id}`, { method: "DELETE" });
     }
@@ -168,7 +184,7 @@ class PersonApi {
     return Promise.resolve(new Response(null, { status: 204 }));
   }
 
-  uidExists(uid) {
+  uidExists(uid: string): Promise<Response> {
     //if it exists db
     if (useApi) {
       return sendApi(`/api/person/uid/${uid}`);
@@ -182,7 +198,7 @@ class PersonApi {
     );
   }
 
-  uidInUse(uid, id) {
+  uidInUse(uid: string, id: number | string): Promise<Response> {
     //if it is in use by others
     if (useApi) {
       return sendApi(`/api/person/uid/${id}/${uid}`);
@@ -200,7 +216,7 @@ class PersonApi {
     );
   }
 
-  mobileNumberExists(mobileNumber) {
+  mobileNumberExists(mobileNumber: string): Promise<Response> {
     //for create person
     if (useApi) {
       return sendApi(`/api/person/mobileNumber/${mobileNumber}`);
@@ -218,7 +234,7 @@ class PersonApi {
     );
   }
 
-  emailExists(email) {
+  emailExists(email: string): Promise<Response> {
     //for create person
     if (useApi) {
       return sendApi(`/api/person/email/${email}`);
@@ -234,16 +250,7 @@ class PersonApi {
     );
   }
 
-  postCSV(formData) {
-    // return sendApi(
-    //   "/api/person/importcsv",
-    //   {
-    //     method: "POST",
-    //     body: formData,
-    //   },
-    //   "multipart/form-data"
-    // );
-
+  postCSV(formData: FormData) {
     return axios.post(apiUri + "/api/person/importcsv", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -251,12 +258,7 @@ class PersonApi {
     });
   }
 
-  getCSVJson() {
-    // if (useApi) {
-    // return sendApi("/api/person/importcsv/json", {
-    //   method: "GET",
-    // });
-    // }
+  getCSVJson(): Promise<Response> | undefined {
     if (useApi) {
       return sendApi("/api/person/importcsv/json", {
         method: "GET",
@@ -266,7 +268,7 @@ class PersonApi {
         return { ...p };
       });
 
-      persons.forEach((person) => {
+      persons.forEach((person: any) => {
         if (person.accessGroup) {
           // populate access group
           person.accessGroup = {
@@ -283,70 +285,15 @@ class PersonApi {
     }
   }
 
-  postGreenData(file) {
+  postGreenData(file: unknown): Promise<Response> | undefined {
     if (useApi) {
-      // const dataArray = file.map((obj) => {
-      //   // remove any invalid characters (such as the BOM marker)
-      //   const cleanObj = Object.keys(obj).reduce((acc, key) => {
-      //     const cleanKey = key.replace(/\W/g, "");
-      //     const cleanVal = obj[key];
-      //     return { ...acc, [cleanKey]: cleanVal };
-      //   }, {});
-      //   return cleanObj;
-      // });
       console.log(file);
       return sendApi("/api/person/importcsv/greenData", {
         method: "POST",
-        body: file,
+        body: file as BodyInit,
         headers: { "Content-Type": "application/json" },
       });
     }
   }
-
-  // postGreenData(file) {
-  //   if (useApi) {
-  //     const stringData = file.map((obj) => JSON.stringify(obj)).join(", ");
-  //     // const dataArray = JSON.parse(`[${stringData}]`);
-  //     console.log(stringData);
-  //     return sendApi("/api/person/importcsv/greenData", {
-  //       method: "POST",
-  //       body: stringData,
-  //     });
-  //   }
-  // }
-
-  //   importCSV = async (CSVData) => {
-  //     const formData = new FormData();
-  //     formData.append("file", CSVData, "file.csv");
-  //     try {
-  //       // sendApi doesnt send multipart request
-
-  //       // const boundary =
-  //       //   "------WebKitFormBoundary" + Math.random().toString(36).substr(2);
-  //       // sendApi("/api/person/importcsv", {
-  //       //   method: "POST",
-  //       //   body: formData,
-  //       //   headers: {
-  //       //     "Content-Type": `multipart/form-data; boundary=${boundary}`,
-  //       //   },
-  //       // });
-
-  //       // use axios for now, apiUri is BE address
-
-  //       await axios.post(apiUri + "/api/person/importcsv", formData, {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       });
-
-  //       alert("File uploaded successfully");
-  //     } catch (error) {
-  //       console.error(error);
-  //       alert(
-  //         "Failed to upload file, excel first row headers need to match import template"
-  //       );
-  //     }
-  //   };
-  // }
 }
 export const personApi = new PersonApi();
