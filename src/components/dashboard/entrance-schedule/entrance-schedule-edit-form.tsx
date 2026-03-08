@@ -32,7 +32,7 @@ const EditEntSchedForm = ({
   accessGroupScheduleInfo,
   accessGroupScheduleValidations,
 }) => {
-  const { entranceScheduleId, entranceSchedule, rrule, timeStart, timeEnd } =
+  const { entranceScheduleId, entranceScheduleName, rrule, timeStart, timeEnd } =
     accessGroupScheduleInfo;
 
   const {
@@ -160,9 +160,9 @@ const EditEntSchedForm = ({
             <TextField
               fullWidth
               label="Name"
-              name="entranceSchedule"
+              name="entranceScheduleName"
               required
-              value={entranceSchedule}
+              value={entranceScheduleName}
               onChange={(e) => {
                 changeTextField(e, entranceScheduleId);
               }}
