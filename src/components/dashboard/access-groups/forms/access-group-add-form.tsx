@@ -148,7 +148,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                 >
                                     <Grid mb={1}>
                                         <Typography
-                                            variant="body"
+                                            variant="body1"
                                             fontWeight="bold"
                                         >
                                             Assign persons:
@@ -193,7 +193,7 @@ const AccessGroupForm = ({ accessGroupInfo, accessGroupValidations, removeCard, 
                                 >
                                     <Grid mb={1}>
                                         <Typography
-                                            variant="body"
+                                            variant="body1"
                                             fontWeight="bold"
                                         >
                                             Assign Entrances:

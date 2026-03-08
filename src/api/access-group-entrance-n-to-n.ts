@@ -1,5 +1,5 @@
 import { fakeAccessGroupEntranceNtoN, useApi, fakeEntrances, fakeAccessGroups } from "./api-config";
-import { sendApi } from "./api-helpers";
+import { encodeArrayForSpring, sendApi } from "./api-helpers";
 
 // helper method placed outside so other files have no access to this
 const assignmentHelper = (
@@ -93,8 +93,7 @@ class AccessGroupEntranceNtoNApi {
 
   assignEntrancesToAccessGroup(entranceIds: (number | string)[], accessGroupId: number | string): Promise<Response> {
     if (useApi) {
-      const entranceIdsString = JSON.stringify(entranceIds);
-      return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?entranceids=${encodeURIComponent(entranceIdsString.substring(1, entranceIdsString.length - 1))}`, { method: "POST" });
+      return sendApi(`/api/access-group-entrance/access-group/${accessGroupId}?entranceids=${encodeArrayForSpring(entranceIds)}`, { method: "POST" });
     }
     assignmentHelper(accessGroupId, entranceIds, "accessGroupId", "entranceId");
 

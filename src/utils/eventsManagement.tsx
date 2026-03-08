@@ -128,7 +128,7 @@ const displayEntranceOrController = eventManagement => {
 }
 
 // takes in outputActions list and return string 
-const eventActionOutputDescription = (outputActions, smsConfig= {}, emailConfig={}) => {
+const eventActionOutputDescription = (outputActions, smsConfig: any = {}, emailConfig: any = {}) => {
     
     return (outputActions.map(
         (outputAction, i) =>

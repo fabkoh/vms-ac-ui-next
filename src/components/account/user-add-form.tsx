@@ -16,7 +16,6 @@ import ExpandMore from "../dashboard/shared/expand-more";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // import MuiPhoneNumber from "material-ui-phone-number";
 import { useState, useRef } from "react";
-import { getRoleLabel } from "../../utils/users";
 import { useAuth } from "../../hooks/use-auth";
 
 const UserAddForm = ({

@@ -129,10 +129,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
             validation.timerDurationInputBlank = true;
             setInputWithTimerEventsManagementValidations(validations);
         }
-        if ((e.target as HTMLInputElement).value < 1) {
+        if (Number((e.target as HTMLInputElement).value) < 1) {
             validation.timerDurationInputNotPositive = true;
             setInputWithTimerEventsManagementValidations(validations);
-        } else if ((e.target as HTMLInputElement).value > MAX_INPUT_TIMER_DURATION) {;
+        } else if (Number((e.target as HTMLInputElement).value) > MAX_INPUT_TIMER_DURATION) {
             validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
             setInputWithTimerEventsManagementValidations(validations);
         } else {
@@ -154,10 +154,10 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
             validation.timerDurationOutputBlank = true;
             setOutputWithTimerEventsManagementValidations(validations);
         }
-        if((e.target as HTMLInputElement).value < 1) {
+        if(Number((e.target as HTMLInputElement).value) < 1) {
             validation.timerDurationOutputNotPositive = true;
             setOutputWithTimerEventsManagementValidations(validations);
-        } else if ((e.target as HTMLInputElement).value > MAX_OUTPUT_TIMER_DURATION) {
+        } else if (Number((e.target as HTMLInputElement).value) > MAX_OUTPUT_TIMER_DURATION) {
             validation.timerDurationOutputTooLarge = true;
             setOutputWithTimerEventsManagementValidations(validations);
         } else {
@@ -654,7 +654,6 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                     xs={12}
                                 >
                                     {/* Remove console log at your own risk */}
-                                    {console.log(inputEventsValueWithoutTimerState, "inputEventsValueWithoutTimerState")}
                                     <Select
                                         sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
                                         required={inputEvents.length===0}
@@ -767,7 +766,6 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                     xs={12}
                                 >  
                                     {/* Remove console log at your own risk */}
-                                    {console.log(outputActionsValueWithoutTimerState)}
                                     <MultipleSelectInput
                                         options={outputEventsWithoutTimer}
                                         setSelected={(e) => {

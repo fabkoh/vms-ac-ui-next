@@ -89,7 +89,7 @@ const AddCredentials = () => {
   }, [isMounted]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(getInfo, []);
+  useEffect(() => { getInfo(); }, []);
 
   // logic for selection of persons
   const [selectedPersons, setSelectedPersons] = useState<any[]>([]);

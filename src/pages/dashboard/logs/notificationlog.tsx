@@ -151,7 +151,7 @@ useEffect(
 const getInfo = useCallback(async() => {
     const notifsCountRes = await notificationLogsApi.getNotifsCount();
     if (notifsCountRes.status !== 200) {
-        if (res.status == serverDownCode) {
+        if (notifsCountRes.status == serverDownCode) {
             setServerDownOpen(true);
         }
         toast.error("Failed to get total notifs count");

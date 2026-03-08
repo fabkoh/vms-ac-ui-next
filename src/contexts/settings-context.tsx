@@ -37,7 +37,7 @@ export const storeSettings = (settings) => {
   window.localStorage.setItem('settings', JSON.stringify(settings));
 };
 
-export const SettingsContext = createContext({
+export const SettingsContext = createContext<{ settings: typeof initialSettings; saveSettings: (s: any) => void }>({
   settings: initialSettings,
   saveSettings: () => { }
 });

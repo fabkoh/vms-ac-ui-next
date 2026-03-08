@@ -28,7 +28,7 @@ const ChartLine = () => {
       show: false
     },
     stroke: {
-      curve: 'smooth',
+      curve: 'smooth' as const,
       width: 3
     },
     theme: {

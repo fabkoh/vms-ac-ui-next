@@ -178,7 +178,6 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 					<Button component={NextLink} href={getControllerEditLinkWithId(controllerId)}
 						sx={{ ml:2, mb: 2 }}
 						variant="contained"
-						onClick={getControllerEditLinkWithId(controllerId)}
 					>
 						Assign Entrance
 					</Button>

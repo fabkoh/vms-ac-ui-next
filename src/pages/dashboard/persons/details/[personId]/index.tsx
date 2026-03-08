@@ -39,7 +39,7 @@ const PersonDetails = () => {
   const [person, setPerson] = useState(null); 
   const [credentials, setCredentials] = useState<any[]>([]);
   const router = useRouter();
-  const { personId } = router.query;
+  const personId = router.query.personId as string;
 	const [serverDownOpen, setServerDownOpen] = useState(false);
 
   useEffect(() => {

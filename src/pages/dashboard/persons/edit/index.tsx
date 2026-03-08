@@ -43,7 +43,7 @@ const getNewCredential = (id) => ({
 
 const EditPersonsTwo = () => {
   const router = useRouter();
-  const ids = JSON.parse(decodeURIComponent(router.query.ids));
+  const ids = JSON.parse(decodeURIComponent(router.query.ids as string));
 
   // stores list of person objects
   const [personsInfo, setPersonsInfo] = useState<any[]>([]);
@@ -564,7 +564,8 @@ const EditPersonsTwo = () => {
         ref.current?.value,
         personUids,
         "uidInUse",
-        "uidRepeated"
+        "uidRepeated",
+        undefined
       ) || blankCheckHelper(id, "uidBlank", ref.current?.value);
 
     if (b1) {
@@ -580,14 +581,14 @@ const EditPersonsTwo = () => {
       ref.current?.value,
       personMobileNumbers,
       "numberInUse",
-      "numberRepeated"
+      "numberRepeated",
+      undefined
     );
     const b2 = checkInvalidNumberHelper(
       id,
       ref.current?.value,
       "numberInvalid",
-      personsValidation,
-      personsInfo
+      personsValidation
     );
 
     if (b1 || b2) {
@@ -693,7 +694,8 @@ const EditPersonsTwo = () => {
       ref.current?.value,
       personEmails,
       "emailInUse",
-      "emailRepeated"
+      "emailRepeated",
+      undefined
     );
 
     if (b1) {
@@ -850,7 +852,7 @@ const EditPersonsTwo = () => {
               handleDialogClose={() => setServerDownOpen(false)}
             />
 
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>

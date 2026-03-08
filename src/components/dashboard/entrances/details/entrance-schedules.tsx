@@ -168,7 +168,7 @@ export default function EntranceSchedules({
 										<TableCell>{schedule.entranceScheduleName}</TableCell>
 										<TableCell>{rruleDescription(rrulestr(schedule.rrule), schedule.timeStart, schedule.timeEnd)}</TableCell>
 										<TableCell>
-											{console.log(schedule)}
+	{/* debug removed */}
 											<Switch onChange={handleToggleFactory(schedule.entranceScheduleId)}
 												defaultChecked={schedule.active}
 												size="small" ></Switch>

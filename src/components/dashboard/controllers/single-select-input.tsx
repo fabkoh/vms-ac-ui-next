@@ -53,7 +53,6 @@ const SingleSelect = ({
                             <MenuItem
                                 key={value}
                                 value={value}
-                                name={label}
                             >
                                 {label}
                             </MenuItem>

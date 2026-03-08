@@ -369,7 +369,7 @@ export const UsersList = () => {
       const res = await authDeleteUserAdmin(id);
       if ((res as any).status != 200) {
         const restwo = await authDeleteTechAdmin(id);
-        if (restwo.status == 200) {
+        if ((restwo as any).status == 200) {
           return restwo;
         }
       }

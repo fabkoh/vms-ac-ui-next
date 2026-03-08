@@ -1,27 +1,27 @@
-import React, { useCallback, useState, useEffect } from "react";
-import NextLink from "next/link";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { Box, Button, Container, Grid, Link, Typography } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { AuthGuard } from "../../../../components/authentication/auth-guard";
-import { DashboardLayout } from "../../../../components/dashboard/dashboard-layout";
-import { useMounted } from "../../../../hooks/use-mounted";
-import { ChevronDown as ChevronDownIcon } from "../../../../icons/chevron-down";
-import { gtm } from "../../../../lib/gtm";
-import StyledMenu from "../../../../components/dashboard/styled-menu";
-import MenuItem from "@mui/material/MenuItem";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import { Confirmdelete } from "../../../../components/dashboard/events-management/confirm-delete";
-import toast from "react-hot-toast";
-import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
-import { serverDownCode } from "../../../../api/api-helpers";
-import { eventsManagementListLink } from "../../../../utils/eventsManagement";
-import { eventsManagementApi } from "../../../../api/events-management";
-import { EventManagementDetails } from "../../../../components/dashboard/events-management/list/events-management-details";
-import { EventManagementNotifDetails } from "../../../../components/dashboard/events-management/list/events-management-notif-details";
+import React, { useCallback, useState, useEffect } from 'react';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
+import { Box, Button, Container, Grid, Link, Typography } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { AuthGuard } from '../../../../components/authentication/auth-guard';
+import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
+import { useMounted } from '../../../../hooks/use-mounted';
+import { ChevronDown as ChevronDownIcon } from '../../../../icons/chevron-down';
+import { gtm } from '../../../../lib/gtm';
+import StyledMenu from '../../../../components/dashboard/styled-menu';
+import MenuItem from '@mui/material/MenuItem';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import { Confirmdelete } from '../../../../components/dashboard/events-management/confirm-delete';
+import toast from 'react-hot-toast';
+import { ServerDownError } from '../../../../components/dashboard/errors/server-down-error';
+import { serverDownCode } from '../../../../api/api-helpers';
+import { eventsManagementListLink } from '../../../../utils/eventsManagement';
+import { eventsManagementApi } from '../../../../api/events-management';
+import { EventManagementDetails } from '../../../../components/dashboard/events-management/list/events-management-details';
+import { EventManagementNotifDetails } from '../../../../components/dashboard/events-management/list/events-management-notif-details';
 
 const IndividualEventManagement = () => {
   // load person details
@@ -33,7 +33,7 @@ const IndividualEventManagement = () => {
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
   useEffect(() => {
-    gtm.push({ event: "page_view" });
+    gtm.push({ event: 'page_view' });
   }, []);
 
   const getEventManagementbyId = async (emId) => {
@@ -43,7 +43,7 @@ const IndividualEventManagement = () => {
       );
       if (res.status != 200) {
         // person not found
-        toast.error("Event Management not found");
+        toast.error('Event Management not found');
       }
       const body = await res.json();
       if (isMounted()) {
@@ -88,10 +88,10 @@ const IndividualEventManagement = () => {
       eventsManagementApi.deleteById(eventManagement.eventsManagementId)
     ).then((res) => {
       if (res.status == 200) {
-        toast.success("Delete success");
+        toast.success('Delete success');
         router.replace(eventsManagementListLink);
       } else {
-        toast.error("Delete unsuccessful");
+        toast.error('Delete unsuccessful');
         res.json().then((json) => toast(json));
       }
     });
@@ -122,33 +122,34 @@ const IndividualEventManagement = () => {
                 open={serverDownOpen}
                 handleDialogClose={() => setServerDownOpen(false)}
               />
-              
-                <Link
-                  color="textPrimary"
-                  component={NextLink} href={eventsManagementListLink}
-                  sx={{
-                    alignItems: "center",
-                    display: "flex",
-                  }}
-                >
-                  <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
-                  <Typography variant="subtitle2">Events Management</Typography>
-                </Link>
+
+              <Link
+                color="textPrimary"
+                component={NextLink}
+                href={eventsManagementListLink}
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
+                <Typography variant="subtitle2">Events Management</Typography>
+              </Link>
             </Box>
             <Grid container justifyContent="space-between" spacing={3}>
               <Grid
                 item
                 sx={{
-                  alignItems: "center",
-                  display: "flex",
-                  overflow: "hidden",
+                  alignItems: 'center',
+                  display: 'flex',
+                  overflow: 'hidden',
                 }}
               >
                 <div>
                   <Typography variant="h4">
                     {eventManagement
                       ? eventManagement.eventsManagementName
-                      : ""}
+                      : ''}
                   </Typography>
                 </div>
               </Grid>
@@ -166,11 +167,14 @@ const IndividualEventManagement = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  
-                    <MenuItem component={NextLink} href="/dashboard/events-management/create" disableRipple>
-                      <AddIcon />
-                      Create
-                    </MenuItem>
+                  <MenuItem
+                    component={NextLink}
+                    href="/dashboard/events-management/create"
+                    disableRipple
+                  >
+                    <AddIcon />
+                    Create
+                  </MenuItem>
                   <MenuItem disableRipple onClick={handleDeleteOpen}>
                     <DeleteIcon />
                     Delete
@@ -192,7 +196,7 @@ const IndividualEventManagement = () => {
               </Grid>
               {eventManagement.eventsManagementNotification
                 ? eventManagement.eventsManagementNotification.map((e) => (
-                    <Grid item xs={12}>
+                    <Grid key={e} item xs={12}>
                       <EventManagementNotifDetails
                         eventManagementNotification={e}
                       />

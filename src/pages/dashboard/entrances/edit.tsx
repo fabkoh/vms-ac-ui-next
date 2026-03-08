@@ -134,7 +134,7 @@ const EditEntrances = () => {
     const run = async () => {
       try {
         getAccessGroupsEntrances(
-          await getEntrances(JSON.parse(decodeURIComponent(router.query.ids)))
+          await getEntrances(JSON.parse(decodeURIComponent(router.query.ids as string)))
         );
       } catch (e) {
         router.replace("/dashboard/entrances");
@@ -415,7 +415,7 @@ const EditEntrances = () => {
       >
         <Container maxWidth="xl">
           <Box sx={{ mb: 4 }}>
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>

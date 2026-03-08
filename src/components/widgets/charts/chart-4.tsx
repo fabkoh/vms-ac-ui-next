@@ -57,7 +57,7 @@ export const Chart4 = () => {
       strokeWidth: 3
     },
     stroke: {
-      curve: 'smooth'
+      curve: 'smooth' as const
     },
     theme: {
       mode: theme.palette.mode

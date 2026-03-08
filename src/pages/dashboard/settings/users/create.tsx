@@ -113,7 +113,7 @@ const CreatePersonsTwo = () => {
         setMobileNumbersList(mobileNumbers); // Assuming you have a state or method to handle this
         setIsUpdated(true);
       } else {
-        if (res.status == serverDownCode) {
+        if ((res as any).status == serverDownCode) {
           setServerDownOpen(true);
         }
       }
@@ -347,8 +347,7 @@ const CreatePersonsTwo = () => {
       id,
       ref.current?.value,
       'numberInvalid',
-      personsValidation,
-      personsInfo
+      personsValidation
     );
     const b3 = checkInUseHelper(
       id,

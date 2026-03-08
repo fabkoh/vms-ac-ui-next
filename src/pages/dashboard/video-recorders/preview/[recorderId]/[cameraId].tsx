@@ -9,6 +9,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";
 import Head from 'next/head';
+import Script from 'next/script';
 import router from 'next/router';
 import {
   Box,
@@ -1566,13 +1567,12 @@ VideoCameraDetails.getLayout = (page) => (
       <title>
         Etlas: Video Camera Preview
       </title>
-      <script src="/static/sdk/codebase/jquery-1.12.1.min.js"></script>
-      <script src="/static/sdk/codebase/encryption/AES.js"></script>
-      <script src="/static/sdk/codebase/encryption/cryptico.min.js"></script>
-      <script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js"></script>
-      <script id="videonode"
-        src="/static/sdk/codebase/webVideoCtrl.js"></script>
     </Head>
+    <Script src="/static/sdk/codebase/jquery-1.12.1.min.js" strategy="afterInteractive" />
+    <Script src="/static/sdk/codebase/encryption/AES.js" strategy="afterInteractive" />
+    <Script src="/static/sdk/codebase/encryption/cryptico.min.js" strategy="afterInteractive" />
+    <Script src="/static/sdk/codebase/encryption/crypto-3.1.2.min.js" strategy="afterInteractive" />
+    <Script id="videonode" src="/static/sdk/codebase/webVideoCtrl.js" strategy="afterInteractive" />
     <DashboardLayout>
       {page}
     </DashboardLayout>

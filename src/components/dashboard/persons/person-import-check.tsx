@@ -37,16 +37,13 @@ import {
 import { rruleDescriptionWithBr } from "../../../utils/rrule-desc";
 import { rrulestr } from "rrule";
 
-const theme = createMuiTheme({
-  overrides: {
+const theme = createTheme({
+  components: {
     MuiTableCell: {
-      root: {
-        color: "#F44336",
-      },
-    },
-    MuiTableCell: {
-      root: {
-        color: "#F44336",
+      styleOverrides: {
+        root: {
+          color: "#F44336",
+        },
       },
     },
   },

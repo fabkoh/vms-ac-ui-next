@@ -29,11 +29,11 @@ export const Chart2 = () => {
       }
     },
     legend: {
-      horizontalAlign: 'right',
+      horizontalAlign: 'right' as const,
       labels: {
         colors: theme.palette.text.secondary
       },
-      position: 'top',
+      position: 'top' as const,
       show: true
     },
     markers: {
@@ -42,15 +42,15 @@ export const Chart2 = () => {
         sizeOffset: 2
       },
       radius: 2,
-      shape: 'circle',
+      shape: 'circle' as const,
       size: 4,
       strokeColors: ['#1f87e6', '#27c6db'],
       strokeWidth: 0
     },
     stroke: {
-      curve: 'smooth',
+      curve: 'smooth' as const,
       dashArray: [0, 3],
-      lineCap: 'butt',
+      lineCap: 'butt' as const,
       width: 3
     },
     theme: {

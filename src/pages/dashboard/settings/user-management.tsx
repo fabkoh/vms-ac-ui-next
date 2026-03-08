@@ -79,7 +79,7 @@ const AccountManagement = () => {
         setIsUpdated(true);
         console.log(usersList);
       } else {
-        if (res.status == serverDownCode) {
+        if ((res as any).status == serverDownCode) {
           setServerDownOpen(true);
         }
       }

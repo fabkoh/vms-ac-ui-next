@@ -72,7 +72,7 @@ export default function DetailsCardWithSearchField({
     return true;
   },
   icon = false,
-}) {
+}: { [key: string]: any }) {
   const [inputValue, setInputValue] = useState("");
   const handleChange = (e) => setInputValue(e.target.value);
   const clearInput = () => setInputValue("");

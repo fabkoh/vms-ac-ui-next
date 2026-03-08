@@ -1,490 +1,345 @@
-import { useEffect, useState, useCallback } from "react";
-import NextLink from "next/link";
-import Head from "next/head";
-import { Link, Box, Container, Typography, Stack, Button, Grid, TextField, Alert, Tooltip } from "@mui/material";
-import ArrowBack from "@mui/icons-material/ArrowBack";
+import { useEffect, useState, useCallback } from 'react';
+import NextLink from 'next/link';
+import Head from 'next/head';
+import {
+  Link,
+  Box,
+  Container,
+  Typography,
+  Stack,
+  Button,
+  Grid,
+  Alert,
+} from '@mui/material';
+import ArrowBack from '@mui/icons-material/ArrowBack';
 import { AuthGuard } from '../../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
-import Add from "@mui/icons-material/Add";
-import { accessGroupApi } from "../../../../api/access-groups";
-import toast from "react-hot-toast";
-import router, { useRouter } from "next/router";
-import formUtils from "../../../../utils/form-utils";
-import accessGroupEntranceNtoNApi from "../../../../api/access-group-entrance-n-to-n";
-import EditAccGrpSchedForm from "../../../../components/dashboard/access-group-schedule/access-group-schedule-edit-form";
-import MultipleSelectInput from "../../../../components/dashboard/shared/multi-select-input"
-import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
-import { Info } from "@mui/icons-material";
-import entranceApi from "../../../../api/entrance";
-import { entranceScheduleApi } from "../../../../api/entrance-schedule";
-import EditEntSchedForm from "../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form";
-import { controllerApi } from "../../../../api/controllers";
-import { serverDownCode } from "../../../../api/api-helpers";
-import { ServerDownError } from "../../../../components/dashboard/errors/server-down-error";
+import Add from '@mui/icons-material/Add';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/router'; // Removed singleton 'router' import
+import formUtils from '../../../../utils/form-utils';
+import EditEntSchedForm from '../../../../components/dashboard/entrance-schedule/entrance-schedule-edit-form';
+import MultipleSelectInput from '../../../../components/dashboard/shared/multi-select-input';
+import entranceApi from '../../../../api/entrance';
+import { entranceScheduleApi } from '../../../../api/entrance-schedule';
+import { serverDownCode } from '../../../../api/api-helpers';
+import { ServerDownError } from '../../../../components/dashboard/errors/server-down-error';
 
 const ModifyEntranceSchedule = () => {
-    //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
-    const router = useRouter();
-    const temp = router.query;
-    const entranceId = temp.entranceId;
+  const router = useRouter();
+  const { entranceId } = router.query;
 
-    // const [accGrp, setAccGrp] = useState()
-    const [grpToEnt, setGrpToEnt] = useState<any[]>([]) // grptoent.contains grptoentId and ent obj
-    const [allEntrances, setAllEntrances] = useState<any[]>([])
-    
-    const [serverDownOpen, setServerDownOpen] = useState(false);
+  const [allEntrances, setAllEntrances] = useState<any[]>([]);
+  const [entrances, setEntrances] = useState<any[]>([]);
+  const [serverDownOpen, setServerDownOpen] = useState(false);
 
-    const getEntrance = async () => {
-        const res = await entranceApi.getEntrances();
-        if (res.status != 200) { // entrance not found
-            if (res.status == serverDownCode) {
-                setServerDownOpen(true);
-              }
-              toast.error("Error loading entrances");
-              setAllEntrances([]);
-              return;
-            // router.replace("/dashboard");
-        }
-        const data = await res.json();
-        setAllEntrances(data)
-        console.log(JSON.stringify(data))
+  // Initial State Helpers
+  const getEmptyEntranceScheduleInfo = (id: number) => ({
+    entranceScheduleId: id,
+    entranceScheduleName: '',
+    rrule: '',
+    timeStart: '00:00',
+    timeEnd: '23:59',
+  });
+
+  const getEmptyEntranceScheduleValidations = (id: number) => ({
+    entranceScheduleId: id,
+    entranceScheduleNameBlank: true,
+    timeEndInvalid: false,
+    timeStartInvalid: false,
+    untilInvalid: false,
+    beginInvalid: true,
+  });
+
+  const [entranceScheduleInfoArr, setEntranceScheduleInfoArr] = useState([
+    getEmptyEntranceScheduleInfo(0),
+  ]);
+  const [entranceScheduleValidationsArr, setEntranceScheduleValidationsArr] =
+    useState([getEmptyEntranceScheduleValidations(0)]);
+
+  // Data Fetching
+  const getEntrance = useCallback(async () => {
+    try {
+      const res = await entranceApi.getEntrances();
+      if (res.status !== 200) {
+        if (res.status === serverDownCode) setServerDownOpen(true);
+        toast.error('Error loading entrances');
+        return;
+      }
+      const data = await res.json();
+      setAllEntrances(data);
+    } catch (e) {
+      console.error(e);
     }
-    // const getAccGrp = async() => {
-    //     const res = await accessGroupApi.getAccessGroup(entranceId);
-    //     if(res.status != 200) { // accgrp not found
-    //         toast.error("Access Group not found");
-    //         // router.replace("/dashboard");
-    //     }
-    //     const data = await res.json();
-    //     setAccGrp(data);
-    //     // console.log(JSON.stringify(data))
-    // }
-    useEffect(() => {
-        try {
-            getEntrance()
-            // getAccGrp()
-        } catch (error) {
-            console.log(error)
-        }
-    }, [])
-      
-    //
+  }, []);
 
-    // empty objects for initialisation of new card
-    const getEmptyEntranceScheduleInfo = (entranceScheduleId) => ({
-        entranceScheduleId,
-        entranceScheduleName:"",
-        rrule:"",
-        timeStart:"",
-        timeEnd:"",
-        
+  useEffect(() => {
+    if (router.isReady) {
+      getEntrance();
+    }
+  }, [router.isReady, getEntrance]);
+
+  // Card Management
+  const addCard = () => {
+    const newId =
+      entranceScheduleInfoArr.length > 0
+        ? Math.max(
+            ...entranceScheduleInfoArr.map((i) => i.entranceScheduleId)
+          ) + 1
+        : 0;
+    setEntranceScheduleInfoArr((prev) => [
+      ...prev,
+      getEmptyEntranceScheduleInfo(newId),
+    ]);
+    setEntranceScheduleValidationsArr((prev) => [
+      ...prev,
+      getEmptyEntranceScheduleValidations(newId),
+    ]);
+  };
+
+  const removeCard = (id: number) => {
+    setEntranceScheduleInfoArr((prev) =>
+      prev.filter((i) => i.entranceScheduleId !== id)
+    );
+    setEntranceScheduleValidationsArr((prev) =>
+      prev.filter((v) => v.entranceScheduleId !== id)
+    );
+  };
+
+  // --- IMMUTABLE STATE UPDATERS ---
+  const updateInfo = (id: number, patch: any) => {
+    setEntranceScheduleInfoArr((prev) =>
+      prev.map((item) =>
+        item.entranceScheduleId === id ? { ...item, ...patch } : item
+      )
+    );
+  };
+
+  const updateValidation = (id: number, patch: any) => {
+    setEntranceScheduleValidationsArr((prev) =>
+      prev.map((v) => (v.entranceScheduleId === id ? { ...v, ...patch } : v))
+    );
+  };
+
+  // Input Handlers
+  const changeTextField = (e: any, id: number) => {
+    const { name, value } = e.target;
+    updateInfo(id, { [name]: value });
+    if (name === 'entranceScheduleName') {
+      updateValidation(id, {
+        entranceScheduleNameBlank: formUtils.checkBlank(value),
+      });
+    }
+  };
+
+  const changeTimeStart = (start: string, id: number) => {
+    updateInfo(id, { timeStart: start });
+    updateValidation(id, { timeStartInvalid: formUtils.checkBlank(start) });
+  };
+
+  const changeTimeEnd = (end: string, id: number) => {
+    const currentInfo = entranceScheduleInfoArr.find(
+      (i) => i.entranceScheduleId === id
+    );
+    const startTime = currentInfo?.timeStart || '00:00';
+
+    updateInfo(id, { timeEnd: end });
+    updateValidation(id, {
+      timeEndInvalid:
+        formUtils.checkBlank(end) ||
+        (startTime !== '00:00' && end <= startTime),
     });
-    const getEmptyEntranceScheduleValidations = (entranceScheduleId) => ({
-        entranceScheduleId,
-        entranceScheduleNameBlank: true,
+  };
 
-        timeEndInvalid:false,
-        timeStartInvalid:false,
-        //Entrance valid(might not need as field is select. cannot custom add)
-        untilInvalid:false,
-        beginInvalid: true,
-        // submit failed
-        submitFailed: false
-    });
+  const changeRrule = (rrule: string, id: number) => updateInfo(id, { rrule });
 
-    const [entranceScheduleInfoArr, 
-        setEntranceScheduleInfoArr] = useState([getEmptyEntranceScheduleInfo(0)]);
-    const [entranceScheduleValidationsArr, 
-        setEntranceScheduleValidationsArr] = useState([getEmptyEntranceScheduleValidations(0)]);
+  // Submission Logic
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const action = (e.nativeEvent as any).submitter.name;
+    const entIdArr = entrances.map((ent) => ent.entranceId);
 
+    // This is where the fix for the "2" vs 2 error happens
+    // Ensure entranceScheduleApi handles the array joining as we discussed!
+    try {
+      const apiCall =
+        action === 'add'
+          ? entranceScheduleApi.addEntranceSchedules(
+              entranceScheduleInfoArr,
+              entIdArr
+            )
+          : entranceScheduleApi.replaceEntranceSchedules(
+              entranceScheduleInfoArr,
+              entIdArr
+            );
 
-    // add card logic
-    //returns largest entranceId + 1
-    const getNewId = () => entranceScheduleInfoArr.map(info => info.entranceScheduleId)
-                                             .reduce((a, b) => Math.max(a, b), -1) + 1
+      const res = await apiCall;
+      if (res.status !== 200) throw new Error();
 
-    const addCard = () => {
-        const newId = getNewId();
-        setEntranceScheduleInfoArr([ ...entranceScheduleInfoArr, getEmptyEntranceScheduleInfo(newId) ]);
-        setEntranceScheduleValidationsArr([ ...entranceScheduleValidationsArr, getEmptyEntranceScheduleValidations(newId) ]);
+      toast.success(
+        action === 'add' ? 'Schedules added' : 'Schedules replaced'
+      );
+      router.replace(`/dashboard/entrances/details/${entranceId}`);
+    } catch (err) {
+      toast.error('Failed to update schedules');
     }
+  };
 
+  // MultiSelect Helpers
+  const entranceEqual = (opt, val) => opt.entranceId === val.entranceId;
+  const getEntranceName = (e) => e.entranceName;
+  const entranceFilter = (options, state) => {
+    const text = state.inputValue.toLowerCase();
+    return options.filter((e) => e.entranceName.toLowerCase().includes(text));
+  };
 
-    // remove card logic
-    const removeCard = (id) => {
-        const newAccessGroupScheduleInfoArr = entranceScheduleInfoArr.filter(info => info.entranceScheduleId != id);
-        const newValidations = entranceScheduleValidationsArr.filter(validation => validation.entranceScheduleId != id);
-
-        setEntranceScheduleInfoArr(newAccessGroupScheduleInfoArr);
-        setEntranceScheduleValidationsArr(newValidations);       
-    }
-    
-    // update methods for form inputs
-    const changeTextField = (e, id) => {
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        // this method is reliant on text field having a name field == key in info object ie accessGroupName, accessGroupDesc
-        updatedInfo.find(info => info.entranceScheduleId == id)[e.target.name] = e.target.value;
-        setEntranceScheduleInfoArr(updatedInfo);
-    }
-
-    //set rrule string
-    const changeRrule = (string,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['rrule']=string;
-        setEntranceScheduleInfoArr(updatedInfo);
-        console.log(entranceScheduleInfoArr)
-    }
-    //set timestartend
-    const changeTimeStart = (start,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['timeStart']=start;
-        setEntranceScheduleInfoArr(updatedInfo);
-        checkTimeStart(start,id)
-    }
-    const changeTimeEnd = (end,id) =>{
-        const updatedInfo = [ ...entranceScheduleInfoArr ];
-        updatedInfo.find(info => info.entranceScheduleId == id)['timeEnd']=end;
-        setEntranceScheduleInfoArr(updatedInfo);
-        checkTimeEnd(end,id)
-    }
-    const checkTimeEnd = (end,id) => {
-        const endTime = end;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
-        // store a temp updated access group info
-        const newAccessGroupScheduleInfoArr = [ ...entranceScheduleInfoArr ]
-        const tempStartTime = newAccessGroupScheduleInfoArr.find(group => group.entranceScheduleId == id)['timeStart'];
-
-        if(tempStartTime=="00:00"){
-            validation.timeEndInvalid = false;
-            setEntranceScheduleValidationsArr(newValidations)
-            // console.log(newValidations)
-        }
-        
-        validation.timeEndInvalid = (formUtils.checkBlank(endTime)||endTime<=tempStartTime);
-        // validation.timeEndInvalid = formUtils.checkBlank(endTime);
-        // console.log(validation)
-        setEntranceScheduleValidationsArr(newValidations)
-    }
-    const checkTimeStart = (start,id) => {
-        const starttime = start;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
-
-        validation.timeStartInvalid = (formUtils.checkBlank(starttime));
-        // validation.timeEndInvalid = formUtils.checkBlank(endTime);
-        // console.log(validation)
-        setEntranceScheduleValidationsArr(newValidations)
-    }
-
-    // error checking methods
-    const changeNameCheck = async (e, id) => {
-        const entranceScheduleName = e.target.value;
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
-
-        // store a temp updated access group info
-        const newAccessGroupScheduleInfoArr = [ ...entranceScheduleInfoArr ]
-        newAccessGroupScheduleInfoArr.find(group => group.entranceScheduleId == id).entranceScheduleName = entranceScheduleName;
-
-        // remove submit failed
-        // validation.submitFailed = false;
-
-        // check name is blank?
-        validation.entranceScheduleNameBlank = formUtils.checkBlank(entranceScheduleName);
-
-        setEntranceScheduleValidationsArr(newValidations);
-    }
-    //currying for cleaner code
-    const onNameChangeFactory = (id) => (e) => {
-        changeTextField(e, id);
-        changeNameCheck(e, id);
-    }
-    const checkUntil = (id) =>(e) => {
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
-        validation.untilInvalid = e
-        // console.log("newValidations",newValidations)
-        setEntranceScheduleValidationsArr(newValidations);
-
-    }
-
-    const checkBegin = (id) =>(e) => {
-        const newValidations = [ ...entranceScheduleValidationsArr ];
-        const validation = newValidations.find(v => v.entranceScheduleId == id);
-        validation.beginInvalid = e
-        // console.log("newValidations",newValidations)
-        setEntranceScheduleValidationsArr(newValidations);
-    }
-    const [submitted, setSubmitted] = useState(false);
-
-
-    const replaceAll = (e) => {
-        e.preventDefault();
-
-        const entIdArr = []
-        entrances.forEach(ent=>entIdArr.push(ent.entranceId))
-
-        Promise.resolve(entranceScheduleApi.replaceEntranceSchedules(entranceScheduleInfoArr,entIdArr))
-        .then(res =>{
-            if (res.status!=200){
-                return toast.error("Error replacing all schedules")
-            }
-            else{
-                toast.success("Successfully replaced all schedules")
-                router.replace(`/dashboard/entrances/details/${entranceId}`)
-            }
-        })
-        
-    }
-    const addOn = (e) => {
-        e.preventDefault();
-        const entIdArr = []
-        entrances.forEach(ent=>entIdArr.push(ent.entranceId))
-        Promise.resolve(entranceScheduleApi.addEntranceSchedules(entranceScheduleInfoArr,entIdArr))
-        .then(res =>{
-            if (res.status!=200){
-                return toast.error("Error adding schedules")
-            }
-            else{
-                toast.success("Schedules successfully added")
-                router.replace(`/dashboard/entrances/details/${entranceId}`)
-            }
-        })
-
-    }
-
-    //for MultiSelectInput
-    const entranceEqual = (option, value) => option.entranceId == value.entranceId;
-    const getEntranceName = (e) => e.entranceName;
-    const entranceFilter = (entrances, state) => {
-        // console.log(entrances)
-        const text = state.inputValue.toLowerCase(); // case insensitive search
-        return entrances.filter(e => (
-            e.entranceName.toLowerCase().includes(text)
-        ))
-    }
-    const [entrances, setEntrances] = useState<any[]>([])
-    const changeEntrance = (newValue) => {
-        console.log(newValue,"SSSSSSSS")
-        setEntrances(newValue)
-    }
-    // const [grpToEntIdArr, setGrpToEntIdArr] = useState<any[]>([])
-    // const getGrpToEntId = (grpToEntIdArr) => {
-    //     entrances.forEach(ent => {
-    //         grpToEnt.forEach(obj=>{
-    //             if(obj.entrance.entranceId==ent.entranceId){
-    //                 grpToEntIdArr.push(obj.groupToEntranceId)
-    //             }
-    //         })
-    //     })
-    // }
-
-    
-    return(
-        <>
-            <Head>
-                <title>
-                    Etlas: Modify Entrance Schedule
-                </title>
-            </Head>
-            <ServerDownError
-                open={serverDownOpen}
-                handleDialogClose={() => setServerDownOpen(false)}
-            />
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    py: 8
-                }}
+  return (
+    <>
+      <Head>
+        <title>Etlas: Modify Entrance Schedule</title>
+      </Head>
+      <ServerDownError
+        open={serverDownOpen}
+        handleDialogClose={() => setServerDownOpen(false)}
+      />
+      <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
+        <Container maxWidth="xl">
+          <Box sx={{ mb: 4 }}>
+            <Link
+              color="textPrimary"
+              component={NextLink}
+              href={`/dashboard/entrances/details/${entranceId}`}
+              sx={{ alignItems: 'center', display: 'flex' }}
             >
-                <Container maxWidth="xl">
-                    <Box sx={{ mb: 4 }}>
-                        
-                            <Link
-                                color="textPrimary"
-                                component={NextLink} href={`/dashboard/entrances/details/${entranceId}`}
-                                sx={{
-                                    alignItems: 'center',
-                                    display: 'flex'
-                                }}
-                            >
-                                <ArrowBack
-                                    fontSize="small"
-                                    sx={{ mr: 1 }}
-                                />
-                                <Typography variant="subtitle2">
-                                    Entrance Details
-                                </Typography>
-                            </Link>
-                    </Box>
-                    <Box marginBottom={3}>
-                        <Typography variant="h3">
-                            Modify Entrance Schedule
-                        </Typography>
-                        {/* <Grid container>
-                            <Grid item mr={1}>
-                        <Typography variant="body2" color="neutral.500">
-                        {"Modifying for Access Group: "}
-                        </Typography>
-                        </Grid>
-                        <Grid item>
-                        <Typography variant="body2" color="neutral.500" fontWeight="bold">
-                        {accGrp?accGrp.accessGroupName:"undefined"}
-                        </Typography>
-                        </Grid>
-                        </Grid> */}
-                        {/* <Typography variant="body2" color="neutral.500">
-                        {accGrp?(`Modifying for Access Group: ${accGrp.accessGroupName}`):("No access Group found")}
-                        </Typography> */}
-                        <Alert severity="info"
-                                variant="outlined">Quick tip : You may apply these schedules to multiple entrances by selecting more than one entrance</Alert>
-                    </Box>
-                    <Grid container
-                        alignItems="center"
-                        mb={3}>
-                        <Grid item
-                            mr={2}>
-                            <Typography fontWeight="bold">Entrance(s) :</Typography>
-                        </Grid>
-                        <Grid item
-                            xs={11}
-                            md={7}>
-                            <MultipleSelectInput
-                                options={allEntrances}
-                                setSelected={changeEntrance}
-                                getOptionLabel={getEntranceName}
-                                label="Entrances"
-                                noOptionsText="No entrance found"
-                                placeholder="Enter entrance details (name, description) to search"
-                                filterOptions={entranceFilter}
-                                value={entrances}
-                                isOptionEqualToValue={entranceEqual}
-                                error={
-                                    Boolean(entrances.length==0)
-                                }
-                                helperText={
-                                    Boolean(entrances.length==0)&&"Error : no entrance selected"
-                                }
-                            />
-                        </Grid>
-                    </Grid>
-                    <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
-                    {/* <form onSubmit={(e) => { console.log(e.nativeEvent.submitter.name); e.preventDefault(); }}> */}
-                        <Stack spacing={3}>
-                            { entranceScheduleInfoArr.map((accessGroupScheduleInfo, i) => (
-                                <EditEntSchedForm
-                                    key={accessGroupScheduleInfo.entranceScheduleId}
-                                    accessGroupScheduleInfo={accessGroupScheduleInfo}
-                                    removeCard={removeCard}
-                                    changeTimeStart={changeTimeStart}
-                                    changeTimeEnd={changeTimeEnd}
-                                    accessGroupScheduleValidations={entranceScheduleValidationsArr[i]}
-                                    changeTextField={onNameChangeFactory(accessGroupScheduleInfo.entranceScheduleId)}
-                                    changeNameCheck={changeNameCheck}
-                                    changeRrule={changeRrule}
-                                    checkUntil={checkUntil(accessGroupScheduleInfo.entranceScheduleId)}
-                                    checkBegin={checkBegin(accessGroupScheduleInfo.entranceScheduleId)}
+              <ArrowBack fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle2">Entrance Details</Typography>
+            </Link>
+          </Box>
+          <Box marginBottom={3}>
+            <Typography variant="h3" mb={2}>
+              Modify Entrance Schedule
+            </Typography>
+            <Alert severity="info" variant="outlined">
+              Quick tip: You may apply these schedules to multiple entrances by
+              selecting more than one.
+            </Alert>
+          </Box>
 
-                                />
-                            ))}
-                            <div>
-                                <Button
-                                    size="large"
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                    onClick={addCard}
-                                >
-                                    Add another
-                                </Button>
-                            </div>
-                            <Grid container>
-                                <Grid item
-                                    marginRight={3}
-                                    mb={2}>
-                                    <Button
-                                        type="submit"
-                                        size="large"
-                                        variant="contained"
-                                        name="replace"
-                                        id="replace all"
-                                        // onClick={replaceAll}
-                                        disabled={
-                                        //     submitted                      ||
-                                        //     entranceScheduleInfoArr.length == 0 || // no access groups to submit
-                                        entrances.length ==0 ||
-                                            entranceScheduleValidationsArr.some( // check if validations fail
-                                                validation => validation.entranceScheduleNameBlank        ||
-                                                validation.timeEndInvalid ||
-                                                validation.untilInvalid ||
-                                                validation.beginInvalid ||
-                                                validation.timeStartInvalid
-                                        //                       validation.accessGroupNameExists       ||
-                                        //                       validation.accessGroupNameDuplicated   ||
-                                        //                       validation.accessGroupPersonDuplicated
-                                            )
-                                        }
-                                    >
-                                        Replace all
-                                    </Button>
-                                </Grid>
-                                <Grid item
-                                    marginRight={3}
-                                    mb={2}>
-                                    <Button
-                                        type="submit"
-                                        size="large"
-                                        variant="contained"
-                                        name="add"
-                                        value="add button"
-                                        // onClick={addOn}
-                                        disabled={
-                                        //     submitted                      ||
-                                        //     entranceScheduleInfoArr.length == 0 || // no access groups to submit
-                                            entrances.length==0||
-                                            entranceScheduleValidationsArr.some( // check if validations fail
-                                                validation => validation.entranceScheduleNameBlank        ||
-                                                validation.timeEndInvalid ||
-                                                validation.untilInvalid ||
-                                                validation.beginInvalid ||
-                                                validation.timeStartInvalid
-                                        //                       validation.accessGroupNameExists       ||
-                                        //                       validation.accessGroupNameDuplicated   ||
-                                        //                       validation.accessGroupPersonDuplicated
-                                            )
-                                        }
-                                    >
-                                        Add on
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    
-                                        <Button component={NextLink} href={`/dashboard/entrances/details/${entranceId}`}
-                                            size="large"
-                                            variant="outlined"
-                                            color="error"
-                                        >
-                                            Cancel
-                                        </Button>
-                                </Grid>                              
-                            </Grid>
-                        </Stack>
-                    </form>
-                </Container>
-            </Box>
-        </>
-    )
-}
+          <Grid container alignItems="center" mb={3}>
+            <Grid item mr={2}>
+              <Typography fontWeight="bold">Entrance(s) :</Typography>
+            </Grid>
+            <Grid item xs={11} md={7}>
+              <MultipleSelectInput
+                options={allEntrances}
+                setSelected={setEntrances}
+                getOptionLabel={getEntranceName}
+                label="Entrances"
+                filterOptions={entranceFilter}
+                value={entrances}
+                isOptionEqualToValue={entranceEqual}
+                error={entrances.length === 0}
+                helperText={
+                  entrances.length === 0 && 'Error: no entrance selected'
+                }
+              />
+            </Grid>
+          </Grid>
 
-ModifyEntranceSchedule
-.getLayout = (page) => (
-    <AuthGuard>
-        <DashboardLayout>
-            { page }
-        </DashboardLayout>
-    </AuthGuard>
-)
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={3}>
+              {entranceScheduleInfoArr.map((info, i) => (
+                <EditEntSchedForm
+                  key={info.entranceScheduleId}
+                  accessGroupScheduleInfo={info}
+                  removeCard={removeCard}
+                  changeTimeStart={changeTimeStart}
+                  changeTimeEnd={changeTimeEnd}
+                  accessGroupScheduleValidations={
+                    entranceScheduleValidationsArr[i]
+                  }
+                  changeTextField={(e) =>
+                    changeTextField(e, info.entranceScheduleId)
+                  }
+                  changeRrule={changeRrule}
+                  checkUntil={(val) =>
+                    updateValidation(info.entranceScheduleId, {
+                      untilInvalid: val,
+                    })
+                  }
+                  checkBegin={(val) =>
+                    updateValidation(info.entranceScheduleId, {
+                      beginInvalid: val,
+                    })
+                  }
+                />
+              ))}
+              <Button
+                size="large"
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={addCard}
+                sx={{ width: 'fit-content' }}
+              >
+                Add another
+              </Button>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Button
+                    type="submit"
+                    name="replace"
+                    size="large"
+                    variant="contained"
+                    disabled={
+                      entrances.length === 0 ||
+                      entranceScheduleValidationsArr.some((v) =>
+                        Object.values(v).includes(true)
+                      )
+                    }
+                  >
+                    Replace all
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    type="submit"
+                    name="add"
+                    size="large"
+                    variant="contained"
+                    disabled={
+                      entrances.length === 0 ||
+                      entranceScheduleValidationsArr.some((v) =>
+                        Object.values(v).includes(true)
+                      )
+                    }
+                  >
+                    Add on
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    component={NextLink}
+                    href={`/dashboard/entrances/details/${entranceId}`}
+                    size="large"
+                    variant="outlined"
+                    color="error"
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+              </Grid>
+            </Stack>
+          </form>
+        </Container>
+      </Box>
+    </>
+  );
+};
 
-export default ModifyEntranceSchedule
-;
+ModifyEntranceSchedule.getLayout = (page) => (
+  <AuthGuard>
+    <DashboardLayout>{page}</DashboardLayout>
+  </AuthGuard>
+);
+
+export default ModifyEntranceSchedule;

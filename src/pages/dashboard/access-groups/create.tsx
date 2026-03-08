@@ -282,7 +282,7 @@ const CreateAccessGroups = () => {
     const validation = validations.find((v) => v.accessGroupId == id);
 
     const newAccessGroupInfoArr = [...accessGroupInfoArr];
-    newAccessGroupInfoArr.find((group) => group.accessGroupId == id).person =
+    newAccessGroupInfoArr.find((group) => group.accessGroupId == id).persons =
       newValue; // hold an updated copy of access group info for validation checks
 
     // remove submit failed
@@ -426,7 +426,7 @@ const CreateAccessGroups = () => {
         />
         <Container maxWidth="xl">
           <Box sx={{ mb: 4 }}>
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>
@@ -451,6 +451,7 @@ const CreateAccessGroups = () => {
                     duplicatedPerson={duplicatedPerson}
                     allEntrances={allEntrances}
                     onEntranceChange={onEntranceChangeFactory(id)}
+                    edit={false}
                   />
                 );
               })}

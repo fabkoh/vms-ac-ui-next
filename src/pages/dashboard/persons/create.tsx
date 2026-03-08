@@ -576,8 +576,7 @@ const CreatePersonsTwo = () => {
       id,
       ref.current?.value,
       "numberInvalid",
-      personsValidation,
-      personsInfo
+      personsValidation
     );
 
     if (b1 || b2 || b3) {
@@ -655,7 +654,7 @@ const CreatePersonsTwo = () => {
     // Reset and update validations
     const newValidations = [...personsValidation];
     newInfo.forEach((person, i) => {
-        newValidations[i].credentialSubmitFailed = {};
+        (newValidations[i] as any).credentialSubmitFailed = {};
     });
 
     const b1 = checkCredRepeatedHelper(newInfo, personsValidation);
@@ -827,7 +826,7 @@ const CreatePersonsTwo = () => {
               open={serverDownOpen}
               handleDialogClose={() => setServerDownOpen(false)}
             />
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>

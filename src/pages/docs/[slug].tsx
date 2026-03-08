@@ -15,7 +15,7 @@ export const getStaticPaths = () => {
     paths: articles.map((article) => {
       return {
         params: {
-          slug: article.slug
+          slug: (article as any).slug
         }
       };
     }),

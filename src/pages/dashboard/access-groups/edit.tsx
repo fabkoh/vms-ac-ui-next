@@ -151,7 +151,7 @@ const EditAccessGroups = () => {
     const run = async () => {
       try {
         getGroupEntrances(
-          await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids)))
+          await getAccessGroups(JSON.parse(decodeURIComponent(router.query.ids as string)))
         );
       } catch (e) {
         router.replace("/dashboard/access-groups");
@@ -465,7 +465,7 @@ const EditAccessGroups = () => {
       >
         <Container maxWidth="xl">
           <Box sx={{ mb: 4 }}>
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>

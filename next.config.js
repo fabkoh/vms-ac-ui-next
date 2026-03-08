@@ -5,19 +5,17 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/daygrid',
   '@fullcalendar/list',
   '@fullcalendar/timegrid',
-  '@fullcalendar/timeline'
+  '@fullcalendar/timeline',
 ]);
 
 module.exports = withTM({
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
-    ignoreDuringBuilds: true,
   },
   typescript: {
     // During TS migration: type errors are checked via `npx tsc --noEmit`
     // but do not block the production build.
-    ignoreBuildErrors: true,
   },
   reactStrictMode: true,
   webpack(config) {
@@ -28,10 +26,10 @@ module.exports = withTM({
         {
           loader: '@svgr/webpack',
           options: {
-            svgoConfig: { plugins: [{ removeViewBox: false }] }
-          }
-        }
-      ]
+            svgoConfig: { plugins: [{ removeViewBox: false }] },
+          },
+        },
+      ],
     });
     return config;
   },
@@ -40,8 +38,8 @@ module.exports = withTM({
       {
         source: '/docs',
         destination: '/docs/welcome',
-        permanent: true
-      }
+        permanent: true,
+      },
     ];
-  }
+  },
 });

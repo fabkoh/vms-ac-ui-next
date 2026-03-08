@@ -60,7 +60,6 @@ const SMTPForm = ({SMTPInfo, isEnableCustom, setToDefault, getEmailSettings, tes
                 <Grid
                     container
                     spacing={3}
-                    fluid
                 >
                     <Grid item
 xs={8}>

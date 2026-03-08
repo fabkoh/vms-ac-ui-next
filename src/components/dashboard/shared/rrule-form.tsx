@@ -81,7 +81,7 @@ const Rrule = (props) => {
 			const newRule2 = { ...rule, ...newrule1 };
 			const rule2 = new RRule(newRule2);
 			handleRrule(rule2);
-			handleAdd({"allDay":allDay,
+			handleAdd?.({"allDay":allDay,
 						"endOfDay":endOfDay,
 						"repeatToggle":repeatToggle});
 		} catch(e) { console.log(e); };
@@ -198,7 +198,7 @@ const Rrule = (props) => {
 	const AllDayRenderer = (allDay) => {
 		if (allDay) {
 			return (
-				<Grid container
+				<Grid container item
 					alignItems="center"
 					xs={12}>
 					<Grid item
@@ -722,7 +722,7 @@ const Rrule = (props) => {
 					required
 					sx={{ minWidth: 200, mr: 10 }}
 					error={dtstart?false:true}
-					helperText={dtstart?true :"Error: no start date"}
+					helperText={dtstart?" " :"Error: no start date"}
 				/>
 				<FormControl>
 					<FormGroup>
@@ -777,7 +777,7 @@ const Rrule = (props) => {
 			</Grid>
 				)}
 			</Grid>
-			{(Divider as any)}
+			<Divider />
 			<Grid item>
 				{repeatToggle && (
 					<Grid container
@@ -813,8 +813,7 @@ const Rrule = (props) => {
 			<Grid container
 				mt={2}
 				ml={-2}
-				alignItems="center"
-				xs={12}>
+				alignItems="center">
 					
 				<Grid item
 					mr={3}>

@@ -173,8 +173,8 @@ md={6}>
                                     md={2}
                                 >
                                     <Grid mb={1}>
-                                        <Typography 
-                                            variant="body" 
+                                        <Typography
+                                            variant="body1"
                                             fontWeight="bold"
                                         >
                                             Assign Access Groups:

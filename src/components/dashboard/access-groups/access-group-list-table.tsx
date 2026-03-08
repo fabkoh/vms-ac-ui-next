@@ -171,7 +171,7 @@ export const AccessGroupListTable = (props) => {
                         <Link component={NextLink} href={
                           "/dashboard/access-groups/details/" +
                           accGroup.accessGroupId
-                        } color="inherit" variant="headline5">
+                        } color="inherit" variant="h5">
                           <Typography noWrap>
                             {accGroup.accessGroupName}
                           </Typography>

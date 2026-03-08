@@ -14,7 +14,7 @@ export const EntranceBasicDetails = (props) => {
     const controller = props.entranceController[entranceId];
     
     // copied from template
-    const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
+    const mdUp = useMediaQuery ((theme: any) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
 
     return(

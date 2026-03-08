@@ -56,7 +56,8 @@ const EditEventManagementForm = ({
   notificationSMSs,
   changeNotificationEmails,
   changeNotificationSMSs,
-}) => {
+  removeCard = undefined,
+}: any) => {
   const inputEventsWithTimer = allInputEvents.filter((e) => e.timerEnabled);
   const inputEventsWithoutTimer = allInputEvents.filter((e) => !e.timerEnabled);
   const outputEventsWithTimer = allOutputEvents.filter((e) => e.timerEnabled);
@@ -192,10 +193,10 @@ const EditEventManagementForm = ({
       validation.timerDurationInputBlank = true;
       setInputWithTimerEventsManagementValidations(validations);
     }
-    if ((e.target as HTMLInputElement).value < 1) {
+    if (Number((e.target as HTMLInputElement).value) < 1) {
       validation.timerDurationInputNotPositive = true;
       setInputWithTimerEventsManagementValidations(validations);
-    } else if ((e.target as HTMLInputElement).value > MAX_INPUT_TIMER_DURATION) {
+    } else if (Number((e.target as HTMLInputElement).value) > MAX_INPUT_TIMER_DURATION) {
       validations.find(
         (info) => info.inputId == inputId
       ).timerDurationInputTooLarge = true;
@@ -220,10 +221,10 @@ const EditEventManagementForm = ({
       validation.timerDurationOutputBlank = true;
       setOutputWithTimerEventsManagementValidations(validations);
     }
-    if ((e.target as HTMLInputElement).value < 1) {
+    if (Number((e.target as HTMLInputElement).value) < 1) {
       validation.timerDurationOutputNotPositive = true;
       setOutputWithTimerEventsManagementValidations(validations);
-    } else if ((e.target as HTMLInputElement).value > MAX_OUTPUT_TIMER_DURATION) {
+    } else if (Number((e.target as HTMLInputElement).value) > MAX_OUTPUT_TIMER_DURATION) {
       validation.timerDurationOutputTooLarge = true;
       setOutputWithTimerEventsManagementValidations(validations);
     } else {
@@ -1186,7 +1187,7 @@ const EditEventManagementForm = ({
                             newNotificationEmailRecipients
                           );
                           console.log(
-                            newNotificationEmailRecipients.eventsManagementEmailRecipients
+                            (newNotificationEmailRecipients as any).eventsManagementEmailRecipients
                           );
 
                           const newValue = {

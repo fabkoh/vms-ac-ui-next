@@ -10,26 +10,26 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from "@mui/material";
-import { Scrollbar } from "../../scrollbar";
-import WarningChip from "../shared/warning-chip";
-import NextLink from "next/link";
-import { PencilAlt } from "../../../icons/pencil-alt";
-import { ArrowRight } from "../../../icons/arrow-right";
-import { ListFilter } from "../shared/list-filter";
+} from '@mui/material';
+import { Scrollbar } from '../../scrollbar';
+import WarningChip from '../shared/warning-chip';
+import NextLink from 'next/link';
+import { PencilAlt } from '../../../icons/pencil-alt';
+import { ArrowRight } from '../../../icons/arrow-right';
+import { ListFilter } from '../shared/list-filter';
 import {
   getVideoRecorderDetailsLink,
   getVideoRecordersEditLink,
   getVideoRecorderEditLink,
-} from "../../../utils/video-recorder";
-import { toDisplayDateString } from "../../../utils/utils";
-import CropPortraitIcon from "@mui/icons-material/CropPortrait";
-import SignalCellularAlt1BarSharpIcon from "@mui/icons-material/SignalCellularAlt1BarSharp";
-import { SeverityPill } from "../../severity-pill";
-import { useEffect, useState } from "react";
+} from '../../../utils/video-recorder';
+import { toDisplayDateString } from '../../../utils/utils';
+import CropPortraitIcon from '@mui/icons-material/CropPortrait';
+import SignalCellularAlt1BarSharpIcon from '@mui/icons-material/SignalCellularAlt1BarSharp';
+import { SeverityPill } from '../../severity-pill';
+import { useEffect, useState } from 'react';
 
 // for status options
-const statusOptions = ["Non-Active", "Active"];
+const statusOptions = ['Non-Active', 'Active'];
 
 export default function VideoListTable({
   selectedAllVideoRecorders,
@@ -51,7 +51,7 @@ export default function VideoListTable({
     <div {...other}>
       <Scrollbar>
         <Table sx={{ minWidth: 700 }}>
-          <TableHead sx={{ backgroundColor: "neutral.200" }}>
+          <TableHead sx={{ backgroundColor: 'neutral.200' }}>
             <TableRow>
               <TableCell padding="checkbox">
                 <Checkbox
@@ -99,7 +99,7 @@ export default function VideoListTable({
               const handleSelect = handleSelectFactory(recorderId);
               const detailsLink = getVideoRecorderDetailsLink(recorder);
               const editLink = getVideoRecorderEditLink(recorderId);
-              console.log(recorder, "recorder");
+              console.log(recorder, 'recorder');
               return (
                 <TableRow
                   hover
@@ -130,10 +130,16 @@ export default function VideoListTable({
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={(recorder && "cameras" in recorder)  ? "ACTIVE" : "NON-ACTIVE"}
-                      color={(recorder && "cameras" in recorder)  ? "success" : "error"}
+                      label={
+                        recorder && 'cameras' in recorder
+                          ? 'ACTIVE'
+                          : 'NON-ACTIVE'
+                      }
+                      color={
+                        recorder && 'cameras' in recorder ? 'success' : 'error'
+                      }
                       sx={{
-                        fontSize: "12px",
+                        fontSize: '12px',
                         fontWeight: 600,
                       }}
                       size="small"
@@ -155,17 +161,19 @@ export default function VideoListTable({
                         //     color="primary"
                         //     style={{ fontSize: 160}}
                         //     />
-                        camera["online"] ? (
+                        camera['online'] ? (
                           <SeverityPill
+                            key={camera}
                             color="success"
-                            style={{ color: "transparent", margin: "4px" }}
+                            style={{ color: 'transparent', margin: '4px' }}
                           >
                             _.
                           </SeverityPill>
                         ) : (
                           <SeverityPill
+                            key={camera}
                             color="error"
-                            style={{ color: "transparent", margin: "4px" }}
+                            style={{ color: 'transparent', margin: '4px' }}
                           >
                             _.
                           </SeverityPill>
@@ -217,27 +225,30 @@ export default function VideoListTable({
                     )}
                   </TableCell> */}
                   <TableCell>
-                    
-                      <Link component={NextLink} href={detailsLink} color="inherit">
-                        <Typography noWrap>
-                          {toDisplayDateString(created)}
-                        </Typography>
-                      </Link>
+                    <Link
+                      component={NextLink}
+                      href={detailsLink}
+                      color="inherit"
+                    >
+                      <Typography noWrap>
+                        {toDisplayDateString(created)}
+                      </Typography>
+                    </Link>
                   </TableCell>
                   <TableCell>
-                    
-                      <IconButton component={NextLink} href={editLink}>
-                        <PencilAlt fontSize="small" />
-                      </IconButton>
-                    
-                      <IconButton
-                        component={NextLink} href={detailsLink}
-                        onClick={() => {
-                          window.location.href = `/dashboard/video-recorders/details/${recorderId}`;
-                        }}
-                      >
-                        <ArrowRight fontSize="small" />
-                      </IconButton>
+                    <IconButton component={NextLink} href={editLink}>
+                      <PencilAlt fontSize="small" />
+                    </IconButton>
+
+                    <IconButton
+                      component={NextLink}
+                      href={detailsLink}
+                      onClick={() => {
+                        window.location.href = `/dashboard/video-recorders/details/${recorderId}`;
+                      }}
+                    >
+                      <ArrowRight fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               );

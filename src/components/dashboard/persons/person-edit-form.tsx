@@ -208,7 +208,7 @@ export const PersonEditForm = (props) => {
                     helperText={(person.valid.uidNotRepeated && person.valid.uidNotInUse) || "Error: UID taken"}
                     label="UID"
                     name="uid"
-                    required='UID must not be blank'
+                    required={true}
                     onChange={(e) => {
                       onFieldChange(e, person.id)
                       onUidChange(e, person.id)
@@ -254,10 +254,10 @@ export const PersonEditForm = (props) => {
                   xs={12}>
                     <FormControl fullWidth>
                       <InputLabel>Access Group</InputLabel>
-                  <Select  label = "Access Group" value={person.accessGroup ? person.accessGroup.accessGroupName : ""} data="" onChange={(e)=> handleAccGrpChg(e,person.id)}>
+                  <Select  label = "Access Group" value={person.accessGroup ? person.accessGroup.accessGroupName : ""} onChange={(e)=> handleAccGrpChg(e,person.id)}>
                     {/* {mapping for accessgrp todisplay menu item here} */}
                     <MenuItem value={"clear"} sx={{fontStyle: 'italic'}}>clear</MenuItem>
-                    {allAccGroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} data={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
+                    {allAccGroups.map(accGrp => <MenuItem key={accGrp.accessGroupId} value={accGrp.accessGroupName}>{accGrp.accessGroupName}</MenuItem>)}
                   </Select>
                   </FormControl>
                 </Grid>

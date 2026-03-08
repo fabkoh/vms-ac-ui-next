@@ -45,7 +45,7 @@ const DataManagement = () => {
 
             const dataUrl = reader.result;
             const link = document.createElement('a');
-            link.href = dataUrl;
+            link.href = dataUrl as string;
             link.setAttribute('download', `backup${dateString}.sql`); // Or use a dynamic name if provided by the server
             document.body.appendChild(link);
             link.click();

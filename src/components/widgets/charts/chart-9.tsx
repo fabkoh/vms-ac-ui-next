@@ -29,7 +29,7 @@ export const Chart9 = () => {
       size: 6
     },
     stroke: {
-      curve: 'straight',
+      curve: 'straight' as const,
       width: 2
     },
     theme: {

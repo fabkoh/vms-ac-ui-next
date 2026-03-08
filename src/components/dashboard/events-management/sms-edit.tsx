@@ -186,7 +186,7 @@ export const SMSEdit = (props) => {
                 }}
                 control={<Switch defaultChecked />}
                 sx={{ marginBottom: 2 }}
-                labelPlacement="right"
+                labelPlacement="end"
                 label="Use Default"
               />
             </div>

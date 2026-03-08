@@ -3,7 +3,7 @@ import { Card, CardHeader, Collapse, Divider } from "@mui/material";
 import ExpandMore from "./expand-more";
 import { useState } from "react";
 
-const BasicDetailsCard = ({ children, title="Basic Details", subtitle = undefined }) => {
+const BasicDetailsCard = ({ children, title="Basic Details", subtitle = undefined }: { children?: any; title?: string; subtitle?: any; }) => {
 
     const [expanded, setExpanded] = useState(true);
     const handleExpandClick = () => setExpanded(!expanded);

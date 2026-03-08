@@ -58,7 +58,7 @@ const AccountManagement = () => {
 
   const [expandedAccount, setExpandedAccount] = useState(false);
   const [expandedUsers, setExpandedUsers] = useState(false);
-  const [userSettings, setUserSettings] = useState(false);
+  const [userSettings, setUserSettings] = useState<any>(null);
   const [isUpdated, setIsUpdated] = useState(false);
 
   const handleExpandedAccount = () => setExpandedAccount(!expandedAccount);
@@ -73,7 +73,7 @@ const AccountManagement = () => {
         setUserSettings(settings);
         setIsUpdated(true);
       } else {
-        if (res.status == serverDownCode) {
+        if ((res as any).status == serverDownCode) {
           setServerDownOpen(true);
         }
       }
@@ -122,7 +122,7 @@ const AccountManagement = () => {
             <Typography variant="h3">My Account Settings</Typography>
           </div>
           <Stack spacing={4} sx={{ mt: 4 }}>
-            <Card defaultExpanded>
+            <Card>
               <CardHeader
                 title="Update My Account Details"
                 avatar={

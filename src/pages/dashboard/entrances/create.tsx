@@ -378,7 +378,7 @@ const CreateEntrances = () => {
         />
         <Container maxWidth="xl">
           <Box sx={{ mb: 4 }}>
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant={"subtitle2" as any}>
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>
@@ -401,6 +401,7 @@ const CreateEntrances = () => {
                     allAccessGroups={allAccessGroups}
                     onAccessGroupChange={onAccessGroupChangeFactory(id)}
                     onThirdPartyOptionsChange={onThirdPartyOptionsChange(id)}
+                    edit={false}
                   />
                 );
               })}

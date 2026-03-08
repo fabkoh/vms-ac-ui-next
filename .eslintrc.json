@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "prettier"
-  ],
+  "extends": ["next/core-web-vitals", "prettier"],
   "overrides": [
     {
       "files": ["**/*.js", "**/*.jsx"],
@@ -19,12 +16,6 @@
   "rules": {
     "@next/next/no-img-element": "off",
     "jsx-a11y/alt-text": "off",
-    "react/display-name": "off",
-    "react/jsx-max-props-per-line": [
-      1,
-      {
-        "maximum": 1
-      }
-    ]
+    "react/display-name": "off"
   }
 }

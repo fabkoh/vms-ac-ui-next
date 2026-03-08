@@ -39,8 +39,8 @@ const AuthDeviceDetails = () => {
     const router = useRouter();
     // load entrance details
     const isMounted = useMounted();
-    const { authDeviceId }  = router.query; //change to auth device id
-    const { controllerId }  = router.query; //change to auth device id
+    const authDeviceId = router.query.authDeviceId as string; //change to auth device id
+    const controllerId = router.query.controllerId as string; //change to auth device id
     const [serverDownOpen, setServerDownOpen] = useState(false);
     const [currentAuth,setCurrentAuth] = useState()
 
@@ -124,7 +124,8 @@ const AuthDeviceDetails = () => {
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
         setStatusLoaded(false)
-            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            toast.loading("Fetching status...");
+            Promise.resolve(controllerApi.getAuthStatus(controllerId))
             .then(async res=>{
                 toast.dismiss()
                 if (res.status != 200) {

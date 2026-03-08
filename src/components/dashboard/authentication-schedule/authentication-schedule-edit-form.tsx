@@ -24,7 +24,7 @@ import SingleSelect from "../controllers/single-select-input";
 import { authDeviceApi } from "../../../api/auth-devices";
 
 const EditAuthSchedForm = ({
-    changeAuthMethod,checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,authMethodScheduleInfo,authMethodScheduleValidations}) => {
+    changeAuthMethod,checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,changeNameCheck,edit,removeCard,authMethodScheduleInfo,authMethodScheduleValidations}) => {
     const {
         authMethodScheduleId,
         authMethodSchedule,

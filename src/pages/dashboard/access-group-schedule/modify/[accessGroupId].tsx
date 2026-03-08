@@ -23,7 +23,7 @@ const ModifyAccessGroupSchedule = () => {
     //need to get the access group ID then entrances(get from NtoN with acc grp id) from prev page AKA accgrpdetails page
     const router = useRouter();
     const temp = router.query;
-    const accessGroupId = temp.accessGroupId;
+    const accessGroupId = temp.accessGroupId as string;
 
     const [accGrp, setAccGrp] = useState()
     const [grpToEnt, setGrpToEnt] = useState<any[]>([]) // grptoent.contains grptoentId and ent obj
@@ -335,7 +335,7 @@ color="neutral.500">
                         <Typography variant="body2"
 color="neutral.500"
 fontWeight="bold">
-                        {accGrp?accGrp.accessGroupName:"undefined"}
+                        {accGrp?(accGrp as any).accessGroupName:"undefined"}
                         </Typography>
                         </Grid>
                         </Grid>
@@ -374,7 +374,7 @@ md={7}>
                             />
                         </Grid>
                         </Grid>
-                    <form onSubmit={(e) => { e.nativeEvent.submitter.name =="add"? (addOn(e)):(replaceAll(e))}}>
+                    <form onSubmit={(e) => { (e.nativeEvent.submitter as any).name =="add"? (addOn(e)):(replaceAll(e))}}>
                     {/* <form onSubmit={(e) => { console.log(e.nativeEvent.submitter.name); e.preventDefault(); }}> */}
                         <Stack spacing={3}>
                             { accessGroupScheduleInfoArr.map((accessGroupScheduleInfo, i) => (
@@ -390,6 +390,7 @@ md={7}>
                                     changeRrule={changeRrule}
                                     checkUntil={checkUntil(accessGroupScheduleInfo.accessGroupScheduleId)}
                                     checkBegin={checkBegin(accessGroupScheduleInfo.accessGroupScheduleId)}
+                                    edit={false}
                                 />
                             ))}
                             <div>

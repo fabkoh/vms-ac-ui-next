@@ -65,11 +65,10 @@ CustomDocument.getInitialProps = async (ctx) => {
   const { extractCriticalToChunks } = createEmotionServer(cache);
 
   ctx.renderPage = () => originalRenderPage({
-    enhanceApp: (App) => (props) => (
-      <App
-                emotionCache={cache}
-        {...props} />
-    )
+    enhanceApp: (App) => (props) => {
+      const AppAny = App as any;
+      return <AppAny emotionCache={cache} {...props} />;
+    }
   });
 
   const initialProps = await Document.getInitialProps(ctx);

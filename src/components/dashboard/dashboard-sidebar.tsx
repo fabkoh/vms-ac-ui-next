@@ -1024,7 +1024,7 @@ export const DashboardSidebar = (props) => {
                   .uniconUpdater()
                   .then((res) => {
                     if (res.status == 200) {
-                      window.location.reload(true);
+                      window.location.reload();
                       toast.success("Synced successfully", { duration: 2000 });
                     } else {
                       if (res.status == serverDownCode) {

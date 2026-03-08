@@ -482,7 +482,7 @@ const ModifyauthMethodSchedule = () => {
     authDevices.forEach((a) => authDeviceIdArr.push(a.authDeviceId));
 
     authMethodScheduleApi
-      .replaceAuthDeviceSchedules(authMethodScheduleInfoArr, authDeviceIdArr)
+      .replaceAuthDeviceSchedules(authMethodScheduleInfoArr as any, authDeviceIdArr)
       .then((res) => {
         if (res.status != 200) {
           return toast.error("Error replacing all schedules");
@@ -499,7 +499,7 @@ const ModifyauthMethodSchedule = () => {
     const authDeviceIdArr = [];
     authDevices.forEach((a) => authDeviceIdArr.push(a.authDeviceId));
     authMethodScheduleApi
-      .addAuthDeviceSchedules(authMethodScheduleInfoArr, authDeviceIdArr)
+      .addAuthDeviceSchedules(authMethodScheduleInfoArr as any, authDeviceIdArr)
       .then((res) => {
         if (res.status != 200) {
           res.json().then((data) => {
@@ -507,7 +507,7 @@ const ModifyauthMethodSchedule = () => {
             data.map((singleError) => {
               Object.entries(singleError).map(
                 ([newScheduleName, clashes], i) => {
-                  clashes.map((clash, j) => {
+                  (clashes as any).map((clash, j) => {
                     array.push(clash);
                   });
                 }
@@ -674,7 +674,7 @@ const ModifyauthMethodSchedule = () => {
             </Grid>
           <form
             onSubmit={(e) => {
-              e.nativeEvent.submitter.name == "add" ? addOn(e) : replaceAll(e);
+              (e.nativeEvent.submitter as any).name == "add" ? addOn(e) : replaceAll(e);
             }}
           >
             {/* <form onSubmit={(e) => { console.log(e.nativeEvent.submitter.name); e.preventDefault(); }}> */}
@@ -698,6 +698,7 @@ const ModifyauthMethodSchedule = () => {
                   checkUntil={checkUntil(
                     authMethodScheduleInfo.authMethodScheduleId
                   )}
+                  edit={false}
                 />
               ))}
               <div>

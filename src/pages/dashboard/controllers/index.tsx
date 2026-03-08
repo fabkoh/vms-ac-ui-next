@@ -153,11 +153,11 @@ const ControllerList = () => {
   };
   const deleteControllers = async (e) => {
     // e.preventDefault();
+    toast.loading("Deleting Selected Controller(s)...");
     Promise.all(
       selectedControllers.map((id) => {
         return controllerApi.deleteController(id);
-      }),
-      toast.loading("Deleting Selected Controller(s)...")
+      })
     ).then((resArr) => {
       toast.dismiss();
 
@@ -194,11 +194,11 @@ const ControllerList = () => {
     setResetOpen(false);
   };
   const resetControllers = async () => {
+    toast.loading("Resetting Selected Controller(s)...");
     Promise.all(
       selectedControllers.map((id) => {
         return controllerApi.resetController(id);
-      }),
-      toast.loading("Resetting Selected Controller(s)...")
+      })
     ).then((resArr) => {
       toast.dismiss();
 
@@ -373,6 +373,7 @@ const ControllerList = () => {
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               controllerCount={controllerCount}
+              controllersStatus={null}
             />
           </Card>
         </Container>

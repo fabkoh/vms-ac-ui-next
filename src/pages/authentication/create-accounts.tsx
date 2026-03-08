@@ -406,7 +406,7 @@ const CreatePersonsTwo = () => {
 
         const b1 = checkDuplicateHelper("personMobileNumber", "numberRepeated", personsValidation, personsInfo);
         const b2 = checkInUseHelper(id, ref.current?.value, personMobileNumbers, "numberInUse", personsValidation);
-        const b3 = checkInvalidNumberHelper(id, ref.current?.value, "numberInvalid", personsValidation, personsInfo);
+        const b3 = checkInvalidNumberHelper(id, ref.current?.value, "numberInvalid", personsValidation);
 
         if (b1 || b2 || b3) { setPersonsValidation([ ...personsValidation ]); }
     }
@@ -605,10 +605,11 @@ const CreatePersonsTwo = () => {
                                     Array.isArray(personsInfo) && personsInfo.map((p,i) => {
                                         const id = p.personId;                                        
                                         return (
-                                            <PersonAddFormTwo 
+                                            <PersonAddFormTwo
                                                 key={id}
                                                 onClear={removePersonFactory(id)}
                                                 person={p}
+                                                originalCredTypes={[]}
                                                 onPersonFirstNameChange={onPersonFirstNameChangeFactory(id)}
                                                 onPersonLastNameChange={onPersonLastNameChangeFactory(id)}
                                                 onPersonUidChange={onPersonUidChangeFactory(id)}

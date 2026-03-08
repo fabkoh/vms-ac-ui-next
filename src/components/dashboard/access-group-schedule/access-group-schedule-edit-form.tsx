@@ -21,7 +21,7 @@ import rruleDescription from "../../../utils/rrule-desc";
 import { whitespace } from "stylis";
 import { WrapText } from "@mui/icons-material";
 
-const EditAccGrpSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
+const EditAccGrpSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,changeNameCheck,edit,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         accessGroupScheduleId,
         accessGroupScheduleName,

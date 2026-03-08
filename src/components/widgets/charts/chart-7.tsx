@@ -103,13 +103,13 @@ export const Chart7 = () => {
         sizeOffset: 2
       },
       radius: 2,
-      shape: 'circle',
+      shape: 'circle' as const,
       size: 4,
       strokeWidth: 0
     },
     stroke: {
-      curve: 'smooth',
-      lineCap: 'butt',
+      curve: 'smooth' as const,
+      lineCap: 'butt' as const,
       width: 3
     },
     theme: {

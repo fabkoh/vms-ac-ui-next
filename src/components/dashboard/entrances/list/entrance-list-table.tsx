@@ -150,7 +150,7 @@ export default function EntranceListTable({
                     )}
                   </TableCell>
                   <TableCell>
-                    {console.log(isLocked, "isLocked")}
+{/* debug removed */}
                     <Chip
                       label={isLocked ? "LOCKED" : "UNLOCKED"}
                       icon={isLocked ? <Lock /> : <LockOpen />}

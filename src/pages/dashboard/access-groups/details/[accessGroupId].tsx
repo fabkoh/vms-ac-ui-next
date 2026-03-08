@@ -47,7 +47,7 @@ const AccessGroupDetails = () => {
   const [accessGroup, setAccessGroup] = useState(null);
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [accessGroupIsActive, setAccessGroupIsActive] = useState(null);
-  const { accessGroupId } = router.query;
+  const accessGroupId = router.query.accessGroupId as string;
   useEffect(() => {
     // copied from original template
     gtm.push({ event: "page_view" });
@@ -90,7 +90,7 @@ const AccessGroupDetails = () => {
           toast.error("Error loading schedule info");
         }
       } else {
-        if (accessGroupToEntranceMap.status == serverDownCode) {
+        if ((accessGroupToEntranceMap as any).status == serverDownCode) {
           setServerDownOpen(true);
         }
         setAccessGroupToEntranceMap([]);
@@ -306,7 +306,7 @@ const AccessGroupDetails = () => {
                     display: "flex",
                   }}
                 >
-                  <ArrowBackIcon fontSize="smal" sx={{ mr: 1 }} />
+                  <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
                   <Typography variant="subtitle2">Access Groups</Typography>
                 </Link>
             </Box>

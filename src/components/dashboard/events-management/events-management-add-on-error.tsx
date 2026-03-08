@@ -1,10 +1,10 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { styled } from "@mui/material/styles";
-import DialogActions from "@mui/material/DialogActions";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import {
   Alert,
   Box,
@@ -23,17 +23,17 @@ import {
   TableHead,
   TableRow,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 import {
   eventActionInputText,
   eventActionOutputText,
-} from "../../../utils/eventsManagement";
+} from '../../../utils/eventsManagement';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
+  '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  "& .MuiDialogActions-root": {
+  '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
 }));
@@ -49,7 +49,7 @@ const BootstrapDialogTitle = (props) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -83,7 +83,7 @@ export default function EventsManagementAddOnError({
     // enable scrolling
     // Helper text
     <Dialog onBackdropClick={handleClose} fullWidth maxWidth="lg" open={open}>
-      <DialogTitle sx={{ color: "#F44336" }}>
+      <DialogTitle sx={{ color: '#F44336' }}>
         Error : Failed to create new event management.
       </DialogTitle>
       <DialogContent>
@@ -95,7 +95,7 @@ export default function EventsManagementAddOnError({
             <br />
             Please take note that you can only use each custom trigger/action as
             either GEN_IN or GEN_OUT and not both. Do make the necessary changes
-            and ensure your hardware is configured properly before pressing the{" "}
+            and ensure your hardware is configured properly before pressing the{' '}
             <b>Add on/Replace all</b> button again.
           </Alert>
         </Box>
@@ -117,7 +117,8 @@ export default function EventsManagementAddOnError({
           </TableHead>
           <TableBody>
             {errorMessages[0] &&
-              Object.entries(errorMessages[0]).map(([key, clashes], i) => {
+              Object.entries(errorMessages[0]).map(([key, clashesVal], i) => {
+                const clashes = clashesVal as any[];
                 console.log(clashes);
                 return (
                   <React.Fragment key={`row${i}`}>
@@ -135,16 +136,16 @@ export default function EventsManagementAddOnError({
                       return (
                         <TableRow key={`row${j}`}>
                           <TableCell>
-                            {" "}
-                            ID {clash.eventsManagementId} : Event Management "
-                            {clash.eventsManagementName}" for{" "}
+                            {' '}
+                            ID {clash.eventsManagementId} : Event Management
+                            &quot;{clash.eventsManagementName}&quot; for{' '}
                             {clash.entrance?.entranceName ||
                               clash.controller?.controllerName ||
-                              "(linked to unknown entity)"}{" "}
-                            with the following triggers:{" "}
+                              '(linked to unknown entity)'}{' '}
+                            with the following triggers:{' '}
                             {eventActionInputText(clash.inputEvents)} and the
-                            following output actions:{" "}
-                            {eventActionOutputText(clash.outputActions)}{" "}
+                            following output actions:{' '}
+                            {eventActionOutputText(clash.outputActions)}{' '}
                           </TableCell>
                           <TableCell padding="checkbox">
                             <Checkbox
@@ -166,7 +167,7 @@ export default function EventsManagementAddOnError({
         <Button onClick={handleClose}>Close</Button>
         <Button
           onClick={deleteEventsManagement}
-          sx={{ color: "#F44336" }}
+          sx={{ color: '#F44336' }}
           autoFocus
         >
           Delete Selected

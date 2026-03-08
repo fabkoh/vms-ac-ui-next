@@ -10,7 +10,7 @@ import {
   Paper,
   Popper,
   Typography,
-  Grid
+  Grid,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
@@ -20,10 +20,9 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 //   'Rebase and merge'
 // ];
 
-
 // props:
 // array = array of options (not including reset option)
-// onSelect = function to run when button is selected 
+// onSelect = function to run when button is selected
 //            returns the index of option chosen
 //            or -1 if the reset option is chosen
 // defaultLabel = string to display when reset option is chosen
@@ -54,50 +53,40 @@ export const ListFilter = (props) => {
   };
 
   return (
-    <Box
-    >
-      <ButtonGroup
-        ref={anchorRef}
-        variant="text"
-      >
-        <Grid container alignItems="center"> 
-            {selectedIndex == -1 ? defaultLabel : options[selectedIndex]}
+    <Box>
+      <ButtonGroup ref={anchorRef} variant="text">
+        <Grid container alignItems="center">
+          {selectedIndex == -1 ? defaultLabel : options[selectedIndex]}
         </Grid>
         <Button
           onClick={handleToggle}
           size="small"
-          sx={{ size: 'small',whiteSpace:'nowrap' }}
+          sx={{ size: 'small', whiteSpace: 'nowrap' }}
         >
           <FilterListIcon fontSize="small" />
         </Button>
       </ButtonGroup>
-      <Popper
-        anchorEl={anchorRef.current}
-        open={open}
-        transition
-      >
+      <Popper anchorEl={anchorRef.current} open={open} transition>
         {({ TransitionProps, placement }) => (
-          <Grow {...TransitionProps}
-                style={{
-                  transformOrigin: placement === 'bottom'
-                    ? 'center top'
-                    : 'center bottom'
-                }}
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin:
+                placement === 'bottom' ? 'center top' : 'center bottom',
+            }}
           >
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu">
-                    <MenuItem 
-                        key="reset"
-                        onClick={() => handleMenuItemClick(-1)}
-                        selected={selectedIndex == -1}
-                    >
-                        <Typography fontStyle="italic">
-                            clear 
-                        </Typography>
-                    </MenuItem>
+                  <MenuItem
+                    key="reset"
+                    onClick={() => handleMenuItemClick(-1)}
+                    selected={selectedIndex == -1}
+                  >
+                    <Typography fontStyle="italic">clear</Typography>
+                  </MenuItem>
                   {options.map((option, index) => (
-                    <MenuItem                   
+                    <MenuItem
                       key={option}
                       onClick={() => handleMenuItemClick(index)}
                       selected={index === selectedIndex}

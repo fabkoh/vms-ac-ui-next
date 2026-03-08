@@ -25,7 +25,7 @@ const Home = () => {
         </title>
       </Head> */}
       <main>
-        <Login sx={{color:'primary'}}/>
+        <Login />
       </main>
     </>
   );

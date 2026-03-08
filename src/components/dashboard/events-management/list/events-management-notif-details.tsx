@@ -1,17 +1,24 @@
 import PropTypes from 'prop-types';
-import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
-import { SelectAll } from "@mui/icons-material";
-import { PropertyList } from '../../../property-list'
+import {
+  Card,
+  CardHeader,
+  Divider,
+  Link,
+  useMediaQuery,
+  Typography,
+  Chip,
+} from '@mui/material';
+import { SelectAll } from '@mui/icons-material';
+import { PropertyList } from '../../../property-list';
 import { PropertyListItem } from '../../../property-list-item';
 import WarningIcon from '@mui/icons-material/Warning';
 import BasicDetailsCard from '../../shared/basic-details-card';
-import RenderTableCell from "../../../dashboard/shared/renderTableCell";
-
+import RenderTableCell from '../../../dashboard/shared/renderTableCell';
 
 export const EventManagementNotifDetails = (props) => {
   const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('xs'));
   const align = mdUp ? 'horizontal' : 'vertical';
-  console.log(props)
+  console.log(props);
   const {
     eventsManagementNotificationContent,
     eventsManagementNotificationId,
@@ -20,39 +27,38 @@ export const EventManagementNotifDetails = (props) => {
     eventsManagementNotificationType,
   } = props.eventManagementNotification;
 
-    const recipientarr = eventsManagementNotificationRecipients.split(',')
+  const recipientarr = eventsManagementNotificationRecipients.split(',');
 
-    console.log(recipientarr)
+  console.log(recipientarr);
 
-    return (
-      <BasicDetailsCard title={'Notification Details [' + eventsManagementNotificationType +']'}>
-        <PropertyList>
-          <PropertyListItem
-            align={align}
-            divider
-            label="Recipients"
-            value={
-                recipientarr.map((e) => (
-                  <Chip label={e}></Chip>
-                ))
-            }
-          />
-          { eventsManagementNotificationType=="EMAIL" ?
-          <PropertyListItem
+  return (
+    <BasicDetailsCard
+      title={'Notification Details [' + eventsManagementNotificationType + ']'}
+    >
+      <PropertyList>
+        <PropertyListItem
           align={align}
           divider
-          label="Title"
-          value={eventsManagementNotificationTitle}
-          />: null}
+          label="Recipients"
+          value={recipientarr.map((e) => (
+            <Chip key={e} label={e}></Chip>
+          ))}
+        />
+        {eventsManagementNotificationType == 'EMAIL' ? (
           <PropertyListItem
             align={align}
             divider
-            label="Content"
-            value={eventsManagementNotificationContent}
+            label="Title"
+            value={eventsManagementNotificationTitle}
           />
-        </PropertyList>
-      </BasicDetailsCard>
-    ); 
+        ) : null}
+        <PropertyListItem
+          align={align}
+          divider
+          label="Content"
+          value={eventsManagementNotificationContent}
+        />
+      </PropertyList>
+    </BasicDetailsCard>
+  );
 };
-
-
