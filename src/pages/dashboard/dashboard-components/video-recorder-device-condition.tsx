@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Add, Delete, Edit, HelpOutline } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";

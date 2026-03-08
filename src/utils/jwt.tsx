@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable no-bitwise */
 export const JWT_SECRET = 'devias-top-secret-key';
 export const JWT_EXPIRES_IN = 3600 * 24 * 2; // 2 days

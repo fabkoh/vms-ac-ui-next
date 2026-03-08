@@ -116,6 +116,7 @@ export const Form3 = () => (
               />
             </div>
           </Grid>
+        </Grid>
       </CardContent>
       <Divider />
       <CardActions

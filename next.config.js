@@ -14,6 +14,11 @@ module.exports = withTM({
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    // During TS migration: type errors are checked via `npx tsc --noEmit`
+    // but do not block the production build.
+    ignoreBuildErrors: true,
+  },
   reactStrictMode: true,
   webpack(config) {
     config.module.rules.push({

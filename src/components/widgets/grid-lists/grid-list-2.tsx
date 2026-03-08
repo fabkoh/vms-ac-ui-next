@@ -145,6 +145,7 @@ export const GridList2 = () => (
                     ago
                   </Typography>
                 </Box>
+              </Box>
             </Box>
             <Box
               sx={{
@@ -204,6 +205,7 @@ export const GridList2 = () => (
                     Type
                   </Typography>
                 </Grid>
+              </Grid>
             </Box>
             <Divider />
             <Box

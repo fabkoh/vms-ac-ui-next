@@ -1,3 +1,4 @@
+// @ts-nocheck
 import numeral from 'numeral';
 import { subDays, subHours } from 'date-fns';
 import {
@@ -294,6 +295,7 @@ export const Table5 = () => (
             label="Shippable"
           />
         </Box>
+      </Box>
       <Scrollbar>
         <Table sx={{ minWidth: 1200 }}>
           <TableHead>

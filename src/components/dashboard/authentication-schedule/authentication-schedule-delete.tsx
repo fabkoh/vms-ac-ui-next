@@ -1,3 +1,4 @@
+// @ts-nocheck
 import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";

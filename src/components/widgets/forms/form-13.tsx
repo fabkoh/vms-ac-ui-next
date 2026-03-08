@@ -132,6 +132,7 @@ export const Form13 = () => (
               name="zip"
             />
           </Grid>
+        </Grid>
       </Box>
       <Box
         sx={{
@@ -290,6 +291,7 @@ export const Form13 = () => (
               name="cardSecurityCode"
             />
           </Grid>
+        </Grid>
       </Box>
       <Box
         sx={{

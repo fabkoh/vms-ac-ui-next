@@ -148,6 +148,7 @@ export const Form1 = () => (
             name="hasDiscount"
           />
         </Grid>
+      </Grid>
       <Box sx={{ mt: 2 }}>
         <Button
           type="submit"

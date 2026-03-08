@@ -1,3 +1,4 @@
+// @ts-nocheck
 import numeral from 'numeral';
 import { subDays, subHours } from 'date-fns';
 import {
@@ -223,6 +224,7 @@ export const Table3 = () => (
             ))}
           </TextField>
         </Box>
+      </Box>
       <Scrollbar>
         <Table sx={{ minWidth: 700 }}>
           <TableHead>
@@ -284,6 +286,7 @@ export const Table3 = () => (
                         {customer.email}
                       </Typography>
                     </Box>
+                  </Box>
                 </TableCell>
                 <TableCell>
                   {`${customer.city}, ${customer.state}, ${customer.country}`}

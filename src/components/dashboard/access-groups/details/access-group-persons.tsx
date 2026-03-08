@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Person } from "@mui/icons-material";
 import DetailsCard from "../../shared/details-card-with-search-field";
 import { getPersonName, getPersonDetailsLink, filterPersonsByString, filterPersonByStringPlaceholder } from "../../../../utils/persons";

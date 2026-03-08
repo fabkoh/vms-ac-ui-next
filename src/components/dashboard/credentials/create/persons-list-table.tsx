@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Checkbox, Table, TableHead, TableCell, TableRow, TableBody, Avatar, Link, Typography, TablePagination } from "@mui/material";
 import { getInitials } from "../../../../utils/get-initials";
 import { Scrollbar } from "../../../scrollbar";

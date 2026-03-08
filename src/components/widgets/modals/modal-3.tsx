@@ -30,6 +30,7 @@ export const Modal3 = () => (
             <XIcon fontSize="small" />
           </IconButton>
         </Box>
+      </Box>
       <Box sx={{ p: 3 }}>
         <Container maxWidth="md">
           <Box

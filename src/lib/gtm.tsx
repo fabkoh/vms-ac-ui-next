@@ -1,4 +1,10 @@
-const warn = (...args) => {
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
+const warn = (...args: any[]) => {
   if (process.env.NODE_ENV !== 'development') {
     return;
   }
@@ -7,9 +13,11 @@ const warn = (...args) => {
 };
 
 class GTM {
+  CONTAINER_ID: string | null = null;
+  initialized: boolean = false;
+
   constructor() {
     this.CONTAINER_ID = null;
-
     this.initialized = false;
   }
 

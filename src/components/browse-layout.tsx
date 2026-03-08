@@ -32,8 +32,6 @@ export const BrowseLayout = (props) => {
             alignItems="center"
             container
             spacing={3}
-          
-          
           >
             <Grid
               item
@@ -81,6 +79,7 @@ export const BrowseLayout = (props) => {
                 src="/static/browse/hero.svg"
               />
             </Grid>
+          </Grid>
         </Container>
       </Box>
       <Divider />

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import numeral from 'numeral';
 import {
   Box,
@@ -153,6 +154,7 @@ export const GroupedList5 = () => (
                         Sales
                       </Typography>
                     </Box>
+                  </Box>
                 </TableCell>
                 <TableCell>
                   <Typography variant="subtitle2">

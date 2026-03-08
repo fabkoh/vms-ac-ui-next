@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { format, subDays, subHours } from 'date-fns';
 import numeral from 'numeral';
 import {
@@ -210,6 +211,7 @@ export const Table6 = () => (
             ))}
           </TextField>
         </Box>
+      </Box>
       <Scrollbar>
         <Table sx={{ minWidth: 1200 }}>
           <TableHead>

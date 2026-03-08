@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 

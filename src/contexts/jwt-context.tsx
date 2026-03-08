@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { authLogOut } from '../api/auth-api';

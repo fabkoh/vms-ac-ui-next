@@ -162,6 +162,7 @@ export const Form5 = () => (
               name="canHire"
             />
           </Grid>
+        </Grid>
       </CardContent>
       <Divider />
       <CardActions

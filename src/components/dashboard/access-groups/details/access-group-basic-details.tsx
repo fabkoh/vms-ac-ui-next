@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";

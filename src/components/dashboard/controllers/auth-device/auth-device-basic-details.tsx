@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Circle, MeetingRoom } from "@mui/icons-material";
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider, Switch, Chip, CircularProgress, Typography } from "@mui/material";

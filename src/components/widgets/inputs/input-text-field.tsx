@@ -68,6 +68,8 @@ export const InputTextField = () => (
               label="City"
             />
           </Grid>
+        </Grid>
       </Grid>
+    </Grid>
   </Box>
 );

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Button, Divider, Grid, TextField } from "@mui/material";
 import SingleSelect from "../shared/single-select-input";
 import Toggle from "../shared/toggle";

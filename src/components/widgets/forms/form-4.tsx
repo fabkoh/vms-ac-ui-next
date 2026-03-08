@@ -39,6 +39,7 @@ export const Form4 = () => (
             type="password"
           />
         </Grid>
+      </Grid>
       <Divider sx={{ pt: 2 }} />
       <Box
         sx={{

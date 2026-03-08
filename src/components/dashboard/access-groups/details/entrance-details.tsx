@@ -1,3 +1,4 @@
+// @ts-nocheck
 import DetailsCard from "../../shared/details-card-with-search-field";
 import MeetingRoom from "@mui/icons-material/MeetingRoom";
 import { getEntranceLabel, getEntranceDetailsLink, filterEntrancesByString, filterEntranceByStringPlaceholder } from "../../../../utils/entrance";

@@ -146,6 +146,7 @@ export const GridList5 = () => (
                   <ShareIcon fontSize="small" />
                 </IconButton>
               </Box>
+            </Box>
           </Card>
         </Grid>
       ))}

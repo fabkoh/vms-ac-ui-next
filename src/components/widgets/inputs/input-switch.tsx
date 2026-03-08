@@ -46,5 +46,6 @@ export const InputSwitch = () => (
         </Typography>
         <Switch />
       </Grid>
+    </Grid>
   </Box>
 );

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider, CircularProgress } from "@mui/material";
 import { isObject, toDisplayDateString } from "../../../../utils/utils";

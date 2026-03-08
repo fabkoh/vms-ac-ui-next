@@ -37,6 +37,7 @@ export const Form11 = () => (
             type="number"
           />
         </Grid>
+      </Grid>
       <Box sx={{ mt: 2 }}>
         <FormControlLabel
           control={(

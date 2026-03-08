@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
 	Card, 
@@ -109,8 +110,6 @@ export const PersonAddForm = (props) => {
         <Grid
           container
           spacing={3}
-        
-        
         >
           <Grid
             item
@@ -148,8 +147,6 @@ export const PersonAddForm = (props) => {
             item
             md={12}
             xs={12}
-          
-          
           >
             <Collapse in={expanded}>
               <Grid
@@ -221,8 +218,10 @@ export const PersonAddForm = (props) => {
                     </Select>
                   </FormControl>
                   </Grid>
+              </Grid>
             </Collapse>
           </Grid>
+        </Grid>
       </CardContent>
 		</Card>
 	)

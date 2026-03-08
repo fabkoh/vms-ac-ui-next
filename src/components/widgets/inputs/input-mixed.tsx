@@ -86,4 +86,5 @@ export const InputMixed = () => (
         Enable Contents
       </Typography>
     </Box>
+  </Box>
 );

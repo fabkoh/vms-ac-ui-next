@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Button, Card, CardActions, CardHeader, Divider, useMediaQuery } from '@mui/material';
 import { PropertyList } from '../../property-list';

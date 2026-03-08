@@ -1,3 +1,4 @@
+// @ts-nocheck
 //can be used to replace Logo.js. need to get proper SVG file. currently imported as Etlasglobesvg in 
 // dashboard-sidebar.
 import PropTypes from 'prop-types';

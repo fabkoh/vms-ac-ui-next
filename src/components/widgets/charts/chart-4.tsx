@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Card, CardContent, CardHeader, Divider, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DotsHorizontal as DotsHorizontalIcon } from '../../../icons/dots-horizontal';

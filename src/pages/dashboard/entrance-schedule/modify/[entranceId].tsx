@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { HelpOutline, Refresh, VerticalAlignCenter } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";

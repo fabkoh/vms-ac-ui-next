@@ -102,6 +102,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^5.5.0",
+    "@types/jquery": "^4.0.0",
     "eslint": "^7.32.0",
     "eslint-config-next": "^13.5.6",
     "eslint-config-prettier": "^10.1.8",

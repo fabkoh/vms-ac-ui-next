@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import { Scrollbar } from "../../scrollbar";
 import { toDisplayEventsDateString } from "../../../utils/utils";

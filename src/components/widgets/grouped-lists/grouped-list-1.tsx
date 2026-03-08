@@ -144,6 +144,7 @@ export const GroupedList1 = () => (
               Online
             </Typography>
           </Box>
+        </Box>
         <Divider />
         <List disablePadding>
           {activities.map((activity, i) => (

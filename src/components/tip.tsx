@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';

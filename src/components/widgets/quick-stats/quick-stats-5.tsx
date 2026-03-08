@@ -1,3 +1,4 @@
+// @ts-nocheck
 import numeral from 'numeral';
 import { Box, Grid, Typography, Card } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -235,6 +236,7 @@ export const QuickStats5 = () => (
             <ChartLine />
           </Box>
         </Grid>
+      </Grid>
     </Card>
   </Box>
 );

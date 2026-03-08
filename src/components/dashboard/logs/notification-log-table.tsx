@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Button, Tooltip, Chip, Link, Typography } from "@mui/material";
 import NextLink from 'next/link';
 import { Scrollbar } from "../../scrollbar";

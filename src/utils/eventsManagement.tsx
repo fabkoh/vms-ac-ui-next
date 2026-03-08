@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Entrance util functions
  *

@@ -165,6 +165,7 @@ export const QuickStats4 = () => (
             26,000
           </Typography>
         </Grid>
+      </Grid>
     </Card>
   </Box>
 );

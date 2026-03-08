@@ -99,6 +99,7 @@ export const Form7 = () => (
             rows={6}
           />
         </Grid>
+      </Grid>
       <Box
         sx={{
           display: 'flex',

@@ -110,6 +110,7 @@ export const Form2 = () => {
             placeholder="Enter a keyword"
           />
         </Box>
+      </Box>
       <Divider />
       <Box
         sx={{
@@ -176,5 +177,6 @@ export const Form2 = () => {
           label="In network"
         />
       </Box>
+    </Box>
   );
 };

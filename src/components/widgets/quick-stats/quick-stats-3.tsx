@@ -136,6 +136,7 @@ export const QuickStats3 = () => (
                 Live
               </SeverityPill>
             </Box>
+          </Box>
           <Typography
             color="textSecondary"
             sx={{ mt: 1 }}
@@ -144,6 +145,7 @@ export const QuickStats3 = () => (
             Active now
           </Typography>
         </Grid>
+      </Grid>
     </Card>
   </Box>
 );

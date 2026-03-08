@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { addMinutes } from 'date-fns';

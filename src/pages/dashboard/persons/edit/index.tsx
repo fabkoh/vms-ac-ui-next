@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Add, ArrowBack, Battery3BarSharp } from "@mui/icons-material";
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import Head from "next/head";

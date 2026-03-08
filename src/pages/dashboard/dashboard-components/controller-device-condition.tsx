@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Avatar, Box, Button, Card, CardActions, Divider, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';

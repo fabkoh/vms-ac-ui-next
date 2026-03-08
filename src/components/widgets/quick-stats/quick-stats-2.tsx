@@ -53,6 +53,7 @@ export const QuickStats2 = () => (
                 4%
               </SeverityPill>
             </Box>
+          </Box>
           <Avatar
             sx={{
               backgroundColor: 'primary.main',
@@ -104,6 +105,7 @@ export const QuickStats2 = () => (
                 -10%
               </SeverityPill>
             </Box>
+          </Box>
           <Avatar
             sx={{
               backgroundColor: 'primary.main',
@@ -150,6 +152,7 @@ export const QuickStats2 = () => (
                 variant="determinate"
               />
             </Box>
+          </Box>
         </Card>
       </Grid>
       <Grid
@@ -190,6 +193,7 @@ export const QuickStats2 = () => (
                 $25.50
               </Typography>
             </Box>
+          </Box>
           <Avatar
             sx={{
               backgroundColor: 'primary.contrastText',
@@ -202,5 +206,6 @@ export const QuickStats2 = () => (
           </Avatar>
         </Card>
       </Grid>
+    </Grid>
   </Box>
 );

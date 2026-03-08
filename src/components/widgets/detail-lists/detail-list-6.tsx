@@ -64,7 +64,13 @@ export const DetailList6 = () => (
                   />
                 ))}
               </Box>
+            </Box>
           </Grid>
+          <Grid
+            item
+            md={6}
+            xs={12}
+          >
         <Box sx={{ mt: 3 }}>
           <Typography
             color="textSecondary"
@@ -77,6 +83,8 @@ export const DetailList6 = () => (
             <Markdown source={description} />
           </MarkdownWrapper>
         </Box>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   </Box>

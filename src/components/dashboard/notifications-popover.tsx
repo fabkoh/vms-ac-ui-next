@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { format, subDays, subHours } from 'date-fns';

@@ -180,6 +180,7 @@ export const QuickStats6 = () => {
             </CardActions>
           </Card>
         </Grid>
+      </Grid>
     </Box>
   );
 };

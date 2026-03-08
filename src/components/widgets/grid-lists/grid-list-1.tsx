@@ -131,6 +131,7 @@ export const GridList1 = () => (
                 {post.shortDescription}
               </Typography>
             </Box>
+            </Box>
           </Card>
         </Grid>
       ))}

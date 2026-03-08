@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';

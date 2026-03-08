@@ -123,6 +123,7 @@ export const QuickStats8 = () => {
                   361
                 </Typography>
               </Box>
+            </Box>
             <Box sx={{ maxWidth: 200 }}>
               <Chart
                 height={100}
@@ -131,6 +132,7 @@ export const QuickStats8 = () => {
                 series={chartSeries}
               />
             </Box>
+          </Box>
         </Card>
       </Container>
     </Box>

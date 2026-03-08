@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";

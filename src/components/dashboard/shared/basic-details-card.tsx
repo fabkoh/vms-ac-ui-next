@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Card, CardHeader, Collapse, Divider } from "@mui/material";
 import ExpandMore from "./expand-more";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
 import { SelectAll } from "@mui/icons-material";

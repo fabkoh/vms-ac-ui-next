@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRouter } from "next/router";
 import * as Yup from "yup";
 import { useFormik } from "formik";

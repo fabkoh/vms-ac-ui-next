@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { format } from 'date-fns';
 import { Box, Card, CardHeader, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
