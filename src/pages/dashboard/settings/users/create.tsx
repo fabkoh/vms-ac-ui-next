@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack } from '@mui/icons-material';
 import { Box, Button, Container, Link, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
@@ -80,8 +79,9 @@ const CreatePersonsTwo = () => {
   const [personsValidation, setPersonsValidation] = useState([
     getNewPersonValidation(0),
   ]);
-  const [mobileNumbersList, setMobileNumbersList] = useState([]);
-  const [usersList, setUsersList] = useState([]);
+  const [mobileNumbersList, setMobileNumbersList] = useState<any[]>([]);
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   console.log(mobileNumbersList);
 

@@ -1,4 +1,10 @@
-// @ts-nocheck
+declare global {
+  interface Window {
+    WebVideoCtrl: any;
+    jQuery: any;
+  }
+}
+
 import { useCallback, useEffect, useContext, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
@@ -44,9 +50,9 @@ import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
 import videoRecorderApi from "../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
-import { getVideoRecorderEditLink, getVideoRecorderListLink } from "../../../../utils/video-recorder";
+import { getVideoRecorderEditLink, videoRecorderListLink } from "../../../../utils/video-recorder";
 import {VideoRecorderCameras} from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
-import { serverDownCode } from "../../../../api/api-helpers";
+import { serverDownCode, authRenewToken } from "../../../../api/api-helpers";
 import {ServerDownError} from "../../../../components/dashboard/errors/server-down-error";
 
 function formatDate(date) {
@@ -74,7 +80,7 @@ const VideoRecorderPreview = () => {
     }, [])
     const [videoRecorderInfo, setVideoRecorderInfo] = useState(null)
     const [loadedSDK, setLoadedSDK] = useState(false)
-    const [authStatus, setAuthStatus] = useState({})
+    const [authStatus, setAuthStatus] = useState<any>({})
     const [sdkHandle, setSDKHandle] = useState(null)
     const [previewMode, setPreviewMode] = useState("live")
     const [ptz_speed, setPtzSpeed] = useState(4)
@@ -85,11 +91,11 @@ const VideoRecorderPreview = () => {
     const [end_time, setEndTime] = useState(new Date());
     const [download_start_time, setDownloadStartTime] = useState(new Date());
     const [download_end_time, setDownloadEndTime] = useState(new Date());
-    const [playback_files, setPlaybackFiles] = useState([]);
+    const [playback_files, setPlaybackFiles] = useState<any[]>([]);
     const [serverDownOpen, setServerDownOpen] = useState(false);
     const [selectedWindow, setSelectedWindow] = useState(1);
     const [selectedChannel, setSelectedChannel] = useState('1');
-    const [availableChannels, setAvailableChannels] = useState([]);
+    const [availableChannels, setAvailableChannels] = useState<any[]>([]);
 
     // Begin indefinite polling for refresh token
     useEffect(
@@ -123,7 +129,7 @@ const VideoRecorderPreview = () => {
     }
 
     const attach_sdk     = async function(handle) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
             const {clientHeight: height, clientWidth: width} = document.getElementById('divPlugin');
             console.log(width, height)
 
@@ -142,11 +148,11 @@ const VideoRecorderPreview = () => {
                 cbRemoteConfig:     function () { },
                 cbInitPluginComplete: function () {
                     try {
-                        WebVideoCtrl.I_InsertOBJECTPlugin("divPlugin");
-                        resolve();
+                        window.WebVideoCtrl.I_InsertOBJECTPlugin("divPlugin");
+                        resolve(undefined);
                     } catch (ex) {
                         console.warn("Failed to inject plugin")
-                        reject();
+                        reject(undefined);
                     }
                 }
             });
@@ -154,13 +160,13 @@ const VideoRecorderPreview = () => {
     }
 
     const login_sdk = async function(handle, {ip, port, username, password}) {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<any>((resolve, reject) => {
           handle.I_Login(ip, 2, port, username, password, {
               success: function (xmlDoc) {
-                  resolve();
+                  resolve(undefined);
                   console.log("login success");
               }, error: function (status, xmlDoc) {
-                  reject();
+                  reject(undefined);
                   alert("Video Recorder login failed");
               }
           });
@@ -168,7 +174,7 @@ const VideoRecorderPreview = () => {
   }
 
     const get_device_info = async function(handle, {ip}) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
             try{
             handle.I_GetDeviceInfo(ip, {
                 success: function (xmlDoc) {
@@ -184,7 +190,7 @@ const VideoRecorderPreview = () => {
                         encoder_version:    `${xml_handle.find("encoderVersion").eq(0).text()}  ${xml_handle.find("encoderReleasedDate").eq(0).text()}`,
                     });
                 }, error: function (status, xmlDoc) {
-                    reject();
+                    reject(undefined);
                 }
             })
         } catch(ex) {}
@@ -192,14 +198,14 @@ const VideoRecorderPreview = () => {
     }
 
     const get_device_ports= async function(handle, {ip}) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
             const ports = handle.I_GetDevicePort(ip);
             resolve(ports);
         });
     }
 
     const get_analogue_channels = async function(handle, {ip}) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
             handle.I_GetAnalogChannelInfo(ip, {
                 async: false,
                 success: function (xmlDoc) {
@@ -214,14 +220,14 @@ const VideoRecorderPreview = () => {
 
                     resolve(channels);
                 }, error: function (status, xmlDoc) {
-                    reject();
+                    reject(undefined);
                 }
             });
         });
     }
 
     const get_digital_channels = async function(handle, {ip}) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
             handle.I_GetDigitalChannelInfo(ip, {
                 async: false,
                 success: function (xmlDoc) {
@@ -238,7 +244,7 @@ const VideoRecorderPreview = () => {
 
                     resolve(channels);
                 }, error: function (status, xmlDoc) {
-                    reject();
+                    reject(undefined);
                 }
             });
         });
@@ -249,7 +255,7 @@ const VideoRecorderPreview = () => {
         console.log("handle", handle);
         console.log("privateIP", privateIP);
         console.log("publicIP", publicIP);
-        await new Promise((resolve, reject) => {
+        await new Promise<any>((resolve, reject) => {
           handle.I_StartRealPlay(privateIP, publicIP, {
             iRtspPort: rtsp_port,
             iStreamType: stream_type,
@@ -257,11 +263,11 @@ const VideoRecorderPreview = () => {
             bZeroChannel: zero_channel,
             iWSPort: port,
             success: function () {
-              resolve();
+              resolve(undefined);
               console.log("preview_recorder success");
             }, 
             error: function () {
-              reject();
+              reject(undefined);
               console.log("preview_recorder error");
             }
           });
@@ -276,12 +282,12 @@ const VideoRecorderPreview = () => {
     const stop_preview_recorder = async function(handle) {
       const currentStatus = await sdkHandle.I_GetWindowStatus(selectedWindow)
       if(!!currentStatus) { 
-        return await new Promise((resolve, reject) => {
+        return await new Promise<any>((resolve, reject) => {
           handle.I_Stop({
             success: function () {
-              resolve();
+              resolve(undefined);
             }, error: function () {
-              reject()
+              reject(undefined)
             }
           });
         });
@@ -290,10 +296,10 @@ const VideoRecorderPreview = () => {
     }
 
     const change_split_Screen = async function(handle, mode) {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<any>((resolve, reject) => {
         handle.I_ChangeWndNum(mode);
         setStreamType(mode);
-        resolve();
+        resolve(undefined);
       });
     }
 
@@ -475,10 +481,10 @@ const VideoRecorderPreview = () => {
                       var elem = document.getElementById("divPlugin");
                       if (elem.requestFullscreen) {
                         await elem.requestFullscreen().catch((err) => console.log(err));
-                      } else if (elem.webkitRequestFullscreen) { /* Safari */
-                        await elem.webkitRequestFullscreen().catch((err) => console.log(err));
-                      } else if (elem.msRequestFullscreen) { /* IE11 */
-                        await elem.msRequestFullscreen().catch((err) => console.log(err));
+                      } else if ((elem as any).webkitRequestFullscreen) { /* Safari */
+                        await (elem as any).webkitRequestFullscreen().catch((err) => console.log(err));
+                      } else if ((elem as any).msRequestFullscreen) { /* IE11 */
+                        await (elem as any).msRequestFullscreen().catch((err) => console.log(err));
                       }                    
                       setTheaterMode(!theaterMode);
                     }}>

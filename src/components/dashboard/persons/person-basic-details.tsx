@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from "prop-types";
 import NextLink from "next/link";
 import {
@@ -32,7 +31,7 @@ export const PersonBasicDetails = (props) => {
     accessGroupInSchedule,
   } = props.person;
 
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up("md"));
 
   const align = mdUp ? "horizontal" : "vertical";
 

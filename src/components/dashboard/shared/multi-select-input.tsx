@@ -36,15 +36,15 @@ export default function CheckboxesTags({
     getOptionLabel,
     setSelected,
     filterOptions,
-    helperText,
-    isWarning,
-    isError,
-    error,
+    helperText = undefined,
+    isWarning = undefined,
+    isError = undefined,
+    error = undefined,
     value,
     isOptionEqualToValue,
     options,
     ...other
-}) {
+}: { [key: string]: any }) {
 
     // search bar value
     const [inputValue, setInputValue] = useState('');

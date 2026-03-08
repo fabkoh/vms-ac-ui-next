@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -63,8 +62,8 @@ export const JWTLogin = (props) => {
 
   const formik = useFormik({
     initialValues: {
-      // email: 'ISSAdmin@isssecurity.sg',
-      // password: 'ISSAdmin',
+      email: '',
+      password: '',
       submit: null,
     },
     validationSchema: Yup.object({
@@ -81,7 +80,7 @@ export const JWTLogin = (props) => {
           // console.log("JWTLogin onSubmit");
           // setIsPolling(true);
           const returnUrl = router.query.returnUrl || '/dashboard';
-          router.push(returnUrl);
+          router.push(returnUrl as string);
         }
       } else {
         helpers.setStatus({ success: false });
@@ -97,7 +96,7 @@ export const JWTLogin = (props) => {
         autoFocus
         error={Boolean(formik.touched.email && formik.errors.email)}
         fullWidth
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={formik.touched.email && formik.errors.email as string}
         label="Email Address"
         margin="normal"
         name="email"
@@ -109,7 +108,7 @@ export const JWTLogin = (props) => {
       <TextField
         error={Boolean(formik.touched.password && formik.errors.password)}
         fullWidth
-        helperText={formik.touched.password && formik.errors.password}
+        helperText={formik.touched.password && formik.errors.password as string}
         label="Password"
         margin="normal"
         name="password"
@@ -120,7 +119,7 @@ export const JWTLogin = (props) => {
       />
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
-          <FormHelperText error>{formik.errors.submit}</FormHelperText>
+          <FormHelperText error>{formik.errors.submit as string}</FormHelperText>
         </Box>
       )}
       <Box sx={{ mt: 2 }}>

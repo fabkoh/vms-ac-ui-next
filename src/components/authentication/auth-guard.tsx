@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -6,7 +5,6 @@ import { useAuth } from '../../hooks/use-auth';
 
 export const AuthGuard = (props) => {
   const { children } = props;
-  const { user } = useAuth;
   const auth = useAuth();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
@@ -25,9 +23,9 @@ export const AuthGuard = (props) => {
         // add a condition to check the page and roles allowed to access
         
         // if any of the given role is not present redirect back  
-        if(props.page==='Controllers' && user && !( 
-            user.authorities.some(pair => pair.authority === "ROLE_SYSTEM_ADMIN")|| 
-            user.authorities.some(pair => pair.authority === "ROLE_TECH_ADMIN")) ) 
+        if(props.page==='Controllers' && auth.user && !(
+            (auth.user.authorities as any[]).some((pair: any) => pair.authority === "ROLE_SYSTEM_ADMIN")||
+            (auth.user.authorities as any[]).some((pair: any) => pair.authority === "ROLE_TECH_ADMIN")) ) 
             
         {
           router.back();        

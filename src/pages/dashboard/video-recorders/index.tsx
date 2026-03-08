@@ -1,4 +1,10 @@
-// @ts-nocheck
+declare global {
+  interface Window {
+    WebVideoCtrl: any;
+    jQuery: any;
+  }
+}
+
 import { Add, Delete, Edit, HelpOutline } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
@@ -35,14 +41,14 @@ const RecorderList = () => {
     })
 
     // get entrances and access groups
-    const [recorders, setRecorders] = useState([]);
+    const [recorders, setRecorders] = useState<any[]>([]);
 
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const isMounted = useMounted();
 
     const [loadedSDK, setLoadedSDK] = useState(false)
-    const [authStatus, setAuthStatus] = useState({})
+    const [authStatus, setAuthStatus] = useState<any>({})
     const [sdkHandle, setSDKHandle] = useState(null)
 
 
@@ -57,7 +63,7 @@ const RecorderList = () => {
     }
 
     const attach_sdk = async function (handle) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<void>((resolve, reject) => {
             handle.I_InitPlugin(500, 300, {
                 bWndFull: true,
                 iPackageType: 2,
@@ -80,7 +86,7 @@ const RecorderList = () => {
     }
 
     const login_sdk = async function (name, { ip, port, username, password }) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<void>((resolve, reject) => {
             name.I_Login(ip, 2, port, username, password, {
                 success: function (xmlDoc) {
                     resolve();
@@ -234,11 +240,11 @@ const RecorderList = () => {
     }
 
     const refresh = (async () => {
-        window.location.reload(true);
+        window.location.reload();
     })
 
     // for selection of checkboxes
-    const [selectedRecorders, setSelectedRecorders] = useState([]);
+    const [selectedRecorders, setSelectedRecorders] = useState<any[]>([]);
     const selectedAllRecorders = selectedRecorders.length == recorders.length;
     const selectedSomeRecorders = selectedRecorders.length > 0 && !selectedAllRecorders;
     const handleSelectAllRecorders = (e) => setSelectedRecorders(e.target.checked ? recorders.map(e => e.recorderId) : []);
@@ -327,7 +333,7 @@ const RecorderList = () => {
         setDeleteOpen(false);
     };
 
-    useEffect(() => getRecordersLocal(), [isMounted]);
+    useEffect(() => { getRecordersLocal(); }, [isMounted]);
 
     return (
         <>

@@ -1,9 +1,15 @@
-// @ts-nocheck
+declare global {
+  interface Window {
+    WebVideoCtrl: any;
+    jQuery: any;
+  }
+}
+
 import { Add, Delete, Edit, HelpOutline } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useCallback, useEffect, useRef, useState, React } from "react";
+import { useCallback, useEffect, useRef, useState} from "react";
 import toast from "react-hot-toast";
 import videoRecorderApi from "../../../api/videorecorder";
 import { AuthGuard } from "../../../components/authentication/auth-guard";
@@ -27,7 +33,7 @@ const VideoRecorderDeviceCondition = () => {
   })
 
   // get entrances and access groups
-  const [recorders, setRecorders] = useState([]);
+  const [recorders, setRecorders] = useState<any[]>([]);
   const [upCounter, setUpCounter] = useState(0);
   const [healthPercentage, setHealthPercentage] = useState(0);
   const [login, setLogin] = useState(false);
@@ -35,6 +41,7 @@ const VideoRecorderDeviceCondition = () => {
   const isMounted = useMounted();
 
   const [loadedSDK, setLoadedSDK] = useState(false)
+  const [serverDownOpen, setServerDownOpen] = useState(false)
 
   // sdk 
   const get_sdk_handle = async function () {

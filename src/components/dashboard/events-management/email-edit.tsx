@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import {
@@ -76,7 +75,7 @@ export const EmailEdit = (props) => {
 						label="Email Recipients"
 						value={notificationEmailsInputValue}
 						onChange={(e) => {
-							setNotificationEmailsInputValue(e.target.value);
+							setNotificationEmailsInputValue((e.target as HTMLInputElement).value);
 						}}
 						helperText={ 
 							(isEmptyRecipients && "Error: empty email recipients is not allowed") ||
@@ -117,7 +116,7 @@ export const EmailEdit = (props) => {
 						}}
 						onKeyDown={(e) => {
 							if (e.key == "Enter") {
-								const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
+								const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...((e.target as HTMLInputElement).value).split(",")];
 								let isInvalid = false;
 								for (let j = 0; j < newNotificationEmailRecipients.length; j++) {
 									if (validateEmail(newNotificationEmailRecipients[j]) === null) {
@@ -134,7 +133,7 @@ export const EmailEdit = (props) => {
 					<TextField
 						sx={{ mt: 2 }}
 						value={notificationEmailTitle}
-						onChange={(e) => {setNotificationEmailTitle(e.target.value)}}
+						onChange={(e) => {setNotificationEmailTitle((e.target as HTMLInputElement).value)}}
 						placeholder="Enter Email Title"
 						disabled={useDefaultEmails}
 						fullWidth
@@ -144,7 +143,7 @@ export const EmailEdit = (props) => {
 						multiline
 						rows={10}
 						value={notificationEmailContent}
-						onChange={(e) => {setNotificationEmailContent(e.target.value)}}
+						onChange={(e) => {setNotificationEmailContent((e.target as HTMLInputElement).value)}}
 						placeholder="Enter Email Content"
 						disabled={useDefaultEmails}
 						fullWidth
@@ -157,12 +156,12 @@ export const EmailEdit = (props) => {
 						<div>
 							<FormControlLabel checked={useDefaultEmails}
 								onChange={(e) => {
-									if (e.target.checked) {
+									if ((e.target as HTMLInputElement).checked) {
 										let content = "Event Management " + eventManagementName + " at <exit/controller name> " + defaultEmailContent + " on <occurence time>.";
 										setNotificationEmailTitle(defaultEmailTitle)
 										setNotificationEmailContent(content)
 									}
-									setUseDefaultEmails(e.target.checked)
+									setUseDefaultEmails((e.target as HTMLInputElement).checked)
 								}}
 								control={<Switch defaultChecked />}
 								sx={{marginBottom: 2}}

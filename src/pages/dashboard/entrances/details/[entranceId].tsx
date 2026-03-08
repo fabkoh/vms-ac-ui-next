@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
@@ -53,7 +52,8 @@ const EntranceDetails = () => {
     // load entrance details
     const isMounted = useMounted();
     const [entrance, setEntrance] = useState(null);
-    const { entranceId } = router.query;
+    const { entranceId: entranceIdRaw } = router.query;
+    const entranceId = entranceIdRaw as string;
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
     useEffect(() => { // copied from original template
@@ -62,12 +62,12 @@ const EntranceDetails = () => {
 
     const link = getEntranceScheduleEditLink(entranceId);
 
-    const [entranceSchedules, setEntranceSchedules] = useState([]);
-    const [entranceEventManagements, setEntranceEventManagements] = useState([]);
-    const [accessGroup, setAccessGroup] = useState([]);
+    const [entranceSchedules, setEntranceSchedules] = useState<any[]>([]);
+    const [entranceEventManagements, setEntranceEventManagements] = useState<any[]>([]);
+    const [accessGroup, setAccessGroup] = useState<any[]>([]);
     const [entranceIsActive, setEntranceIsActive] = useState();
     const [entranceIsLocked, setEntranceIsLocked] = useState(true);
-    const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
+    const [entranceController, setEntranceController] = useState<any>({}); // map entranceId to controller
 
     const getControllers = async() => {
         try {
@@ -176,17 +176,17 @@ const EntranceDetails = () => {
                 };
             if (isMounted()) {
                 setEntrance(dataWithCurrentStatus);
-                getAccessGroups(body.entranceId);
+                getAccessGroups();
                 setEntranceIsActive(body.isActive);
             }
         } catch(err) {
             console.error(err);
         }
-    });
+    }, [isMounted]);
 
     const getEntranceSchedules = async() => {
         try {
-            const scheduleRes = await entranceScheduleApi.getEntranceSchedulesWhereEntranceIdsIn(entranceId);
+            const scheduleRes = await entranceScheduleApi.getEntranceSchedulesWhereEntranceIdsIn([entranceId]);
 
             if (scheduleRes.status == 200) {
                 const body = await scheduleRes.json();
@@ -195,7 +195,7 @@ const EntranceDetails = () => {
                 }
             }
             else {
-                if (res.status == serverDownCode) {
+                if (scheduleRes.status == serverDownCode) {
                     setServerDownOpen(true);
                 }
                 toast.error("Error loading entrance schedule info");
@@ -327,7 +327,7 @@ const getEntranceEventsManagement = useCallback(async () => {
     }
 
     // for updating status
-    const [statusUpdateId, setStatusUpdateId] = useState([]);
+    const [statusUpdateId, setStatusUpdateId] = useState<any[]>([]);
     const [updateStatus, setUpdateStatus] = useState(null);
     const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
     const [unlockDialogOpen, setUnlockDialogOpen] = useState(false);
@@ -436,7 +436,7 @@ const getEntranceEventsManagement = useCallback(async () => {
                                     }}
                                 >
                                     <ArrowBackIcon
-                                        fontSize="smal"
+                                        fontSize="small"
                                         sx={{ mr: 1 }}
                                     />
                                     <Typography variant="subtitle2">Entrances</Typography>
@@ -569,11 +569,10 @@ const getEntranceEventsManagement = useCallback(async () => {
                                 item
                                 xs={12}
                             >
-                                <EntranceEventsManagement  
-                                    entrance={entrance}
+                                <EntranceEventsManagement
                                     entranceEventManagements={entranceEventManagements}
                                     deleteEventManagements={deleteEventManagements}
-                                    eventsManagementCreatelink={eventsManagementCreateLink} 
+                                    eventsManagementCreatelink={eventsManagementCreateLink}
                                 />
                             </Grid>
                             </Grid>

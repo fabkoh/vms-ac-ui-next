@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   BuildCircle,
   Delete,
@@ -61,7 +60,7 @@ const ControllerList = () => {
   const handleActionClose = () => setActionAnchor(null);
 
   // data
-  const [controllers, setControllers] = useState([]);
+  const [controllers, setControllers] = useState<any[]>([]);
   const isMounted = useMounted();
 
   const getInfo = useCallback(async () => {
@@ -84,7 +83,7 @@ const ControllerList = () => {
   }, []);
 
   // for selection of checkboxes
-  const [selectedControllers, setSelectedControllers] = useState([]); // stores the ids of selected
+  const [selectedControllers, setSelectedControllers] = useState<any[]>([]); // stores the ids of selected
   const selectedAllControllers =
     selectedControllers.length == controllers.length;
   const selectedSomeControllers =

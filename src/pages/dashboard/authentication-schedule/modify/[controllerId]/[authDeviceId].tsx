@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -46,8 +45,8 @@ const ModifyauthMethodSchedule = () => {
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
   // const [accGrp, setAccGrp] = useState()
-  const [grpToEnt, setGrpToEnt] = useState([]); // grptoent.contains grptoentId and ent obj
-  const [allAuthenticationDevices, setAllAuthenticationDevices] = useState([]);
+  const [grpToEnt, setGrpToEnt] = useState<any[]>([]); // grptoent.contains grptoentId and ent obj
+  const [allAuthenticationDevices, setAllAuthenticationDevices] = useState<any[]>([]);
 
   const getControllerAuthDevices = async () => {
     const res = await controllerApi.getControllers();
@@ -94,10 +93,10 @@ const ModifyauthMethodSchedule = () => {
     }
   }, []);
 
-  const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+  const [singleErrorMessage, setSingleErrorMessage] = useState<any[]>([]);
 
   // for selection of checkboxes
-  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [selectedSchedules, setSelectedSchedules] = useState<any[]>([]);
   const selectedAllSchedules =
     selectedSchedules.length ===
     [
@@ -197,7 +196,7 @@ const ModifyauthMethodSchedule = () => {
     setauthMethodScheduleValidationsArr,
   ] = useState([getEmptyauthMethodScheduleValidations(0)]);
 
-  const [errorMessages, setErrorMessages] = useState([]);
+  const [errorMessages, setErrorMessages] = useState<any[]>([]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -558,12 +557,12 @@ const ModifyauthMethodSchedule = () => {
         e.authDeviceDirection?.toLowerCase().includes(text)
     );
   };
-  const [authDevices, setAuthDevices] = useState([]);
+  const [authDevices, setAuthDevices] = useState<any[]>([]);
   const changeAuthDevice = (newValue) => {
     console.log(newValue, "SSSSSSSS");
     setAuthDevices(newValue);
   };
-  // const [grpToEntIdArr, setGrpToEntIdArr] = useState([])
+  // const [grpToEntIdArr, setGrpToEntIdArr] = useState<any[]>([])
   // const getGrpToEntId = (grpToEntIdArr) => {
   //     entrances.forEach(ent => {
   //         grpToEnt.forEach(obj=>{

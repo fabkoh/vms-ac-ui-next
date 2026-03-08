@@ -1,4 +1,3 @@
-// @ts-nocheck
 import numeral from 'numeral';
 import { Box, Grid, Typography, Card } from '@mui/material';
 import { useTheme } from '@mui/material/styles';

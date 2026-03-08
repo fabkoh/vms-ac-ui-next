@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   Add,
   Delete,
@@ -54,10 +53,10 @@ const applyFilter = createFilter({
 
 const EventsManagementList = () => {
   const isMounted = useMounted();
-  const [eventsManagement, setEventsManagement] = useState([]);
+  const [eventsManagement, setEventsManagement] = useState<any[]>([]);
   const [serverDownOpen, setServerDownOpen] = useState(false);
-  const [smsConfig, setSMSConfig] = useState({});
-  const [emailConfig, setEmailConfig] = useState({});
+  const [smsConfig, setSMSConfig] = useState<any>({});
+  const [emailConfig, setEmailConfig] = useState<any>({});
 
   const getSMSEmailConfig = useCallback(async () => {
     const smsNotificationConfig = await notificationsApi.getSMSSettings();
@@ -137,7 +136,7 @@ const EventsManagementList = () => {
   const filteredEventsManagement = applyFilter(eventsManagement, filters);
 
   // for selection of checkboxes
-  const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+  const [selectedEventsManagement, setSelectedEventsManagement] = useState<any[]>([]);
   const selectedAllEventsManagement =
     selectedEventsManagement.length == eventsManagement.length;
   const selectedSomeEventsManagement =

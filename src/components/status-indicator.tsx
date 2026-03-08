@@ -1,21 +1,29 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
-const sizes = {
+interface StatusIndicatorOwnerState {
+  size: string;
+  status: string;
+}
+
+interface StatusIndicatorRootProps {
+  ownerState: StatusIndicatorOwnerState;
+}
+
+const sizes: Record<string, number> = {
   small: 8,
   medium: 16,
   large: 23
 };
 
-const colors = {
+const colors: Record<string, string> = {
   offline: '#fafafa',
   away: '#fb8c00',
   busy: '#e53935',
   online: '#43a047'
 };
 
-const StatusIndicatorRoot = styled('span')(({ ownerState }) => {
+const StatusIndicatorRoot = styled('span')<StatusIndicatorRootProps>(({ ownerState }) => {
   const size = sizes[ownerState.size];
   const color = colors[ownerState.status];
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material"
 import { isObject } from "../../../utils/utils"
 /**
@@ -26,7 +25,7 @@ const SingleSelect = ({
     getValue,
     helperText,
     ...props
-}) => {
+}: { [key: string]: any }) => {
 
     return (
         <FormControl {...props}>

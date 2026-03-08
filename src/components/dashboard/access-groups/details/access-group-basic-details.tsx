@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider } from "@mui/material";
 import { PropertyList } from "../../../property-list";
@@ -13,7 +12,7 @@ export const AccessGroupBasicDetails = (props) => {
     props.accessGroup;
 
   // copied from template
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up("md"));
   const align = mdUp ? "horizontal" : "vertical";
 
   return (

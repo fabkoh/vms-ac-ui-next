@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useState, useEffect } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -27,7 +26,7 @@ import { EventManagementNotifDetails } from "../../../../components/dashboard/ev
 const IndividualEventManagement = () => {
   // load person details
   const isMounted = useMounted();
-  const [eventManagement, setEventManagement] = useState({});
+  const [eventManagement, setEventManagement] = useState<any>({});
   const router = useRouter();
   const emId = router.query;
   // console.log(emId)
@@ -93,7 +92,7 @@ const IndividualEventManagement = () => {
         router.replace(eventsManagementListLink);
       } else {
         toast.error("Delete unsuccessful");
-        res.json().then((json) => toast.info(json));
+        res.json().then((json) => toast(json));
       }
     });
   };

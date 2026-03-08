@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack } from "@mui/icons-material";
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import Head from "next/head";
@@ -13,7 +12,7 @@ import { useMounted } from "../../hooks/use-mounted";
 import { accessGroupApi } from "../../api/access-groups";
 import { personApi } from '../../api/person';
 import { getCredTypesApi } from "../../api/credential-types";
-import { arraySameContents, isObject } from "../../utils/utils";
+import { arraySameContents, isObject, validatePhoneNumber } from "../../utils/utils";
 import toast from "react-hot-toast";
 import router from "next/router";
 import { saveCredentialApi, checkCredentialApi } from "../../api/credentials";
@@ -78,15 +77,15 @@ const CreatePersonsTwo = () => {
     const [personsValidation, setPersonsValidation] = useState([getNewPersonValidation(0)]);
 
     // access groups for access group select
-    const [accessGroups, setAccessGroups] = useState([]);
+    const [accessGroups, setAccessGroups] = useState<any[]>([]);
 
     // info for checking
-    const [personUids, setPersonUids] = useState([]);
-    const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
-    const [personEmails, setPersonEmails] = useState([]);
+    const [personUids, setPersonUids] = useState<any[]>([]);
+    const [personMobileNumbers, setPersonMobileNumbers] = useState<any[]>([]);
+    const [personEmails, setPersonEmails] = useState<any[]>([]);
 
     // credTypes
-    const [credTypes, setCredTypes] = useState([]);
+    const [credTypes, setCredTypes] = useState<any[]>([]);
 
     // get info
     const isMounted = useMounted(); 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Box, Card, CardContent, CardHeader, Checkbox, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';

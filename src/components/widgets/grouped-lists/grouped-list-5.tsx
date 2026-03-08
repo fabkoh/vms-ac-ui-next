@@ -1,4 +1,3 @@
-// @ts-nocheck
 import numeral from 'numeral';
 import {
   Box,

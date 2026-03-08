@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Circle, MeetingRoom } from "@mui/icons-material";
 import Warning from "@mui/icons-material/Warning";
 import { Card, useMediaQuery, CardHeader, Divider, Switch, Chip, CircularProgress, Typography } from "@mui/material";
@@ -16,7 +15,7 @@ import BasicDetailsCard from "../../shared/basic-details-card";
 
 export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusLoaded,authStatus,getCurrentAuthMethod}) => {
     // copied from template
-    const mdUp = useMediaQuery ((theme) => theme.breakpoints.up('md'));
+    const mdUp = useMediaQuery ((theme: any) => theme.breakpoints.up('md'));
     const align = mdUp ? 'horizontal' : 'vertical';
     
     if(deviceInfo == null){
@@ -70,9 +69,9 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                     value={
                         deviceInfo.entrance ? (
                             
-                                <Link component={NextLink} href={getEntranceDetailsLink(deviceInfo.entrance)}>
-                                <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
-                                </Link>
+                                <NextLink href={getEntranceDetailsLink(deviceInfo.entrance)} passHref legacyBehavior>
+                                <Link><Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/></Link>
+                                </NextLink>
                         ) : (
                             <WarningChip text="No entrance assigned"/>
                         )
@@ -91,7 +90,7 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                             >
                                 {deviceInfo.defaultAuthMethod.authMethodDesc}
                             </Typography>
-                            <divider/>
+                            <Divider/>
                                 <Typography
                                 style={{color:'rgb(101, 116, 139)' ,fontSize:'12px'}}
                             >

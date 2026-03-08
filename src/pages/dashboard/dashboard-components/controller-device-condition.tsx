@@ -1,18 +1,17 @@
-// @ts-nocheck
 import { Avatar, Box, Button, Card, CardActions, Divider, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { ChevronUp as ChevronUpIcon } from '../../../icons/chevron-up';
 import { Chart } from '../../../components/chart';
 import { controllerApi } from '../../../api/controllers';
-import { React, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import toast from "react-hot-toast";
 
 const ControllerDeviceCondition = () => {
   const theme = useTheme();
 
   const [upCounter,   setUpCounter]    = useState(0);
-  const [controllers, setControllers] = useState([]);
+  const [controllers, setControllers] = useState<any[]>([]);
   const [healthPercentage, setHealthPercentage] = useState(0);
 
   const getControllers = async () => {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
 	Link,
 	Box,
@@ -18,7 +17,6 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 	Divider,
-	FormControlUnstyledContext,
 } from "@mui/material";
 import { set } from "nprogress";
 import { useEffect, useState } from "react";
@@ -39,7 +37,7 @@ const Rrule = (props) => {
 		handleInvalidBegin,
 	} = props;
 
-	const [rule, setRule] = useState({
+	const [rule, setRule] = useState<any>({
 		//rule object use to create the string and text description
 		freq:RRule.DAILY,
 		interval: null,
@@ -48,7 +46,7 @@ const Rrule = (props) => {
 		bysetpos: null,
 		bymonth: null,
 	});
-	const [nonChangingRule, setNonChangingRule] = useState({
+	const [nonChangingRule, setNonChangingRule] = useState<any>({
 		dtstart: null,
 		until: null,
 		count: null,
@@ -64,15 +62,15 @@ const Rrule = (props) => {
 	const [repeatToggle, setRepeatToggle] = useState(false);
 	const handleRepeatToggle = () => {
 		repeatToggle
-			? (setRepeatToggle(false), setRule({ freq: 3, interval: 1 }),
+			? (setRepeatToggle(false), setRule((prevState: any) => ({ ...prevState, freq: 3, interval: 1 })),
 				setNonChangingRule(prevState=>({...prevState,until:null, count:1})))
 			: (setRepeatToggle(true),
-			  setRule({freq:2,interval:1}),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
+			  setRule((prevState: any) => ({ ...prevState, freq:2,interval:1})),setNonChangingRule(prevState=>({...prevState,until:null, count:null})));
 	};
 
 	useEffect(() => {
-		setRule({freq:3,interval:1});
-		setNonChangingRule({count:1,});
+		setRule((prevState: any) => ({...prevState, freq:3,interval:1}));
+		setNonChangingRule((prevState: any) => ({...prevState, count:1}));
 	}, [])
 
 
@@ -97,7 +95,7 @@ const Rrule = (props) => {
 	}, [rule,nonChangingRule])
 	
 	//handle dtstart
-	const [dtstart, setDtstart] = useState(false);
+	const [dtstart, setDtstart] = useState<any>(false);
 	const handleDtstart = (e) => {
 		//textfield date format yyyy-mm-dd but jan = 1 unlike rrule
 		const dateobj = new Date(e.target.value)
@@ -275,10 +273,10 @@ const Rrule = (props) => {
 		}));
 	};
 
-	const [byweekday, setByweekday] = useState([]); 
+	const [byweekday, setByweekday] = useState<any[]>([]); 
 	useEffect(() => {
 	  handleYearly()
-	}, [rule.handleDtstart])
+	}, [])
 	
 	useEffect(() => { //reininitialize fields based on freq
 		if (repeatToggle && rule.freq == RRule.WEEKLY) { //reinitialize for weekly options
@@ -367,9 +365,9 @@ const Rrule = (props) => {
 		return weekarray[newweekarrayno]
 	}
 	// const weektoday = weekarray[tempday-1] //needs rework
-	const WeeknoHandler = () => {
+	const WeeknoHandler = (): any => {
 		const date = nonChangingRule.dtstart.getDate();
-		let weekno = Math.floor(date/7);
+		let weekno: any = Math.floor(date/7);
 		if(weekno == 0 || date == 7){
 			return weekno="1st"
 		}
@@ -383,11 +381,11 @@ const Rrule = (props) => {
 			return weekno="4th"
 		}
 		return weekno="5th"
-		
+
 	}
-	const WeeknoHandlerValue = () => {
-		let date;
-		let weekno;
+	const WeeknoHandlerValue = (): any => {
+		let date: any;
+		let weekno: any;
 		try {
 			date = nonChangingRule.dtstart.getDate();
 			weekno = Math.floor(date / 7);
@@ -409,10 +407,10 @@ const Rrule = (props) => {
 			return weekno=4
 		}
 		return weekno=5
-		
+
 	}
 
-	const [monthOptionsMenu, setMonthOptionsMenu] = useState()
+	const [monthOptionsMenu, setMonthOptionsMenu] = useState<any>()
 	const handleMonthOptionsMenu = (e) => {
 		setMonthOptionsMenu(e.target.value)
 	}
@@ -462,9 +460,9 @@ const Rrule = (props) => {
 				return (
 					<Grid container
 						alignItems="center"
-						flexwrap="wrap">
+						{...{flexwrap:"wrap"}}>
 						<Grid item>
-							<Typography container
+							<Typography
 								ml={3}
 								mr={3}
 								mt={1}
@@ -474,14 +472,10 @@ const Rrule = (props) => {
 							</Typography>
 						</Grid>
 						<Grid item
-							justifyContent="flex-start"
-							required>
+							justifyContent="flex-start">
 							<ToggleButtonGroup
 								color="info"
-								// flexwrap="wrap"
 								value={rule.byweekday}
-								required
-								// onChange={(e)=>console.log(e.target.value)}
 								onChange={handleByweekday}
 								sx={{ mt: 1 ,flexWrap:"wrap"}}
 							>
@@ -501,9 +495,9 @@ const Rrule = (props) => {
 				return (
 					<Grid container
 						alignItems="center"
-						flexwrap="wrap">
+						{...{flexwrap:"wrap"}}>
 						<Grid item>
-							<Typography container
+							<Typography
 								ml={3}
 								mr={3}
 								mt={1}
@@ -550,7 +544,7 @@ const Rrule = (props) => {
 						alignItems="center"
 						flexWrap="wrap">
 						<Grid item>
-							<Typography container
+							<Typography
 								ml={3}
 								mr={3}
 								mt={1}
@@ -603,7 +597,7 @@ const Rrule = (props) => {
 
 	
 	//handle until
-	const [until, setUntil] = useState()
+	const [until, setUntil] = useState<any>()
 	const handleUntil = (e) => {
 		const dateobj = new Date(e.target.value)
 		handleInvalidUntil(false)
@@ -783,14 +777,14 @@ const Rrule = (props) => {
 			</Grid>
 				)}
 			</Grid>
-			<Divider width={repeatToggle?"100%":"0"}/>
+			{(Divider as any)}
 			<Grid item>
 				{repeatToggle && (
 					<Grid container
 						alignItems="center"
 						mb={2}>
 						<Grid item>
-							<Typography item
+							<Typography
 								fontWeight="bold"
 								mr={2}>
 								{" "}
@@ -815,7 +809,7 @@ const Rrule = (props) => {
 					</Grid>
 				)}
 			</Grid>
-			<Divider width={repeatToggle?"100%":"0"} />
+			<Divider sx={{width: repeatToggle?"100%":"0"}} />
 			<Grid container
 				mt={2}
 				ml={-2}

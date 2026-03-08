@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Head from "next/head";
 import {
   Box,
@@ -40,7 +39,7 @@ const applyFilter = createFilter({
 const AddCredentials = () => {
   // fetch info
   const isMounted = useMounted();
-  const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState<any[]>([]);
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const getInfo = useCallback(async () => {
     try {
@@ -93,7 +92,7 @@ const AddCredentials = () => {
   useEffect(getInfo, []);
 
   // logic for selection of persons
-  const [selectedPersons, setSelectedPersons] = useState([]);
+  const [selectedPersons, setSelectedPersons] = useState<any[]>([]);
   const selectedAllPersons = selectedPersons.length == persons.length;
   const selectedSomePersons = !selectedAllPersons && selectedPersons.length > 0;
   const handleSelectAllPersons = (e) =>

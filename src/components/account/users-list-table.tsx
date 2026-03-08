@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import numeral from "numeral";

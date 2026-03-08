@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import { useMounted } from "../../../../hooks/use-mounted";
@@ -31,39 +30,39 @@ const EditEventManagement = () => {
 
     const router = useRouter();
     const isMounted = useMounted();
-    const emId = JSON.parse(decodeURIComponent(router.query.id));
-    const [eventManagement, setEventManagement] = useState({}); 
+    const emId = JSON.parse(decodeURIComponent(router.query.id as string));
+    const [eventManagement, setEventManagement] = useState<any>({}); 
     const [isLoaded, setLoaded] = useState(false)
 
 
-    const [allEntrances, setAllEntrances] = useState([]);
-    const [allControllers, setAllControllers] = useState([]);
-    const [entrancesControllers, setEntrancesControllers] = useState([]);
-    const [entrances, setEntrances] = useState([]);
-    const [controllers, setControllers] = useState([]);
-    const [inputEvents, setInputEvents] = useState([]);
-    const [outputEvents, setOutputEvents] = useState([]);
-    const [smsConfig, setSMSConfig] = useState({});
-    const [emailConfig, setEmailConfig] = useState({});
-    const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState({});
-    const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState({});
-    const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
-    const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
+    const [allEntrances, setAllEntrances] = useState<any[]>([]);
+    const [allControllers, setAllControllers] = useState<any[]>([]);
+    const [entrancesControllers, setEntrancesControllers] = useState<any[]>([]);
+    const [entrances, setEntrances] = useState<any[]>([]);
+    const [controllers, setControllers] = useState<any[]>([]);
+    const [inputEvents, setInputEvents] = useState<any[]>([]);
+    const [outputEvents, setOutputEvents] = useState<any[]>([]);
+    const [smsConfig, setSMSConfig] = useState<any>({});
+    const [emailConfig, setEmailConfig] = useState<any>({});
+    const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState<any>({});
+    const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState<any>({});
+    const [inputEventsWithTimer, setInputEventsWithTimer] = useState<any>({});
+    const [outputEventsWithTimer, setOutputEventsWithTimer] = useState<any>({});
 
     // dictionary, key is event management ID, value is the email {recipient (an array), content}
-    const [notificationEmails, setNotificationEmails] = useState({});
+    const [notificationEmails, setNotificationEmails] = useState<any>({});
     // dictionary, key is event management ID, value is the SMS {recipient (an array), content}
-    const [notificationSMSs, setNotificationSMSs] = useState({});
+    const [notificationSMSs, setNotificationSMSs] = useState<any>({});
 
     const [open, setOpen] = useState(false);
     const [serverDownOpen, setServerDownOpen] = useState(false);
     const [notificationDisabledOpen, setNotificationDisabledOpen] = useState(false);
 
-    const [errorMessages, setErrorMessages] = useState([]);
-    const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+    const [errorMessages, setErrorMessages] = useState<any[]>([]);
+    const [singleErrorMessage, setSingleErrorMessage] = useState<any[]>([]);
 
     // for selection of checkboxes
-    const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+    const [selectedEventsManagement, setSelectedEventsManagement] = useState<any[]>([]);
     const selectedAllEventsManagement = selectedEventsManagement.length === [...new Set(singleErrorMessage.map(e => e.eventsManagementId))].length;
     const selectedSomeEventsManagement = selectedEventsManagement.length > 0 && !selectedAllEventsManagement;
     const handleSelectAllEventsManagement = (e) => setSelectedEventsManagement(e.target.checked ? [...new Set(singleErrorMessage.map(e => e.eventsManagementId))] : []);
@@ -107,8 +106,8 @@ const EditEventManagement = () => {
 
     // This check is dependant on the name of the custom input to not change eg: remain GEN_IN_1 and GEN_OUT_1
     // Only check for this conflict in changeInputEventsWithoutTimer and changeOutputActionsWithTimer as these are the types of the custom input/output
-    const [customInputEventsSelected, setCustomInputEventsSelected] = useState({});     // List of custom input events (GEN_IN_1, etc) that is selected for validation
-    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState({});    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
+    const [customInputEventsSelected, setCustomInputEventsSelected] = useState<any>({});     // List of custom input events (GEN_IN_1, etc) that is selected for validation
+    const [customOutputEventsSelected, setCustomOutputEventsSelected] = useState<any>({});    // List of custom output events (GEN_OUT_1, etc) that is selected for validation
 
     const deleteEventsManagement = async (e) => {
         e.preventDefault();
@@ -138,7 +137,7 @@ const EditEventManagement = () => {
             }
             return;
         }else{
-            let body = {};
+            let body: any = {};
             // let trigger = {};
             await res.json().then(temp=> body = temp);
             // await res.json().then(temp=> trigger = temp.triggerSchedules);
@@ -339,7 +338,6 @@ const EditEventManagement = () => {
         eventsManagementOutputActionsConflict: false,
         eventsManagementTriggerSchedulesEmpty: false,
         eventsManagementInvalidEmailRecipients: false,
-        eventsManagementInvalidEmailRecipientsError: "",
         eventsManagementInvalidSMSRecipients: false,
         eventsManagementEmailRecipientsEmpty: false,
         eventsManagementSMSRecipientsEmpty: false,
@@ -461,7 +459,7 @@ const EditEventManagement = () => {
                 (res.json()).then(data => {
                     const array = [];
                     if (data[0]) {
-                        Object.entries(data[0]).map(([key, value]) => {
+                        (Object.entries(data[0]) as [string, any][]).map(([key, value]) => {
                             value.map(singleData =>
                                 // console.log(key, singleData))
                                 array.push(singleData))
@@ -488,10 +486,10 @@ const EditEventManagement = () => {
             let hasEmailNotif = false;
             let hasSMSNotif = false;
             for (let i = 0; i < eventsManagementInfoArr.length; i++) {
-                if (i.eventsManagementEmail) {
+                if (eventsManagementInfoArr[i].eventsManagementEmail) {
                     hasEmailNotif = true;
                 }
-                if (i.eventsManagementSMS) {
+                if (eventsManagementInfoArr[i].eventsManagementSMS) {
                     hasSMSNotif = true;
                 }
             }
@@ -526,7 +524,7 @@ const EditEventManagement = () => {
 			}
 			else {
 				toast.success('Delete success');
-                setTimeout(submitAddingAfterDeleting(), 5000)
+                setTimeout(submitAddingAfterDeleting, 5000)
 			}
 		})
 
@@ -538,7 +536,7 @@ const EditEventManagement = () => {
             (res.json()).then(data => {
                 const array = [];
                 if (data[0]) {
-                    Object.entries(data[0]).map(([key, value]) => {
+                    (Object.entries(data[0]) as [string, any][]).map(([key, value]) => {
                         value.map(singleData =>
                             // console.log(key, singleData))
                             array.push(singleData))
@@ -770,7 +768,7 @@ const EditEventManagement = () => {
             currValidation.eventsManagementOutputActionsConflict = false;
         }
 
-        for (const [key, value] of Object.entries(selectedInputEvents)) {
+        for (const [key, value] of Object.entries(selectedInputEvents) as [string, any][]) {
             if (key == 'GEN_IN_1') {
                 let genOut1s = selectedOutputEvents['GEN_OUT_1'];
                 if (genOut1s != undefined) {
@@ -1055,7 +1053,7 @@ const EditEventManagement = () => {
             currValidation.eventsManagementOutputActionsConflict = false;
         }
 
-        for (const [key, value] of Object.entries(selectedInputEvents)) {
+        for (const [key, value] of Object.entries(selectedInputEvents) as [string, any][]) {
             if (key == 'GEN_IN_1') {
                 let genOut1s = selectedOutputEvents['GEN_OUT_1'];
                 if (genOut1s != undefined) {
@@ -1158,7 +1156,7 @@ const EditEventManagement = () => {
 
         // Convert the set to a string and store it
         if (invalidRecipientsErrors.size > 0) {
-            validation.eventsManagementInvalidSMSRecipientsError = Array.from(invalidRecipientsErrors).join(", ");
+            (validation as any).eventsManagementInvalidSMSRecipients = Array.from(invalidRecipientsErrors).join(", ");
         }
 
         setEventsManagementValidationsArr(newValidations);
@@ -1297,7 +1295,6 @@ const EditEventManagement = () => {
                                     eventsManagementInfo={eventsManagementInfo}
                                     eventsManagementValidations={eventsManagementValidationsArr[i]}
                                     changeTextField={onNameChangeFactory(eventsManagementInfo.eventsManagementId)}
-                                    changeNameCheck={changeNameCheck}
                                     changeTriggerSchedules={changeTriggerSchedules}
                                     checkAnyBeginForEventManagement={checkAnyBeginForEventManagement(eventsManagementInfo.eventsManagementId)}
                                     checkAnyUntilForEventManagement={checkAnyUntilForEventManagement(eventsManagementInfo.eventsManagementId)}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable no-bitwise */
 export const JWT_SECRET = 'devias-top-secret-key';
 export const JWT_EXPIRES_IN = 3600 * 24 * 2; // 2 days
@@ -14,8 +13,8 @@ export const sign = (payload, privateKey, header) => {
   const encodedPayload = btoa(JSON.stringify(payload));
   const signature = btoa(Array
     .from(encodedPayload)
-    .map((item, key) => (String.fromCharCode(item.charCodeAt(0) ^ privateKey[key
-    % privateKey.length].charCodeAt(0))))
+    .map((item: any, key) => (String.fromCharCode(item.charCodeAt(0) ^ (privateKey as any)[key
+    % (privateKey as any).length].charCodeAt(0))))
     .join(''));
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
@@ -35,7 +34,7 @@ export const decode = (token) => {
 
   const verifiedSignature = btoa(Array
     .from(encodedPayload)
-    .map((item, key) => (String.fromCharCode(item.charCodeAt(0) ^ JWT_SECRET[key
+    .map((item: any, key) => (String.fromCharCode(item.charCodeAt(0) ^ (JWT_SECRET as any)[key
     % JWT_SECRET.length].charCodeAt(0))))
     .join(''));
 
@@ -58,8 +57,8 @@ export const verify = (token, privateKey) => {
 
   const verifiedSignature = btoa(Array
     .from(encodedPayload)
-    .map((item, key) => (String.fromCharCode(item.charCodeAt(0) ^ privateKey[key
-    % privateKey.length].charCodeAt(0))))
+    .map((item: any, key) => (String.fromCharCode(item.charCodeAt(0) ^ (privateKey as any)[key
+    % (privateKey as any).length].charCodeAt(0))))
     .join(''));
 
   if (verifiedSignature !== signature) {

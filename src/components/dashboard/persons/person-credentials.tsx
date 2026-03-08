@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import { Card, CardContent, CardHeader, Collapse, Divider, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
 import { useState } from "react";

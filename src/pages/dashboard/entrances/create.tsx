@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -68,7 +67,7 @@ const CreateEntrances = () => {
 
   // fetch all access group info
   const isAccessGroupMounted = useMounted();
-  const [allAccessGroups, setAllAccessGroups] = useState([]);
+  const [allAccessGroups, setAllAccessGroups] = useState<any[]>([]);
   const getAccessGroups = useCallback(async () => {
     try {
       const res = await accessGroupApi.getAccessGroups();
@@ -97,10 +96,10 @@ const CreateEntrances = () => {
   );
 
   // stores the duplicated person ids
-  //const [duplicatedPerson, setDuplicatedPerson] = useState({});
+  //const [duplicatedPerson, setDuplicatedPerson] = useState<any>({});
 
   // store previous entrance names
-  const [entranceNames, setEntranceNames] = useState({});
+  const [entranceNames, setEntranceNames] = useState<any>({});
   useEffect(() => {
     entranceApi.getEntrances().then(async (res) => {
       const newEntranceNames = {};

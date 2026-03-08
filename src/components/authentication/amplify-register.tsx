@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -9,7 +8,7 @@ import { useMounted } from '../../hooks/use-mounted';
 export const AmplifyRegister = (props) => {
   const isMounted = useMounted();
   const router = useRouter();
-  const { register } = useAuth();
+  const { register } = useAuth() as any;
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -59,7 +58,7 @@ export const AmplifyRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.email && formik.errors.email)}
         fullWidth
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={formik.touched.email && formik.errors.email as string}
         label="Email Address"
         margin="normal"
         name="email"
@@ -71,7 +70,7 @@ export const AmplifyRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.password && formik.errors.password)}
         fullWidth
-        helperText={formik.touched.password && formik.errors.password}
+        helperText={formik.touched.password && formik.errors.password as string}
         label="Password"
         margin="normal"
         name="password"
@@ -109,13 +108,13 @@ export const AmplifyRegister = (props) => {
       </Box>
       {Boolean(formik.touched.policy && formik.errors.policy) && (
         <FormHelperText error>
-          {formik.errors.policy}
+          {formik.errors.policy as string}
         </FormHelperText>
       )}
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>
-            {formik.errors.submit}
+            {formik.errors.submit as string}
           </FormHelperText>
         </Box>
       )}

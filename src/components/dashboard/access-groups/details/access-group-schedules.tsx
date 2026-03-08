@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -49,9 +48,9 @@ export default function AccessGroupSchedules({
   // States for accessGroupToEntranceSchedules
   const [groupToEntranceId, setGroupToEntranceId] = useState("");
   const [accessGroupToEntranceSchedules, setAccessGroupToEntranceSchedules] =
-    useState([]);
+    useState<any[]>([]);
   // State to coordinate switch status
-  const [scheduleActiveStates, setScheduleActiveStates] = useState({});
+  const [scheduleActiveStates, setScheduleActiveStates] = useState<any>({});
 
   const handleEntranceSelect = (selected) => {
     setGroupToEntranceId(selected.target.value);

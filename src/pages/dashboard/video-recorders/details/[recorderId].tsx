@@ -1,4 +1,10 @@
-// @ts-nocheck
+declare global {
+  interface Window {
+    WebVideoCtrl: any;
+    jQuery: any;
+  }
+}
+
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted";
 import { gtm } from "../../../../lib/gtm";
@@ -28,7 +34,6 @@ import videoRecorderApi from "../../../../api/videorecorder";
 import { VideoRecorderBasicDetails } from "../../../../components/dashboard/video-recorders/details/video-recorder-basic-details";
 import {
   getVideoRecorderEditLink,
-  getVideoRecorderListLink,
   videoRecorderListLink,
 } from "../../../../utils/video-recorder";
 import { VideoRecorderCameras } from "../../../../components/dashboard/video-recorders/details/video-recorder-cameras";
@@ -63,7 +68,7 @@ const VideoRecorderDetails = () => {
   };
 
   const attach_sdk = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       handle.I_InitPlugin(500, 300, {
         bWndFull: true,
         iPackageType: 2,
@@ -88,7 +93,7 @@ const VideoRecorderDetails = () => {
   const login_sdk = async function (handle, { ip, port, username, password }) {
     console.log(ip);
     console.log(port);
-    return await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       handle.I_Login(ip, 2, port, username, password, {
         success: function (xmlDoc) {
           resolve();
@@ -259,7 +264,7 @@ const VideoRecorderDetails = () => {
   }, [isMounted]);
 
   const refresh = async () => {
-    window.location.reload(true);
+    window.location.reload();
   };
 
   useEffect(
@@ -298,7 +303,7 @@ const VideoRecorderDetails = () => {
 
   const deleteVideoRecorder = async () => {
     toast.loading("Deleting Controller...");
-    videoRecorderApi.deleteRecorder(recorderId).then(async (res) => {
+    videoRecorderApi.deleteRecorder(recorderId as string).then(async (res: any) => {
       toast.dismiss();
 
       if (res.status != 200) {

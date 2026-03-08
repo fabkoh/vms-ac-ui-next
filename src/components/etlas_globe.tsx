@@ -1,10 +1,9 @@
-// @ts-nocheck
 //can be used to replace Logo.js. need to get proper SVG file. currently imported as Etlasglobesvg in 
 // dashboard-sidebar.
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
-export const Etlasglobesvg = styled((props) => {
+export const Etlasglobesvg = styled((props: any) => {
   const { variant, ...other } = props;
 
   const color = variant === 'light' ? '#C1C4D6' : '#5048E5';
@@ -12,7 +11,7 @@ export const Etlasglobesvg = styled((props) => {
   return (
       <svg>
     <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
-    fill={color} stroke="none" fillRule='oddeven'>
+    fill={color} stroke="none" fillRule='evenodd'>
     <path d="M0 640 l0 -640 660 0 660 0 0 640 0 640 -660 0 -660 0 0 -640z m792
     579 c56 -12 180 -66 213 -93 11 -9 -2 -6 -30 8 -171 83 -373 78 -530 -13 -54
     -31 -155 -117 -155 -132 0 -4 32 -18 71 -30 l71 -22 54 54 c56 55 73 59 28 6
@@ -47,9 +46,6 @@ export const Etlasglobesvg = styled((props) => {
     
 })``;
 
-Etlasglobesvg.defaultProps = {
-  variant: 'primary'
-};
 
 Etlasglobesvg.propTypes = {
   variant: PropTypes.oneOf(['light', 'primary'])

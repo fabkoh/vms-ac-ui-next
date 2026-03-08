@@ -1,10 +1,14 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
-const SeverityPillRoot = styled('span')(({ theme, ownerState }) => {
-  const backgroundColor = theme.palette[ownerState.color].main;
-  const color = theme.palette[ownerState.color].contrastText;
+interface SeverityPillRootProps {
+  ownerState: { color: string };
+}
+
+const SeverityPillRoot = styled('span')<SeverityPillRootProps>(({ theme, ownerState }) => {
+  const palette = (theme.palette as any)[ownerState.color];
+  const backgroundColor = palette?.main;
+  const color = palette?.contrastText;
 
   return {
     alignItems: 'center',

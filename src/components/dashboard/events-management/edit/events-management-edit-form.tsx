@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Button,
@@ -184,19 +183,19 @@ const EditEventManagementForm = ({
   const changeInputTime = (e, inputId) => {
     const updatedInfo = [...inputWithTimerEventsManagementArr];
     updatedInfo.find((info) => info.inputId == inputId)["timerDuration"] =
-      e.target.value;
+      (e.target as HTMLInputElement).value;
     setInputWithTimerEventsManagementArr(updatedInfo);
 
     const validations = [...inputWithTimerEventsManagementValidations];
     const validation = validations.find((info) => info.inputId == inputId);
-    if (!e.target.value) {
+    if (!(e.target as HTMLInputElement).value) {
       validation.timerDurationInputBlank = true;
       setInputWithTimerEventsManagementValidations(validations);
     }
-    if (e.target.value < 1) {
+    if ((e.target as HTMLInputElement).value < 1) {
       validation.timerDurationInputNotPositive = true;
       setInputWithTimerEventsManagementValidations(validations);
-    } else if (e.target.value > MAX_INPUT_TIMER_DURATION) {
+    } else if ((e.target as HTMLInputElement).value > MAX_INPUT_TIMER_DURATION) {
       validations.find(
         (info) => info.inputId == inputId
       ).timerDurationInputTooLarge = true;
@@ -212,19 +211,19 @@ const EditEventManagementForm = ({
   const changeOutputTime = (e, outputId) => {
     const updatedInfo = [...outputWithTimerEventsManagementArr];
     updatedInfo.find((info) => info.outputId == outputId)["timerDuration"] =
-      e.target.value;
+      (e.target as HTMLInputElement).value;
     setOutputWithTimerEventsManagementArr(updatedInfo);
 
     const validations = [...outputWithTimerEventsManagementValidations];
     const validation = validations.find((info) => info.outputId == outputId);
-    if (!e.target.value) {
+    if (!(e.target as HTMLInputElement).value) {
       validation.timerDurationOutputBlank = true;
       setOutputWithTimerEventsManagementValidations(validations);
     }
-    if (e.target.value < 1) {
+    if ((e.target as HTMLInputElement).value < 1) {
       validation.timerDurationOutputNotPositive = true;
       setOutputWithTimerEventsManagementValidations(validations);
-    } else if (e.target.value > MAX_OUTPUT_TIMER_DURATION) {
+    } else if ((e.target as HTMLInputElement).value > MAX_OUTPUT_TIMER_DURATION) {
       validation.timerDurationOutputTooLarge = true;
       setOutputWithTimerEventsManagementValidations(validations);
     } else {
@@ -238,28 +237,28 @@ const EditEventManagementForm = ({
   const changeSelectionInputWithTime = (e, inputId) => {
     const validations = [...inputWithTimerEventsManagementValidations];
     const validation = validations.find((info) => info.inputId == inputId);
-    if (!e.target.value) {
+    if (!(e.target as HTMLInputElement).value) {
       validation.eventActionInputIdBlank = true;
       setInputWithTimerEventsManagementValidations(validations);
     }
     const updatedInfo = [...inputWithTimerEventsManagementArr];
     updatedInfo.find((info) => info.inputId == inputId)["eventActionInputType"][
       "eventActionInputId"
-    ] = e.target.value;
+    ] = (e.target as HTMLInputElement).value;
     setInputWithTimerEventsManagementArr(updatedInfo);
   };
 
   const changeSelectionOutputWithTime = (e, outputId) => {
     const validations = [...outputWithTimerEventsManagementValidations];
     const validation = validations.find((info) => info.outputId == outputId);
-    if (!e.target.value) {
+    if (!(e.target as HTMLInputElement).value) {
       validation.eventActionOutputIdBlank = true;
       setOutputWithTimerEventsManagementValidations(validations);
     }
     const updatedInfo = [...outputWithTimerEventsManagementArr];
     updatedInfo.find((info) => info.outputId == outputId)[
       "eventActionOutputType"
-    ]["eventActionOutputId"] = e.target.value;
+    ]["eventActionOutputId"] = (e.target as HTMLInputElement).value;
     setOutputWithTimerEventsManagementArr(updatedInfo);
   };
 
@@ -549,17 +548,17 @@ const EditEventManagementForm = ({
   );
 
   const [beginHolderForEventManagement, setBeginHolderForEventManagement] =
-    useState({});
+    useState<any>({});
   const [untilHolderForEventManagement, setUntilHolderForEventManagement] =
-    useState({});
+    useState<any>({});
   const [startHolderForEventManagement, setStartHolderForEventManagement] =
-    useState({});
+    useState<any>({});
   const [endHolderForEventManagement, setEndHolderForEventManagement] =
-    useState({});
+    useState<any>({});
   //get rrule string and text from rrulecomponent
-  const [description, setDescription] = useState({});
-  const [rrulestring, setRrulestring] = useState({});
-  const [rule, setRule] = useState({});
+  const [description, setDescription] = useState<any>({});
+  const [rrulestring, setRrulestring] = useState<any>({});
+  const [rule, setRule] = useState<any>({});
 
   const [firstRendering, setfirstRendering] = useState(false);
 
@@ -887,7 +886,7 @@ const EditEventManagementForm = ({
                     value={inputEventsValueWithoutTimerState}
                     onChange={(e) => {
                       changeInputEventsWithoutTimer(
-                        e.target.value,
+                        (e.target as HTMLInputElement).value,
                         originalEM.eventsManagementId
                       );
                     }}
@@ -1111,7 +1110,7 @@ const EditEventManagementForm = ({
                       label="Email Recipients"
                       value={notificationEmailsInputValue}
                       onChange={(e) => {
-                        setNotificationEmailsInputValue(e.target.value);
+                        setNotificationEmailsInputValue((e.target as HTMLInputElement).value);
                       }}
                       helperText={
                         (Boolean(eventsManagementEmailRecipientsEmpty) &&
@@ -1181,7 +1180,7 @@ const EditEventManagementForm = ({
                         if (e.key == "Enter") {
                           const newNotificationEmailRecipients = [
                             ...notificationEmailsRecipients,
-                            ...e.target.value.split(","),
+                            ...(e.target as HTMLInputElement).value.split(","),
                           ];
                           setNotificationEmailsRecipients(
                             newNotificationEmailRecipients
@@ -1289,13 +1288,13 @@ const EditEventManagementForm = ({
                         ),
                       }}
                       onChange={(e) => {
-                        setNotificationSMSsInputValue(e.target.value);
+                        setNotificationSMSsInputValue((e.target as HTMLInputElement).value);
                       }}
                       onKeyDown={(e) => {
                         if (e.key == "Enter") {
                           const newNotificationSMSRecipients = [
                             ...notificationSMSsRecipients,
-                            ...e.target.value.split(","),
+                            ...(e.target as HTMLInputElement).value.split(","),
                           ];
                           setNotificationSMSsRecipients(
                             newNotificationSMSRecipients

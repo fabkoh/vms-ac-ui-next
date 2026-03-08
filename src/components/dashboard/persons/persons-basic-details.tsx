@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Button, Card, CardActions, CardHeader, Divider, useMediaQuery } from '@mui/material';
 import { PropertyList } from '../../property-list';
@@ -6,7 +5,7 @@ import { PropertyListItem } from '../../property-list-item';
 
 export const CustomerBasicDetails = (props) => {
   const { address1, address2, country, email, isVerified, phone, state, ...other } = props;
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('md'));
 
   const align = mdUp ? 'horizontal' : 'vertical';
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -28,8 +27,8 @@ import { ServerDownError } from "../../../components/dashboard/errors/server-dow
 
 const EditEntrances = () => {
   // edited entrance logic
-  const [entranceInfoArr, setEntranceInfoArr] = useState([]);
-  const [entranceValidationsArr, setEntranceValidationsArr] = useState([]);
+  const [entranceInfoArr, setEntranceInfoArr] = useState<any[]>([]);
+  const [entranceValidationsArr, setEntranceValidationsArr] = useState<any[]>([]);
 
   // load entrance to be edited
   const getEntrances = async (ids) => {
@@ -146,7 +145,7 @@ const EditEntrances = () => {
 
   // fetch all access groups info
   const isAccessGroupMounted = useMounted();
-  const [allAccessGroups, setAllAccessGroups] = useState([]);
+  const [allAccessGroups, setAllAccessGroups] = useState<any[]>([]);
 
   const getAccessGroups = useCallback(async () => {
     try {
@@ -172,10 +171,10 @@ const EditEntrances = () => {
   );
 
   // stores the duplicated person ids
-  //const [duplicatedPerson, setDuplicatedPerson] = useState({});
+  //const [duplicatedPerson, setDuplicatedPerson] = useState<any>({});
 
   // store previous entrance names
-  const [entranceNames, setEntranceNames] = useState({});
+  const [entranceNames, setEntranceNames] = useState<any>({});
   useEffect(() => {
     entranceApi.getEntrances().then(async (res) => {
       const newEntranceNames = {};

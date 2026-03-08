@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     Card,
     CardActionArea,
@@ -17,7 +16,7 @@ import toast from "react-hot-toast";
   
   const ControllerDeviceProperty = () => {
       const router = useRouter();
-      const [controllers, setControllers] = useState([]);
+      const [controllers, setControllers] = useState<any[]>([]);
 
       const handleClickController = () => {
       };

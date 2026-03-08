@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack } from "@mui/icons-material";
 import {
   Box,
@@ -16,7 +15,6 @@ import {
   Container,
   Link,
   Stack,
-  Item,
   Table,
   TableRow,
   TableCell,

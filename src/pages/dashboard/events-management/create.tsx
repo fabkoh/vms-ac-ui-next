@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import { useMounted } from "../../../hooks/use-mounted";
@@ -44,37 +43,37 @@ const ModifyEventManagement = () => {
   const temp = router.query;
   // const eventsManagementId = temp.eventsManagementId;
 
-  const [allEntrances, setAllEntrances] = useState([]);
-  const [allControllers, setAllControllers] = useState([]);
-  const [entrancesControllers, setEntrancesControllers] = useState([]);
-  const [entrances, setEntrances] = useState([]);
-  const [controllers, setControllers] = useState([]);
-  const [inputEvents, setInputEvents] = useState([]);
-  const [outputEvents, setOutputEvents] = useState([]);
-  const [smsConfig, setSMSConfig] = useState({});
-  const [emailConfig, setEmailConfig] = useState({});
-  const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState({});
+  const [allEntrances, setAllEntrances] = useState<any[]>([]);
+  const [allControllers, setAllControllers] = useState<any[]>([]);
+  const [entrancesControllers, setEntrancesControllers] = useState<any[]>([]);
+  const [entrances, setEntrances] = useState<any[]>([]);
+  const [controllers, setControllers] = useState<any[]>([]);
+  const [inputEvents, setInputEvents] = useState<any[]>([]);
+  const [outputEvents, setOutputEvents] = useState<any[]>([]);
+  const [smsConfig, setSMSConfig] = useState<any>({});
+  const [emailConfig, setEmailConfig] = useState<any>({});
+  const [inputEventsWithoutTimer, setInputEventsWithoutTimer] = useState<any>({});
   const [outputActionsWithoutTimer, setOutputActionsWithoutTimer] = useState(
     {}
   );
-  const [inputEventsWithTimer, setInputEventsWithTimer] = useState({});
-  const [outputEventsWithTimer, setOutputEventsWithTimer] = useState({});
+  const [inputEventsWithTimer, setInputEventsWithTimer] = useState<any>({});
+  const [outputEventsWithTimer, setOutputEventsWithTimer] = useState<any>({});
 
   // dictionary, key is event management ID, value is the email {recipient (an array), content}
-  const [notificationEmails, setNotificationEmails] = useState({});
+  const [notificationEmails, setNotificationEmails] = useState<any>({});
   // dictionary, key is event management ID, value is the SMS {recipient (an array), content}
-  const [notificationSMSs, setNotificationSMSs] = useState({});
+  const [notificationSMSs, setNotificationSMSs] = useState<any>({});
 
   const [open, setOpen] = useState(false);
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [notificationDisabledOpen, setNotificationDisabledOpen] =
     useState(false);
 
-  const [errorMessages, setErrorMessages] = useState([]);
-  const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+  const [errorMessages, setErrorMessages] = useState<any[]>([]);
+  const [singleErrorMessage, setSingleErrorMessage] = useState<any[]>([]);
 
   // for selection of checkboxes
-  const [selectedEventsManagement, setSelectedEventsManagement] = useState([]);
+  const [selectedEventsManagement, setSelectedEventsManagement] = useState<any[]>([]);
   const selectedAllEventsManagement =
     selectedEventsManagement.length ===
     [...new Set(singleErrorMessage.map((e) => e.eventsManagementId))].length;
@@ -431,7 +430,7 @@ const ModifyEventManagement = () => {
           res.json().then((data) => {
             const array = [];
             if (data[0]) {
-              Object.entries(data[0]).map(([key, value]) => {
+              (Object.entries(data[0]) as [string, any][]).map(([key, value]) => {
                 value.map((singleData) =>
                   // console.log(key, singleData))
                   array.push(singleData)
@@ -459,10 +458,10 @@ const ModifyEventManagement = () => {
       let hasEmailNotif = false;
       let hasSMSNotif = false;
       for (let i = 0; i < eventsManagementInfoArr.length; i++) {
-        if (i.eventsManagementEmail) {
+        if (eventsManagementInfoArr[i].eventsManagementEmail) {
           hasEmailNotif = true;
         }
-        if (i.eventsManagementSMS) {
+        if (eventsManagementInfoArr[i].eventsManagementSMS) {
           hasSMSNotif = true;
         }
       }
@@ -499,7 +498,7 @@ const ModifyEventManagement = () => {
           res.json().then((data) => {
             const array = [];
             if (data[0]) {
-              Object.entries(data[0]).map(([key, value]) => {
+              (Object.entries(data[0]) as [string, any][]).map(([key, value]) => {
                 value.map((singleData) =>
                   // console.log(key, singleData))
                   array.push(singleData)
@@ -787,7 +786,7 @@ const ModifyEventManagement = () => {
       currValidation.eventsManagementOutputActionsConflict = false;
     }
 
-    for (const [key, value] of Object.entries(selectedInputEvents)) {
+    for (const [key, value] of Object.entries(selectedInputEvents) as [string, any][]) {
       if (key == "GEN_IN_1") {
         let genOut1s = selectedOutputEvents["GEN_OUT_1"];
         if (genOut1s != undefined) {
@@ -1193,7 +1192,7 @@ const ModifyEventManagement = () => {
       currValidation.eventsManagementOutputActionsConflict = false;
     }
 
-    for (const [key, value] of Object.entries(selectedInputEvents)) {
+    for (const [key, value] of Object.entries(selectedInputEvents) as [string, any][]) {
       if (key == "GEN_IN_1") {
         let genOut1s = selectedOutputEvents["GEN_OUT_1"];
         if (genOut1s != undefined) {
@@ -1456,7 +1455,7 @@ const ModifyEventManagement = () => {
               }
               handleDialogClose={() => setNotificationDisabledOpen(false)}
             />
-            <Button onClick={() => router.back()} variant="subtitle2">
+            <Button onClick={() => router.back()} variant="text">
               <ArrowBack fontSize="small" sx={{ mr: 1 }} />
               Back
             </Button>
@@ -1528,7 +1527,6 @@ const ModifyEventManagement = () => {
                   changeTextField={onNameChangeFactory(
                     eventsManagementInfo.eventsManagementId
                   )}
-                  changeNameCheck={changeNameCheck}
                   changeTriggerSchedules={changeTriggerSchedules}
                   checkAnyBeginForEventManagement={checkAnyBeginForEventManagement(
                     eventsManagementInfo.eventsManagementId
@@ -1599,7 +1597,7 @@ const ModifyEventManagement = () => {
                         validation.eventsManagementOutputActionsConflict ||
                         validation.eventsManagementTriggerSchedulesEmpty ||
                         validation.eventsManagementInvalidEmailRecipients ||
-                        validation.eventsManagementInvalidEmailRecipientsError ||
+                        validation.eventsManagementInvalidEmailRecipients ||
                         validation.eventsManagementInvalidSMSRecipients ||
                         validation.eventsManagementInvalidSMSRecipientsError ||
                         validation.eventsManagementEmailRecipientsEmpty ||
@@ -1636,7 +1634,7 @@ const ModifyEventManagement = () => {
                         validation.eventsManagementOutputActionsConflict ||
                         validation.eventsManagementTriggerSchedulesEmpty ||
                         validation.eventsManagementInvalidEmailRecipients ||
-                        validation.eventsManagementInvalidEmailRecipientsError ||
+                        validation.eventsManagementInvalidEmailRecipients ||
                         validation.eventsManagementInvalidSMSRecipients ||
                         validation.eventsManagementInvalidSMSRecipientsError ||
                         validation.eventsManagementEmailRecipientsEmpty ||

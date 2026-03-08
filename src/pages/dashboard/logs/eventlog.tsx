@@ -106,10 +106,10 @@ const Logs = () => {
     }));
   };
 
-  const [Events, setEvents] = useState([]);
+  const [Events, setEvents] = useState<any[]>([]);
 
   console.log(filters);
-  const [searchedEvents, setSearchedEvents] = useState([]);
+  const [searchedEvents, setSearchedEvents] = useState<any[]>([]);
   const filteredEvents =
     searchedEvents.length <= 0
       ? applyDateTimeFilter(

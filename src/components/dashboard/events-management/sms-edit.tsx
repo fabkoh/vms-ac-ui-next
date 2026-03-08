@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import {
@@ -89,7 +88,7 @@ export const SMSEdit = (props) => {
             label="SMS Recipients"
             value={notificationSMSsInputValue}
             onChange={(e) => {
-              setNotificationSMSsInputValue(e.target.value);
+              setNotificationSMSsInputValue((e.target as HTMLInputElement).value);
             }}
             helperText={
               (isEmptyRecipients &&
@@ -142,7 +141,7 @@ export const SMSEdit = (props) => {
               if (e.key == "Enter") {
                 const newNotificationSMSRecipients = [
                   ...notificationSMSsRecipients,
-                  ...e.target.value.split(","),
+                  ...(e.target as HTMLInputElement).value.split(","),
                 ];
                 let isInvalid = false;
                 for (let j = 0; j < newNotificationSMSRecipients.length; j++) {
@@ -163,7 +162,7 @@ export const SMSEdit = (props) => {
             rows={10}
             value={notificationSMSContent}
             onChange={(e) => {
-              setNotificationSMSContent(e.target.value);
+              setNotificationSMSContent((e.target as HTMLInputElement).value);
             }}
             placeholder="Enter SMS Content"
             disabled={useDefaultSMS}
@@ -174,7 +173,7 @@ export const SMSEdit = (props) => {
               <FormControlLabel
                 checked={useDefaultSMS}
                 onChange={(e) => {
-                  if (e.target.checked) {
+                  if ((e.target as HTMLInputElement).checked) {
                     let content =
                       "Event Management " +
                       eventManagementName +
@@ -183,7 +182,7 @@ export const SMSEdit = (props) => {
                       " on <occurence time>.";
                     setNotificationSMSContent(content);
                   }
-                  setUseDefaultSMS(e.target.checked);
+                  setUseDefaultSMS((e.target as HTMLInputElement).checked);
                 }}
                 control={<Switch defaultChecked />}
                 sx={{ marginBottom: 2 }}

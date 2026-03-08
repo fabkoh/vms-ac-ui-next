@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
@@ -56,7 +55,8 @@ const LostPerson = () => {
 
 	const isMounted = useMounted();
 	const queryRef = useRef(null);
-	const [lostId, setLostId] = useState(null); 
+	const [lostId, setLostId] = useState(null);
+	const [serverDownOpen, setServerDownOpen] = useState(false);
 	const router = useRouter();
 	const [isSubmitted, setisSubmitted] = useState(false);
 	

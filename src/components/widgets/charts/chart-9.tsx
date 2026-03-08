@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Box, Card, CardContent, CardHeader } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Chart } from '../../chart';

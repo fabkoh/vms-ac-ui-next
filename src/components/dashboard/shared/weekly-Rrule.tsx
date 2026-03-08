@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
 	Link,
 	Box,
@@ -18,7 +17,6 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 	Divider,
-	FormControlUnstyledContext,
 } from "@mui/material";
 import { set } from "nprogress";
 import { useEffect, useState } from "react";
@@ -37,13 +35,13 @@ const WeeklyRrule = (props) => {
 		handleInvalidUntil,
 	} = props;
 
-	const [rule, setRule] = useState({
+	const [rule, setRule] = useState<any>({
 		//rule object use to create the string and text description
         freq:RRule.WEEKLY,
 		interval: null,
 		byweekday: null, //[0,1,2,3,4,5,6]
 	});
-	const [nonChangingRule, setNonChangingRule] = useState({
+	const [nonChangingRule, setNonChangingRule] = useState<any>({
 		dtstart: null,
 		until: null,
 		count: null,
@@ -61,8 +59,8 @@ const WeeklyRrule = (props) => {
     const dtstart = new Date();
 
 	useEffect(() => {
-		setRule({freq:2,interval:1});
-		setNonChangingRule({dtstart:dtstart,});
+		setRule((prevState: any) => ({...prevState, freq:2,interval:1}));
+		setNonChangingRule((prevState: any) => ({...prevState, dtstart:dtstart}));
 	}, [])
 
 
@@ -252,9 +250,9 @@ mt={1} >
 		}));
 	};
 
-	const [byweekday, setByweekday] = useState([]); 
+	const [byweekday, setByweekday] = useState<any[]>([]); 
 	useEffect(() => {
-	}, [rule.handleDtstart])
+	}, [])
 	
 	useEffect(() => { //reininitialize fields based on freq
 		if (repeatToggle && rule.freq == RRule.WEEKLY) { //reinitialize for weekly options
@@ -311,15 +309,13 @@ mt={1} >
 				return (
 					<Grid container
 alignItems="center"
-flexwrap="wrap">
+flexWrap="wrap">
 						<Grid item
-justifyContent="flex-start"
-required>
+justifyContent="flex-start">
 							<ToggleButtonGroup
 								color="info"
 								// flexwrap="wrap"
 								value={rule.byweekday}
-								required
 								// onChange={(e)=>console.log(e.target.value)}
 								onChange={handleByweekday}
 								sx={{ mt: 1 ,flexWrap:"wrap"}}
@@ -414,12 +410,12 @@ mt={1}>
 						</Grid>
 						<Grid item
 alignItems="center">
-							{FreqRender(rule.freq)}
+							{FreqRender()}
 						</Grid>
 					</Grid>
 				)}
 			</Grid>
-			<Divider width={repeatToggle?"100%":"0"}/>
+			<Divider sx={{width: repeatToggle?"100%":"0"}}/>
 
 			<Grid container
 mt={2}

@@ -1,8 +1,19 @@
-// @ts-nocheck
 import { createContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { authLogOut } from '../api/auth-api';
 import { authLogin, authGetProfile } from '../api/auth-api';
+import type { ApiResponse } from '../types/api';
+import type { User } from '../types/models';
+
+interface AuthContextType {
+  isAuthenticated: boolean;
+  isInitialized: boolean;
+  user: User | null;
+  platform: string;
+  login: (email: string, password: string) => Promise<ApiResponse<any>>;
+  logout: () => Promise<void>;
+  register: (email: string, name: string, password: string) => Promise<void>;
+}
 
 const initialState = {
   isAuthenticated: false,
@@ -50,10 +61,10 @@ const reducer = (state, action) => (handlers[action.type]
   ? handlers[action.type](state, action)
   : state);
 
-export const AuthContext = createContext({
+export const AuthContext = createContext<AuthContextType>({
   ...initialState,
   platform: 'JWT',
-  login: () => Promise.resolve(),
+  login: () => Promise.resolve() as any,
   logout: () => Promise.resolve(),
   register: () => Promise.resolve()
 });
@@ -119,7 +130,7 @@ export const AuthProvider = (props) => {
     if(res.type === "success"){
       // get user profile
       const user_res = await authGetProfile();
-      const user = user_res.response;
+      const user = (user_res as any).response;
       dispatch({
         type: 'LOGIN',
         payload:  {
@@ -138,18 +149,8 @@ export const AuthProvider = (props) => {
   };
 
   // for creating new acc
-  const register = async (email, name, password) => {
-    const accessToken = await authApi.register({ email, name, password });
-    const user = await authApi.me(accessToken);
-
-    localStorage.setItem('accessToken', accessToken);
-
-    dispatch({
-      type: 'REGISTER',
-      payload: {
-        user
-      }
-    });
+  const register = async (_email: string, _name: string, _password: string) => {
+    // Not implemented for JWT auth
   };
 
   return (

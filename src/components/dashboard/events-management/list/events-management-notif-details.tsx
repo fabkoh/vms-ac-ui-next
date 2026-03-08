@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
 import { SelectAll } from "@mui/icons-material";
@@ -10,7 +9,7 @@ import RenderTableCell from "../../../dashboard/shared/renderTableCell";
 
 
 export const EventManagementNotifDetails = (props) => {
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('xs'));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('xs'));
   const align = mdUp ? 'horizontal' : 'vertical';
   console.log(props)
   const {

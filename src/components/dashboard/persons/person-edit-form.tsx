@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
 	Card, 
@@ -25,10 +24,9 @@ import { Box } from '@mui/system';
 // import MuiPhoneNumber from "material-ui-phone-number";
 import { accessGroupApi } from '../../../api/access-groups';
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
+const ExpandMore = styled(({ expand, ...other }: { expand: boolean; [key: string]: any }) => (
+  <IconButton {...other} />
+))<{ expand: boolean }>(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
@@ -81,7 +79,7 @@ export const PersonEditForm = (props) => {
       
       removePerson(person.id)
     } else {
-      toast.error("Delete unsuccessful for" + id);
+      toast.error("Delete unsuccessful for" + person.id);
     }
 		}
   

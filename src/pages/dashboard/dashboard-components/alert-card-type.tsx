@@ -17,7 +17,7 @@ const AlertCardType = (props) => {
     const {
         cardType
     } = props;
-    const [count, setCount] = useState([]);
+    const [count, setCount] = useState<any[]>([]);
     const [alertIcon, setIcon] = useState(null);
 
     // Sets number of unauthenticated scans in the last 24 hours

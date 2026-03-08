@@ -1,4 +1,3 @@
-// @ts-nocheck
 import 'simplebar/dist/simplebar.min.css';
 import { forwardRef } from 'react';
 import SimpleBar from 'simplebar-react';
@@ -6,7 +5,7 @@ import { styled } from '@mui/material/styles';
 
 const ScrollbarRoot = styled(SimpleBar)``;
 
-export const Scrollbar = forwardRef((props, ref) => {
+export const Scrollbar = forwardRef<any, any>((props, ref) => {
   return (
     <ScrollbarRoot
       ref={ref}

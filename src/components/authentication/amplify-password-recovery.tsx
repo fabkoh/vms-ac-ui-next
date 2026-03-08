@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -8,7 +7,7 @@ import { useMounted } from '../../hooks/use-mounted';
 
 export const AmplifyPasswordRecovery = (props) => {
   const isMounted = useMounted();
-  const { passwordRecovery } = useAuth();
+  const { passwordRecovery } = useAuth() as any;
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -51,7 +50,7 @@ export const AmplifyPasswordRecovery = (props) => {
         autoFocus
         error={Boolean(formik.touched.email && formik.errors.email)}
         fullWidth
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={formik.touched.email && formik.errors.email as string}
         label="Email Address"
         margin="normal"
         name="email"
@@ -63,7 +62,7 @@ export const AmplifyPasswordRecovery = (props) => {
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>
-            {formik.errors.submit}
+            {formik.errors.submit as string}
           </FormHelperText>
         </Box>
       )}

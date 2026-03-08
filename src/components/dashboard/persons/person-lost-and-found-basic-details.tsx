@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
@@ -23,7 +22,7 @@ export const PersonLostDetails = (props) => {
   } = props.person;
   
   
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('md'));
 
   const align = mdUp ? 'horizontal' : 'vertical';
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Button, FormHelperText } from '@mui/material';
@@ -8,7 +7,7 @@ import { useMounted } from '../../hooks/use-mounted';
 export const Auth0Login = (props) => {
   const isMounted = useMounted();
   const router = useRouter();
-  const { loginWithPopup } = useAuth();
+  const { loginWithPopup } = useAuth() as any;
   const [error, setError] = useState(null);
 
   const handleLogin = async () => {
@@ -17,7 +16,7 @@ export const Auth0Login = (props) => {
 
       if (isMounted()) {
         const returnUrl = router.query.returnUrl || '/dashboard';
-        router.push(returnUrl);
+        router.push(returnUrl as string);
       }
     } catch (err) {
       console.error(err);

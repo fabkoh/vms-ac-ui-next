@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -9,7 +8,7 @@ import { DashboardLayout } from '../../../../../../components/dashboard/dashboar
 import { useMounted } from "../../../../../../hooks/use-mounted";
 import toast from "react-hot-toast";
 import router from "next/router";
-import formUtils from "../../../../../../hooks/use-mounted";
+// import formUtils from "../../../../../../utils/form-utils"; // removed incorrect import
 import accessGroupEntranceApi from "../../../../../../api/access-group-entrance-n-to-n";
 import ControllerEditForm from "../../../../../../components/dashboard/controllers/controller-edit-form";
 import AssignAuthDevice from "../../../../../../components/dashboard/controllers/assign-auth-device";
@@ -22,10 +21,12 @@ import { ServerDownError } from "../../../../../../components/dashboard/errors/s
 
 const EditAuthDevice = () => {
     const isMounted = useMounted();
-    const { authdeviceId }  = router.query; 
-    const { controllerId }  = router.query; 
+    const { authdeviceId: authdeviceIdRaw }  = router.query;
+    const authdeviceId = authdeviceIdRaw as string;
+    const { controllerId: controllerIdRaw }  = router.query;
+    const controllerId = controllerIdRaw as string; 
     // console.log(authdeviceId)
-    const [deviceInfo, setDeviceInfo] = useState();
+    const [deviceInfo, setDeviceInfo] = useState<any>();
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const getDevice = async(authdeviceId) => {
@@ -43,7 +44,7 @@ const EditAuthDevice = () => {
                     } else {
                         toast.error("Device info not found")
                     }
-                    router.replace(getControllerListLink) //maybe go back to controller details?
+                    router.replace(getControllerListLink()) //maybe go back to controller details?
                     return;
                 }
             })
@@ -51,7 +52,7 @@ const EditAuthDevice = () => {
         catch (err) { console.log(err) }
     }
 
-    const [authMethodList, setAuthMethodList ] = useState([])
+    const [authMethodList, setAuthMethodList ] = useState<any[]>([])
     const getAuthMethodList = async () => {
         authDeviceApi.getAllAuthMethods().then(async (res) => {
             if (res.status == 200) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
@@ -10,7 +9,7 @@ import { useMounted } from '../../hooks/use-mounted';
 export const AmplifyVerifyCode = (props) => {
   const isMounted = useMounted();
   const router = useRouter();
-  const { verifyCode } = useAuth();
+  const { verifyCode } = useAuth() as any;
   const itemsRef = useRef([]);
   const [username, setUsername] = useState('');
   const formik = useFormik({
@@ -68,7 +67,7 @@ export const AmplifyVerifyCode = (props) => {
             autoFocus
             error={Boolean(formik.touched.email && formik.errors.email)}
             fullWidth
-            helperText={formik.touched.email && formik.errors.email}
+            helperText={formik.touched.email && formik.errors.email as string}
             label="Email Address"
             margin="normal"
             name="email"
@@ -182,7 +181,7 @@ export const AmplifyVerifyCode = (props) => {
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>
-            {formik.errors.submit}
+            {formik.errors.submit as string}
           </FormHelperText>
         </Box>
       )}

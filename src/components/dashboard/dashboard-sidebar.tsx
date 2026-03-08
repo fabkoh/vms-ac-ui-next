@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -446,10 +445,10 @@ export const DashboardSidebar = (props) => {
   const { theaterMode, onClose, open } = props;
   const router = useRouter();
   const { t } = useTranslation();
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"), {
+  const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"), {
     noSsr: true,
   });
-  const [syncErrorMessages, setSyncErrorMessages] = useState([]);
+  const [syncErrorMessages, setSyncErrorMessages] = useState<any[]>([]);
   const [syncErrorOpen, setSyncErrorOpen] = useState(false);
   const { user } = useAuth();
 
@@ -973,7 +972,7 @@ export const DashboardSidebar = (props) => {
                </NextLink>
               <NextLink href="/dashboard">
                 
-                  <Image src={etlasname} />
+                  <Image src={etlasname} alt="etlas" />
                </NextLink>
             </Box>
             {/* <Box sx={{ px: 2 }}>

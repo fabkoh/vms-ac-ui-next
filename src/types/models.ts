@@ -11,8 +11,10 @@ export interface User {
   firstName?: string;
   lastName?: string;
   name?: string;
+  username?: string;
   email: string;
   role?: string[] | string;
+  authorities?: string[] | { authority: string }[];
   mobile?: string;
   password?: string;
 }

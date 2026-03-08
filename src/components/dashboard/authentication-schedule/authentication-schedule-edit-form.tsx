@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { 
     Button, 
@@ -61,7 +60,7 @@ const EditAuthSchedForm = ({
         setEnd(e)
     }
 
-    const [authMethodList, setAuthMethodList ] = useState([])
+    const [authMethodList, setAuthMethodList ] = useState<any[]>([])
     const getAuthMethodList = async () => {
         authDeviceApi.getAllAuthMethods().then(async(res)=>{
             setAuthMethodList(await res.json())

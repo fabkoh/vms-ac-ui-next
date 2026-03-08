@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack } from "@mui/icons-material";
 import {
   Box,
@@ -16,7 +15,6 @@ import {
   Container,
   Link,
   Stack,
-  Item,
   Table,
   TableRow,
   TableCell,
@@ -59,7 +57,7 @@ const AccountManagement = () => {
   const isMounted = useMounted();
 
   const [expandedUsers, setExpandedUsers] = useState(false);
-  const [usersList, setUsersList] = useState([]);
+  const [usersList, setUsersList] = useState<any[]>([]);
   const [isUpdated, setIsUpdated] = useState(false);
 
   const handleExpandedUsers = () => setExpandedUsers(!expandedUsers);

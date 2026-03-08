@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -73,9 +72,9 @@ const CreateRecorders = () => {
         setRecorderValidationsArr] = useState([getEmptyRecorderValidations(0)]);
 
     // store previous video recorder names & ip addresses
-    const [recorderNames, setRecorderNames] = useState({});
-    const [recorderPrivateIpes, setRecorderPrivateIpes] = useState({});
-    const [recorderPortNumbers, setRecorderPortNumbers] = useState({});
+    const [recorderNames, setRecorderNames] = useState<any>({});
+    const [recorderPrivateIpes, setRecorderPrivateIpes] = useState<any>({});
+    const [recorderPortNumbers, setRecorderPortNumbers] = useState<any>({});
 
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
@@ -320,7 +319,7 @@ const CreateRecorders = () => {
         validation.recorderPortNumberError = "";
 
         // check port number exists?
-        validation.recorderPortNumberExists = !!recorderPortNumbers[recorderPortNumber];
+        validation.recorderPortNumberExist = !!recorderPortNumbers[recorderPortNumber];
 
         // check port number duplicated
         checkDuplicatePortNumber(newRecorderInfoArr, newValidations);
@@ -342,7 +341,7 @@ const CreateRecorders = () => {
         validation.recorderIWSPortError = "";
 
         // check port number exists?
-        validation.recorderIWSPortExists = !!recorderPortNumbers[recorderIWSPort];
+        validation.recorderIWSPortExist = !!recorderPortNumbers[recorderIWSPort];
 
         // check port number duplicated
         checkDuplicateIWSPort(newRecorderInfoArr, newValidations);
@@ -366,7 +365,7 @@ const CreateRecorders = () => {
         e.preventDefault(); 
 
         setSubmitted(true);
-        Promise.all(recorderInfoArr.map(recorder => videoRecorderApi.createVideoRecorder(recorder)))
+        Promise.all(recorderInfoArr.map(recorder => videoRecorderApi.createVideoRecorder(recorder as any)))
                .then(resArr => {
                     const failedResIndex = []; // stores the index of the failed creations
                    const successResIndex = []; // stores the index of success creations
@@ -392,13 +391,13 @@ const CreateRecorders = () => {
                                 setRecorderInfoArr(failedResIndex.map(i => recorderInfoArr[i])); // set failed recorders to stay
                                 setRecorderValidationsArr(failedResIndex.map((i) => {
                                     let recordValidation = recorderValidationsArr[i]
-                                    recordValidation.recorderNameError = failedResArr.recorderName ?? "";
-                                    recordValidation.recorderPublicIpError = failedResArr.recorderPublicIp ?? "",
-                                    recordValidation.recorderPrivateIpError = failedResArr.recorderPrivateIp ?? "";
-                                    recordValidation.recorderPortNumberError = failedResArr.recorderPortNumber ?? "";
-                                    recordValidation.recorderIWSPortError = failedResArr.recorderIWSPort ?? "";
-                                    recordValidation.recorderUsernameError = failedResArr.recorderUsername ?? "";
-                                    recordValidation.recorderPasswordError = failedResArr.recorderPassword ?? "";
+                                    recordValidation.recorderNameError = (failedResArr[i] as any)?.recorderName ?? "";
+                                    recordValidation.recorderPublicIpError = (failedResArr[i] as any)?.recorderPublicIp ?? "",
+                                    recordValidation.recorderPrivateIpError = (failedResArr[i] as any)?.recorderPrivateIp ?? "";
+                                    recordValidation.recorderPortNumberError = (failedResArr[i] as any)?.recorderPortNumber ?? "";
+                                    recordValidation.recorderIWSPortError = (failedResArr[i] as any)?.recorderIWSPort ?? "";
+                                    recordValidation.recorderUsernameError = (failedResArr[i] as any)?.recorderUsername ?? "";
+                                    recordValidation.recorderPasswordError = (failedResArr[i] as any)?.recorderPassword ?? "";
                                     recordValidation.submitFailed = true;
                                     return recordValidation;
                                 })); // set failed recorder validations to stay
@@ -473,6 +472,7 @@ const CreateRecorders = () => {
                                         onPasswordChange={onPasswordChangeFactory(id)}
                                         handleToggleDefaultIP={handleToggleDefaultIP(id)}
                                         handleToggleAutoPortForwarding={handleToggleAutoPortForwarding(id)}
+                                        edit={false}
                                         />
                                 )
                             })}
@@ -501,7 +501,7 @@ const CreateRecorders = () => {
                                                     validation.recorderNameDuplicated ||
                                                     validation.recorderNameExists ||
                                                     validation.recorderPublicIpBlank ||
-                                                    validation.recorderPublicIpExists ||
+                                                    //validation.recorderPublicIpExists ||
                                                     validation.recorderPrivateIpBlank ||
                                                     //validation.recorderPrivateIpDuplicated ||
                                                     //validation.recorderPrivateIpExists ||

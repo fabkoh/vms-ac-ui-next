@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Button, Tooltip, Chip, Link, Typography } from "@mui/material";
 import NextLink from 'next/link';
 import { Scrollbar } from "../../scrollbar";
@@ -18,10 +17,10 @@ const NotificationLogTable = ({
     logs }) => {
     const [smsOpen, setSMSOpen] = useState(false);
     const [emailOpen, setEmailOpen] = useState(false);
-    const [smsRecipients, setSMSRecipients] = useState([]);
+    const [smsRecipients, setSMSRecipients] = useState<any[]>([]);
     const [smsContent, setSMSContent] = useState("");
     const [emailContent, setEmailContent] = useState("");
-    const [emailRecipients, setEmailRecipients] = useState([]);
+    const [emailRecipients, setEmailRecipients] = useState<any[]>([]);
     const [emailTitle, setEmailTitle] = useState("");
     const [errMsg, setErrMsg] = useState("");
     const [errOpen, setErrOpen] = useState(false);

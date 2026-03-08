@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Warning from "@mui/icons-material/Warning";
 import {Lock, LockOpen} from "@mui/icons-material";
 import { Card, useMediaQuery, CardHeader, Divider, Link, Typography, Chip } from "@mui/material";

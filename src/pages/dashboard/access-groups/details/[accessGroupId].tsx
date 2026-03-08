@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted";
 import { gtm } from "../../../../lib/gtm";
@@ -56,8 +55,8 @@ const AccessGroupDetails = () => {
 
   const link = getAccessGroupScheduleEditLink(accessGroupId);
 
-  const [accessGroupToEntranceMap, setAccessGroupToEntranceMap] = useState([]);
-  const [accessGroupToEntranceScheduleMap, setAccessGroupToEntranceScheduleMap] = useState([]);
+  const [accessGroupToEntranceMap, setAccessGroupToEntranceMap] = useState<any[]>([]);
+  const [accessGroupToEntranceScheduleMap, setAccessGroupToEntranceScheduleMap] = useState<any[]>([]);
 
   const getAccessGroupEntranceAndSchedule = async () => {
     try {

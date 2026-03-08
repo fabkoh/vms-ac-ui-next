@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
 	Card, 
@@ -23,10 +22,9 @@ import IconButton from '@mui/material/IconButton';
 
 // import MuiPhoneNumber from "material-ui-phone-number";
 
-export const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
+export const ExpandMore = styled(({ expand, ...other }: { expand: boolean; [key: string]: any }) => (
+  <IconButton {...other} />
+))<{ expand: boolean }>(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {

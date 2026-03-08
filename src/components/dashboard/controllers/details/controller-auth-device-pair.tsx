@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import {
 	Button,
@@ -73,6 +72,8 @@ export default function AuthDevicePair({ authPair,controllerId, status, statusLo
 	// useEffect(() => {
 	// 	getDeviceEntrance(authPair);
 	// }, [authPair]);
+
+	const [selectedDevices, setSelectedDevices] = useState<any>('');
 
 	// auth device actions
 	const [actionAnchor, setActionAnchor] = useState(null);

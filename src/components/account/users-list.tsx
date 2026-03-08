@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
@@ -228,7 +227,7 @@ export const UsersList = () => {
   const applyPagination = (Persons, page, rowsPerPage) =>
     Persons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  const [Persons, setPersons] = useState([]);
+  const [Persons, setPersons] = useState<any[]>([]);
   // const [currentTab, setCurrentTab] = useState("all");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -259,7 +258,7 @@ export const UsersList = () => {
 
         setPersons(newList);
       } else {
-        if (res.status == serverDownCode) {
+        if ((res as any).status == serverDownCode) {
           setServerDownOpen(true);
         }
       }
@@ -308,7 +307,7 @@ export const UsersList = () => {
     setAnchorEl(null);
   };
   //for persons-list-table
-  const [selectedPersons, setSelectedPersons] = useState([]);
+  const [selectedPersons, setSelectedPersons] = useState<any[]>([]);
   const handleSelectAllPersons = (event) => {
     setSelectedPersons(
       event.target.checked ? Persons.map((person) => person.id) : []
@@ -368,7 +367,7 @@ export const UsersList = () => {
   const deleteHelper = async (id) => {
     try {
       const res = await authDeleteUserAdmin(id);
-      if (res.status != 200) {
+      if ((res as any).status != 200) {
         const restwo = await authDeleteTechAdmin(id);
         if (restwo.status == 200) {
           return restwo;
@@ -388,7 +387,7 @@ export const UsersList = () => {
       })
     ).then((resArr) => {
       resArr.filter((res) => {
-        if (res.status == 200) {
+        if ((res as any).status == 200) {
           toast.success("Delete success", { duration: 2000 });
         } else {
           toast.error("Delete unsuccessful");

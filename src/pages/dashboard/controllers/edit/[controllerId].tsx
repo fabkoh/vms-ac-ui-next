@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -25,20 +24,21 @@ import { serverDownCode } from "../../../../api/api-helpers";
 
 const EditController = () => {
     const isMounted = useMounted();
-    const { controllerId }  = router.query; 
+    const { controllerId: controllerIdRaw }  = router.query;
+    const controllerId = controllerIdRaw as string; 
 
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
-    const [controllerInfo, setControllerInfo] = useState()
+    const [controllerInfo, setControllerInfo] = useState<any>()
     const [controllerValidations, setControllerValidations] = useState({
         invalidIP:false,
         invalidEntrance:false,
         takenIP:false
     })
-    const [E1, setE1] = useState()
-    const [E2, setE2] = useState()
-    const [currentAuth,setCurrentAuth] = useState()
-    const [authStatus, setAuthStatus] = useState({})
+    const [E1, setE1] = useState<any>()
+    const [E2, setE2] = useState<any>()
+    const [currentAuth,setCurrentAuth] = useState<any>()
+    const [authStatus, setAuthStatus] = useState<any>({})
 
     const getController = async(controllerId) => {
         try{
@@ -56,7 +56,7 @@ const EditController = () => {
                     } else {
                         toast.error("Controller info not found")
                     }
-                    router.replace(getControllerListLink)
+                    router.replace(getControllerListLink())
                     return;
                 }
             })
@@ -78,7 +78,8 @@ const EditController = () => {
 
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
-            Promise.resolve(controllerApi.getAuthStatus(controllerId),toast.loading("Fetching status..."))
+            toast.loading("Fetching status...");
+            Promise.resolve(controllerApi.getAuthStatus(controllerId))
             .then(async res=>{
                 toast.dismiss()
                 if(res.status!=200){
@@ -146,7 +147,7 @@ const EditController = () => {
     [])
 
     // fetch all entrance info
-    const [allEntrances, setAllEntrances] = useState([]);
+    const [allEntrances, setAllEntrances] = useState<any[]>([]);
     const getEntrances = async(E1,E2) => {
         const toUpdate =[...allEntrances]
         Promise.resolve(authDeviceApi.getAvailableEntrances())
@@ -261,7 +262,8 @@ const EditController = () => {
     const submitForm = (e) => {
         e.preventDefault();
         setSubmitted(true)
-        Promise.resolve(controllerApi.updateController(controllerInfo),toast.loading("Attempting to update controller"))
+        toast.loading("Attempting to update controller");
+        Promise.resolve(controllerApi.updateController(controllerInfo))
         .then(res=>{
             toast.dismiss()
             if(res.status!=200){

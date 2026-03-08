@@ -1,4 +1,10 @@
-// @ts-nocheck
+declare global {
+  interface Window {
+    WebVideoCtrl: any;
+    jQuery: any;
+  }
+}
+
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useMounted } from "../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../lib/gtm";
@@ -45,7 +51,9 @@ function formatDate(date) {
 
 const VideoCameraDetails = () => {
   const isMounted = useMounted();
-  const { cameraId, recorderId } = router.query;
+  const { cameraId: cameraIdRaw, recorderId: recorderIdRaw } = router.query;
+  const cameraId = cameraIdRaw as string;
+  const recorderId = recorderIdRaw as string;
   const { theaterMode, setTheaterMode } = useContext(TheaterModeContext)
 
   useEffect(() => {
@@ -63,7 +71,7 @@ const VideoCameraDetails = () => {
   const [end_time, setEndTime] = useState(new Date());
   const [download_start_time, setDownloadStartTime] = useState(new Date());
   const [download_end_time, setDownloadEndTime] = useState(new Date());
-  const [playback_files, setPlaybackFiles] = useState([]);
+  const [playback_files, setPlaybackFiles] = useState<any[]>([]);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -143,7 +151,7 @@ const VideoCameraDetails = () => {
   }
 
   const attach_sdk = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       const { clientHeight: height, clientWidth: width } = document.getElementById('divPlugin');
 
       handle.I_InitPlugin(width, height, {
@@ -158,11 +166,11 @@ const VideoCameraDetails = () => {
         cbRemoteConfig: function () { },
         cbInitPluginComplete: function () {
           try {
-            WebVideoCtrl.I_InsertOBJECTPlugin("divPlugin");
-            resolve();
+            window.WebVideoCtrl.I_InsertOBJECTPlugin("divPlugin");
+            resolve(undefined);
           } catch (ex) {
             console.warn("Failed to inject plugin")
-            reject();
+            reject(undefined);
           }
         }
       });
@@ -170,12 +178,12 @@ const VideoCameraDetails = () => {
   }
 
   const login_sdk = async function (handle, { ip, port, username, password }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_Login(ip, 2, port, username, password, {
         success: function (xmlDoc) {
-          resolve();
+          resolve(undefined);
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
           alert("Video Recorder login failed");
         }
       });
@@ -183,7 +191,7 @@ const VideoCameraDetails = () => {
   }
 
   const get_device_info = async function (handle, { ip }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       try {
         handle.I_GetDeviceInfo(ip, {
           success: function (xmlDoc) {
@@ -199,7 +207,7 @@ const VideoCameraDetails = () => {
               encoder_version: `${xml_handle.find("encoderVersion").eq(0).text()}  ${xml_handle.find("encoderReleasedDate").eq(0).text()}`,
             });
           }, error: function (status, xmlDoc) {
-            reject();
+            reject(undefined);
           }
         })
       } catch (ex) { }
@@ -207,14 +215,14 @@ const VideoCameraDetails = () => {
   }
 
   const get_device_ports = async function (handle, { ip }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       const ports = handle.I_GetDevicePort(ip);
       resolve(ports);
     });
   }
 
   const get_analogue_channels = async function (handle, { ip }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_GetAnalogChannelInfo(ip, {
         async: false,
         success: function (xmlDoc) {
@@ -229,14 +237,14 @@ const VideoCameraDetails = () => {
 
           resolve(channels);
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const get_digital_channels = async function (handle, { ip }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_GetDigitalChannelInfo(ip, {
         async: false,
         success: function (xmlDoc) {
@@ -253,37 +261,37 @@ const VideoCameraDetails = () => {
 
           resolve(channels);
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const take_picture = async function (handle) {
-    return await new Promise((resolve, reject) => {
-      const xmlDoc = WebVideoCtrl.I_GetLocalCfg();
+    return await new Promise<any>((resolve, reject) => {
+      const xmlDoc = window.WebVideoCtrl.I_GetLocalCfg();
       let szCaptureFileFormat = "0";
       if (xmlDoc != null) {
         szCaptureFileFormat = $(xmlDoc).find("CaptureFileFormat").eq(0).text();
       }
 
-      var szPicName = new Date().getTime();
+      var szPicName: any = new Date().getTime();
       szPicName += ("0" === szCaptureFileFormat) ? ".jpg" : ".bmp";
 
-      WebVideoCtrl.I2_CapturePic(szPicName, {
+      window.WebVideoCtrl.I2_CapturePic(szPicName, {
         bDateDir: true
       });
 
-      resolve();
+      resolve(undefined);
     });
   }
 
   const start_recording = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_StartRecord(new Date().getTime().toString(), {
         bDateDir: true,
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function (error) {
           console.error("Start Recording Error: ", error);
@@ -294,10 +302,10 @@ const VideoCameraDetails = () => {
   }
 
   const stop_recording = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_StopRecord({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function (error) {
           console.error("Stop Recording Error: ", error);
@@ -308,39 +316,39 @@ const VideoCameraDetails = () => {
   }
 
   const zoom_in = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 10, false, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     });
   }
 
   const zoom_out = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 11, false, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     });
   }
 
   const zoom_stop = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 11, true, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     });
@@ -348,7 +356,7 @@ const VideoCameraDetails = () => {
 
   const preview_recorder = async function (handle, { privateIP, publicIP, rtsp_port, stream_type, channel_id, zero_channel, port }) {
     try {
-      await new Promise((resolve, reject) => {
+      await new Promise<any>((resolve, reject) => {
         handle.I_StartRealPlay(privateIP, publicIP, {
           iRtspPort: rtsp_port,
           iStreamType: stream_type,
@@ -357,7 +365,7 @@ const VideoCameraDetails = () => {
           iWSPort: port,
           success: function () {
             console.log("Preview Started")
-            resolve();
+            resolve(undefined);
           },
           error: function () {
             reject(new Error("Error in preview_recorder"));
@@ -371,146 +379,146 @@ const VideoCameraDetails = () => {
   }
 
   const stop_preview_recorder = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_Stop({
         success: function () {
-          resolve();
+          resolve(undefined);
         }, error: function () {
-          reject()
+          reject(undefined)
         }
       });
     });
   }
 
   const move_ptz = async function (handle, ptz_index, ptz_speed) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, ptz_index, false, {
         iPTZSpeed: ptz_speed,
         success: function (xmlDoc) {
           resolve(xmlDoc);
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const stop_ptz = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 1, true, {
         success: function (xmlDoc) {
           resolve(xmlDoc);
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     })
   }
 
   const focus_in = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 12, false, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const focus_out = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 13, false, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const focus_stop = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 12, true, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const iris_in = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 14, true, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const iris_out = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 15, true, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const iris_stop = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PTZControl(videoRecorderInfo.recorderPrivateIp, 14, true, {
         iWndIndex: 0,
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const set_preset = async function (handle, preset_id) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_SetPreset(videoRecorderInfo.recorderPrivateIp, preset_id, {
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const go_preset = async function (handle, preset_id) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_GoPreset(videoRecorderInfo.recorderPrivateIp, preset_id, {
         success: function (xmlDoc) {
           resolve(xmlDoc)
         }, error: function (status, xmlDoc) {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const enable_audio = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       var res = handle.I_OpenSound();
       if (res == 0) {
         console.log("Audio Enabled");
@@ -521,7 +529,7 @@ const VideoCameraDetails = () => {
   }
 
   const disable_audio = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       var res = handle.I_CloseSound();
       if (res == 0) {
         console.log("Audio Disabled");
@@ -532,7 +540,7 @@ const VideoCameraDetails = () => {
   }
 
   const search_video = async function (handle, { ip, port, type, stream_type, start_time, end_time }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
 
       var szDeviceIdentify = `${ip}_${port}`,
         iChannelID = 1,
@@ -590,14 +598,14 @@ const VideoCameraDetails = () => {
             resolve(results)
           }
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     });
   }
 
   const download_video = async function (handle, { ip, file_name, playbackURI, start_time, end_time }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       var szDeviceIdentify = `${ip}`,
         szChannelID = 1,
         szFileName = file_name,
@@ -612,7 +620,7 @@ const VideoCameraDetails = () => {
   }
 
   const play = async function (handle, { publicIP, privateIP, port, IWSPort, rtsp_port, type, stream_type, start_time, end_time }) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       console.log("handlePlay", start_time);
       var szDeviceIdentify = `${publicIP}`,
         iChannelID = 1,
@@ -632,74 +640,74 @@ const VideoCameraDetails = () => {
         szEndTime: szEndTime,
         port: IWSPort,
         success: function () {
-          resolve();
+          resolve(undefined);
         }, error: function (status, xmlDoc) {
-          reject()
+          reject(undefined)
         }
       });
     });
   }
 
   const stop = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_Stop({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function () {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const pause = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_Pause({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function () {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const resume = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_Resume({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function () {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const slow_forward = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PlaySlow({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function () {
-          reject();
+          reject(undefined);
         }
       });
     });
   }
 
   const fast_forward = async function (handle) {
-    return await new Promise((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       handle.I_PlayFast({
         success: function () {
-          resolve();
+          resolve(undefined);
         },
         error: function () {
-          reject();
+          reject(undefined);
         }
       });
     });
@@ -895,10 +903,10 @@ const VideoCameraDetails = () => {
                     var elem = document.getElementById("divPlugin");
                     if (elem.requestFullscreen) {
                       await elem.requestFullscreen().catch((err) => console.log(err));
-                    } else if (elem.webkitRequestFullscreen) { /* Safari */
-                      await elem.webkitRequestFullscreen().catch((err) => console.log(err));
-                    } else if (elem.msRequestFullscreen) { /* IE11 */
-                      await elem.msRequestFullscreen().catch((err) => console.log(err));
+                    } else if ((elem as any).webkitRequestFullscreen) { /* Safari */
+                      await (elem as any).webkitRequestFullscreen().catch((err) => console.log(err));
+                    } else if ((elem as any).msRequestFullscreen) { /* IE11 */
+                      await (elem as any).msRequestFullscreen().catch((err) => console.log(err));
                     }
                     setTheaterMode(!theaterMode);
 
@@ -918,7 +926,6 @@ const VideoCameraDetails = () => {
                       padding: '.6em',
                       margin: '.2em',
                       display: 'inline-block',
-                      border: '1px solid #D1D5DB',
                       border: `1px solid ${(previewMode === 'live') ? '#3e5879' : '#D1D5DB'}`,
                       borderRadius: 4,
                       cursor: 'pointer',
@@ -985,7 +992,7 @@ const VideoCameraDetails = () => {
                         <Select
                           labelId="ptz_speed"
                           onChange={({ target: { value } }) => {
-                            setPtzSpeed(value)
+                            setPtzSpeed(value as number)
                           }}
                           sx={{ width: 100 }}
                           value={ptz_speed}
@@ -1192,7 +1199,7 @@ const VideoCameraDetails = () => {
                       <Select
                         labelId="preset_view"
                         onChange={({ target: { value } }) => {
-                          setPresetView(value)
+                          setPresetView(value as number)
                         }}
                         sx={{ width: 100 }}
                         value={preset_view}
@@ -1312,7 +1319,7 @@ const VideoCameraDetails = () => {
                       <InputLabel id="ptz_speed">Stream type</InputLabel>
                       <Select
                         labelId="ptz_speed"
-                        onChange={({ target: { value } }) => { setStreamType(value) }}
+                        onChange={({ target: { value } }) => { setStreamType(value as number) }}
                         sx={{ width: 200 }}
                         value={stream_type}
                         label="Stream type"

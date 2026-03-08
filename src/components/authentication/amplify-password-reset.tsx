@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
@@ -9,7 +8,7 @@ import { useMounted } from '../../hooks/use-mounted';
 
 export const AmplifyPasswordReset = (props) => {
   const isMounted = useMounted();
-  const { passwordReset } = useAuth();
+  const { passwordReset } = useAuth() as any;
   const router = useRouter();
   const itemsRef = useRef([]);
   const [username, setUsername] = useState('');
@@ -81,7 +80,7 @@ export const AmplifyPasswordReset = (props) => {
             autoFocus
             error={Boolean(formik.touched.email && formik.errors.email)}
             fullWidth
-            helperText={formik.touched.email && formik.errors.email}
+            helperText={formik.touched.email && formik.errors.email as string}
             label="Email Address"
             margin="normal"
             name="email"
@@ -195,7 +194,7 @@ export const AmplifyPasswordReset = (props) => {
       <TextField
         error={Boolean(formik.touched.password && formik.errors.password)}
         fullWidth
-        helperText={formik.touched.password && formik.errors.password}
+        helperText={formik.touched.password && formik.errors.password as string}
         label="Password"
         margin="normal"
         name="password"
@@ -207,7 +206,7 @@ export const AmplifyPasswordReset = (props) => {
       <TextField
         error={Boolean(formik.touched.passwordConfirm && formik.errors.passwordConfirm)}
         fullWidth
-        helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm}
+        helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm as string}
         label="Password Confirmation"
         margin="normal"
         name="passwordConfirm"
@@ -219,7 +218,7 @@ export const AmplifyPasswordReset = (props) => {
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>
-            {formik.errors.submit}
+            {formik.errors.submit as string}
           </FormHelperText>
         </Box>
       )}

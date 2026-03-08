@@ -8,7 +8,7 @@ const useStyles = makeStyles({
 });
 
 // card border turns red if error
-const ErrorCard = ({ error, ...props }) => {
+const ErrorCard = ({ error = undefined, ...props }) => {
     const errorStyle = useStyles();
     return (
         <Card className={error && errorStyle.root || ""} {...props} />

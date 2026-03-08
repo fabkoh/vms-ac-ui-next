@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -18,7 +17,7 @@ const MainSidebarLink = styled(Link)(({ theme }) => ({
 export const MainSidebar = (props) => {
   const { onClose, open } = props;
   const router = useRouter();
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
 
   const handlePathChange = () => {
     if (open) {

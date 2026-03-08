@@ -1,4 +1,3 @@
-// @ts-nocheck
 import WarningAmberOutlined from "@mui/icons-material/WarningAmberOutlined";
 import { Alert, Box, Button, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import { useState } from "react";
@@ -22,7 +21,7 @@ const AuthenticationScheduleDelete = ({ open, schedules, handleDialogClose, dele
     }
 
     // table select
-    const [selected, setSelected] = useState([])
+    const [selected, setSelected] = useState<any[]>([])
     const selectedAll = Array.isArray(schedules) && selected.length == schedules.length;
     const selectedSome = selected.length > 0 && !selectedAll;
     const handleSelectAll = (e) => setSelected(e.target.checked ? schedules.map(schedule => schedule.authMethodScheduleId) : []);

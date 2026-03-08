@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack } from "@mui/icons-material";
 import {
   Box,
@@ -16,7 +15,6 @@ import {
   Container,
   Link,
   Stack,
-  Item,
   Table,
   TableRow,
   TableCell,
@@ -56,9 +54,9 @@ const NotificationSettings = () => {
   const [expandedSMS, setExpandedSMS] = useState(false);
   const [SMSCredits, setSMSCredits] = useState(0);
   const [enableCustom, setEnableCustom] = useState(false);
-  const [emailSettings, setEmailSettings] = useState({ isTLS: false });
+  const [emailSettings, setEmailSettings] = useState<any>({ isTLS: false });
   const [isUpdated, setIsUpdated] = useState(false);
-  const [smsSettings, setSMSSettings] = useState([]);
+  const [smsSettings, setSMSSettings] = useState<any[]>([]);
   const [disableSubmit, setDisableSubmit] = useState(false);
   const [portNumberValue, setPortNumberValue] = useState("");
   const [errorPopUp, setErrorPopUp] = useState(false);
@@ -189,10 +187,9 @@ const NotificationSettings = () => {
           if (res.status == serverDownCode) {
             setServerDownOpen(true);
           }
-          const settings = { ...body };
           setEmailSettings({});
           setEnableCustom(false);
-          setPortNumberValue(0);
+          setPortNumberValue("0");
           setIsUpdated(false);
         }
       }
@@ -451,7 +448,7 @@ const NotificationSettings = () => {
                   
                   >
                     <Grid item>
-                      <Typography variant="body">
+                      <Typography variant="body1">
                         Switch to Custom SMTP Email Server
                       </Typography>
                     </Grid>
@@ -464,9 +461,9 @@ const NotificationSettings = () => {
                     <ExpandMore expand={emailSettings}></ExpandMore>
                     {emailSettings && isUpdated && (
                       <CardContent>
-                        <Grid container spacing={3} fluid>
+                        <Grid container spacing={3}>
                           <Grid item xs={8}>
-                            <Typography variant="body">
+                            <Typography variant="body1">
                               SMTP Protocol
                             </Typography>
                           </Grid>
@@ -698,7 +695,7 @@ const NotificationSettings = () => {
                       paddingLeft: "24px",
                     }}
                   >
-                    <p className="paragraph" padding="100%">
+                    <p className="paragraph" style={{paddingLeft:"100%"}}>
                       Mobile Number requires country code. Example: +65 for
                       Singapore
                     </p>
@@ -729,7 +726,7 @@ const NotificationSettings = () => {
                     // justifyContent="flex-start"
                   >
                     <Grid item>
-                      <Typography variant="body">
+                      <Typography variant="body1">
                         Number of SMS Credits Left: {SMSCredits}
                       </Typography>
                     </Grid>

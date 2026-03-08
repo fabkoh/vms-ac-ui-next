@@ -51,7 +51,7 @@ const ControllerRow = ({controller, selectedControllers, handleSelectFactory}) =
 
     const detailsLink = getControllerDetailsLink(controller);
 
-    const [deviceStatus, setDeviceStatus] = useState({});
+    const [deviceStatus, setDeviceStatus] = useState<any>({});
     const [statusLoaded, setStatusLoaded] = useState(false);
     const [connected,    setConnected]    = useState(false);
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -28,9 +27,8 @@ import AssignAuthDevice from "../../../../components/dashboard/controllers/assig
 import videoRecorderApi from "../../../../api/videorecorder";
 import {
   getVideoRecorderEditLink,
-  getVideoRecorderListLink,
-  getVideoRecorderDetailsLink,
   videoRecorderListLink,
+  getVideoRecorderDetailsLink,
 } from "../../../../utils/video-recorder";
 import { authDeviceApi } from "../../../../api/auth-devices";
 import { useRouter } from "next/router";
@@ -41,10 +39,10 @@ import VideoRecorderEditForm from "../../../../components/dashboard/video-record
 
 const EditVideoRecorder = () => {
   const router = useRouter();
-  const ids = JSON.parse(decodeURIComponent(router.query.ids));
+  const ids = JSON.parse(decodeURIComponent(router.query.ids as string));
   console.log(router);
   const isMounted = useMounted();
-  const [recorderInfoArr, setRecorderInfoArr] = useState([]);
+  const [recorderInfoArr, setRecorderInfoArr] = useState<any[]>([]);
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
   const getEmptyRecorderValidations = (recorderId) => ({
@@ -84,9 +82,9 @@ const EditVideoRecorder = () => {
   });
 
   // store previous video recorder names & ip addresses
-  const [recorderNames, setRecorderNames] = useState({});
-  const [recorderPrivateIpes, setRecorderPrivateIpes] = useState({});
-  const [recorderPortNumbers, setRecorderPortNumbers] = useState({});
+  const [recorderNames, setRecorderNames] = useState<any>({});
+  const [recorderPrivateIpes, setRecorderPrivateIpes] = useState<any>({});
+  const [recorderPortNumbers, setRecorderPortNumbers] = useState<any>({});
 
   useEffect(() => {
     videoRecorderApi.getRecorders().then(async (res) => {
@@ -198,9 +196,8 @@ const EditVideoRecorder = () => {
 
   const [disableSubmit, setDisableSubmit] = useState(false);
 
-  const changeIPHandler = (e) => {
-    changeIP(e);
-    checkIP(e);
+  const changeIPHandler = (_e: any) => {
+    // changeIP and checkIP handlers removed (not defined)
   };
   const [loading, setLoading] = useState(true);
 
@@ -497,7 +494,7 @@ const EditVideoRecorder = () => {
         toast.error("Unable to edit video recorders below");
         // filter failed personsInfo and personsValidation
         setRecorderInfoArr(recorderInfoArr.filter((p, i) => !boolArr[i]));
-        setRecorderValidation(
+        setRecorderValidationsArr(
           recorderValidationsArr.filter((p, i) => !boolArr[i])
         );
       } else {
@@ -573,6 +570,7 @@ const EditVideoRecorder = () => {
                       handleToggleAutoPortForwarding={handleToggleAutoPortForwarding(
                         id
                       )}
+                      edit={true}
                     />
                   );
                 })

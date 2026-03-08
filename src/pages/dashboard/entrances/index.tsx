@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   Add,
   Delete,
@@ -67,7 +66,7 @@ const EntranceList = () => {
   });
 
   // get entrances and access groups
-  const [entrances, setEntrances] = useState([]);
+  const [entrances, setEntrances] = useState<any[]>([]);
   const [serverDownOpen, setServerDownOpen] = useState(false);
 
   const isMounted = useMounted();
@@ -146,7 +145,7 @@ const EntranceList = () => {
     }
     return data;
   }, [isMounted]);
-  const [entranceSchedules, setEntranceSchedules] = useState({}); // map entranceId to number of schedules
+  const [entranceSchedules, setEntranceSchedules] = useState<any>({}); // map entranceId to number of schedules
   const getEntranceSchedules = async () => {
     try {
       const res = await entranceScheduleApi.getEntranceSchedules();
@@ -167,7 +166,7 @@ const EntranceList = () => {
       toast.error("Error loading entrance schedules");
     }
   };
-  const [entranceController, setEntranceController] = useState({}); // map entranceId to controller
+  const [entranceController, setEntranceController] = useState<any>({}); // map entranceId to controller
   const getControllers = async () => {
     try {
       const res = await controllerApi.getControllers();
@@ -205,7 +204,7 @@ const EntranceList = () => {
   }, []);
 
   // for selection of checkboxes
-  const [selectedEntrances, setSelectedEntrances] = useState([]);
+  const [selectedEntrances, setSelectedEntrances] = useState<any[]>([]);
   const selectedAllEntrances = selectedEntrances.length == entrances.length;
   const selectedSomeEntrances =
     selectedEntrances.length > 0 && !selectedAllEntrances;
@@ -275,7 +274,7 @@ const EntranceList = () => {
   );
 
   // for updating status
-  const [statusUpdateIds, setStatusUpdateIds] = useState([]);
+  const [statusUpdateIds, setStatusUpdateIds] = useState<any[]>([]);
   const [updateStatus, setUpdateStatus] = useState(null);
   const [openUnlockDialog, setOpenUnlockDialog] = useState(false);
   const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);

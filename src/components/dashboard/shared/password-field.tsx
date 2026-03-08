@@ -4,15 +4,15 @@ import { useState } from "react"
 
 const PasswordField = ({
     // required
-    inputRef, // ref : ref to put in input
+    inputRef = undefined, // ref : ref to put in input
     // optional
-    required, // Boolean : if the password is required or not
+    required = undefined, // Boolean : if the password is required or not
     label="Password", // String : text label of field
-    handleChange, // function (event -> null) : callback to event onChange
-    error,
-    helperText,
-    ...props 
-}) => {
+    handleChange = undefined, // function (event -> null) : callback to event onChange
+    error = undefined,
+    helperText = undefined,
+    ...props
+}: { [key: string]: any }) => {
 
     const [show, setShow] = useState(false);
     const handleShowPasswordClick = () => setShow(!show);

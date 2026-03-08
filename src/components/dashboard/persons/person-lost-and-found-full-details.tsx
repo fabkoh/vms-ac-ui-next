@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
@@ -34,10 +33,12 @@ import { findPersonWithCredUid } from "../../../api/credentials";
 import { getPersonName, getPersonsEditLink, personListLink, filterPersonByCredentialsPlaceholder} from '../../../utils/persons';
 import { getCredentialWherePersonIdApi } from '../../../api/credentials';
 import toast from 'react-hot-toast';
+import { serverDownCode } from '../../../api/api-helpers';
 
 
 export const PersonLostDetailsCard = (props) => {
 	const isMounted = useMounted();
+	const [serverDownOpen, setServerDownOpen] = useState(false);
 	const [person, setPerson] = useState({ 
 		personId: null,
 		personFirstName: null, 
@@ -47,7 +48,7 @@ export const PersonLostDetailsCard = (props) => {
 		personEmail: null,
 		accessGroup: null
 	  }); 
-	const [credentials, setCredentials] = useState([]);
+	const [credentials, setCredentials] = useState<any[]>([]);
 	const router = useRouter();
 
 	const getLostPerson = async() => {
@@ -123,7 +124,7 @@ export const PersonLostDetailsCard = (props) => {
 			}
 			else{
 				toast.error('Delete unsuccessful');
-				res.json().then(json => toast.info(json))
+				res.json().then(json => toast(json))
 			}
 		})
 	};

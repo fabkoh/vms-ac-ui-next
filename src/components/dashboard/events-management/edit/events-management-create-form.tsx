@@ -1,4 +1,3 @@
-// @ts-nocheck
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { 
     Button, 
@@ -77,13 +76,13 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     });
 
     const [inputWithTimerEventsManagementArr, 
-        setInputWithTimerEventsManagementArr] = useState([]);
+        setInputWithTimerEventsManagementArr] = useState<any[]>([]);
     const [inputWithTimerEventsManagementValidations, 
-        setInputWithTimerEventsManagementValidations] = useState([]);
+        setInputWithTimerEventsManagementValidations] = useState<any[]>([]);
     const [outputWithTimerEventsManagementArr, 
-        setOutputWithTimerEventsManagementArr] = useState([]);
+        setOutputWithTimerEventsManagementArr] = useState<any[]>([]);
     const [outputWithTimerEventsManagementValidations, 
-        setOutputWithTimerEventsManagementValidations] = useState([]);
+        setOutputWithTimerEventsManagementValidations] = useState<any[]>([]);
 
     // add card logic
     const getNewIdForInputWithTimer = () => inputWithTimerEventsManagementArr.map(info => info.inputId)
@@ -121,19 +120,19 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
 
     const changeInputTime = (e, inputId) => {
         const updatedInfo = [...inputWithTimerEventsManagementArr];
-        updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = e.target.value;
+        updatedInfo.find(info => info.inputId == inputId)['timerDuration'] = (e.target as HTMLInputElement).value;
         setInputWithTimerEventsManagementArr(updatedInfo);
 
         const validations = [...inputWithTimerEventsManagementValidations];
         const validation = validations.find(info => info.inputId == inputId);
-        if (!e.target.value) {
+        if (!(e.target as HTMLInputElement).value) {
             validation.timerDurationInputBlank = true;
             setInputWithTimerEventsManagementValidations(validations);
         }
-        if (e.target.value < 1) {
+        if ((e.target as HTMLInputElement).value < 1) {
             validation.timerDurationInputNotPositive = true;
             setInputWithTimerEventsManagementValidations(validations);
-        } else if (e.target.value > MAX_INPUT_TIMER_DURATION) {;
+        } else if ((e.target as HTMLInputElement).value > MAX_INPUT_TIMER_DURATION) {;
             validations.find(info => info.inputId == inputId).timerDurationInputTooLarge = true;
             setInputWithTimerEventsManagementValidations(validations);
         } else {
@@ -146,19 +145,19 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
 
     const changeOutputTime = (e, outputId) => {
         const updatedInfo = [...outputWithTimerEventsManagementArr];
-        updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = e.target.value;
+        updatedInfo.find(info => info.outputId == outputId)['timerDuration'] = (e.target as HTMLInputElement).value;
         setOutputWithTimerEventsManagementArr(updatedInfo);
 
         const validations = [...outputWithTimerEventsManagementValidations];
         const validation = validations.find(info => info.outputId == outputId);
-        if (!e.target.value) {
+        if (!(e.target as HTMLInputElement).value) {
             validation.timerDurationOutputBlank = true;
             setOutputWithTimerEventsManagementValidations(validations);
         }
-        if(e.target.value < 1) {
+        if((e.target as HTMLInputElement).value < 1) {
             validation.timerDurationOutputNotPositive = true;
             setOutputWithTimerEventsManagementValidations(validations);
-        } else if (e.target.value > MAX_OUTPUT_TIMER_DURATION) {
+        } else if ((e.target as HTMLInputElement).value > MAX_OUTPUT_TIMER_DURATION) {
             validation.timerDurationOutputTooLarge = true;
             setOutputWithTimerEventsManagementValidations(validations);
         } else {
@@ -172,24 +171,24 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     const changeSelectionInputWithTime = (e, inputId) => {
         const validations = [...inputWithTimerEventsManagementValidations];
         const validation = validations.find(info => info.inputId == inputId);
-        if (!e.target.value) {
+        if (!(e.target as HTMLInputElement).value) {
             validation.eventActionInputIdBlank = true;
             setInputWithTimerEventsManagementValidations(validations);
         }
         const updatedInfo = [...inputWithTimerEventsManagementArr];
-        updatedInfo.find(info => info.inputId == inputId)['eventActionInputType']['eventActionInputId'] = e.target.value;
+        updatedInfo.find(info => info.inputId == inputId)['eventActionInputType']['eventActionInputId'] = (e.target as HTMLInputElement).value;
         setInputWithTimerEventsManagementArr(updatedInfo);
     }
     
     const changeSelectionOutputWithTime = (e, outputId) => {
         const validations = [...outputWithTimerEventsManagementValidations];
         const validation = validations.find(info => info.outputId == outputId);
-        if (!e.target.value) {
+        if (!(e.target as HTMLInputElement).value) {
             validation.eventActionOutputIdBlank = true;
             setOutputWithTimerEventsManagementValidations(validations);
         }
         const updatedInfo = [...outputWithTimerEventsManagementArr];
-        updatedInfo.find(info => info.outputId == outputId)['eventActionOutputType']['eventActionOutputId'] = e.target.value;
+        updatedInfo.find(info => info.outputId == outputId)['eventActionOutputType']['eventActionOutputId'] = (e.target as HTMLInputElement).value;
         setOutputWithTimerEventsManagementArr(updatedInfo);
     }
 
@@ -392,16 +391,16 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
     const handleExpandClick = () => setExpanded(!expanded);
 
     //get timestart timeend 
-    const [start, setStart] = useState({})
-    const [end, setEnd] = useState({})
-    const [beginHolderForEventManagement, setBeginHolderForEventManagement] = useState({})
-    const [untilHolderForEventManagement, setUntilHolderForEventManagement] = useState({})
-    const [startHolderForEventManagement, setStartHolderForEventManagement] = useState({})
-    const [endHolderForEventManagement, setEndHolderForEventManagement] = useState({})
+    const [start, setStart] = useState<any>({})
+    const [end, setEnd] = useState<any>({})
+    const [beginHolderForEventManagement, setBeginHolderForEventManagement] = useState<any>({})
+    const [untilHolderForEventManagement, setUntilHolderForEventManagement] = useState<any>({})
+    const [startHolderForEventManagement, setStartHolderForEventManagement] = useState<any>({})
+    const [endHolderForEventManagement, setEndHolderForEventManagement] = useState<any>({})
     //get rrule string and text from rrulecomponent
-    const [description, setDescription] = useState({})
-    const [rrulestring, setRrulestring] = useState({})
-    const [rule, setRule] = useState({})
+    const [description, setDescription] = useState<any>({})
+    const [rrulestring, setRrulestring] = useState<any>({})
+    const [rule, setRule] = useState<any>({})
     const getStart = (triggerScheduleId) => (e) => {
         changeTimeStartTriggerSchedule(e, triggerScheduleId);
         setStart({ ...start, [triggerScheduleId]: e });
@@ -660,7 +659,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         sx={{ maxWidth: "100%", minWidth: "100%", marginBottom: "10px" }}
                                         required={inputEvents.length===0}
                                         value={inputEventsValueWithoutTimerState}
-                                        onChange={(e) => { changeInputEventsWithoutTimer(e.target.value, eventsManagementId) }}
+                                        onChange={(e) => { changeInputEventsWithoutTimer((e.target as HTMLInputElement).value, eventsManagementId) }}
                                         error={
                                             Boolean(inputEvents.length==0)
                                         }
@@ -814,7 +813,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         label="Email Recipients"
                                         value={notificationEmailsInputValue}
                                         onChange={(e) => {
-                                            setNotificationEmailsInputValue(e.target.value);
+                                            setNotificationEmailsInputValue((e.target as HTMLInputElement).value);
                                         }}
                                         helperText={ 
                                             (Boolean(eventsManagementEmailRecipientsEmpty) && "Error: empty email recipients is not allowed") ||
@@ -852,7 +851,7 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key == "Enter") {
-                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...(e.target.value).split(",")];
+                                                const newNotificationEmailRecipients = [...notificationEmailsRecipients, ...((e.target as HTMLInputElement).value).split(",")];
                                                 setNotificationEmailsRecipients(newNotificationEmailRecipients);
                                                 const newValue = {
                                                     eventsManagementEmailRecipients: newNotificationEmailRecipients,
@@ -919,11 +918,11 @@ const EditEventManagementForm = ({checkAnyUntilForEventManagement, checkAnyBegin
                                         ),
                                         }}
                                         onChange={(e) => {
-                                            setNotificationSMSsInputValue(e.target.value);
+                                            setNotificationSMSsInputValue((e.target as HTMLInputElement).value);
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key == "Enter") {
-                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...(e.target.value).split(",")];
+                                                const newNotificationSMSRecipients = [...notificationSMSsRecipients, ...((e.target as HTMLInputElement).value).split(",")];
                                                 setNotificationSMSsRecipients(newNotificationSMSRecipients);
                                                 const newValue = {
                                                     eventsManagementSMSRecipients: newNotificationSMSRecipients,

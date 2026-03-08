@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material"
 import { isObject } from "../../../utils/utils"
 /**
@@ -9,7 +8,7 @@ import { isObject } from "../../../utils/utils"
  *  onChange : function (event) -> null (onChange handler that executes everytime somethings occurs)
  *                                      (note that e.target.value will be string [getLabel(entity)] due to mui select restrictions)
  *  options : array of entities (the options)
- * 
+ *
  *  optional props
  *  label : String (the label on field)
  *  noclear : boolean (if true, no clear option)
@@ -19,27 +18,27 @@ const SingleSelect = ({
     label = "Select",
     getLabel,
     onChange,
-    value,
+    value = undefined,
     options,
-    noclear,
-    required,
+    noclear = undefined,
+    required = undefined,
     getValue,
-    helperText,
+    helperText = undefined,
     ...props
-}) => {
+}: { [key: string]: any }) => {
 
     return (
         <FormControl {...props}>
             <InputLabel required={required}>{label}</InputLabel>
-            <Select 
-                label={label} 
+            <Select
+                label={label}
                 value={value}
                 onChange={onChange}
                 required={required}
             >
-                { !noclear && 
+                { !noclear &&
                     <MenuItem // clear field
-                        value={null} 
+                        value={null}
                         sx={{ fontStyle: 'italic' }}
                     >
                         clear

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
@@ -198,7 +197,7 @@ const applyPagination = (Persons, page, rowsPerPage) =>
 const PersonList = () => {
   const isMounted = useMounted();
   const queryRef = useRef(null);
-  const [Persons, setPersons] = useState([]);
+  const [Persons, setPersons] = useState<any[]>([]);
   // const [currentTab, setCurrentTab] = useState("all");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -210,7 +209,7 @@ const PersonList = () => {
     // isProspect: null,
     // isReturning: null,
   });
-  const [accessGroupNames, setAccessGroupNames] = useState([]);
+  const [accessGroupNames, setAccessGroupNames] = useState<any[]>([]);
   const fileReader = new FileReader();
 
   const createPerson = async (person) => {
@@ -376,7 +375,7 @@ const PersonList = () => {
   };
 
   // json data from csv file
-  const [csvData, setCsvData] = useState([]);
+  const [csvData, setCsvData] = useState<any[]>([]);
 
   const importCSVIndex = async (file) => {
     try {
@@ -552,7 +551,7 @@ const PersonList = () => {
     setAnchorEl(null);
   };
   //for persons-list-table
-  const [selectedPersons, setSelectedPersons] = useState([]);
+  const [selectedPersons, setSelectedPersons] = useState<any[]>([]);
   const handleSelectAllPersons = (event) => {
     setSelectedPersons(
       event.target.checked ? Persons.map((person) => person.personId) : []
@@ -698,10 +697,10 @@ const PersonList = () => {
 
   // pop-up for import-check
 
-  const [singleErrorMessage, setSingleErrorMessage] = useState([]);
+  const [singleErrorMessage, setSingleErrorMessage] = useState<any[]>([]);
 
   // for selection of checkboxes
-  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [selectedSchedules, setSelectedSchedules] = useState<any[]>([]);
   const selectedAllSchedules =
     selectedSchedules.length ===
     [
@@ -768,7 +767,7 @@ const PersonList = () => {
     setauthMethodScheduleValidationsArr,
   ] = useState([getEmptyauthMethodScheduleValidations(0)]);
 
-  const [errorMessages, setErrorMessages] = useState([]);
+  const [errorMessages, setErrorMessages] = useState<any[]>([]);
   const [openImport, setOpenImport] = useState(false);
 
   const handleOpenImport = () => {

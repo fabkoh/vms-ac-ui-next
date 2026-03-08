@@ -1,4 +1,3 @@
-// @ts-nocheck
 import numeral from 'numeral';
 import { subDays, subHours } from 'date-fns';
 import {

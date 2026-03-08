@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
@@ -173,7 +172,7 @@ const applyPagination = (accessGroup, page, rowsPerPage) =>
 const AccessGroupList = () => {
   const isMounted = useMounted();
   const queryRef = useRef(null);
-  const [accessGroup, setAccessGroup] = useState([]);
+  const [accessGroup, setAccessGroup] = useState<any[]>([]);
   // const [currentTab, setCurrentTab] = useState("all");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -313,7 +312,7 @@ const AccessGroupList = () => {
     setAnchorEl(null);
   };
   //for access-group-list-table
-  const [selectedAccessGroup, setSelectedAccessGroup] = useState([]);
+  const [selectedAccessGroup, setSelectedAccessGroup] = useState<any[]>([]);
   const handleSelectAllAccessGroup = (event) => {
     setSelectedAccessGroup(
       event.target.checked
@@ -354,7 +353,7 @@ const AccessGroupList = () => {
   );
 
   // for updating status of access group (active/ non-active)
-  const [statusUpdateIds, setStatusUpdateIds] = useState([]);
+  const [statusUpdateIds, setStatusUpdateIds] = useState<any[]>([]);
   const [statusUpdateDialogOpen, setStatusUpdateDialogOpen] = useState(false);
   const [updateStatus, setUpdateStatus] = useState(null);
 

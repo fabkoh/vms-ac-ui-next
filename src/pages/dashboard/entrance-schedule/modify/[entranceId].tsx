@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState, useCallback } from "react";
 import NextLink from "next/link";
 import Head from "next/head";
@@ -30,8 +29,8 @@ const ModifyEntranceSchedule = () => {
     const entranceId = temp.entranceId;
 
     // const [accGrp, setAccGrp] = useState()
-    const [grpToEnt, setGrpToEnt] = useState([]) // grptoent.contains grptoentId and ent obj
-    const [allEntrances, setAllEntrances] = useState([])
+    const [grpToEnt, setGrpToEnt] = useState<any[]>([]) // grptoent.contains grptoentId and ent obj
+    const [allEntrances, setAllEntrances] = useState<any[]>([])
     
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
@@ -265,12 +264,12 @@ const ModifyEntranceSchedule = () => {
             e.entranceName.toLowerCase().includes(text)
         ))
     }
-    const [entrances, setEntrances] = useState([])
+    const [entrances, setEntrances] = useState<any[]>([])
     const changeEntrance = (newValue) => {
         console.log(newValue,"SSSSSSSS")
         setEntrances(newValue)
     }
-    // const [grpToEntIdArr, setGrpToEntIdArr] = useState([])
+    // const [grpToEntIdArr, setGrpToEntIdArr] = useState<any[]>([])
     // const getGrpToEntId = (grpToEntIdArr) => {
     //     entrances.forEach(ent => {
     //         grpToEnt.forEach(obj=>{

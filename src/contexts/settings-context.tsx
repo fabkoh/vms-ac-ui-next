@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 

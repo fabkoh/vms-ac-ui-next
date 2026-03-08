@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Button, Card, CardContent, CardHeader, Collapse, Divider, Grid, TextField } from "@mui/material";
 import ErrorCard from "../shared/error-card";
 import { useState, useRef } from "react";

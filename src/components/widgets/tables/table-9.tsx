@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { format } from 'date-fns';
 import {
   Box,

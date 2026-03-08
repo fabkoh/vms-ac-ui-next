@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -6,8 +5,8 @@ import { LightBulb as LightBulbIcon } from '../icons/light-bulb';
 
 const TipRoot = styled('div')((({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark'
-    ? theme.palette.neutral[800]
-    : theme.palette.neutral[100],
+    ? (theme.palette as any).neutral[800]
+    : (theme.palette as any).neutral[100],
   borderRadius: theme.shape.borderRadius,
   display: 'flex',
   padding: theme.spacing(1)

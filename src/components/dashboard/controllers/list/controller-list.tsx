@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import { Scrollbar } from "../../../scrollbar";
 import ControllerRow from "./controller-list-row";

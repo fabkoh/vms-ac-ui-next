@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -38,7 +37,7 @@ const PersonDetails = () => {
   // load person details
   const isMounted = useMounted();
   const [person, setPerson] = useState(null); 
-  const [credentials, setCredentials] = useState([]);
+  const [credentials, setCredentials] = useState<any[]>([]);
   const router = useRouter();
   const { personId } = router.query;
 	const [serverDownOpen, setServerDownOpen] = useState(false);
@@ -139,7 +138,7 @@ const PersonDetails = () => {
       }
       else{
         toast.error('Delete unsuccessful');
-        res.json().then(json => toast.info(json))
+        res.json().then(json => toast(json))
       }
     })
 	};

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../hooks/use-mounted"
 import { gtm } from "../../../../lib/gtm";
@@ -50,7 +49,8 @@ const ControllerDetails = () => {
 
     // load entrance details
     const isMounted = useMounted();
-    const { controllerId }  = router.query; //change to controller Id
+    const { controllerId: controllerIdRaw }  = router.query; //change to controller Id
+    const controllerId = controllerIdRaw as string;
     // console.log("controllerId",controllerId)
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -58,11 +58,11 @@ const ControllerDetails = () => {
     const [serverDownOpen, setServerDownOpen] = useState(false);
 
     const [controllerInfo, setControllerInfo] = useState(null)
-    const [controllerEventManagements, setControllerEventManagements] = useState([]);
-    const [E1, setE1] = useState()
-    const [E2, setE2] = useState()
-    const [currentAuth,setCurrentAuth] = useState()
-    const [authStatus, setAuthStatus] = useState({})
+    const [controllerEventManagements, setControllerEventManagements] = useState<any[]>([]);
+    const [E1, setE1] = useState<any>()
+    const [E2, setE2] = useState<any>()
+    const [currentAuth,setCurrentAuth] = useState<any>()
+    const [authStatus, setAuthStatus] = useState<any>({})
 
     const getController = async(controllerId) => {
         try{
@@ -275,7 +275,8 @@ const ControllerDetails = () => {
 		setResetOpen(false);
 	}
 	const resetController = async() => {
-        controllerApi.resetController(controllerId), toast.loading("Resetting Controller...")
+        toast.loading("Resetting Controller...");
+        controllerApi.resetController(controllerId)
         .then(async res =>{
             toast.dismiss()
 
@@ -332,6 +333,9 @@ const ControllerDetails = () => {
             getInfo();
         })
     } */
+
+    const resetAuthDevices = async (selectedAuthDevices: any) => {};
+    const deleteAuthDevices = async (selectedAuthDevices: any) => {};
 
     const handleToggleMasterpinE1 = async (id,e) => {
         const bool = e.target.checked;
@@ -555,6 +559,8 @@ const ControllerDetails = () => {
                                 getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE1}
                                 removeEntrance={() => removeEntranceButton(E1)}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                             <Grid
@@ -569,6 +575,8 @@ const ControllerDetails = () => {
                                 statusLoaded={statusLoaded}
                                 getCurrentAuthMethod={getCurrentAuthMethod}
                                 handleToggleMasterpin={handleToggleMasterpinE2}
+                                resetAuthDevices={resetAuthDevices}
+                                deleteAuthDevices={deleteAuthDevices}
                                 />
                             </Grid>                         
                        

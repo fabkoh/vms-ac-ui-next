@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRouter } from "next/router";
 import * as Yup from "yup";
 import "yup-phone";
@@ -137,12 +136,12 @@ export const EditAccountDetails = (accountDetails) => {
         variant="outlined"
         required
         error={Boolean(formik.touched.mobileNumber && formik.errors.mobileNumber)}
-        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
+        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber as string}
       /> */}
 
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
-          <FormHelperText error>{formik.errors.submit}</FormHelperText>
+          <FormHelperText error>{formik.errors.submit as string}</FormHelperText>
         </Box>
       )}
       <Box sx={{ mt: 2 }}>

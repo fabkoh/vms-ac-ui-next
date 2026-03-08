@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { format, subDays, subMinutes, subSeconds } from 'date-fns';
 import {
   Box,

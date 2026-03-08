@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useState } from "react";
 import { useMounted } from "../../../../../../hooks/use-mounted"
 import { gtm } from "../../../../../../lib/gtm";
@@ -46,7 +45,7 @@ const AuthDeviceDetails = () => {
     const [currentAuth,setCurrentAuth] = useState()
 
     const link = getAuthenticationScheduleEditLink(controllerId,authDeviceId);
-    const [authenticationSchedules, setauthenticationSchedules] = useState([]);
+    const [authenticationSchedules, setauthenticationSchedules] = useState<any[]>([]);
 
     useEffect(() => { // copied from original template
         gtm.push({ event: 'page_view' });
@@ -121,7 +120,7 @@ const AuthDeviceDetails = () => {
 
     }
 
-    const [authStatus, setAuthStatus] = useState({})
+    const [authStatus, setAuthStatus] = useState<any>({})
     const [statusLoaded, setStatusLoaded] = useState(false)
     const getStatus = async() => {
         setStatusLoaded(false)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
 import "yup-phone";
@@ -84,7 +83,7 @@ export const JWTRegister = (props) => {
           if(res.status == 200){
             toast.success('You have successfully registered as a User')
             const returnUrl = router.query.returnUrl || '/dashboard';
-            router.push(returnUrl);
+            router.push(returnUrl as string);
           }
         }
       } catch (err) {
@@ -131,7 +130,7 @@ export const JWTRegister = (props) => {
           <TextField
             error={Boolean(formik.touched.firstName && formik.errors.firstName)}
             fullWidth
-            helperText={formik.touched.firstName && formik.errors.firstName}
+            helperText={formik.touched.firstName && formik.errors.firstName as string}
             label="First Name"
             margin="normal"
             name="firstName"
@@ -144,7 +143,7 @@ export const JWTRegister = (props) => {
           <TextField
             error={Boolean(formik.touched.lastName && formik.errors.lastName)}
             fullWidth
-            helperText={formik.touched.lastName && formik.errors.lastName}
+            helperText={formik.touched.lastName && formik.errors.lastName as string}
             label="Last Name"
             margin="normal"
             name="lastName"
@@ -158,7 +157,7 @@ export const JWTRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.email && formik.errors.email)}
         fullWidth
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={formik.touched.email && formik.errors.email as string}
         label="Email Address"
         margin="normal"
         name="email"
@@ -170,7 +169,7 @@ export const JWTRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.mobileNumber && formik.errors.mobileNumber)}
         fullWidth
-        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
+        helperText={formik.touched.mobileNumber && formik.errors.mobileNumber as string}
         label="Mobile Number"
         margin="normal"
         name="mobileNumber"
@@ -184,7 +183,7 @@ export const JWTRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.password && formik.errors.password)}
         fullWidth
-        helperText={formik.touched.password && formik.errors.password}
+        helperText={formik.touched.password && formik.errors.password as string}
         label="Password"
         margin="normal"
         name="password"
@@ -196,7 +195,7 @@ export const JWTRegister = (props) => {
       <TextField
         error={Boolean(formik.touched.passwordConfirm && formik.errors.passwordConfirm)}
         fullWidth
-        helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm}
+        helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm as string}
         label="Reconfirm Password"
         margin="normal"
         name="passwordConfirm"
@@ -235,13 +234,13 @@ export const JWTRegister = (props) => {
       </Box>
       {Boolean(formik.touched.policy && formik.errors.policy) && (
         <FormHelperText error>
-          {formik.errors.policy}
+          {formik.errors.policy as string}
         </FormHelperText>
       )}
       {formik.errors.submit && (
         <Box sx={{ mt: 3 }}>
           <FormHelperText error>
-            {formik.errors.submit}
+            {formik.errors.submit as string}
           </FormHelperText>
         </Box>
       )}

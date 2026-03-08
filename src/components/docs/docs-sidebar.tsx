@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -137,7 +136,7 @@ const sections = [
 export const DocsSidebar = (props) => {
   const { onClose, open } = props;
   const router = useRouter();
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'), {
+  const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'), {
     noSsr: true
   });
 

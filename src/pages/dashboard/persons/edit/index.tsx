@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Add, ArrowBack, Battery3BarSharp } from "@mui/icons-material";
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import Head from "next/head";
@@ -47,16 +46,16 @@ const EditPersonsTwo = () => {
   const ids = JSON.parse(decodeURIComponent(router.query.ids));
 
   // stores list of person objects
-  const [personsInfo, setPersonsInfo] = useState([]);
-  const [personsValidation, setPersonsValidation] = useState([]);
+  const [personsInfo, setPersonsInfo] = useState<any[]>([]);
+  const [personsValidation, setPersonsValidation] = useState<any[]>([]);
 
   // access groups for access group select
-  const [accessGroups, setAccessGroups] = useState([]);
+  const [accessGroups, setAccessGroups] = useState<any[]>([]);
 
   // info for checking
-  const [personUids, setPersonUids] = useState([]);
-  const [personMobileNumbers, setPersonMobileNumbers] = useState([]);
-  const [personEmails, setPersonEmails] = useState([]);
+  const [personUids, setPersonUids] = useState<any[]>([]);
+  const [personMobileNumbers, setPersonMobileNumbers] = useState<any[]>([]);
+  const [personEmails, setPersonEmails] = useState<any[]>([]);
 
   /**
    * credTypes dynamically stores the allowed credTypes for each person
@@ -64,8 +63,8 @@ const EditPersonsTwo = () => {
    * If a person has a PIN credential, then the PIN credential type will be excluded from the credTypes
    * If a person does not have a PIN credential, then the originalCredTypes will be used to render the dropdown selection
    */
-  const [credTypes, setCredTypes] = useState([]);
-  const [originalCredTypes, setOriginalCredTypes] = useState([]);
+  const [credTypes, setCredTypes] = useState<any[]>([]);
+  const [originalCredTypes, setOriginalCredTypes] = useState<any[]>([]);
 
   const [serverDownOpen, setServerDownOpen] = useState(false);
 

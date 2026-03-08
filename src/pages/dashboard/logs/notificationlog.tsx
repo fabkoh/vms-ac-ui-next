@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { HelpOutline, Refresh, VerticalAlignCenter } from "@mui/icons-material";
 import { Box, Button, Card, Container, Divider, Grid, InputAdornment, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
@@ -89,10 +88,10 @@ const handleQueryChange = (e) => {
     };
 
 
-const [Notifications, setNotifications] = useState([]);
+const [Notifications, setNotifications] = useState<any[]>([]);
 
 console.log(filters)
-const [searchedNotifications, setSearchedNotifications] = useState([]);
+const [searchedNotifications, setSearchedNotifications] = useState<any[]>([]);
 const filteredNotifications = searchedNotifications.length <= 0 ? applyDateTimeFilter(applyFilter(Notifications, filters),filterStart,filterEnd) : searchedNotifications;
 
 // for pagination

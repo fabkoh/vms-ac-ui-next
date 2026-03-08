@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import numeral from "numeral";
@@ -47,7 +46,7 @@ export const AccessGroupListTable = (props) => {
     openUnlockDialog,
     ...other
   } = props;
-  // const [selectedPersons, setSelectedPersons] = useState([]);
+  // const [selectedPersons, setSelectedPersons] = useState<any[]>([]);
 
   // // Reset selected Persons when Persons change
   // useEffect(
@@ -81,7 +80,7 @@ export const AccessGroupListTable = (props) => {
   // 	selectedPersons.length > 0 && selectedPersons.length < Persons.length;
   // const selectedAllPersons = selectedPersons.length === Persons.length;
 
-  //   const [selectId, setSelectId] = useState([]);
+  //   const [selectId, setSelectId] = useState<any[]>([]);
   // 	const handleSelectId = (event,personId) => {
   //   setSelectId(personId)
   //   }, [selectId]);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { addMinutes } from 'date-fns';
@@ -168,7 +167,7 @@ export const CalendarEventDialog = (props) => {
           <TextField
             error={Boolean(formik.touched.title && formik.errors.title)}
             fullWidth
-            helperText={formik.touched.title && formik.errors.title}
+            helperText={formik.touched.title && formik.errors.title as string}
             label="Title"
             name="title"
             onBlur={formik.handleBlur}
@@ -179,7 +178,7 @@ export const CalendarEventDialog = (props) => {
             <TextField
               error={Boolean(formik.touched.description && formik.errors.description)}
               fullWidth
-              helperText={formik.touched.description && formik.errors.description}
+              helperText={formik.touched.description && formik.errors.description as string}
               label="Description"
               name="description"
               onBlur={formik.handleBlur}
@@ -226,7 +225,7 @@ export const CalendarEventDialog = (props) => {
           {Boolean(formik.touched.end && formik.errors.end) && (
             <Box sx={{ mt: 2 }}>
               <FormHelperText error>
-                {formik.errors.end}
+                {formik.errors.end as string}
               </FormHelperText>
             </Box>
           )}

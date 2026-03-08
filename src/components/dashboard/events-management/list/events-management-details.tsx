@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import { Card, CardHeader, Divider, Link, useMediaQuery, Typography, Chip } from '@mui/material';
@@ -23,7 +22,7 @@ export const EventManagementDetails = (props) => {
     controller,
   } = props.eventManagement;
   
-  const mdUp = useMediaQuery((theme) => theme.breakpoints.up('xs'));
+  const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('xs'));
 
   const align = mdUp ? 'horizontal' : 'vertical';
 
