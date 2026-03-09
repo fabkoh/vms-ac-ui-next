@@ -31,7 +31,8 @@ import AccessGroupDetails from "../../../../components/dashboard/entrances/detai
 import { DoorFront, LockOpen } from "@mui/icons-material";
 import ConfirmStatusUpdate from "../../../../components/dashboard/entrances/list/confirm-status-update";
 import ConfirmUnlock from "../../../../components/dashboard/entrances/list/confirm-unlock";
-import { entranceCreateLink, entranceListLink, getEntranceEditLink } from "../../../../utils/entrance";
+import { entranceCreateLink, entranceListLink, getEntranceEditLink, getBookingCreateLink } from "../../../../utils/entrance";
+import EntranceBookings from "../../../../components/dashboard/entrances/details/entrance-bookings";
 import EntranceSchedules from "../../../../components/dashboard/entrances/details/entrance-schedules";
 import { entranceScheduleApi } from "../../../../api/entrance-schedule";
 import { getEntranceScheduleEditLink } from "../../../../utils/entrance-schedule";
@@ -583,7 +584,17 @@ const getEntranceEventsManagement = useCallback(async () => {
                                     eventsManagementCreatelink={eventsManagementCreateLink} 
                                 />
                             </Grid>
-                        </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                            >
+                                <EntranceBookings
+                                    entranceId={entranceId}
+                                    accessGroupEntrance={accessGroup}
+                                    onDeleted={getInfo}
+                                />
+                            </Grid>
+                            </Grid>
                     </Box>
                 </Container>
             </Box>
