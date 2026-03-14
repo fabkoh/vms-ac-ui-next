@@ -192,7 +192,7 @@ const VideoRecorderDeviceCondition = () => {
             }),
             timeout(3000)
           ]).catch((error) => {
-            if (error.message === "Timeout") {
+            if (error && error.message === "Timeout") {
               console.log("Login function call timed out after 3 seconds");
             } else {
               console.error(error);
