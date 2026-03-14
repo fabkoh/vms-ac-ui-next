@@ -30,7 +30,8 @@ yarn-error.log*
 # local env files
 .env
 .env.local
-
+.env.development.local
+.env.production.local
 .env.test.local
 
 
