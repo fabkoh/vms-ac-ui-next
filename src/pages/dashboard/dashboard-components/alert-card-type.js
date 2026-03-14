@@ -5,6 +5,7 @@ import {
     Divider,
     Icon,
     IconButton,
+    Skeleton,
     Typography
   } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -17,8 +18,9 @@ const AlertCardType = (props) => {
     const {
         cardType
     } = props;
-    const [count, setCount] = useState([]);
+    const [count, setCount] = useState(null);
     const [alertIcon, setIcon] = useState(null);
+    const loading = count === null;
 
     // Sets number of unauthenticated scans in the last 24 hours
     const getUnauthenticatedScans = async () => {
@@ -65,6 +67,15 @@ const AlertCardType = (props) => {
             setIcon(<LocalFireDepartmentOutlined style={{ marginRight: '10px', fontSize: '36px' }} />);
         }
     }, [cardType]);
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Skeleton variant="circular" width={36} height={36} sx={{ mr: '10px' }} />
+                <Skeleton variant="text" width={60} height={45} />
+            </div>
+        );
+    }
 
     return (
         <div style={{ display: 'flex', alignItems: 'center' }}>

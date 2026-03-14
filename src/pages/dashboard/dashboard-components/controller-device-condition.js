@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Card, CardActions, Divider, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardActions, Divider, Skeleton, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { ChevronUp as ChevronUpIcon } from '../../../icons/chevron-up';
@@ -13,6 +13,7 @@ const ControllerDeviceCondition = () => {
   const [upCounter,   setUpCounter]    = useState(0);
   const [controllers, setControllers] = useState([]);
   const [healthPercentage, setHealthPercentage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const getControllers = async () => {
     const controllersRes = await controllerApi.getControllers();
@@ -51,6 +52,7 @@ const ControllerDeviceCondition = () => {
           }
         });
         await Promise.all(promises);
+        setLoading(false);
       }
       
       count();
@@ -99,6 +101,29 @@ const ControllerDeviceCondition = () => {
   };
 
   const chartSeries = [healthPercentage];
+
+  if (loading) {
+    return (
+      <Card>
+        <Box
+          sx={{
+            alignItems: { sm: 'center' },
+            display: 'flex',
+            flexWrap: 'wrap',
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 3
+          }}
+        >
+          <Skeleton variant="circular" width={200} height={200} sx={{ mb: 2 }} />
+          <Divider sx={{ width: '100%' }} />
+          <Skeleton variant="text" width={120} height={40} sx={{ mt: 1 }} />
+          <Divider sx={{ width: '100%' }} />
+          <Skeleton variant="text" width={160} height={24} sx={{ mt: 1 }} />
+        </Box>
+      </Card>
+    );
+  }
 
   return (
     <Card>
