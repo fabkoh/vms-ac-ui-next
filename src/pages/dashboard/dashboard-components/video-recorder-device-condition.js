@@ -1,5 +1,5 @@
 import { Add, Delete, Edit, HelpOutline } from "@mui/icons-material";
-import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Container, Divider, Grid, InputAdornment, MenuItem, Skeleton, TextField, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useCallback, useEffect, useRef, useState, React } from "react";
@@ -30,6 +30,7 @@ const VideoRecorderDeviceCondition = () => {
   const [upCounter, setUpCounter] = useState(0);
   const [healthPercentage, setHealthPercentage] = useState(0);
   const [login, setLogin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const isMounted = useMounted();
 
@@ -192,7 +193,7 @@ const VideoRecorderDeviceCondition = () => {
             }),
             timeout(3000)
           ]).catch((error) => {
-            if (error.message === "Timeout") {
+            if (error && error.message === "Timeout") {
               console.log("Login function call timed out after 3 seconds");
             } else {
               console.error(error);
@@ -249,6 +250,7 @@ const VideoRecorderDeviceCondition = () => {
       });
 
       await Promise.all(promises);
+      setLoading(false);
     }
 
     count();
@@ -298,6 +300,28 @@ const VideoRecorderDeviceCondition = () => {
   };
 
   const chartSeries = [healthPercentage];
+
+  if (loading) {
+    return (
+      <Card>
+        <Box
+          sx={{
+            alignItems: 'center',
+            display: 'flex',
+            flexWrap: 'wrap',
+            flexDirection: 'column',
+            p: 3
+          }}
+        >
+          <Skeleton variant="circular" width={200} height={200} sx={{ mb: 2 }} />
+          <Divider sx={{ width: '100%' }} />
+          <Skeleton variant="text" width={120} height={40} sx={{ mt: 1 }} />
+          <Divider sx={{ width: '100%' }} />
+          <Skeleton variant="text" width={160} height={24} sx={{ mt: 1 }} />
+        </Box>
+      </Card>
+    );
+  }
 
   return (
     <Card>

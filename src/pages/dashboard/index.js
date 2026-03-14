@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Head from 'next/head';
 import {
   Box,
@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import { AuthGuard } from '../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../components/dashboard/dashboard-layout';
-import { OverviewBanner } from '../../components/dashboard/overview/overview-banner';
 import { NotificationImportantOutlined } from '@mui/icons-material';
 import { gtm } from '../../lib/gtm';
 import ComponentList from './dashboard-components/list-of-components';
@@ -25,27 +24,9 @@ import ControllerDeviceProperty from './dashboard-components/controller-device-p
 import AlertCard from './dashboard-components/alert-card';
 
 const Overview = () => {
-  const [displayBanner, setDisplayBanner] = useState(true);
-  // console.log("testing external scripts");
-  // console.log(useExternalScripts("http://myserver.dontexist.com/config.js"));
   useEffect(() => {
     gtm.push({ event: 'page_view' });
   }, []);
-
-  useEffect(() => {
-    // Restore the persistent state from local/session storage
-    const value = globalThis.sessionStorage.getItem('dismiss-banner');
-
-    if (value === 'true') {
-      // setDisplayBanner(false);
-    }
-  }, []);
-
-  const handleDismissBanner = () => {
-    // Update the persistent state
-    // globalThis.sessionStorage.setItem('dismiss-banner', 'true');
-    setDisplayBanner(false);
-  };
 
   return (
     <>
@@ -70,14 +51,6 @@ const Overview = () => {
                 </Typography>
                 <Divider variant="middle" sx={{marginTop: '20px'}}/>
                 </Grid>
-                {displayBanner && (
-                  <Grid
-                    item
-                    xs={12}
-                  >
-                    <OverviewBanner onDismiss={handleDismissBanner} />
-                  </Grid>
-                )}
               </Grid>
             <Grid container item xs={12} spacing={4}>
               <Grid container item xs={12} md={7} spacing={4}>
