@@ -24,7 +24,7 @@ import { WrapText } from "@mui/icons-material";
 const EditEntSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,changeRrule,changeTextField,removeCard,accessGroupScheduleInfo,accessGroupScheduleValidations}) => {
     const {
         entranceScheduleId,
-        entranceSchedule,
+        entranceScheduleName,
         rrule,
         timeStart,
         timeEnd,
@@ -165,9 +165,9 @@ const EditEntSchedForm = ({checkBegin, checkUntil,changeTimeStart,changeTimeEnd,
                         <TextField
                             fullWidth
                             label="Name"
-                            name="entranceSchedule"
+                            name="entranceScheduleName"
                             required
-                            value={entranceSchedule}
+                            value={entranceScheduleName}
                             onChange={(e)=>{changeTextField(e,entranceScheduleId)}}
                             helperText={ 
                                 (entranceScheduleNameBlank && 'Error: entrance schedule name cannot be blank')
