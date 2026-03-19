@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { rrulestr } from "rrule";
 import { accessGroupApi } from "../../../../api/access-groups";
 import { accessGroupScheduleApi } from "../../../../api/access-group-schedules";
+import accessGroupEntranceApi from "../../../../api/access-group-entrance-n-to-n";
 import { getBookingCreateLink } from "../../../../utils/entrance";
 import { getAccessGroupDetailsLink } from "../../../../utils/access-group";
 import rruleDescription from "../../../../utils/rrule-desc";
@@ -66,16 +67,24 @@ export default function EntranceBookings({ entranceId, accessGroupEntrance, onDe
 
   const handleDelete = async (accessGroupId: number) => {
     try {
-      const res = await accessGroupApi.deleteAccessGroup(accessGroupId);
-      if (res.status === 204) {
-        toast.success("Booking deleted");
-        onDeleted();
-      } else {
-        toast.error("Failed to delete booking");
+      // Unlink entrance(s) from the access group — this also soft-deletes
+      // the N-to-N rows and their associated schedules on the backend.
+      const unlinkRes = await accessGroupEntranceApi.assignEntrancesToAccessGroup([], accessGroupId);
+      if (unlinkRes && unlinkRes.status !== 204) {
+        throw new Error("Failed to unlink booking from entrance");
       }
-    } catch (e) {
+
+      // Now safe to delete the (now-orphaned) access group itself.
+      const deleteRes = await accessGroupApi.deleteAccessGroup(accessGroupId);
+      if (deleteRes.status !== 204) {
+        throw new Error("Unlinked, but failed to remove the access group");
+      }
+
+      toast.success("Booking deleted");
+      onDeleted();
+    } catch (e: any) {
       console.error(e);
-      toast.error("Failed to delete booking");
+      toast.error(e?.message ?? "Failed to delete booking");
     }
   };
 
@@ -152,14 +161,19 @@ export default function EntranceBookings({ entranceId, accessGroupEntrance, onDe
                   <ListItemText
                     primary={
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography
-                          variant="body1"
-                          component={NextLink}
+                        <NextLink
                           href={getAccessGroupDetailsLink(ag)}
-                          sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                          passHref
+                          legacyBehavior
                         >
-                          {ag?.accessGroupName ?? "(unnamed)"}
-                        </Typography>
+                          <Typography
+                            variant="body1"
+                            component="a"
+                            sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                          >
+                            {ag?.accessGroupName ?? "(unnamed)"}
+                          </Typography>
+                        </NextLink>
                         <Tooltip
                           title={personsTooltip}
                           arrow

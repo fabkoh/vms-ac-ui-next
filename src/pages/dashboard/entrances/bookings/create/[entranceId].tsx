@@ -36,7 +36,17 @@ import { accessGroupScheduleApi } from "../../../../../api/access-group-schedule
 import { getEntranceDetailsLink } from "../../../../../utils/entrance";
 import Rrule from "../../../../../components/dashboard/shared/rrule-form";
 import rruleDescription from "../../../../../utils/rrule-desc";
-import type { Person, AccessGroup } from "../../../../../types/models";
+
+type Person = {
+  personId: number;
+  personFirstName?: string;
+  personLastName?: string;
+};
+
+type AccessGroup = {
+  accessGroupId: number;
+  accessGroupName: string;
+};
 
 type Mode = "persons" | "duplicate";
 
@@ -44,6 +54,7 @@ const CreateBooking = () => {
   const isMounted = useMounted();
   const { entranceId: entranceIdRaw } = router.query;
   const entranceId = entranceIdRaw as string;
+  const entranceIdNum = Number(entranceId);
 
   // form state
   const [mode, setMode] = useState<Mode>("persons");
@@ -116,11 +127,27 @@ const CreateBooking = () => {
   }, [timeStart, timeEnd]);
 
   const nameError = attempted && !bookingName.trim();
+  const [nameDuplicateError, setNameDuplicateError] = useState(false);
   const personsError = attempted && mode === "persons" && selectedPersons.length === 0;
   const duplicateError = attempted && mode === "duplicate" && !sourceAccessGroupId;
 
+  const checkNameDuplicate = (name: string) => {
+    const trimmed = name.trim().toLowerCase();
+    const isDupe = allAccessGroups.some(
+      (ag) => ag.accessGroupName.toLowerCase() === trimmed
+    );
+    setNameDuplicateError(isDupe);
+    return isDupe;
+  };
+
+  const handleBookingNameChange = (val: string) => {
+    setBookingName(val);
+    checkNameDuplicate(val);
+  };
+
   const isValid = () => {
     if (!bookingName.trim()) return false;
+    if (checkNameDuplicate(bookingName)) return false;
     if (mode === "persons" && selectedPersons.length === 0) return false;
     if (mode === "duplicate" && !sourceAccessGroupId) return false;
     if (!rruleString || beginInvalid || untilInvalid) return false;
@@ -142,6 +169,10 @@ const CreateBooking = () => {
 
     setSubmitting(true);
     try {
+      if (!Number.isFinite(entranceIdNum)) {
+        throw new Error("Invalid entrance id");
+      }
+
       // Step 1: resolve persons
       let persons: Person[] = [];
       if (mode === "persons") {
@@ -156,24 +187,39 @@ const CreateBooking = () => {
       // Step 2: create access group
       const createRes = await accessGroupApi.createAccessGroup({
         accessGroupName: bookingName,
+        accessGroupDesc: "",
         persons,
       });
+      if (createRes.status === 409) {
+        throw new Error("Booking name already exists. Please choose a different name.");
+      }
       if (createRes.status !== 201) throw new Error("Failed to create access group");
       const newGroup = await createRes.json();
       const accessGroupId: number = newGroup.accessGroupId;
 
       // Step 3: link to entrance
       const linkRes = await accessGroupEntranceApi.assignEntrancesToAccessGroup(
-        [entranceId],
+        [entranceIdNum],
         accessGroupId
       );
-      if (linkRes && linkRes.status !== 204) throw new Error("Failed to link entrance to access group");
+      if (linkRes && linkRes.status !== 204) {
+        await accessGroupApi.deleteAccessGroup(accessGroupId);
+        throw new Error("Failed to link entrance to access group");
+      }
 
       // Step 4: get groupToEntranceId
       const gteRes = await accessGroupEntranceApi.getEntranceWhereAccessGroupId(accessGroupId);
-      if (!gteRes || gteRes.status !== 200) throw new Error("Failed to get group-to-entrance link");
+      if (!gteRes || gteRes.status !== 200) {
+        await accessGroupEntranceApi.assignEntrancesToAccessGroup([], accessGroupId);
+        await accessGroupApi.deleteAccessGroup(accessGroupId);
+        throw new Error("Failed to get group-to-entrance link");
+      }
       const gteBody = await gteRes.json();
-      if (!gteBody || gteBody.length === 0) throw new Error("No group-to-entrance link found");
+      if (!gteBody || gteBody.length === 0) {
+        await accessGroupEntranceApi.assignEntrancesToAccessGroup([], accessGroupId);
+        await accessGroupApi.deleteAccessGroup(accessGroupId);
+        throw new Error("No group-to-entrance link found");
+      }
       const groupToEntranceId: number = gteBody[0].groupToEntranceId;
 
       // Step 5: replace schedule
@@ -189,11 +235,13 @@ const CreateBooking = () => {
         [groupToEntranceId]
       );
       if (scheduleRes && scheduleRes.status !== 200 && scheduleRes.status !== 204) {
+        await accessGroupEntranceApi.assignEntrancesToAccessGroup([], accessGroupId);
+        await accessGroupApi.deleteAccessGroup(accessGroupId);
         throw new Error("Failed to set schedule");
       }
 
       toast.success("Booking created");
-      router.push(getEntranceDetailsLink({ entranceId: Number(entranceId) }));
+      router.push(getEntranceDetailsLink({ entranceId: entranceIdNum }));
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Failed to create booking");
@@ -202,8 +250,8 @@ const CreateBooking = () => {
     }
   };
 
-  const backLink = entranceId
-    ? getEntranceDetailsLink({ entranceId: Number(entranceId) })
+  const backLink = Number.isFinite(entranceIdNum)
+    ? getEntranceDetailsLink({ entranceId: entranceIdNum })
     : "/dashboard/entrances";
 
   return (
@@ -214,15 +262,14 @@ const CreateBooking = () => {
       <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
         <Container maxWidth="md">
           <Box sx={{ mb: 4 }}>
-            <Link
-              color="textPrimary"
-              component={NextLink}
-              href={backLink}
-              sx={{ alignItems: "center", display: "flex" }}
-            >
-              <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
-              <Typography variant="subtitle2">Back to Entrance</Typography>
-            </Link>
+            <NextLink href={backLink} passHref legacyBehavior>
+              <Link color="textPrimary" sx={{ alignItems: "center", display: "flex" }}>
+                <Box sx={{ alignItems: "center", display: "flex" }}>
+                  <ArrowBackIcon fontSize="small" sx={{ mr: 1 }} />
+                  <Typography variant="subtitle2">Back to Entrance</Typography>
+                </Box>
+              </Link>
+            </NextLink>
           </Box>
 
           <Typography variant="h4" sx={{ mb: 3 }}>
@@ -317,9 +364,15 @@ const CreateBooking = () => {
                       fullWidth
                       label="Booking name"
                       value={bookingName}
-                      onChange={(e) => setBookingName(e.target.value)}
-                      error={nameError}
-                      helperText={nameError ? "Booking name is required" : ""}
+                      onChange={(e) => handleBookingNameChange(e.target.value)}
+                      error={nameError || nameDuplicateError}
+                      helperText={
+                        nameError
+                          ? "Booking name is required"
+                          : nameDuplicateError
+                          ? "This name is already taken. Please choose a different name."
+                          : ""
+                      }
                     />
                   </CardContent>
                 </Card>
@@ -367,15 +420,11 @@ const CreateBooking = () => {
                     </Button>
                   </Grid>
                   <Grid item>
-                    <Button
-                      component={NextLink}
-                      href={backLink}
-                      variant="outlined"
-                      color="error"
-                      size="large"
-                    >
-                      Cancel
-                    </Button>
+                    <NextLink href={backLink} passHref legacyBehavior>
+                      <Button component="a" variant="outlined" color="error" size="large">
+                        Cancel
+                      </Button>
+                    </NextLink>
                   </Grid>
                 </Grid>
               </Grid>
