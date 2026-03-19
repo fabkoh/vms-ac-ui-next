@@ -62,7 +62,7 @@ const filterEntrancesByState = filterByState(filterEntrancesByString);
 
 const isEntranceEqual = (e1, e2) => isObject(e1) && isObject(e2) && e1.entranceId != null && e1.entranceId === e2.entranceId;
 
-const getBookingCreateLink = (entranceId: string | number) =>
+const getBookingCreateLink = (entranceId) =>
   `/dashboard/entrances/bookings/create/${entranceId}`;
 
 export { filterEntranceByStringPlaceholder, filterEntranceByString, filterEntranceByStatus, filterEntranceByCurrStatus, entranceListLink, entranceCreateLink, getEntranceEditLink, getEntranceIdsEditLink, getEntranceDetailsLink, getEntranceLabel, filterEntrancesByString, filterEntrancesByState, isEntranceEqual, getBookingCreateLink }
