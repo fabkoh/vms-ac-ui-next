@@ -56,7 +56,7 @@ export default function BookingCalendar({
   selectable = false,
   onSelect,
   onEventClick,
-  height = "auto",
+  height = "60vh",
   date,
   onDateChange,
 }: BookingCalendarProps) {
@@ -75,7 +75,87 @@ export default function BookingCalendar({
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        "& .fc": {
+          fontFamily:
+            '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+        },
+
+        "& .fc-theme-standard td, & .fc-theme-standard th": {
+          borderColor: "#E6E8F0",
+        },
+        "& .fc-theme-standard .fc-scrollgrid": {
+          borderColor: "#E6E8F0",
+          borderRadius: "8px",
+          overflow: "hidden",
+        },
+
+        "& .fc-col-header": {
+          backgroundColor: "#F3F4F6",
+        },
+        "& .fc-col-header-cell": {
+          py: 1.25,
+          borderBottomColor: "#E6E8F0",
+        },
+        "& .fc-col-header-cell-cushion": {
+          fontSize: "0.75rem",
+          fontWeight: 600,
+          letterSpacing: "0.5px",
+          textTransform: "uppercase",
+          color: "#374151",
+          textDecoration: "none !important",
+        },
+
+        "& .fc-timegrid-slot-label-cushion": {
+          fontSize: "0.75rem",
+          fontWeight: 400,
+          color: "#65748B",
+        },
+
+        "& .fc-timegrid-slot": {
+          height: "2.5em",
+        },
+
+        "& .fc-day-today": {
+          backgroundColor: "rgba(62, 88, 121, 0.04) !important",
+        },
+
+        "& .fc-event": {
+          borderRadius: "6px",
+          border: "none",
+          px: 0.5,
+          fontSize: "0.8rem",
+          fontWeight: 500,
+          cursor: "pointer",
+          boxShadow:
+            "0px 1px 2px rgba(100, 116, 139, 0.12)",
+        },
+        "& .fc-event-main": {
+          padding: "2px 4px",
+        },
+
+        "& .fc-timegrid-now-indicator-line": {
+          borderColor: "#3E5879",
+          borderWidth: "2px",
+        },
+        "& .fc-timegrid-now-indicator-arrow": {
+          borderColor: "#3E5879",
+        },
+
+        "& .fc-highlight": {
+          backgroundColor: "rgba(62, 88, 121, 0.08)",
+        },
+
+        "& .fc-timegrid-axis": {
+          borderColor: "#E6E8F0",
+        },
+
+        "& .fc-scrollgrid-section > td": {
+          borderColor: "#E6E8F0",
+        },
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -136,6 +216,7 @@ export default function BookingCalendar({
         slotMinTime="00:00:00"
         slotMaxTime="24:00:00"
         allDaySlot
+        allDayText=""
         nowIndicator
         selectable={selectable}
         selectMirror={selectable}
