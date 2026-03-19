@@ -202,7 +202,13 @@ export default function BookingCalendar({
           inputProps={{
             style: { textAlign: "right", fontWeight: 600, fontSize: "1rem" },
           }}
-          sx={{ width: 160 }}
+          sx={{
+            width: 160,
+            "& input::-webkit-calendar-picker-indicator": {
+              filter: (theme) =>
+                theme.palette.mode === "dark" ? "invert(1)" : "none",
+            },
+          }}
         />
       </Box>
 
