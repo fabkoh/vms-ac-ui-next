@@ -7,7 +7,6 @@ import { PropertyList } from "../../../property-list";
 import { PropertyListItem } from "../../../property-list-item";
 import { SeverityPill } from "../../../severity-pill";
 import NextLink from 'next/link';
-import Link from "next/link";
 import { toDisplayDateString } from "../../../../utils/utils";
 import WarningChip from "../../shared/warning-chip";
 import BasicDetailsCard from "../../shared/basic-details-card";
@@ -71,10 +70,14 @@ export const AuthDeviceBasicDetails = ({handleToggleMasterpin,deviceInfo,statusL
                             <NextLink
                                 href={getEntranceDetailsLink(deviceInfo.entrance)}
                                 passHref
+                                legacyBehavior
                             >
-                                <Link>
-                                <Chip icon={<MeetingRoom/>} label={deviceInfo.entrance.entranceName} clickable/>
-                                </Link>
+                                <Chip
+                                    component="a"
+                                    icon={<MeetingRoom/>}
+                                    label={deviceInfo.entrance.entranceName}
+                                    clickable
+                                />
                             </NextLink>
                         ) : (
                             <WarningChip text="No entrance assigned"/>
