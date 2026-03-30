@@ -109,7 +109,7 @@ export const DashboardSidebar = (props) => {
         {
           title: t("Settings"),
           path: "/settings",
-          icon: <HomeIcon fontSize="small" />,
+          icon: <SettingsIcon fontSize="small" />,
           children: [
             {
               title: "My Account",
