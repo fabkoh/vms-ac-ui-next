@@ -28,7 +28,6 @@ const VisitorRegisterPage = () => {
     company: ''
   });
   const [visitData, setVisitData] = useState({
-    visitDate: '',
     purpose: ''
   });
   const [error, setError] = useState('');
@@ -99,7 +98,6 @@ const VisitorRegisterPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           visitorUid: existingVisitor ? existingVisitor.visitorUid : visitorUid.trim(),
-          visitDate: visitData.visitDate,
           purpose: visitData.purpose || ''
         })
       });
@@ -294,14 +292,6 @@ const VisitorRegisterPage = () => {
               <Stack spacing={3}>
                 <Typography variant="h6">Visit details</Typography>
                 <TextField
-                  label="Visit date"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  value={visitData.visitDate}
-                  onChange={(e) => setVisitData({ ...visitData, visitDate: e.target.value })}
-                  fullWidth
-                />
-                <TextField
                   label="Purpose of visit"
                   value={visitData.purpose}
                   onChange={(e) => setVisitData({ ...visitData, purpose: e.target.value })}
@@ -314,7 +304,7 @@ const VisitorRegisterPage = () => {
                   size="large"
                   variant="contained"
                   onClick={handleSubmit}
-                  disabled={loading || !visitData.visitDate}
+                  disabled={loading}
                 >
                   {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
                 </Button>
@@ -347,7 +337,7 @@ const VisitorRegisterPage = () => {
                       mobileNumber: '',
                       company: ''
                     });
-                    setVisitData({ visitDate: '', purpose: '' });
+                    setVisitData({ purpose: '' });
                     setError('');
                   }}
                 >
