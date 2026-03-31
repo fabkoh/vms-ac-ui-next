@@ -70,11 +70,6 @@ const VisitorRegisterPage = () => {
       setError('NEXT_PUBLIC_URI is not configured.');
       return;
     }
-    if (!visitData.visitDate) {
-      setError('Please choose a visit date.');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
