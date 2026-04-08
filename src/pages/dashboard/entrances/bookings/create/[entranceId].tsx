@@ -26,7 +26,6 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import toast from "react-hot-toast";
-import { RRule } from "rrule";
 import { AuthGuard } from "../../../../../components/authentication/auth-guard";
 import { DashboardLayout } from "../../../../../components/dashboard/dashboard-layout";
 import { useMounted } from "../../../../../hooks/use-mounted";
@@ -158,14 +157,14 @@ const CreateBooking = () => {
   }, []);
 
   // Build one-time rrule from the selected date (floating/local — no UTC offset)
+  // Note: RRule.toString() always converts dates to UTC internally, so we build
+  // the string manually to preserve the local calendar date.
   const rruleString = useMemo(() => {
     if (!startDate) return "";
-    const dtstart = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate()
-    );
-    return new RRule({ freq: RRule.DAILY, count: 1, dtstart }).toString();
+    const y = startDate.getFullYear();
+    const m = String(startDate.getMonth() + 1).padStart(2, "0");
+    const d = String(startDate.getDate()).padStart(2, "0");
+    return `DTSTART:${y}${m}${d}T000000\nRRULE:FREQ=DAILY;COUNT=1`;
   }, [startDate]);
 
   const description = useMemo(() => {
