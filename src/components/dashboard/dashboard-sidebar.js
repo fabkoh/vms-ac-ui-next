@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   Drawer,
   Typography,
@@ -62,6 +63,7 @@ export const DashboardSidebar = (props) => {
   });
   const [syncErrorMessages, setSyncErrorMessages] = useState([]);
   const [syncErrorOpen, setSyncErrorOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { user } = useAuth();
 
   useEffect(
@@ -650,6 +652,7 @@ export const DashboardSidebar = (props) => {
           <Box sx={{ p: 2 }}>
             <Button
               onClick={() => {
+                setIsSyncing(true);
                 controllerApi
                   .uniconUpdater()
                   .then((res) => {
@@ -679,15 +682,18 @@ export const DashboardSidebar = (props) => {
                   })
                   .catch((err) => {
                     toast.error("Synced unsuccessfully", { duration: 2000 });
-                  });
+                  })
+                  .finally(() => setIsSyncing(false));
               }}
               color="info"
               component="a"
+              disabled={isSyncing}
               fullWidth
               sx={{ mt: 2 }}
               variant="contained"
+              startIcon={isSyncing ? <CircularProgress size={16} color="inherit" /> : null}
             >
-              {t("Sync Unicons")}
+              {isSyncing ? t("Syncing...") : t("Sync Unicons")}
             </Button>
           </Box>
 
