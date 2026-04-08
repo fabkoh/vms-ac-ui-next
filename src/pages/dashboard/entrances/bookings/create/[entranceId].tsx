@@ -157,15 +157,13 @@ const CreateBooking = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Build one-time rrule from the selected date
+  // Build one-time rrule from the selected date (floating/local — no UTC offset)
   const rruleString = useMemo(() => {
     if (!startDate) return "";
     const dtstart = new Date(
-      Date.UTC(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate()
-      )
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()
     );
     return new RRule({ freq: RRule.DAILY, count: 1, dtstart }).toString();
   }, [startDate]);
