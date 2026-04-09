@@ -10,59 +10,43 @@ import toast from "react-hot-toast";
 const ControllerDeviceCondition = () => {
   const theme = useTheme();
 
-  const [upCounter,   setUpCounter]    = useState(0);
-  const [controllers, setControllers] = useState([]);
+  const [upCounter,        setUpCounter]        = useState(0);
+  const [controllers,      setControllers]      = useState([]);
   const [healthPercentage, setHealthPercentage] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading,          setLoading]          = useState(true);
 
-  const getControllers = async () => {
-    const controllersRes = await controllerApi.getControllers();
-    if (controllersRes.status !== 200) {
-      toast.error("Error loading controllers");
-      return;
-    }
+  useEffect(() => {
+    const fetchAndCheck = async () => {
+      const controllersRes = await controllerApi.getControllers();
+      if (controllersRes.status !== 200) {
+        toast.error("Error loading controllers");
+        setLoading(false);
+        return;
+      }
 
-    const controllersJson = await controllersRes.json();
-    setControllers(controllersJson);
+      const controllersJson = await controllersRes.json();
+      setControllers(controllersJson);
+
+      let up = 0;
+      const promises = controllersJson.map(async (controller) => {
+        try {
+          const res = await controllerApi.getAuthStatus(controller.controllerId);
+          if (res.status === 200) up++;
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      await Promise.all(promises);
+
+      setUpCounter(up);
+      if (controllersJson.length !== 0) {
+        setHealthPercentage((up * 100) / controllersJson.length);
+      }
+      setLoading(false);
     };
 
-    useEffect(() => {
-      const getControllersHelper = async () => {
-        await getControllers();
-      }
-
-      console.log("Controller helper")
-      getControllersHelper();
-    }, []);
-    
-    // Only called after getControllers() is called
-    useEffect(() => {
-      const count = async () => {
-        const promises = controllers.map(async (controller) => {
-          try {
-              const res = await controllerApi.getAuthStatus(controller.controllerId);
-              if (res.status == 200) {
-                  setUpCounter(prevUpCounter => prevUpCounter + 1);
-              } else {
-                  throw new Error("controller not connected");
-              }
-          } catch(e) {
-              // Handle error
-              console.error(e);
-          }
-        });
-        await Promise.all(promises);
-        setLoading(false);
-      }
-      
-      count();
-    }, [controllers]);
-
-    useEffect(() => {
-      if (controllers.length !== 0) {
-        setHealthPercentage((upCounter * 100) / controllers.length);
-      }
-    }, [controllers, upCounter]);
+    fetchAndCheck();
+  }, []);
 
   const chartOptions = {
     chart: {

@@ -165,10 +165,10 @@ const VisitorRegisterPage = () => {
             {step === 1 && (
               <Stack spacing={3}>
                 <Typography color="textSecondary" variant="body2">
-                  Enter your NRIC or passport number to continue.
+                  Enter your mobile number to continue.
                 </Typography>
                 <TextField
-                  label="NRIC / Passport"
+                  label="Mobile Number"
                   value={visitorUid}
                   onChange={(e) => setVisitorUid(e.target.value)}
                   fullWidth
