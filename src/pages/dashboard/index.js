@@ -141,14 +141,14 @@ const Overview = () => {
                 md={3}
                 xs={12}
               >
-                <ComponentList name="Persons" link="access-groups"/>
+                <ComponentList name="Persons" link="persons"/>
               </Grid>
               <Grid
                 item
                 md={3}
                 xs={12}
               >
-                <ComponentList name="Access Groups" link="persons"/>
+                <ComponentList name="Access Groups" link="access-groups"/>
               </Grid>
               <Grid
                 item

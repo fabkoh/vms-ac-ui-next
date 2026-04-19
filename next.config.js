@@ -9,6 +9,7 @@ const withTM = require('next-transpile-modules')([
 ]);
 
 module.exports = withTM({
+  output: 'standalone',
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
@@ -36,6 +37,15 @@ module.exports = withTM({
         source: '/docs',
         destination: '/docs/welcome',
         permanent: true
+      }
+    ];
+  },
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8082';
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`
       }
     ];
   }
