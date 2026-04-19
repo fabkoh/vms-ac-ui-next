@@ -175,6 +175,11 @@ const VideoRecorderDeviceCondition = () => {
     setRecorders(data);
     if (isMounted()) {
       if (!loadedSDK) {
+        if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.NODE_ENV === 'development') {
+          // NVRs are not reachable in dev/demo — mock cameras so health shows green
+          data.forEach(recorder => { recorder.cameras = []; });
+          setRecorders([...data]);
+        } else {
         await Promise.resolve(data.map(async (recorder) => {
 
           const sdk_handle = await get_sdk_handle();
@@ -222,6 +227,7 @@ const VideoRecorderDeviceCondition = () => {
 
           setRecorders([...data]);
         }))
+        }
         setLoadedSDK(true);
       }
     }

@@ -28,15 +28,19 @@ const ControllerDeviceCondition = () => {
       setControllers(controllersJson);
 
       let up = 0;
-      const promises = controllersJson.map(async (controller) => {
-        try {
-          const res = await controllerApi.getAuthStatus(controller.controllerId);
-          if (res.status === 200) up++;
-        } catch (e) {
-          console.error(e);
-        }
-      });
-      await Promise.all(promises);
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.NODE_ENV === 'development') {
+        up = controllersJson.length;
+      } else {
+        const promises = controllersJson.map(async (controller) => {
+          try {
+            const res = await controllerApi.getAuthStatus(controller.controllerId);
+            if (res.status === 200) up++;
+          } catch (e) {
+            console.error(e);
+          }
+        });
+        await Promise.all(promises);
+      }
 
       setUpCounter(up);
       if (controllersJson.length !== 0) {
